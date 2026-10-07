@@ -28,7 +28,7 @@ enum AppSettings<T> {
   unifiedPushEndpoint<String>('chat.fluffy.unifiedpush.endpoint', ''),
   pushNotificationsGatewayUrl<String>(
     'pushNotificationsGatewayUrl',
-    'https://push.fluffychat.im/_matrix/push/v1/notify',
+    'https://summer-brook-a863.ashishboddu940.workers.dev/_matrix/push/v1/notify',
   ),
   pushNotificationsPusherFormat<String>(
     'pushNotificationsPusherFormat',
@@ -68,14 +68,15 @@ enum AppSettings<T> {
   ),
   privacyPolicy<String>(
     'chat.fluffy.privacy_policy_url',
-    'https://fluffychat.im/privacy',
+    'https://matrix.org/legal/privacy-notice/',
   ),
-  tos<String>('chat.fluffy.tos_url', 'https://fluffychat.im/tos'),
+  tos<String>('chat.fluffy.tos_url', 'https://matrix.org/legal/terms-and-conditions/'),
   sendTimelineEventTimeout<int>('chat.fluffy.send_timeline_event_timeout', 15),
   webNotificationSound<bool>('chat.fluffy.web_notification_sound', true),
   chatFilter<String>('chat.fluffy.chat_filter', 'allChats'),
   hideRoomsInSpaces<bool>('chat.fluffy.hideRoomsInSpaces', false),
   showThumbnailsInTimeline<bool>('chat.fluffy.showThumbnailsInTimeline', true),
+  vibeHaptics<bool>('chat.vibe.haptics', true),
   doubleTapToReact<bool>('chat.fluffy.double_tap_to_react', false),
   doubleTapReaction<String>('chat.fluffy.double_tap_reaction', '❤️'),
   benchmarksInLogs<bool>('chat.fluffy.benchmarks_in_logs', false);
