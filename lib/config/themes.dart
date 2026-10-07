@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/setting_keys.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,22 +45,78 @@ abstract class FluffyThemes {
     Brightness brightness, [
     Color? seed,
   ]) {
-    final baseScheme = ColorScheme.fromSeed(
-      brightness: brightness,
-      seedColor: seed ?? Color(AppSettings.colorSchemeSeedInt.value),
-      dynamicSchemeVariant: DynamicSchemeVariant.rainbow,
-    );
-    // Vibe dark look: deep navy surfaces instead of the generated grey ones
+    // Vibe: Discord palette (no generated accent colours)
     final colorScheme = brightness == Brightness.dark
-        ? baseScheme.copyWith(
-            surface: const Color(0xFF10112A),
-            surfaceContainerLowest: const Color(0xFF0B0C1E),
-            surfaceContainerLow: const Color(0xFF14152F),
-            surfaceContainer: const Color(0xFF191A38),
-            surfaceContainerHigh: const Color(0xFF1F2042),
-            surfaceContainerHighest: const Color(0xFF26274C),
+        ? const ColorScheme(
+            brightness: Brightness.dark,
+            primary: Color(0xFF5865F2),
+            onPrimary: Color(0xFFFFFFFF),
+            primaryContainer: Color(0xFF3C45A5),
+            onPrimaryContainer: Color(0xFFE0E3FF),
+            secondary: Color(0xFFB5BAC1),
+            onSecondary: Color(0xFF1A191E),
+            secondaryContainer: Color(0xFF2E2D33),
+            onSecondaryContainer: Color(0xFFF2F3F5),
+            tertiary: Color(0xFF949BA4),
+            onTertiary: Color(0xFF1A191E),
+            tertiaryContainer: Color(0xFF29282D),
+            onTertiaryContainer: Color(0xFFF2F3F5),
+            error: Color(0xFFF23F42),
+            onError: Color(0xFFFFFFFF),
+            errorContainer: Color(0xFF5A1D1E),
+            onErrorContainer: Color(0xFFFFDAD9),
+            surface: Color(0xFF1A191E),
+            onSurface: Color(0xFFF2F3F5),
+            surfaceContainerLowest: Color(0xFF121214),
+            surfaceContainerLow: Color(0xFF1E1D22),
+            surfaceContainer: Color(0xFF252429),
+            surfaceContainerHigh: Color(0xFF29282D),
+            surfaceContainerHighest: Color(0xFF323136),
+            onSurfaceVariant: Color(0xFFB5BAC1),
+            outline: Color(0xFF6D6F78),
+            outlineVariant: Color(0xFF3A393F),
+            inverseSurface: Color(0xFFF2F3F5),
+            onInverseSurface: Color(0xFF1A191E),
+            inversePrimary: Color(0xFF5865F2),
+            shadow: Color(0xFF000000),
+            scrim: Color(0xFF000000),
+            surfaceTint: Color(0x00000000),
           )
-        : baseScheme;
+        : const ColorScheme(
+            brightness: Brightness.light,
+            primary: Color(0xFF5865F2),
+            onPrimary: Color(0xFFFFFFFF),
+            primaryContainer: Color(0xFFE0E3FF),
+            onPrimaryContainer: Color(0xFF1E2370),
+            secondary: Color(0xFF5C5E66),
+            onSecondary: Color(0xFFFFFFFF),
+            secondaryContainer: Color(0xFFE3E5E8),
+            onSecondaryContainer: Color(0xFF313338),
+            tertiary: Color(0xFF80848E),
+            onTertiary: Color(0xFFFFFFFF),
+            tertiaryContainer: Color(0xFFF2F3F5),
+            onTertiaryContainer: Color(0xFF313338),
+            error: Color(0xFFD83C3E),
+            onError: Color(0xFFFFFFFF),
+            errorContainer: Color(0xFFFFDAD9),
+            onErrorContainer: Color(0xFF5A1D1E),
+            surface: Color(0xFFFFFFFF),
+            onSurface: Color(0xFF313338),
+            surfaceContainerLowest: Color(0xFFE3E5E8),
+            surfaceContainerLow: Color(0xFFF7F7F8),
+            surfaceContainer: Color(0xFFF2F3F5),
+            surfaceContainerHigh: Color(0xFFEBEDEF),
+            surfaceContainerHighest: Color(0xFFE3E5E8),
+            onSurfaceVariant: Color(0xFF5C5E66),
+            outline: Color(0xFF80848E),
+            outlineVariant: Color(0xFFD8D9DC),
+            inverseSurface: Color(0xFF313338),
+            onInverseSurface: Color(0xFFF2F3F5),
+            inversePrimary: Color(0xFF5865F2),
+            shadow: Color(0xFF000000),
+            scrim: Color(0xFF000000),
+            surfaceTint: Color(0x00000000),
+          );
     final isColumnMode = FluffyThemes.isColumnMode(context);
     final dividerColor = brightness == Brightness.dark
         ? colorScheme.surfaceContainerHighest
@@ -108,8 +163,9 @@ abstract class FluffyThemes {
       ),
       appBarTheme: AppBarTheme(
         toolbarHeight: isColumnMode ? 72 : 56,
-        surfaceTintColor: isColumnMode ? colorScheme.surface : null,
-        backgroundColor: isColumnMode ? colorScheme.surface : null,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        backgroundColor: colorScheme.surface,
         actionsPadding: isColumnMode
             ? const EdgeInsets.symmetric(horizontal: 16.0)
             : null,
