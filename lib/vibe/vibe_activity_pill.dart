@@ -317,23 +317,28 @@ class VibeUnreadBadge extends StatelessWidget {
     }
     return Padding(
       padding: const EdgeInsets.only(right: 12),
-      child: Container(
-        constraints: const BoxConstraints(minWidth: 20),
-        height: 20,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF23F43),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          n > 99 ? '99+' : '$n',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF23F43),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              n > 99 ? '99+' : '$n',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                height: 1.2,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

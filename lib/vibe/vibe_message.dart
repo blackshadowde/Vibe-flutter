@@ -12,7 +12,6 @@ import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/events/message_content.dart';
 import 'package:fluffychat/pages/chat/events/message_reactions.dart';
-import 'package:fluffychat/pages/chat/events/reply_content.dart';
 import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
@@ -281,8 +280,12 @@ class VibeMessage extends StatelessWidget {
         e.originServerTs.sameEnvironment(event.originServerTs);
 
     // The list is newest-first, so "nextEvent" is the OLDER neighbour.
-    final first = !sameGroup(nextEvent);
-    final last = !sameGroup(previousEvent);
+    bool hasReply(Event? e) =>
+        e != null && e.inReplyToEventId(includingFallback: false) != null;
+    // A reply always starts a new visual group (avatar + header + reply line).
+    final replying = hasReply(event);
+    final first = replying || !sameGroup(nextEvent);
+    final last = hasReply(previousEvent) || !sameGroup(previousEvent);
 
     final displayEvent = event.getDisplayEvent(timeline);
     final sender = event.senderFromMemoryOrFallback;
@@ -411,46 +414,111 @@ class VibeMessage extends StatelessWidget {
       );
     }
 
+    Widget replyStrip() {
+      return FutureBuilder<Event?>(
+        future: event.getReplyEvent(timeline),
+        builder: (context, snapshot) {
+          final replyEvent = snapshot.data;
+          final lineColor = cs.onSurfaceVariant.withValues(alpha: 0.45);
+          Widget content;
+          if (replyEvent == null) {
+            content = Text(
+              snapshot.connectionState == ConnectionState.done
+                  ? 'Original message not available'
+                  : '…',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontStyle: FontStyle.italic,
+                color: cs.onSurfaceVariant,
+              ),
+            );
+          } else {
+            final rs = replyEvent.senderFromMemoryOrFallback;
+            final rname = rs.calcDisplayname();
+            final rown = replyEvent.senderId == client.userID;
+            final rcolor = rown
+                ? _ownNameColor
+                : event.room.isDirectChat
+                ? _otherNameColor
+                : (theme.brightness == Brightness.light
+                      ? rname.colorScheme.primary
+                      : rname.colorScheme.primaryContainer);
+            final preview = replyEvent
+                .getDisplayEvent(timeline)
+                .calcLocalizedBodyFallback(
+                  MatrixLocals(L10n.of(context)),
+                  hideReply: true,
+                  hideEdit: true,
+                  plaintextBody: true,
+                  removeMarkdown: true,
+                );
+            content = Row(
+              children: [
+                Avatar(
+                  mxContent: rs.avatarUrl,
+                  name: rname,
+                  size: 16,
+                  client: client,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  flex: 0,
+                  child: Text(
+                    '@$rname',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: rcolor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    preview,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+          return InkWell(
+            onTap: replyEvent == null
+                ? null
+                : () => scrollToEventId(replyEvent.eventId),
+            child: SizedBox(
+              height: 22,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: avatarSize,
+                    height: 22,
+                    child: CustomPaint(painter: _ReplyCurve(lineColor)),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(child: content),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (first) header(),
-        if (event.inReplyToEventId(includingFallback: false) != null)
-          FutureBuilder<Event?>(
-            future: event.getReplyEvent(timeline),
-            builder: (context, snapshot) {
-              final replyEvent = snapshot.hasData
-                  ? snapshot.data!
-                  : Event(
-                      eventId: event.inReplyToEventId() ?? '\$fake_event_id',
-                      content: {'msgtype': 'm.text', 'body': '...'},
-                      senderId: event.senderId,
-                      type: 'm.room.message',
-                      room: event.room,
-                      status: EventStatus.sent,
-                      originServerTs: DateTime.now(),
-                    );
-              return Padding(
-                padding: const EdgeInsets.only(top: 6, bottom: 2),
-                child: Material(
-                  color: Colors.transparent,
-                  borderRadius: ReplyContent.borderRadius,
-                  child: InkWell(
-                    borderRadius: ReplyContent.borderRadius,
-                    onTap: () => scrollToEventId(replyEvent.eventId),
-                    child: AbsorbPointer(
-                      child: ReplyContent(
-                        replyEvent,
-                        ownMessage: ownMessage,
-                        timeline: timeline,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
         Align(
           alignment: Alignment.centerLeft,
           child: MessageContent(
@@ -730,12 +798,19 @@ class VibeMessage extends StatelessWidget {
                       14,
                       last ? 6 : 1,
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        avatar(),
-                        const SizedBox(width: 12),
-                        Expanded(child: body),
+                        if (replying) replyStrip(),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            avatar(),
+                            const SizedBox(width: 12),
+                            Expanded(child: body),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -821,4 +896,33 @@ class VibeMessage extends StatelessWidget {
     ),
     );
   }
+}
+
+
+/// Discord-style reply connector: up from the avatar's top-centre, then a
+/// rounded corner to the right, ending beside the replied-to author.
+class _ReplyCurve extends CustomPainter {
+  final Color color;
+  const _ReplyCurve(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final mid = size.height / 2;
+    const r = 8.0;
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    final path = Path()
+      ..moveTo(cx, size.height + 2)
+      ..lineTo(cx, mid + r)
+      ..quadraticBezierTo(cx, mid, cx + r, mid)
+      ..lineTo(size.width, mid);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ReplyCurve old) => old.color != color;
 }
