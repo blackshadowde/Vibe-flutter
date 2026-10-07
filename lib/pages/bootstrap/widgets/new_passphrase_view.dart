@@ -5,6 +5,7 @@
 
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/bootstrap/view_model/bootstrap_view_model.dart';
+import 'package:fluffychat/vibe/vibe_security_ui.dart';
 import 'package:flutter/material.dart';
 
 class NewPassphraseView extends StatelessWidget {
@@ -15,115 +16,155 @@ class NewPassphraseView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final canCreatePassphrase =
-        viewModel.value.newPassphraseEqualsRepeatPassphrase &&
-        viewModel.value.newPassphraseNumbers &&
-        viewModel.value.newPassphraseSpecialCharacters &&
-        viewModel.value.newPassphraseUpperAndLowerCase &&
-        viewModel.value.newPassphraseLongEnough;
+    final cs = theme.colorScheme;
+    final v = viewModel.value;
+    final checks = [
+      (v.newPassphraseEqualsRepeatPassphrase, L10n.of(context).passphrasesMatch),
+      (v.newPassphraseLongEnough, L10n.of(context).passphraseLengthRequirement),
+      (
+        v.newPassphraseUpperAndLowerCase,
+        L10n.of(context).passphraseUpperAndLowerCaseRequirement,
+      ),
+      (
+        v.newPassphraseSpecialCharacters,
+        L10n.of(context).passphraseSpecialCharactersRequirement,
+      ),
+      (v.newPassphraseNumbers, L10n.of(context).passphraseNumberRequirement),
+    ];
+    final met = checks.where((c) => c.$1).length;
+    final canCreatePassphrase = met == checks.length;
+
+    Widget eye() => IconButton(
+      icon: Icon(
+        v.obscureText
+            ? Icons.visibility_off_outlined
+            : Icons.visibility_outlined,
+        color: cs.onSurfaceVariant,
+      ),
+      onPressed: viewModel.toggleObscureText,
+    );
 
     return ListView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
       children: [
-        Text(L10n.of(context).newPassphraseDescription, textAlign: .center),
-        const SizedBox(height: 16),
+        VibeHeader(
+          icon: Icons.lock_outline,
+          title: 'Protect your messages',
+          description: L10n.of(context).newPassphraseDescription,
+        ),
+        const VibeSectionLabel('Passphrase'),
         TextField(
-          obscureText: viewModel.value.obscureText,
-          readOnly: viewModel.value.isLoading,
+          obscureText: v.obscureText,
+          readOnly: v.isLoading,
           controller: viewModel.newPassphraseController,
-          decoration: InputDecoration(
-            suffixIcon: IconButton(
-              icon: Icon(
-                viewModel.value.obscureText
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-              ),
-              onPressed: viewModel.toggleObscureText,
-            ),
-            hintText: L10n.of(context).newPassphrase,
+          decoration: vibeFieldDecoration(
+            context,
+            hint: L10n.of(context).newPassphrase,
+            suffix: eye(),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         TextField(
-          obscureText: viewModel.value.obscureText,
-          readOnly: viewModel.value.isLoading,
+          obscureText: v.obscureText,
+          readOnly: v.isLoading,
           controller: viewModel.repeatPassphraseController,
-          decoration: InputDecoration(
-            hintText: L10n.of(context).repeatPassphrase,
+          decoration: vibeFieldDecoration(
+            context,
+            hint: L10n.of(context).repeatPassphrase,
           ),
         ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: canCreatePassphrase && !viewModel.value.isLoading
+        const SizedBox(height: 20),
+        VibeCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  for (var i = 0; i < checks.length; i++) ...[
+                    Expanded(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        height: 4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          color: i < met ? cs.primary : cs.outlineVariant,
+                        ),
+                      ),
+                    ),
+                    if (i < checks.length - 1) const SizedBox(width: 6),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '$met of ${checks.length} requirements met',
+                style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              ),
+              const SizedBox(height: 10),
+              for (final c in checks) _Requirement(checked: c.$1, label: c.$2),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        VibeButton(
+          label: L10n.of(context).continueText,
+          loading: v.isLoading,
+          onPressed: canCreatePassphrase
               ? () => viewModel.setOrSkipPassphrase(
                   viewModel.newPassphraseController.text,
                   context,
                 )
               : null,
-          child: viewModel.value.isLoading
-              ? CircularProgressIndicator.adaptive()
-              : Text(L10n.of(context).continueText),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         TextButton(
-          onPressed: viewModel.value.isLoading
+          onPressed: v.isLoading
               ? null
               : () => viewModel.setOrSkipPassphrase(null, context),
-          style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
+          style: TextButton.styleFrom(
+            foregroundColor: cs.onSurfaceVariant,
+            minimumSize: const Size.fromHeight(44),
+          ),
           child: Text(L10n.of(context).skip),
-        ),
-        const SizedBox(height: 16),
-        _PassphraseCheckListTile(
-          checked: viewModel.value.newPassphraseEqualsRepeatPassphrase,
-          label: L10n.of(context).passphrasesMatch,
-        ),
-        const SizedBox(height: 16),
-        _PassphraseCheckListTile(
-          checked: viewModel.value.newPassphraseLongEnough,
-          label: L10n.of(context).passphraseLengthRequirement,
-        ),
-        const SizedBox(height: 16),
-        _PassphraseCheckListTile(
-          checked: viewModel.value.newPassphraseUpperAndLowerCase,
-          label: L10n.of(context).passphraseUpperAndLowerCaseRequirement,
-        ),
-        const SizedBox(height: 16),
-        _PassphraseCheckListTile(
-          checked: viewModel.value.newPassphraseSpecialCharacters,
-          label: L10n.of(context).passphraseSpecialCharactersRequirement,
-        ),
-        const SizedBox(height: 16),
-        _PassphraseCheckListTile(
-          checked: viewModel.value.newPassphraseNumbers,
-          label: L10n.of(context).passphraseNumberRequirement,
         ),
       ],
     );
   }
 }
 
-class _PassphraseCheckListTile extends StatelessWidget {
+class _Requirement extends StatelessWidget {
   final String label;
   final bool checked;
-  const _PassphraseCheckListTile({required this.label, required this.checked});
+  const _Requirement({required this.label, required this.checked});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      spacing: 8.0,
-      children: [
-        Icon(
-          checked ? Icons.check_circle_outlined : Icons.circle_outlined,
-          color: checked
-              ? theme.brightness == Brightness.light
-                    ? Colors.green.shade800
-                    : Colors.green.shade300
-              : theme.colorScheme.error,
-          size: 20,
-        ),
-        Text(label, style: TextStyle(fontSize: 12)),
-      ],
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: Icon(
+              checked ? Icons.check_circle : Icons.radio_button_unchecked,
+              key: ValueKey(checked),
+              size: 20,
+              color: checked ? cs.primary : cs.outline,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: checked ? cs.onSurface : cs.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
