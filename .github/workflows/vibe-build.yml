@@ -80,6 +80,9 @@ jobs:
 
       - run: flutter pub get
 
+      - name: Check code (fails fast with the exact error)
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib
+
       - run: flutter build apk --debug
 
       - uses: actions/upload-artifact@v4
