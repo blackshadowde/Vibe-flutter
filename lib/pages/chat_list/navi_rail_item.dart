@@ -29,13 +29,12 @@ class NaviRailItem extends StatelessWidget {
     this.unreadBadgeFilter,
     super.key,
   });
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final borderRadius = BorderRadius.circular(AppConfig.borderRadius);
     final icon = isSelected ? selectedIcon ?? this.icon : this.icon;
     final unreadBadgeFilter = this.unreadBadgeFilter;
+
     return HoverBuilder(
       builder: (context, hovered) {
         return SizedBox(
@@ -43,41 +42,21 @@ class NaviRailItem extends StatelessWidget {
           width: FluffyThemes.navRailWidth,
           child: Stack(
             children: [
-              Positioned(
-                top: 8,
-                bottom: 8,
-                left: 0,
-                child: AnimatedContainer(
-                  width: isSelected
-                      ? FluffyThemes.isColumnMode(context)
-                            ? 8
-                            : 4
-                      : 0,
-                  duration: FluffyThemes.animationDuration,
-                  curve: FluffyThemes.animationCurve,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(90),
-                      bottomRight: Radius.circular(90),
-                    ),
-                  ),
-                ),
-              ),
               Center(
                 child: AnimatedScale(
-                  scale: hovered ? 1.1 : 1.0,
+                  scale: hovered ? 1.05 : 1.0,
                   duration: FluffyThemes.animationDuration,
                   curve: FluffyThemes.animationCurve,
                   child: Material(
-                    borderRadius: borderRadius,
                     color: isSelected
-                        ? theme.colorScheme.secondaryContainer
-                        : theme.colorScheme.surfaceContainerHighest,
+                        ? const Color(0xFF5865F2)
+                        : Colors.transparent,
+                    shape: const CircleBorder(),
+                    clipBehavior: Clip.antiAlias,
                     child: Tooltip(
                       message: toolTip,
                       child: InkWell(
-                        borderRadius: borderRadius,
+                        customBorder: const CircleBorder(),
                         onTap: onTap,
                         child: unreadBadgeFilter == null
                             ? icon
