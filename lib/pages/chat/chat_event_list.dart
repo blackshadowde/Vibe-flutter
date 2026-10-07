@@ -15,6 +15,7 @@ import 'package:fluffychat/pages/chat/typing_indicators.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/vibe/vibe_entrance.dart';
 import 'package:fluffychat/vibe/vibe_message.dart';
 import 'package:fluffychat/vibe/vibe_message_menu.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
@@ -170,7 +171,11 @@ class ChatEventList extends StatelessWidget {
                 key: ValueKey(event.transactionId ?? event.eventId),
                 index: i,
                 controller: controller.scrollController,
-                child: Column(
+                child: VibeEntrance(
+                  animate: animateIn,
+                  fromRight:
+                      event.senderId == controller.room.client.userID,
+                  child: Column(
                   mainAxisSize: .min,
                   children: [
                     if (!isCollapsed && displayDate)
@@ -178,7 +183,7 @@ class ChatEventList extends StatelessWidget {
                     Message(
                       event,
                       bigEmojis: controller.bigEmojis,
-                      animateIn: animateIn,
+                      animateIn: false,
                       onSwipe: () => controller.replyAction(replyTo: event),
                       onInfoTab: controller.showEventInfo,
                       onMention: () => controller.sendController.text +=
@@ -222,6 +227,7 @@ class ChatEventList extends StatelessWidget {
                           : null,
                     ),
                   ],
+                ),
                 ),
               );
             },
