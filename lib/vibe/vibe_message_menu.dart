@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -168,7 +169,10 @@ class _Menu extends StatelessWidget {
       Color? color,
       String? subtitle,
     }) => InkWell(
-      onTap: onTap,
+      onTap: () {
+        VibeHaptics.selection();
+        onTap();
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
         child: Row(
@@ -226,7 +230,10 @@ class _Menu extends StatelessWidget {
                         shape: const CircleBorder(),
                         child: InkWell(
                           customBorder: const CircleBorder(),
-                          onTap: () => _react(context, e),
+                          onTap: () {
+                            VibeHaptics.light();
+                            _react(context, e);
+                          },
                           child: SizedBox(
                             width: 48,
                             height: 48,

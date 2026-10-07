@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -96,7 +97,7 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
     final rect = box.localToGlobal(Offset.zero) & box.size;
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
     if (overlay == null) return;
-    HapticFeedback.selectionClick();
+    VibeHaptics.selection();
     late OverlayEntry entry;
     entry = OverlayEntry(
       builder: (_) => _EmojiFall(
@@ -120,7 +121,7 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
     final target = topLeft + Offset(86, size.height - 20);
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
     if (overlay == null) return;
-    HapticFeedback.lightImpact();
+    VibeHaptics.light();
     late OverlayEntry entry;
     entry = OverlayEntry(
       builder: (_) => _HeartBurst(

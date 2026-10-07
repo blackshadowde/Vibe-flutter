@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 
 /// Shrinks slightly while a finger is down and springs back on release.
@@ -22,7 +23,10 @@ class _VibePressableState extends State<VibePressable> {
 
   @override
   Widget build(BuildContext context) => Listener(
-    onPointerDown: (_) => _set(true),
+    onPointerDown: (_) {
+      VibeHaptics.selection();
+      _set(true);
+    },
     onPointerUp: (_) => _set(false),
     onPointerCancel: (_) => _set(false),
     child: AnimatedScale(
