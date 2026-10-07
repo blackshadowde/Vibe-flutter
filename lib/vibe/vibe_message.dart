@@ -242,6 +242,7 @@ class VibeMessage extends StatelessWidget {
   final Timeline timeline;
   final bool highlightMarker;
   final Set<String> bigEmojis;
+  final void Function(Event)? onLongPress;
 
   const VibeMessage(
     this.event, {
@@ -260,6 +261,7 @@ class VibeMessage extends StatelessWidget {
     required this.timeline,
     required this.highlightMarker,
     required this.bigEmojis,
+    this.onLongPress,
     super.key,
   });
 
@@ -674,12 +676,17 @@ class VibeMessage extends StatelessWidget {
                     : Colors.transparent,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: longPressSelect ? null : () => onSelect(event),
+                  onTap: longPressSelect ? () => onSelect(event) : null,
                   onLongPress: longPressSelect
                       ? null
                       : () {
                           HapticFeedback.heavyImpact();
-                          onSelect(event);
+                          final cb = onLongPress;
+                          if (cb != null) {
+                            cb(event);
+                          } else {
+                            onSelect(event);
+                          }
                         },
                   onDoubleTap:
                       AppSettings.doubleTapToReact.value &&
