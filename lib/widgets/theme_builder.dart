@@ -95,8 +95,8 @@ class ThemeController extends State<ThemeBuilder> {
     return Provider(
       create: (_) => this,
       child: DynamicColorBuilder(
-        builder: (light, _) =>
-            widget.builder(context, themeMode, primaryColor ?? light?.primary),
+        // Vibe: always use the Vibe color, not the phone wallpaper color
+        builder: (_, _) => widget.builder(context, themeMode, primaryColor),
       ),
     );
   }
