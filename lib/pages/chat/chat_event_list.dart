@@ -16,6 +16,8 @@ import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/vibe/vibe_message.dart';
+import 'package:fluffychat/vibe/vibe_message_menu.dart';
+import 'package:fluffychat/vibe/vibe_starred.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix_api_lite/model/event_types.dart';
@@ -42,9 +44,11 @@ class ChatEventList extends StatelessWidget {
 
     final horizontalPadding = FluffyThemes.isColumnMode(context) ? 8.0 : 0.0;
 
-    final events = timeline.events.filterByVisibleInGui(
-      threadId: controller.activeThreadId,
-    );
+    final hiddenIds = VibeHidden.ids(controller.room.id);
+    final events = timeline.events
+        .filterByVisibleInGui(threadId: controller.activeThreadId)
+        .where((e) => !hiddenIds.contains(e.eventId))
+        .toList();
 
     // create a map of eventId --> index to greatly improve performance of
     // ListView's findChildIndexCallback
@@ -184,6 +188,8 @@ class ChatEventList extends StatelessWidget {
                           controller.replyEvent?.eventId == event.eventId ||
                           controller.editEvent?.eventId == event.eventId,
                       onSelect: controller.onSelectMessage,
+                      onLongPress: (e) =>
+                          VibeMessageMenu.show(context, controller, e),
                       scrollToEventId: controller.scrollToEventId,
                       longPressSelect: controller.selectedEvents.isNotEmpty,
                       selected: controller.selectedEvents.any(
