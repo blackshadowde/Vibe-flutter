@@ -982,7 +982,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "inviteText": "{username} invited you to FluffyChat.\n1. Visit fluffychat.im and install the app \n2. Sign up or sign in \n3. Open the invite link: \n {link}",
+    "inviteText": "{username} invited you to Vibe.\n1. Install Vibe \n2. Sign up or sign in \n3. Open the invite link: \n {link}",
     "@inviteText": {
         "type": "String",
         "placeholders": {
@@ -1143,7 +1143,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 New message in FluffyChat",
+    "newMessageInFluffyChat": "💬 New message in Vibe",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -2542,7 +2542,7 @@
     "advancedConfigurations": "Advanced configurations",
     "signIn": "Sign in",
     "createNewAccount": "Create new account",
-    "signUpGreeting": "FluffyChat is decentralized! Select a server where you want to create your account and let's go!",
+    "signUpGreeting": "Vibe is decentralized! Select a server where you want to create your account and let's go!",
     "signInGreeting": "You already have an account in Matrix? Welcome back! Select your homeserver and sign in.",
     "theProcessWasCanceled": "The process was canceled.",
     "join": "Join",
@@ -2562,7 +2562,7 @@
     },
     "createNewChat": "Create new chat",
     "reset": "Reset",
-    "supportFluffyChat": "Support FluffyChat",
+    "supportFluffyChat": "Support Vibe",
     "support": "Support",
     "setLowPriority": "Set low priority",
     "unsetLowPriority": "Unset low priority",
@@ -2572,7 +2572,7 @@
     "tagName": "Tag name",
     "createNewTag": "Create new tag",
     "hideRoomsInSpaces": "Hide rooms that are in a space",
-    "possibleByYou": "This release was only possible thanks to your support. FluffyChat remains free, open-source, and entirely community-driven.",
+    "possibleByYou": "This release was only possible thanks to your support. Vibe remains free, open-source, and entirely community-driven.",
     "showThumbnailsInTimeline": "Show thumbnails of images and videos",
     "appSubtitle": "Secure [matrix] Communication",
     "appDescription": "Communicate encrypted over the decentralized [matrix] network in an easy and accessible way for everyone.",
@@ -2656,7 +2656,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newPassphraseDescription": "FluffyChat uses end to end encryption. To not lose your messages, please choose a strong passphrase to secure your crypto identity and your encrypted message backup.",
+    "newPassphraseDescription": "Vibe uses end to end encryption. To not lose your messages, please choose a strong passphrase to secure your crypto identity and your encrypted message backup.",
     "@newPassphraseDescription": {
         "type": "String",
         "placeholders": {}
