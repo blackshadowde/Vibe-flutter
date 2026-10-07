@@ -13,7 +13,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart';
+import 'package:matrix/matrix.dart' hide RequestType;
 import 'package:photo_manager/photo_manager.dart';
 
 /// "+" attachment sheet: gallery grid + Photos / Contacts / Files / Location.
