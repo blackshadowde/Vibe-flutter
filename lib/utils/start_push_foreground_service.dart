@@ -68,7 +68,7 @@ abstract class ForegroundServices {
         }
         final result = await FlutterForegroundTask.startService(
           serviceTypes: [ForegroundServiceTypes.shortService],
-          notificationTitle: 'FluffyChat',
+          notificationTitle: 'Vibe',
           notificationText: l10n.loadingMessages,
           notificationIcon: NotificationIcon(metaDataName: 'ic_launcher'),
         );
