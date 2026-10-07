@@ -7,7 +7,8 @@ import 'package:async/async.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/vibe/vibe_about_page.dart';
+import 'package:fluffychat/vibe/vibe_encryption_page.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -233,7 +234,9 @@ class SettingsView extends StatelessWidget {
             badgeColor: backupOk
                 ? Theme.of(context).colorScheme.primary
                 : Theme.of(context).colorScheme.error,
-            onTap: () => controller.firstRunBootstrapAction(),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const VibeEncryptionPage()),
+            ),
           ),
           _SettingsCard(
             icon: Icons.notifications,
@@ -257,7 +260,9 @@ class SettingsView extends StatelessWidget {
             icon: Icons.info,
             title: 'About Vibe',
             subtitle: 'App version & information',
-            onTap: () => PlatformInfos.showDialog(context),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const VibeAboutPage()),
+            ),
           ),
           _SettingsCard(
             icon: Icons.delete,
