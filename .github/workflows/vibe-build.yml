@@ -102,7 +102,7 @@ jobs:
           fi
           PKG=$(python3 -c 'import json; print(json.load(open("android/app/google-services.json"))["client"][0]["client_info"]["android_client_info"]["package_name"])')
           echo "Firebase package name: $PKG"
-          sed -i "s/applicationId = \"chat.fluffy.fluffychat\"/applicationId = \"$PKG\"/" android/app/build.gradle.kts
+          sed -i -E "s/applicationId = \"[^\"]*\"/applicationId = \"$PKG\"/" android/app/build.gradle.kts
           grep -n "applicationId" android/app/build.gradle.kts
           ./scripts/add-firebase-messaging.sh
           echo "Push notifications: ENABLED ($PKG)"
