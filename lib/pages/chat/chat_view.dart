@@ -90,11 +90,10 @@ class ChatView extends StatelessWidget {
               key: Key('chat_page'),
               extendBodyBehindAppBar: true,
               appBar: AppBar(
-                shape: FluffyThemes.isColumnMode(context)
-                    ? Border(
-                        bottom: BorderSide(color: theme.dividerColor, width: 1),
-                      )
-                    : null,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+                surfaceTintColor: Colors.transparent,
+                shape: const Border(),
                 actionsIconTheme: IconThemeData(
                   color: controller.selectedEvents.isEmpty
                       ? null
@@ -103,7 +102,9 @@ class ChatView extends StatelessWidget {
                 backgroundColor: controller.selectedEvents.isEmpty
                     ? controller.activeThreadId != null
                           ? theme.colorScheme.secondaryContainer
-                          : theme.colorScheme.surface.withAlpha(240)
+                          : accountConfig.wallpaperUrl != null
+                          ? Colors.transparent
+                          : theme.colorScheme.surface
                     : theme.colorScheme.tertiaryContainer,
                 automaticallyImplyLeading: false,
                 leading: controller.selectMode
@@ -392,12 +393,17 @@ class ChatView extends StatelessWidget {
                               key: controller.inputBarKey,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [
-                                    theme.colorScheme.surface.withAlpha(0),
-                                    theme.colorScheme.surface.withAlpha(0),
-                                    theme.colorScheme.surface,
-                                    theme.colorScheme.surface,
-                                  ],
+                                  colors: accountConfig.wallpaperUrl != null
+                                      ? const [
+                                          Colors.transparent,
+                                          Colors.transparent,
+                                        ]
+                                      : [
+                                          theme.colorScheme.surface.withAlpha(0),
+                                          theme.colorScheme.surface.withAlpha(0),
+                                          theme.colorScheme.surface,
+                                          theme.colorScheme.surface,
+                                        ],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                 ),
