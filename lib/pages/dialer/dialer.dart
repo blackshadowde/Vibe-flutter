@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -234,7 +235,7 @@ class MyCallingPage extends State<Calling> {
   void _handleCallState(CallState state) {
     Logs().v('CallingPage::handleCallState: $state');
     if ({CallState.kConnected, CallState.kEnded}.contains(state)) {
-      HapticFeedback.heavyImpact();
+      VibeHaptics.heavy();
     }
 
     if (mounted) {
