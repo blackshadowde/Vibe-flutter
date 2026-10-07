@@ -3,6 +3,7 @@
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:matrix/encryption.dart';
 import 'package:matrix/matrix.dart';
 
 class VibeEncryptionPage extends StatefulWidget {

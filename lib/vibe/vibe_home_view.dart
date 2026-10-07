@@ -173,7 +173,7 @@ class _VibeHomeViewState extends State<VibeHomeView>
                                 onBack: () => setState(() => selectedId = null),
                                 onOpenChat: () {
                                   _lastOpenedId = selected!.id;
-                                  controller.onChatTap(selected!);
+                                  controller.onChatTap(selected);
                                 },
                               ),
                       ),

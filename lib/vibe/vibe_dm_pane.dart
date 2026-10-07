@@ -9,6 +9,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_shared_page.dart';
+import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
