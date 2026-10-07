@@ -40,6 +40,8 @@ import 'package:fluffychat/widgets/log_view.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:fluffychat/vibe/vibe_about_page.dart';
+import 'package:fluffychat/vibe/vibe_encryption_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
@@ -228,6 +230,23 @@ abstract class AppRoutes {
                         : const Settings(),
                   ),
                   routes: [
+                    GoRoute(
+                      path: 'vibe-encryption',
+                      pageBuilder: (context, state) => defaultPageBuilder(
+                        context,
+                        state,
+                        const VibeEncryptionPage(),
+                      ),
+                      redirect: loggedOutRedirect,
+                    ),
+                    GoRoute(
+                      path: 'vibe-about',
+                      pageBuilder: (context, state) => defaultPageBuilder(
+                        context,
+                        state,
+                        const VibeAboutPage(),
+                      ),
+                    ),
                     GoRoute(
                       path: 'notifications',
                       pageBuilder: (context, state) => defaultPageBuilder(
