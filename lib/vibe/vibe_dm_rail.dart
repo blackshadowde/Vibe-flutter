@@ -106,7 +106,7 @@ class VibeDmRail extends StatelessWidget {
                                   color: active
                                       ? theme.colorScheme.primary
                                       : invited
-                                      ? Colors.orange
+                                      ? theme.colorScheme.secondary
                                       : Colors.transparent,
                                 ),
                               ),

@@ -10,7 +10,6 @@ import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
-import 'package:fluffychat/vibe/vibe_user_bar.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +95,7 @@ class VibeDmDetail extends StatelessWidget {
             Divider(height: 1, color: theme.dividerColor),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 110),
                 children: [
                   // Profile card
                   Material(
@@ -205,7 +204,7 @@ class VibeDmDetail extends StatelessWidget {
                     _PagedSection(
                       room: room,
                       icon: Icons.description_outlined,
-                      color: Colors.amber,
+                      color: const Color(0xFFB5BAC1),
                       label: 'FILES',
                       emptyText: 'No files shared in this chat.',
                       searchFunc: (e) =>
@@ -220,7 +219,6 @@ class VibeDmDetail extends StatelessWidget {
                 ],
               ),
             ),
-            const VibeUserBar(),
           ],
         ),
       ),
@@ -252,7 +250,7 @@ class _ApprovalBanner extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.6,
-                  color: Colors.orange,
+                  color: const Color(0xFFB5BAC1),
                 ),
               ),
               const SizedBox(height: 6),
@@ -637,7 +635,7 @@ class _StarredSection extends StatelessWidget {
         final ids = VibeStarred.ids(room.id);
         return _Section(
           icon: Icons.star,
-          color: Colors.amber,
+          color: const Color(0xFFB5BAC1),
           label: 'STARRED',
           count: '${ids.length}',
           child: ids.isEmpty
@@ -679,7 +677,7 @@ class _StarredSection extends StatelessWidget {
                             trailing: IconButton(
                               icon: const Icon(
                                 Icons.star,
-                                color: Colors.amber,
+                                color: const Color(0xFFB5BAC1),
                                 size: 20,
                               ),
                               onPressed: () => VibeStarred.toggle(room.id, id),

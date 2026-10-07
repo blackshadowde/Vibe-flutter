@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
-/// Floating user card: big round avatar overlapping a pill with name,
-/// status, bell and gear.
+/// Full-width floating user card (Discord style): big round avatar
+/// overlapping a pill with name, status, bell and gear.
 class VibeUserBar extends StatelessWidget {
   const VibeUserBar({super.key});
 
@@ -21,9 +21,9 @@ class VibeUserBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 6, 12, 10),
+        padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
         child: SizedBox(
-          height: 70,
+          height: 76,
           child: FutureBuilder<Profile?>(
             future: client.fetchOwnProfile(),
             builder: (context, snapshot) {
@@ -33,17 +33,17 @@ class VibeUserBar extends StatelessWidget {
                 clipBehavior: Clip.none,
                 children: [
                   Positioned(
-                    left: 30,
+                    left: 34,
                     right: 0,
-                    top: 9,
-                    bottom: 9,
+                    top: 8,
+                    bottom: 8,
                     child: Material(
-                      color: theme.colorScheme.surfaceContainerHigh,
-                      elevation: 8,
+                      color: theme.colorScheme.surfaceContainer,
+                      elevation: 6,
                       shadowColor: Colors.black,
                       shape: const StadiumBorder(),
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 52, right: 6),
+                        padding: const EdgeInsets.only(left: 50, right: 8),
                         child: Row(
                           children: [
                             Expanded(
@@ -56,27 +56,29 @@ class VibeUserBar extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 16,
                                     ),
                                   ),
-                                  const Text(
+                                  Text(
                                     'Online',
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.green,
+                                      fontSize: 13,
+                                      color: theme.colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.notifications_none),
+                              icon: const Icon(Icons.notifications),
+                              color: theme.colorScheme.onSurfaceVariant,
                               onPressed: () =>
                                   context.go('/rooms/settings/notifications'),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.settings_outlined),
+                              icon: const Icon(Icons.settings),
+                              color: theme.colorScheme.onSurfaceVariant,
                               onPressed: () => context.go('/rooms/settings'),
                             ),
                           ],

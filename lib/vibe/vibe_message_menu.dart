@@ -129,11 +129,11 @@ class _Menu extends StatelessWidget {
     }) => InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
         child: Row(
           children: [
-            Icon(icon, size: 26, color: color ?? cs.onSurfaceVariant),
-            const SizedBox(width: 20),
+            Icon(icon, size: 22, color: color ?? cs.onSurfaceVariant),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +141,7 @@ class _Menu extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: color ?? cs.onSurface,
                     ),
@@ -150,7 +150,7 @@ class _Menu extends StatelessWidget {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 13,
                         color: cs.onSurfaceVariant,
                       ),
                     ),
@@ -172,8 +172,8 @@ class _Menu extends StatelessWidget {
               Container(
                 margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 12,
+                  horizontal: 8,
+                  vertical: 8,
                 ),
                 decoration: inner,
                 child: Row(
@@ -187,12 +187,12 @@ class _Menu extends StatelessWidget {
                           customBorder: const CircleBorder(),
                           onTap: () => _react(context, e),
                           child: SizedBox(
-                            width: 58,
-                            height: 58,
+                            width: 48,
+                            height: 48,
                             child: Center(
                               child: Text(
                                 e,
-                                style: const TextStyle(fontSize: 28),
+                                style: const TextStyle(fontSize: 23),
                               ),
                             ),
                           ),
@@ -205,9 +205,12 @@ class _Menu extends StatelessWidget {
                         customBorder: const CircleBorder(),
                         onTap: () => _moreEmojis(context),
                         child: const SizedBox(
-                          width: 58,
-                          height: 58,
-                          child: Icon(Icons.sentiment_satisfied_alt_outlined),
+                          width: 48,
+                          height: 48,
+                          child: Icon(
+                            Icons.sentiment_satisfied_alt_outlined,
+                            size: 22,
+                          ),
                         ),
                       ),
                     ),
@@ -216,24 +219,24 @@ class _Menu extends StatelessWidget {
               ),
             Container(
               margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              padding: const EdgeInsets.fromLTRB(14, 12, 16, 12),
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
               decoration: inner,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 12),
+                    padding: const EdgeInsets.only(top: 8),
                     child: Icon(
                       Icons.arrow_back,
-                      size: 22,
+                      size: 20,
                       color: cs.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(width: 18),
+                  const SizedBox(width: 14),
                   Avatar(
                     mxContent: sender.avatarUrl,
                     name: name,
-                    size: 44,
+                    size: 38,
                     client: event.room.client,
                   ),
                   const SizedBox(width: 14),
@@ -246,15 +249,15 @@ class _Menu extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
                           body,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 18),
+                          style: const TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
@@ -262,7 +265,7 @@ class _Menu extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     vibeTime(event.originServerTs),
-                    style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
+                    style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                   ),
                 ],
               ),

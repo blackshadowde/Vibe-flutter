@@ -307,7 +307,7 @@ class _StarredList extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.star, color: Colors.amber),
+                    icon: Icon(Icons.star, color: Theme.of(context).colorScheme.primary),
                     onPressed: () => VibeStarred.toggle(r.id, id),
                   ),
                   onTap: () {

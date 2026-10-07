@@ -25,8 +25,8 @@ import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 
-const Color _ownNameColor = Color(0xFFFFA630);
-const Color _otherNameColor = Color(0xFF4FC3F7);
+const Color _ownNameColor = Color(0xFFB5BAC1);
+const Color _otherNameColor = Color(0xFFF2F3F5);
 const Color _readTickColor = Color(0xFF5865F2);
 
 String vibeTime(DateTime ts) {

@@ -8,6 +8,7 @@ import 'package:fluffychat/utils/stream_extension.dart';
 import 'package:fluffychat/vibe/vibe_dm_detail.dart';
 import 'package:fluffychat/vibe/vibe_dm_pane.dart';
 import 'package:fluffychat/vibe/vibe_dm_rail.dart';
+import 'package:fluffychat/vibe/vibe_user_bar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
@@ -51,31 +52,52 @@ class _VibeHomeViewState extends State<VibeHomeView> {
           for (final r in rooms) {
             if (r.id == selectedId) selected = r;
           }
-          return Row(
-            children: [
-              VibeDmRail(
-                rooms: rooms,
-                selectedId: selected?.id,
-                activeRoomId: controller.activeChat,
-                onSelect: (room) => setState(() => selectedId = room.id),
-                onHome: () => setState(() => selectedId = null),
-              ),
-              Expanded(
-                child: selected == null
-                    ? VibeDmPane(
-                        rooms: rooms,
-                        activeRoomId: controller.activeChat,
-                        onTap: (room) => setState(() => selectedId = room.id),
-                        onOpen: controller.onChatTap,
-                      )
-                    : VibeDmDetail(
-                        key: ValueKey(selected.id),
-                        room: selected,
-                        onBack: () => setState(() => selectedId = null),
-                        onOpenChat: () => controller.onChatTap(selected!),
+          final theme = Theme.of(context);
+          return ColoredBox(
+            color: theme.colorScheme.surfaceContainerLowest,
+            child: Stack(
+              children: [
+                Row(
+                  children: [
+                    VibeDmRail(
+                      rooms: rooms,
+                      selectedId: selected?.id,
+                      activeRoomId: controller.activeChat,
+                      onSelect: (room) => setState(() => selectedId = room.id),
+                      onHome: () => setState(() => selectedId = null),
+                    ),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                        ),
+                        child: selected == null
+                            ? VibeDmPane(
+                                rooms: rooms,
+                                activeRoomId: controller.activeChat,
+                                onTap: (room) =>
+                                    setState(() => selectedId = room.id),
+                                onOpen: controller.onChatTap,
+                              )
+                            : VibeDmDetail(
+                                key: ValueKey(selected.id),
+                                room: selected,
+                                onBack: () => setState(() => selectedId = null),
+                                onOpenChat: () =>
+                                    controller.onChatTap(selected!),
+                              ),
                       ),
-              ),
-            ],
+                    ),
+                  ],
+                ),
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: VibeUserBar(),
+                ),
+              ],
+            ),
           );
         },
       ),

@@ -8,7 +8,6 @@ import 'package:fluffychat/pages/chat_list/unread_bubble.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_shared_page.dart';
-import 'package:fluffychat/vibe/vibe_user_bar.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -90,7 +89,7 @@ class _VibeDmPaneState extends State<VibeDmPane> {
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 110),
                 children: [
                   _NavTile(
                     icon: Icons.star_outline,
@@ -121,7 +120,6 @@ class _VibeDmPaneState extends State<VibeDmPane> {
                 ],
               ),
             ),
-            const VibeUserBar(),
           ],
         ),
       ),
@@ -231,7 +229,7 @@ class _DmTile extends StatelessWidget {
               Icon(
                 room.encrypted ? Icons.lock : Icons.lock_open,
                 size: 12,
-                color: room.encrypted ? Colors.green : null,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 4),
               Expanded(
@@ -301,7 +299,7 @@ class _InviteTile extends StatelessWidget {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.check, color: Colors.green),
+                icon: Icon(Icons.check, color: theme.colorScheme.onSurface),
                 tooltip: 'Accept',
                 onPressed: () async {
                   try {
