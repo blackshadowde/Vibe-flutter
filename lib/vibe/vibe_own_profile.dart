@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/utils/fluffy_share.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,12 @@ abstract class VibeOwnProfile {
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 460),
+        reverseDuration: Duration(milliseconds: 260),
+        curve: Curves.easeOutQuint,
+        reverseCurve: Curves.easeInCubic,
+      ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       clipBehavior: Clip.antiAlias,
       shape: const RoundedRectangleBorder(
@@ -198,14 +205,21 @@ class _OwnSheetState extends State<_OwnSheet> {
                   fit: StackFit.expand,
                   children: [
                     if (avatar != null)
-                      MxcImage(
-                        client: client,
-                        uri: avatar,
-                        cacheKey: 'vibe_own_banner_$avatar',
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 340,
-                        isThumbnail: false,
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 1.18, end: 1.0),
+                        duration: const Duration(milliseconds: 900),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, v, child) =>
+                            Transform.scale(scale: v, child: child),
+                        child: MxcImage(
+                          client: client,
+                          uri: avatar,
+                          cacheKey: 'vibe_own_banner_$avatar',
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 340,
+                          isThumbnail: false,
+                        ),
                       )
                     else
                       Container(
@@ -297,7 +311,10 @@ class _OwnSheetState extends State<_OwnSheet> {
                   ],
                 ),
               ),
-              Padding(
+              VibeStagger(
+                index: 3,
+                dy: 28,
+                child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -429,6 +446,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                     ),
                     SafeArea(top: false, child: const SizedBox(height: 14)),
                   ],
+                ),
                 ),
               ),
             ],

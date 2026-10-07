@@ -7,6 +7,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_list/unread_bubble.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_shared_page.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -98,24 +99,35 @@ class _VibeDmPaneState extends State<VibeDmPane> {
                   ),
                   if (invites.isNotEmpty) ...[
                     _SectionLabel('INVITES — ${invites.length}'),
-                    for (final room in invites)
-                      _InviteTile(
-                        room: room,
-                        name: nameOf(room),
-                        onTap: () => widget.onTap(room),
+                    for (var i = 0; i < invites.length; i++)
+                      VibeStagger(
+                        key: ValueKey('inv_${invites[i].id}'),
+                        index: i,
+                        child: _InviteTile(
+                          room: invites[i],
+                          name: nameOf(invites[i]),
+                          onTap: () => widget.onTap(invites[i]),
+                        ),
                       ),
                   ],
                   _SectionLabel(
                     'DIRECT MESSAGES — ${joined.length}',
                     onAdd: () => VibeAddContact.show(context),
                   ),
-                  for (final room in joined)
-                    _DmTile(
-                      room: room,
-                      name: nameOf(room),
-                      active: room.id == widget.activeRoomId,
-                      onTap: () => widget.onTap(room),
-                      onOpen: () => widget.onOpen(room),
+                  for (var i = 0; i < joined.length; i++)
+                    VibeStagger(
+                      key: ValueKey('dm_${joined[i].id}'),
+                      index: i + invites.length + 1,
+                      child: VibePressable(
+                        scale: 0.97,
+                        child: _DmTile(
+                          room: joined[i],
+                          name: nameOf(joined[i]),
+                          active: joined[i].id == widget.activeRoomId,
+                          onTap: () => widget.onTap(joined[i]),
+                          onOpen: () => widget.onOpen(joined[i]),
+                        ),
+                      ),
                     ),
                 ],
               ),

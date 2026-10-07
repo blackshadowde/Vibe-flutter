@@ -7,6 +7,7 @@ import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -98,36 +99,74 @@ class VibeDmRail extends StatelessWidget {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            AnimatedContainer(
-                              duration: FluffyThemes.animationDuration,
-                              width: 56,
-                              height: 56,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  width: 2,
-                                  color: active
-                                      ? theme.colorScheme.primary
-                                      : invited
-                                      ? theme.colorScheme.secondary
-                                      : Colors.transparent,
+                            Positioned(
+                              left: 0,
+                              top: 0,
+                              bottom: 0,
+                              child: Center(
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 260),
+                                  curve: Curves.easeOutCubic,
+                                  width: 4,
+                                  height: active
+                                      ? 30
+                                      : (room.notificationCount > 0 ? 8 : 0),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.onSurface,
+                                    borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(4),
+                                      bottomRight: Radius.circular(4),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              child: VibeTypingOverlay(
-                                room: room,
-                                ringColor:
-                                    theme.colorScheme.surfaceContainerLowest,
-                                child: Avatar(
-                                  mxContent: room.avatar,
-                                  name: name,
-                                  size: 46,
-                                  client: room.client,
-                                  presenceUserId: room.directChatMatrixID,
-                                  presenceBackgroundColor: theme
-                                      .colorScheme
-                                      .surfaceContainerLowest,
-                                  onTap: () => onSelect(room),
+                            ),
+                            VibePressable(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 280),
+                                curve: Curves.easeOutCubic,
+                                width: 56,
+                                height: 56,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                    active ? 19 : 28,
+                                  ),
+                                  border: Border.all(
+                                    width: 2,
+                                    color: active
+                                        ? theme.colorScheme.primary
+                                        : invited
+                                        ? Colors.orange
+                                        : Colors.transparent,
+                                  ),
+                                ),
+                                child: TweenAnimationBuilder<double>(
+                                  tween: Tween(end: active ? 15.0 : 23.0),
+                                  duration: const Duration(milliseconds: 280),
+                                  curve: Curves.easeOutCubic,
+                                  builder: (context, r, child) =>
+                                      VibeTypingOverlay(
+                                        room: room,
+                                        ringColor: theme
+                                            .colorScheme
+                                            .surfaceContainerLowest,
+                                        child: Avatar(
+                                          mxContent: room.avatar,
+                                          name: name,
+                                          size: 46,
+                                          client: room.client,
+                                          borderRadius: BorderRadius.circular(
+                                            r,
+                                          ),
+                                          presenceUserId:
+                                              room.directChatMatrixID,
+                                          presenceBackgroundColor: theme
+                                              .colorScheme
+                                              .surfaceContainerLowest,
+                                          onTap: () => onSelect(room),
+                                        ),
+                                      ),
                                 ),
                               ),
                             ),
