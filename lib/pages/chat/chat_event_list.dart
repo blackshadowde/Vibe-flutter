@@ -61,8 +61,7 @@ class ChatEventList extends StatelessWidget {
     final hasWallpaper =
         controller.room.client.applicationAccountConfig.wallpaperUrl != null;
 
-    return SelectionArea(
-      child: MediaQuery(
+    return MediaQuery(
         data: MediaQuery.of(context).copyWith(
           textScaler: TextScaler.linear(AppSettings.fontSizeFactor.value),
         ),
@@ -236,7 +235,6 @@ class ChatEventList extends StatelessWidget {
                 controller.findChildIndexCallback(key, thisEventsKeyMap),
           ),
         ),
-      ),
-    );
+      );
   }
 }
