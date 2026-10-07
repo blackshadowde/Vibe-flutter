@@ -8,6 +8,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/sync_status_localization.dart';
+import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/vibe/vibe_user_sheet.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,9 @@ class ChatAppBarTitle extends StatelessWidget {
     final dmUser = room.directChatMatrixID;
     return Row(
       children: [
-        Avatar(
+        VibeTypingOverlay(
+          room: room,
+          child:Avatar(
           mxContent: room.avatar,
           name: name,
           size: 40,
@@ -55,6 +58,7 @@ class ChatAppBarTitle extends StatelessWidget {
                     context.go('/rooms/${room.id}/details');
                   }
                 },
+        ),
         ),
         const SizedBox(width: 12),
         Expanded(
