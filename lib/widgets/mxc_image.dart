@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -78,6 +79,29 @@ class _MxcImageState extends State<MxcImage> {
         : _imageDataCache[cacheKey] = data;
   }
 
+  // Share one request between identical images and never run more than a few
+  // downloads at once, otherwise the homeserver answers 429 and the image
+  // would stay blank.
+  static final Map<String, Future<Uint8List>> _inflight = {};
+  static int _active = 0;
+  static final List<Completer<void>> _waiters = [];
+  static const int _maxActive = 6;
+
+  static Future<T> _limited<T>(Future<T> Function() job) async {
+    while (_active >= _maxActive) {
+      final c = Completer<void>();
+      _waiters.add(c);
+      await c.future;
+    }
+    _active++;
+    try {
+      return await job();
+    } finally {
+      _active--;
+      if (_waiters.isNotEmpty) _waiters.removeAt(0).complete();
+    }
+  }
+
   Future<void> _load() async {
     if (!mounted) return;
     final client =
@@ -92,14 +116,20 @@ class _MxcImageState extends State<MxcImage> {
       final height = widget.height;
       final realHeight = height == null ? null : height * devicePixelRatio;
 
-      final remoteData = await client.downloadMxcCached(
-        uri,
-        width: realWidth,
-        height: realHeight,
-        thumbnailMethod: widget.thumbnailMethod,
-        isThumbnail: widget.isThumbnail,
-        animated: widget.animated,
-      );
+      final key =
+          '${client.clientName}|$uri|$realWidth|$realHeight|${widget.isThumbnail}|${widget.animated}';
+      final remoteData = await (_inflight[key] ??= _limited(
+        () => client.downloadMxcCached(
+          uri,
+          width: realWidth,
+          height: realHeight,
+          thumbnailMethod: widget.thumbnailMethod,
+          isThumbnail: widget.isThumbnail,
+          animated: widget.animated,
+        ),
+      ).whenComplete(() {
+        _inflight.remove(key);
+      }));
       if (!mounted) return;
       setState(() {
         _imageData = remoteData;
@@ -128,15 +158,25 @@ class _MxcImageState extends State<MxcImage> {
     }
   }
 
+  int _attempt = 0;
+  static const List<int> _backoffSeconds = [1, 2, 4, 8, 15, 30];
+
   Future<void> _tryLoad() async {
     if (_imageData != null) {
       return;
     }
     try {
       await _load();
-    } on IOException catch (_) {
+    } on Exception catch (e) {
+      // The download helper throws a plain Exception for any non-200 answer
+      // (rate limit, 5xx ...), so retry on every kind of failure.
       if (!mounted) return;
-      await Future.delayed(widget.retryDuration);
+      if (_attempt >= _backoffSeconds.length) {
+        Logs().w('Giving up loading mxc image', e);
+        return;
+      }
+      final wait = Duration(seconds: _backoffSeconds[_attempt++]);
+      await Future.delayed(wait);
       _tryLoad();
     }
   }
