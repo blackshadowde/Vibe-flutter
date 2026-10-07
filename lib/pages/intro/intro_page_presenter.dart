@@ -11,6 +11,7 @@ import 'package:fluffychat/pages/sign_in/view_model/model/public_homeserver_data
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/oidc_session_json_extension.dart';
 import 'package:fluffychat/utils/sign_in_flows/check_homeserver.dart';
+import 'package:fluffychat/vibe/vibe_welcome.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,8 @@ class IntroPagePresenter extends StatefulWidget {
 
 class _IntroPagePresenterState extends State<IntroPagePresenter> {
   bool isLoading = kIsWeb;
+  static const String _welcomeSeenKey = 'vibe.welcomeSeen';
+  bool _welcomeSeen = AppSettings.store.getBool(_welcomeSeenKey) ?? false;
   String? loggingInToHomeserver;
 
   @override
@@ -113,8 +116,16 @@ class _IntroPagePresenterState extends State<IntroPagePresenter> {
     );
   }
 
+  void _finishWelcome() {
+    AppSettings.store.setBool(_welcomeSeenKey, true);
+    if (mounted) setState(() => _welcomeSeen = true);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_welcomeSeen && !isLoading) {
+      return VibeWelcome(onDone: _finishWelcome);
+    }
     return IntroPage(
       isLoading: isLoading,
       loggingInToHomeserver: loggingInToHomeserver,
