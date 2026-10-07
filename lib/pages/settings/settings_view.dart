@@ -3,12 +3,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:async/async.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
-import 'package:fluffychat/vibe/vibe_about_page.dart';
-import 'package:fluffychat/vibe/vibe_encryption_page.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +26,7 @@ class SettingsView extends StatelessWidget {
   void _accountSheet(BuildContext context) {
     final theme = Theme.of(context);
     showModalBottomSheet<void>(
+      sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
@@ -117,6 +117,7 @@ class SettingsView extends StatelessWidget {
 
   void _managementSheet(BuildContext context) {
     showModalBottomSheet<void>(
+      sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
       shape: const RoundedRectangleBorder(
@@ -234,9 +235,7 @@ class SettingsView extends StatelessWidget {
             badgeColor: backupOk
                 ? Theme.of(context).colorScheme.primary
                 : Theme.of(context).colorScheme.error,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const VibeEncryptionPage()),
-            ),
+            onTap: () => context.go('/rooms/settings/vibe-encryption'),
           ),
           _SettingsCard(
             icon: Icons.notifications,
@@ -260,9 +259,7 @@ class SettingsView extends StatelessWidget {
             icon: Icons.info,
             title: 'About Vibe',
             subtitle: 'App version & information',
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const VibeAboutPage()),
-            ),
+            onTap: () => context.go('/rooms/settings/vibe-about'),
           ),
           _SettingsCard(
             icon: Icons.delete,
