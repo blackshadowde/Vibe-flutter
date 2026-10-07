@@ -17,6 +17,7 @@ import 'package:fluffychat/pages/chat/pinned_events.dart';
 import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
+import 'package:fluffychat/vibe/vibe_starred.dart';
 import 'package:fluffychat/widgets/chat_settings_popup_menu.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -146,6 +147,25 @@ class ChatView extends StatelessWidget {
                       tooltip: L10n.of(context).copyToClipboard,
                       onPressed: controller.copyEventsAction,
                     ),
+                    if (controller.selectedEvents.length == 1)
+                      IconButton(
+                        icon: Icon(
+                          VibeStarred.isStarred(
+                                controller.room.id,
+                                controller.selectedEvents.single.eventId,
+                              )
+                              ? Icons.star
+                              : Icons.star_border,
+                        ),
+                        tooltip: 'Star message',
+                        onPressed: () {
+                          VibeStarred.toggle(
+                            controller.room.id,
+                            controller.selectedEvents.single.eventId,
+                          );
+                          controller.clearSelectedEvents();
+                        },
+                      ),
                     if (controller.canRedactSelectedEvents)
                       IconButton(
                         icon: const Icon(Icons.delete_outlined),
