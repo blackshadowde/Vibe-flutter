@@ -54,8 +54,8 @@ class SettingsView extends StatelessWidget {
                   Text(
                     displayname,
                     style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   TextButton(
@@ -177,7 +177,7 @@ class SettingsView extends StatelessWidget {
         automaticallyImplyLeading: false,
         title: Text(
           L10n.of(context).settings,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         actions: [
           IconButton(
@@ -195,14 +195,14 @@ class SettingsView extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(4, 0, 4, 4),
             child: Text(
               'Settings',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 18),
             child: Text(
               'Manage your Vibe account & preferences',
-              style: TextStyle(fontSize: 17, color: cs.onSurfaceVariant),
+              style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
             ),
           ),
           FutureBuilder<Profile>(
@@ -230,7 +230,9 @@ class SettingsView extends StatelessWidget {
             title: 'Encryption & Keys',
             subtitle: 'End-to-end encryption status',
             badge: backupOk ? 'Active' : 'Not set up',
-            badgeColor: backupOk ? Colors.green : Colors.amber,
+            badgeColor: backupOk
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.error,
             onTap: () => controller.firstRunBootstrapAction(),
           ),
           _SettingsCard(
@@ -325,8 +327,8 @@ class _SettingsCard extends StatelessWidget {
                       Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -335,7 +337,7 @@ class _SettingsCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 13,
                           color: cs.onSurfaceVariant,
                         ),
                       ),
@@ -359,8 +361,8 @@ class _SettingsCard extends StatelessWidget {
                     child: Text(
                       badge!,
                       style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                         color: badgeColor ?? cs.primary,
                       ),
                     ),
