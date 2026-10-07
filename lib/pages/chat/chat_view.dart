@@ -23,6 +23,7 @@ import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../utils/stream_extension.dart';
@@ -250,6 +251,30 @@ class ChatView extends StatelessWidget {
                         icon: const Icon(Icons.call_outlined),
                         tooltip: L10n.of(context).placeCall,
                       ),
+                    if (controller.room.encrypted)
+                      IconButton(
+                        icon: const Icon(Icons.lock_outline),
+                        color: const Color(0xFF22C55E),
+                        tooltip: 'End-to-end encrypted',
+                        onPressed: () => context.go(
+                          '/rooms/${controller.room.id}/encryption',
+                        ),
+                      )
+                    else
+                      IconButton(
+                        icon: const Icon(Icons.lock_open),
+                        color: Colors.redAccent,
+                        tooltip: 'Not encrypted',
+                        onPressed: () => context.go(
+                          '/rooms/${controller.room.id}/encryption',
+                        ),
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      tooltip: L10n.of(context).search,
+                      onPressed: () =>
+                          context.go('/rooms/${controller.room.id}/search'),
+                    ),
                     ChatSettingsPopupMenu(controller.room, true),
                   ],
                 ],
@@ -401,9 +426,7 @@ class ChatView extends StatelessWidget {
                                             ? theme
                                                   .colorScheme
                                                   .tertiaryContainer
-                                            : theme
-                                                  .colorScheme
-                                                  .surfaceContainer,
+                                            : Colors.transparent,
                                         borderRadius: BorderRadius.circular(32),
                                         child:
                                             controller.room.isAbandonedDMRoom ==

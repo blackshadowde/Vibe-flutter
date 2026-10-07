@@ -15,6 +15,7 @@ import 'package:fluffychat/pages/chat/typing_indicators.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/vibe/vibe_message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix_api_lite/model/event_types.dart';
@@ -104,9 +105,11 @@ class ChatEventList extends StatelessWidget {
 
               // Request history button or progress indicator:
               if (i == events.length + 1) {
-                if (controller.activeThreadId != null ||
-                    !timeline.canRequestHistory) {
+                if (controller.activeThreadId != null) {
                   return const SizedBox.shrink();
+                }
+                if (!timeline.canRequestHistory) {
+                  return VibeChatIntro(controller.room);
                 }
                 return Builder(
                   builder: (context) {
@@ -167,35 +170,7 @@ class ChatEventList extends StatelessWidget {
                   mainAxisSize: .min,
                   children: [
                     if (!isCollapsed && displayDate)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: Material(
-                              borderRadius: BorderRadius.circular(
-                                AppConfig.borderRadius * 2,
-                              ),
-                              color: theme.colorScheme.inverseSurface.withAlpha(
-                                200,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                  vertical: 2.0,
-                                ),
-                                child: Text(
-                                  event.originServerTs.localizedDate(context),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.onInverseSurface,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      VibeDateDivider(event.originServerTs),
                     Message(
                       event,
                       bigEmojis: controller.bigEmojis,

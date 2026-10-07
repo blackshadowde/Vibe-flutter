@@ -8,6 +8,7 @@ import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/recording_input_row.dart';
 import 'package:fluffychat/pages/chat/recording_view_model.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/other_party_can_receive.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -132,20 +133,30 @@ class ChatInputRow extends StatelessWidget {
                       : const SizedBox.shrink(),
                 ]
               : <Widget>[
-                  const SizedBox(width: 8),
-                  AnimatedContainer(
-                    duration: FluffyThemes.animationDuration,
-                    curve: FluffyThemes.animationCurve,
-                    width: textMessageOnly ? 0 : 48,
-                    height: height,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(),
-                    clipBehavior: Clip.hardEdge,
-                    child: PopupMenuButton<AddPopupMenuActions>(
-                      useRootNavigator: true,
-                      icon: const Icon(Icons.add_circle_outline),
-                      iconColor: theme.colorScheme.onPrimaryContainer,
-                      onSelected: controller.onAddPopupMenuButtonSelected,
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(10, 6, 0, 8),
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainer,
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Material(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            shape: const CircleBorder(),
+                            clipBehavior: Clip.antiAlias,
+                            child: SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: PopupMenuButton<AddPopupMenuActions>(
+                                useRootNavigator: true,
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.add, size: 26),
+                                onSelected:
+                                    controller.onAddPopupMenuButtonSelected,
                       itemBuilder: (BuildContext context) => [
                         if (PlatformInfos.isMobile)
                           PopupMenuItem(
@@ -253,86 +264,98 @@ class ChatInputRow extends StatelessWidget {
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  Container(
-                    height: height,
-                    width: 48,
-                    alignment: Alignment.center,
-                    child: IconButton(
-                      tooltip: L10n.of(context).emojis,
-                      color: theme.colorScheme.onPrimaryContainer,
-                      icon: Icon(
-                        controller.showEmojiPicker
-                            ? Icons.keyboard
-                            : Icons.add_reaction_outlined,
-                        key: ValueKey(controller.showEmojiPicker),
-                      ),
-                      onPressed: controller.emojiPickerAction,
-                    ),
-                  ),
-                  if (Matrix.of(context).isMultiAccount &&
-                      Matrix.of(context).hasComplexBundles &&
-                      Matrix.of(context).currentBundle!.length > 1)
-                    Container(
-                      height: height,
-                      width: 48,
-                      alignment: Alignment.center,
-                      child: _ChatAccountPicker(controller),
-                    ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2.0),
-                      child: InputBar(
-                        room: controller.room,
-                        minLines: 1,
-                        maxLines: 8,
-                        autofocus: !PlatformInfos.isMobile,
-                        keyboardType: TextInputType.multiline,
-                        textInputAction:
-                            AppSettings.sendOnEnter.value == true &&
-                                PlatformInfos.isMobile
-                            ? TextInputAction.send
-                            : null,
-                        onSubmitted: controller.onInputBarSubmitted,
-                        onSubmitImage: controller.sendImageFromClipBoard,
-                        focusNode: controller.inputFocus,
-                        controller: controller.sendController,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.only(
-                            left: 6.0,
-                            right: 6.0,
-                            bottom: 6.0,
-                            top: 3.0,
-                          ),
-                          counter: const SizedBox.shrink(),
-                          hintText: controller.room.encrypted
-                              ? L10n.of(context).encryptedMessage
-                              : L10n.of(context).unencryptedMessage,
-                          hintMaxLines: 1,
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          filled: false,
-                        ),
-                        onChanged: controller.onInputBarChanged,
-                        suggestionEmojis:
-                            getDefaultEmojiLocale(
-                              AppSettings.emojiSuggestionLocale.value.isNotEmpty
-                                  ? Locale(
-                                      AppSettings.emojiSuggestionLocale.value,
-                                    )
-                                  : Localizations.localeOf(context),
-                            ).fold(
-                              [],
-                              (emojis, category) =>
-                                  emojis..addAll(category.emoji),
+                              ),
                             ),
+                          ),
+                          if (Matrix.of(context).isMultiAccount &&
+                              Matrix.of(context).hasComplexBundles &&
+                              Matrix.of(context).currentBundle!.length > 1)
+                            SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: _ChatAccountPicker(controller),
+                            ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              child: InputBar(
+                                room: controller.room,
+                                minLines: 1,
+                                maxLines: 8,
+                                autofocus: !PlatformInfos.isMobile,
+                                keyboardType: TextInputType.multiline,
+                                textInputAction:
+                                    AppSettings.sendOnEnter.value == true &&
+                                        PlatformInfos.isMobile
+                                    ? TextInputAction.send
+                                    : null,
+                                onSubmitted: controller.onInputBarSubmitted,
+                                onSubmitImage: controller.sendImageFromClipBoard,
+                                focusNode: controller.inputFocus,
+                                controller: controller.sendController,
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  counter: const SizedBox.shrink(),
+                                  hintText:
+                                      'Message | ${controller.room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)))}',
+                                  hintMaxLines: 1,
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  filled: false,
+                                ),
+                                onChanged: controller.onInputBarChanged,
+                                suggestionEmojis:
+                                    getDefaultEmojiLocale(
+                                      AppSettings
+                                              .emojiSuggestionLocale
+                                              .value
+                                              .isNotEmpty
+                                          ? Locale(
+                                              AppSettings
+                                                  .emojiSuggestionLocale
+                                                  .value,
+                                            )
+                                          : Localizations.localeOf(context),
+                                    ).fold(
+                                      [],
+                                      (emojis, category) =>
+                                          emojis..addAll(category.emoji),
+                                    ),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: L10n.of(context).emojis,
+                            icon: Icon(
+                              controller.showEmojiPicker
+                                  ? Icons.keyboard
+                                  : Icons.sentiment_satisfied_alt_outlined,
+                              key: ValueKey(controller.showEmojiPicker),
+                            ),
+                            onPressed: controller.emojiPickerAction,
+                          ),
+                          if (PlatformInfos.isMobile)
+                            IconButton(
+                              tooltip: L10n.of(context).takeAPhoto,
+                              icon: const Icon(Icons.photo_camera_outlined),
+                              onPressed: () =>
+                                  controller.onAddPopupMenuButtonSelected(
+                                    AddPopupMenuActions.photoCamera,
+                                  ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
-                    height: height,
-                    width: height,
+                    height: 54,
+                    width: 54,
                     alignment: Alignment.center,
                     child:
                         PlatformInfos.platformCanRecord &&
@@ -365,12 +388,11 @@ class ChatInputRow extends StatelessWidget {
                               onLongPress: () => recordingViewModel
                                   .startRecording(controller.room),
                               style: IconButton.styleFrom(
-                                backgroundColor: theme.bubbleColor,
-                                foregroundColor: theme.onBubbleColor,
+                                backgroundColor: const Color(0xFFDCE4FF),
+                                foregroundColor: const Color(0xFF226DFD),
+                                fixedSize: const Size(54, 54),
                               ),
-                              icon: Icon(
-                                hovered ? Icons.mic : Icons.mic_none_outlined,
-                              ),
+                              icon: const Icon(Icons.graphic_eq, size: 28),
                             ),
                           )
                         : IconButton(
@@ -378,12 +400,14 @@ class ChatInputRow extends StatelessWidget {
                             tooltip: L10n.of(context).send,
                             onPressed: controller.send,
                             style: IconButton.styleFrom(
-                              backgroundColor: theme.bubbleColor,
-                              foregroundColor: theme.onBubbleColor,
+                              backgroundColor: const Color(0xFFDCE4FF),
+                              foregroundColor: const Color(0xFF226DFD),
+                              fixedSize: const Size(54, 54),
                             ),
-                            icon: const Icon(Icons.send_outlined),
+                            icon: const Icon(Icons.send_rounded, size: 24),
                           ),
                   ),
+                  const SizedBox(width: 10),
                 ],
         );
       },

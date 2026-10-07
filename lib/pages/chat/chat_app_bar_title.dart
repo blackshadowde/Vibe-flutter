@@ -6,12 +6,10 @@
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
-import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/sync_status_localization.dart';
-import 'package:fluffychat/utils/verified_room_extension.dart';
+import 'package:fluffychat/vibe/vibe_user_sheet.dart';
 import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/presence_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -31,52 +29,56 @@ class ChatAppBarTitle extends StatelessWidget {
         ),
       );
     }
-    return InkWell(
-      hoverColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
-      onTap: controller.isArchived
-          ? null
-          : () => FluffyThemes.isThreeColumnMode(context)
-                ? controller.toggleDisplayChatDetailsColumn()
-                : context.go('/rooms/${room.id}/details'),
-      child: Row(
-        children: [
-          Hero(
-            tag: 'content_banner',
-            child: Avatar(
-              mxContent: room.avatar,
-              name: room.getLocalizedDisplayname(
-                MatrixLocals(L10n.of(context)),
-              ),
-              size: 32,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
+    final name = room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
+    final dmUser = room.directChatMatrixID;
+    return Row(
+      children: [
+        Avatar(
+          mxContent: room.avatar,
+          name: name,
+          size: 40,
+          client: room.client,
+          presenceUserId: dmUser,
+          onTap: controller.isArchived
+              ? null
+              : () {
+                  if (dmUser != null) {
+                    VibeUserSheet.show(
+                      context,
+                      client: room.client,
+                      userId: dmUser,
+                      displayName: name,
+                      avatarUrl: room.avatar,
+                      currentRoomId: room.id,
+                    );
+                  } else {
+                    context.go('/rooms/${room.id}/details');
+                  }
+                },
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: InkWell(
+            hoverColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            onTap: controller.isArchived
+                ? null
+                : () => FluffyThemes.isThreeColumnMode(context)
+                      ? controller.toggleDisplayChatDetailsColumn()
+                      : context.go('/rooms/${room.id}/details'),
             child: Column(
-              crossAxisAlignment: .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  spacing: 4,
-                  children: [
-                    if (room.allUsersVerified)
-                      Icon(
-                        Icons.verified,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 16,
-                      ),
-                    Expanded(
-                      child: Text(
-                        room.getLocalizedDisplayname(
-                          MatrixLocals(L10n.of(context)),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 StreamBuilder(
                   stream: room.client.onSyncStatus.stream,
@@ -84,110 +86,36 @@ class ChatAppBarTitle extends StatelessWidget {
                     final status =
                         room.client.onSyncStatus.value ??
                         const SyncStatusUpdate(SyncStatus.waitingForResponse);
-                    final hide =
-                        FluffyThemes.isColumnMode(context) ||
-                        (room.client.onSync.value != null &&
+                    final syncing =
+                        !(room.client.onSync.value != null &&
                             status.status != SyncStatus.error &&
                             room.client.prevBatch != null);
-                    final style = TextStyle(fontSize: 11);
-                    return AnimatedSize(
-                      duration: FluffyThemes.animationDuration,
-                      child: hide
-                          ? room.isDirectChat
-                                ? PresenceBuilder(
-                                    userId: room.directChatMatrixID,
-                                    builder: (context, presence) {
-                                      final statusMessage = presence?.statusMsg;
-
-                                      final lastActiveTimestamp =
-                                          presence?.lastActiveTimestamp;
-
-                                      return Row(
-                                        children: [
-                                          if (presence?.currentlyActive == true)
-                                            Text(
-                                              L10n.of(context).currentlyActive,
-                                              style: style,
-                                            )
-                                          else if (lastActiveTimestamp != null)
-                                            Text(
-                                              L10n.of(context).lastActiveAgo(
-                                                lastActiveTimestamp
-                                                    .localizedTimeShort(
-                                                      context,
-                                                    ),
-                                              ),
-                                              style: style,
-                                            ),
-                                          if (statusMessage != null) ...[
-                                            if ((presence?.currentlyActive ==
-                                                    true ||
-                                                lastActiveTimestamp != null))
-                                              Text(' ◦ ', style: style),
-                                            Expanded(
-                                              child: Text(
-                                                statusMessage,
-                                                style: style,
-                                                maxLines: 1,
-                                              ),
-                                            ),
-                                          ],
-                                        ],
-                                      );
-                                    },
-                                  )
-                                : Row(
-                                    children: [
-                                      Text(
-                                        L10n.of(context).countParticipants(
-                                          (room.summary.mJoinedMemberCount ??
-                                                  1) +
-                                              (room
-                                                      .summary
-                                                      .mInvitedMemberCount ??
-                                                  0),
-                                        ),
-                                        maxLines: 1,
-                                        style: style,
-                                      ),
-                                      if (room.topic.isNotEmpty) ...[
-                                        Text(' ◦ ', style: style),
-                                        Expanded(
-                                          child: Text(
-                                            room.topic,
-                                            style: style,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  )
-                          : Row(
-                              children: [
-                                SizedBox.square(
-                                  dimension: 10,
-                                  child: CircularProgressIndicator.adaptive(
-                                    strokeWidth: 1,
-                                    value: status.progress,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    status.calcLocalizedString(context),
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                              ],
-                            ),
+                    if (!syncing) return const SizedBox.shrink();
+                    return Row(
+                      children: [
+                        SizedBox.square(
+                          dimension: 10,
+                          child: CircularProgressIndicator.adaptive(
+                            strokeWidth: 1,
+                            value: status.progress,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            status.calcLocalizedString(context),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
