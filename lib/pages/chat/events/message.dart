@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
@@ -412,7 +413,7 @@ class Message extends StatelessWidget {
                                     AppSettings.doubleTapToReact.value &&
                                         event.room.canSendDefaultMessages
                                     ? () {
-                                        HapticFeedback.lightImpact();
+                                        VibeHaptics.light();
                                         final emoji =
                                             AppSettings.doubleTapReaction.value;
                                         final existingReaction = event
@@ -450,7 +451,7 @@ class Message extends StatelessWidget {
                                 onLongPress: longPressSelect
                                     ? null
                                     : () {
-                                        HapticFeedback.heavyImpact();
+                                        VibeHaptics.heavy();
                                         onSelect(event);
                                       },
                                 child: _AnimateIn(
