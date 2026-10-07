@@ -40,7 +40,7 @@ class TypingIndicators extends StatelessWidget {
             constraints: const BoxConstraints(
               maxWidth: FluffyThemes.maxTimelineWidth,
             ),
-            height: typingUsers.isEmpty ? 0 : avatarSize + 8,
+            height: typingUsers.isEmpty ? 0 : avatarSize + 4,
             duration: FluffyThemes.animationDuration,
             curve: FluffyThemes.animationCurve,
             alignment:
@@ -51,13 +51,13 @@ class TypingIndicators extends StatelessWidget {
                 : Alignment.topLeft,
             clipBehavior: Clip.hardEdge,
             decoration: const BoxDecoration(),
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            padding: const EdgeInsets.fromLTRB(14, 0, 14, 0),
             child: Row(
               children: [
                 Container(
                   alignment: Alignment.center,
                   height: avatarSize,
-                  width: Avatar.defaultSize,
+                  width: 46,
                   child: Stack(
                     children: [
                       if (typingUsers.isNotEmpty)
@@ -82,15 +82,17 @@ class TypingIndicators extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 Material(
                   color: theme.colorScheme.surfaceContainerHigh,
                   borderRadius: const BorderRadius.all(
                     Radius.circular(AppConfig.borderRadius),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: typingUsers.isEmpty ? null : const TypingAnimation(),
+                  child: SizedBox(
+                    height: avatarSize,
+                    child: typingUsers.isEmpty
+                        ? null
+                        : const Align(widthFactor: 1, child: TypingAnimation()),
                   ),
                 ),
               ],

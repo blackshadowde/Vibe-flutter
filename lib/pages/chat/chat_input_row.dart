@@ -254,8 +254,9 @@ class ChatInputRow extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    height: 54,
-                    width: 54,
+                    height: 56,
+                    width: 56,
+                    margin: const EdgeInsets.only(top: 6, bottom: 8),
                     alignment: Alignment.center,
                     child:
                         PlatformInfos.platformCanRecord &&
@@ -290,7 +291,7 @@ class ChatInputRow extends StatelessWidget {
                               style: IconButton.styleFrom(
                                 backgroundColor: const Color(0xFFDCE4FF),
                                 foregroundColor: const Color(0xFF226DFD),
-                                fixedSize: const Size(54, 54),
+                                fixedSize: const Size(56, 56),
                               ),
                               icon: const Icon(Icons.graphic_eq, size: 28),
                             ),
@@ -302,7 +303,7 @@ class ChatInputRow extends StatelessWidget {
                             style: IconButton.styleFrom(
                               backgroundColor: const Color(0xFFDCE4FF),
                               foregroundColor: const Color(0xFF226DFD),
-                              fixedSize: const Size(54, 54),
+                              fixedSize: const Size(56, 56),
                             ),
                             icon: const Icon(Icons.send_rounded, size: 24),
                           ),
