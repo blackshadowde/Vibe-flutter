@@ -15,6 +15,7 @@ import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/file_description.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/string_color.dart';
+import 'package:fluffychat/vibe/vibe_message.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/member_actions_popup_menu_button.dart';
@@ -102,6 +103,24 @@ class Message extends StatelessWidget {
       return StateMessage(event);
     }
 
+    return VibeMessage(
+      event,
+      nextEvent: nextEvent,
+      previousEvent: previousEvent,
+      displayReadMarker: displayReadMarker,
+      onSelect: onSelect,
+      onInfoTab: onInfoTab,
+      scrollToEventId: scrollToEventId,
+      onSwipe: onSwipe,
+      onMention: onMention,
+      enterThread: enterThread,
+      longPressSelect: longPressSelect,
+      selected: selected,
+      singleSelected: singleSelected,
+      timeline: timeline,
+      highlightMarker: highlightMarker,
+      bigEmojis: bigEmojis,
+    );
     final client = Matrix.of(context).client;
     final ownMessage = event.senderId == client.userID;
     final alignment = ownMessage ? Alignment.topRight : Alignment.topLeft;
