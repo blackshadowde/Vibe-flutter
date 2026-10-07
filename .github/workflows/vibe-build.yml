@@ -85,6 +85,28 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - name: Push notifications (Firebase)
+        env:
+          GSJ: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GSJ:-}" ]; then
+            echo "::warning::GOOGLE_SERVICES_JSON secret is not set - building WITHOUT push notifications"
+            exit 0
+          fi
+          # accept the raw JSON file contents or a base64 of it
+          if printf '%s' "$GSJ" | python3 -c 'import sys,json; json.load(sys.stdin)' 2>/dev/null; then
+            printf '%s' "$GSJ" > android/app/google-services.json
+          else
+            printf '%s' "$GSJ" | base64 -d > android/app/google-services.json
+          fi
+          PKG=$(python3 -c 'import json; print(json.load(open("android/app/google-services.json"))["client"][0]["client_info"]["android_client_info"]["package_name"])')
+          echo "Firebase package name: $PKG"
+          sed -i "s/applicationId = \"chat.fluffy.fluffychat\"/applicationId = \"$PKG\"/" android/app/build.gradle.kts
+          grep -n "applicationId" android/app/build.gradle.kts
+          ./scripts/add-firebase-messaging.sh
+          echo "Push notifications: ENABLED ($PKG)"
+
       - run: flutter pub get
 
       - name: Check code (fails fast with the exact error)
@@ -96,4 +118,3 @@ jobs:
         with:
           name: vibe-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
-          
