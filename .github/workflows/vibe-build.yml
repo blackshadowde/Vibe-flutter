@@ -1,0 +1,99 @@
+name: Vibe build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply Vibe branding (icon, splash, in-app logo)
+        run: |
+          set -euo pipefail
+          test -f vibe-icon.png || { echo "vibe-icon.png is missing from the repo root"; exit 1; }
+          python3 -m pip install --quiet --break-system-packages pillow || python3 -m pip install --quiet pillow
+          python3 - <<'PYEOF'
+          import os
+          from PIL import Image, ImageChops
+          RES = "android/app/src/main/res"
+          BLUE = (0x22, 0x6D, 0xFD)
+          NIGHT = (0x10, 0x11, 0x2A)
+          src = Image.open("vibe-icon.png").convert("RGBA")
+          W, H = src.size
+          c = 400
+          crop = src.crop(((W - c) // 2, (H - c) // 2, (W - c) // 2 + c, (H - c) // 2 + c))
+          for d, px in [("mdpi", 48), ("hdpi", 72), ("xhdpi", 96), ("xxhdpi", 144), ("xxxhdpi", 192)]:
+              crop.resize((px, px), Image.LANCZOS).save(f"{RES}/mipmap-{d}/ic_launcher.png")
+
+          os.makedirs(f"{RES}/drawable-nodpi", exist_ok=True)
+          fg = Image.new("RGBA", (432, 432), (255, 255, 255, 255))
+          s398 = src.resize((398, 398), Image.LANCZOS)
+          fg.alpha_composite(s398, (17, 17))
+          fg.save(f"{RES}/drawable-nodpi/vibe_icon_fg.png")
+          open(f"{RES}/mipmap-anydpi-v26/ic_launcher.xml", "w").write(
+          '''<?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/ic_launcher_background"/>
+              <foreground android:drawable="@drawable/vibe_icon_fg"/>
+          </adaptive-icon>
+          ''')
+
+          # bubble silhouette: red channel, inverted, 87% level
+          r = src.getchannel("R")
+          mask = r.point(lambda v: min(255, int((255 - v) * 255 / (0.87 * 255) + 0.5)))
+          mask = mask.crop(mask.getbbox())
+
+          def make_logo(s, pct, out):
+              inner = s * pct // 100
+              m = mask.copy()
+              m.thumbnail((inner, inner), Image.LANCZOS)
+              # scale up if smaller than inner (like ImageMagick -resize)
+              w, h = m.size
+              k = inner / max(w, h)
+              if k > 1:
+                  m = m.resize((round(w * k), round(h * k)), Image.LANCZOS)
+              canvas = Image.new("L", (s, s), 0)
+              canvas.paste(m, ((s - m.size[0]) // 2, (s - m.size[1]) // 2))
+              img = Image.new("RGBA", (s, s), BLUE + (255,))
+              img.putalpha(canvas)
+              img.save(out)
+
+          for d, px in [("mdpi", 177), ("hdpi", 265), ("xhdpi", 354), ("xxhdpi", 531), ("xxxhdpi", 709)]:
+              make_logo(px, 72, f"{RES}/drawable-{d}/splash.png")
+          Image.new("RGB", (1, 1), NIGHT).save(f"{RES}/drawable-night/background.png")
+
+          crop.convert("RGB").resize((500, 500), Image.LANCZOS).save("assets/logo/mini/logo_mini.png")
+          make_logo(500, 84, "assets/logo/mini/logo_mono_mini.png")
+          print("Vibe branding applied")
+          PYEOF
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: .tool_versions.yaml
+          cache: true
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: flutter pub get
+
+      - name: Check code (fails fast with the exact error)
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib
+
+      - run: flutter build apk --debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vibe-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          
