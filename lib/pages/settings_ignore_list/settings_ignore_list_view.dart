@@ -68,7 +68,7 @@ class SettingsIgnoreListView extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         L10n.of(context).blockListDescription,
-                        style: const TextStyle(color: Colors.orange),
+                        style: const TextStyle(color: Color(0xFF949BA4)),
                       ),
                     ],
                   ),
