@@ -151,7 +151,7 @@ class ChatEncryptionSettingsView extends StatelessWidget {
                                         color: masterKey == null
                                             ? theme.colorScheme.onErrorContainer
                                             : masterKey.verified
-                                            ? Colors.green
+                                            ? Color(0xFF5865F2)
                                             : tofuSince != null
                                             ? theme.colorScheme.primary
                                             : null,
@@ -190,7 +190,7 @@ class ChatEncryptionSettingsView extends StatelessWidget {
                                           : L10n.of(context).signedDevice,
                                       style: TextStyle(
                                         color: device.verified
-                                            ? Colors.green
+                                            ? Color(0xFF5865F2)
                                             : device.blocked
                                             ? theme.colorScheme.error
                                             : !signedDevice
