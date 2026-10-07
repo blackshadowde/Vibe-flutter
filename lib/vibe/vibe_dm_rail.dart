@@ -6,6 +6,7 @@
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -74,8 +75,7 @@ class VibeDmRail extends StatelessWidget {
                                 color: theme.colorScheme.primary,
                               ),
                               tooltip: L10n.of(context).newChat,
-                              onPressed: () =>
-                                  context.go('/rooms/newprivatechat'),
+                              onPressed: () => VibeAddContact.show(context),
                             ),
                           ),
                         ),

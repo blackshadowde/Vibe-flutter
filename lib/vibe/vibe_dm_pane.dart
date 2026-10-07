@@ -6,6 +6,7 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_list/unread_bubble.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_shared_page.dart';
 import 'package:fluffychat/vibe/vibe_user_bar.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -105,7 +106,10 @@ class _VibeDmPaneState extends State<VibeDmPane> {
                         onTap: () => widget.onTap(room),
                       ),
                   ],
-                  _SectionLabel('DIRECT MESSAGES — ${joined.length}'),
+                  _SectionLabel(
+                    'DIRECT MESSAGES — ${joined.length}',
+                    onAdd: () => VibeAddContact.show(context),
+                  ),
                   for (final room in joined)
                     _DmTile(
                       room: room,
@@ -127,21 +131,37 @@ class _VibeDmPaneState extends State<VibeDmPane> {
 
 class _SectionLabel extends StatelessWidget {
   final String text;
-  const _SectionLabel(this.text);
+  final VoidCallback? onAdd;
+  const _SectionLabel(this.text, {this.onAdd});
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-    child: Text(
-      text,
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 0.6,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 8, 2),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.6,
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ),
+          if (onAdd != null)
+            IconButton(
+              icon: Icon(Icons.add, color: cs.onSurfaceVariant),
+              tooltip: 'Add contact',
+              onPressed: onAdd,
+            ),
+        ],
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _NavTile extends StatelessWidget {
