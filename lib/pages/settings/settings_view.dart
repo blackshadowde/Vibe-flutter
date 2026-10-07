@@ -16,7 +16,6 @@ import 'package:matrix/matrix.dart' hide Result;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../../widgets/mxc_image_viewer.dart';
 import 'settings.dart';
 
 class SettingsView extends StatelessWidget {
@@ -24,165 +23,117 @@ class SettingsView extends StatelessWidget {
 
   const SettingsView(this.controller, {super.key});
 
-  @override
-  Widget build(BuildContext context) {
+  void _accountSheet(BuildContext context) {
     final theme = Theme.of(context);
-    final activeRoute = GoRouter.of(
-      context,
-    ).routeInformationProvider.value.uri.path;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(L10n.of(context).settings),
-        leading: Center(
-          child: BackButton(onPressed: () => context.go('/rooms')),
+    showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: FutureBuilder<Profile>(
+          future: controller.profileFuture,
+          builder: (context, snapshot) {
+            final profile = snapshot.data;
+            final mxid =
+                Matrix.of(context).client.userID ?? L10n.of(context).user;
+            final displayname = profile?.displayName ?? mxid.localpart ?? mxid;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Avatar(
+                    mxContent: profile?.avatarUrl,
+                    name: displayname,
+                    size: 96,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    displayname,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => FluffyShare.share(mxid, context),
+                    child: Text(mxid),
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    leading: const Icon(Icons.photo_camera_outlined),
+                    title: const Text('Change profile photo'),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      controller.setAvatarAction();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.edit_outlined),
+                    title: Text(L10n.of(context).editDisplayname),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      controller.setDisplaynameAction();
+                    },
+                  ),
+                  FutureBuilder(
+                    future: Result.capture(
+                      Matrix.of(context).client.getAuthMetadata(),
+                    ).then((result) => result.asValue?.value),
+                    builder: (context, snapshot) {
+                      final url = snapshot.data?.accountManagementUri;
+                      if (url == null) return const SizedBox.shrink();
+                      return ListTile(
+                        leading: const Icon(Icons.open_in_new_outlined),
+                        title: Text(L10n.of(context).manageAccount),
+                        onTap: () => launchUrl(
+                          url,
+                          mode: LaunchMode.inAppBrowserView,
+                        ),
+                      );
+                    },
+                  ),
+                  Divider(color: theme.dividerColor),
+                  ListTile(
+                    leading: const Icon(Icons.logout_outlined),
+                    title: Text(L10n.of(context).logout),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      controller.logoutAction();
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
-      body: ListTileTheme(
-        iconColor: theme.colorScheme.onSurface,
-        child: ListView(
-          key: const Key('SettingsListViewContent'),
-          children: <Widget>[
-            FutureBuilder<Profile>(
-              future: controller.profileFuture,
-              builder: (context, snapshot) {
-                final profile = snapshot.data;
-                final avatar = profile?.avatarUrl;
-                final mxid =
-                    Matrix.of(context).client.userID ?? L10n.of(context).user;
-                final displayname =
-                    profile?.displayName ?? mxid.localpart ?? mxid;
-                return Column(
-                  crossAxisAlignment: .center,
-                  mainAxisSize: .min,
-                  children: [
-                    Stack(
-                      children: [
-                        Avatar(
-                          mxContent: avatar,
-                          name: displayname,
-                          size: Avatar.defaultSize * 2.5,
-                          onTap: avatar != null
-                              ? () => showDialog(
-                                  context: context,
-                                  builder: (_) => MxcImageViewer(avatar),
-                                )
-                              : null,
-                        ),
-                        if (profile != null)
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: FloatingActionButton.small(
-                              elevation: 2,
-                              onPressed: controller.setAvatarAction,
-                              heroTag: null,
-                              child: const Icon(Icons.camera_alt_outlined),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    TextButton.icon(
-                      onPressed: controller.setDisplaynameAction,
-                      icon: const Icon(Icons.edit_outlined, size: 16),
-                      style: TextButton.styleFrom(
-                        foregroundColor: theme.colorScheme.onSurface,
-                        iconColor: theme.colorScheme.onSurface,
-                      ),
-                      label: Text(
-                        displayname,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => FluffyShare.share(mxid, context),
-                      style: TextButton.styleFrom(
-                        foregroundColor: theme.colorScheme.secondary,
-                        iconColor: theme.colorScheme.secondary,
-                      ),
-                      child: Text(
-                        mxid,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                );
-              },
-            ),
-            SwitchListTile.adaptive(
-              controlAffinity: ListTileControlAffinity.trailing,
-              value: controller.cryptoIdentityConnected == true,
-              secondary: const Icon(Icons.backup_outlined),
-              title: Text(L10n.of(context).chatBackup),
-              onChanged: controller.firstRunBootstrapAction,
-              contentPadding: EdgeInsets.only(left: 16, right: 8),
-            ),
-            FutureBuilder(
-              future: Result.capture(
-                Matrix.of(context).client.getAuthMetadata(),
-              ).then((result) => result.asValue?.value),
-              builder: (context, snapshot) {
-                final accountManageUrl = snapshot.data?.accountManagementUri;
-                if (accountManageUrl == null) {
-                  return const SizedBox.shrink();
-                }
-                return ListTile(
-                  leading: const Icon(Icons.account_circle_outlined),
-                  title: Text(L10n.of(context).manageAccount),
-                  trailing: const Icon(Icons.open_in_new_outlined),
-                  onTap: () => launchUrl(
-                    accountManageUrl,
-                    mode: LaunchMode.inAppBrowserView,
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.format_paint_outlined),
-              title: Text(L10n.of(context).changeTheme),
-              tileColor: activeRoute.startsWith('/rooms/settings/style')
-                  ? theme.colorScheme.surfaceContainerHigh
-                  : null,
-              onTap: () => context.go('/rooms/settings/style'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.notifications_outlined),
-              title: Text(L10n.of(context).notifications),
-              tileColor: activeRoute.startsWith('/rooms/settings/notifications')
-                  ? theme.colorScheme.surfaceContainerHigh
-                  : null,
-              onTap: () => context.go('/rooms/settings/notifications'),
-            ),
+    );
+  }
+
+  void _managementSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
             ListTile(
               leading: const Icon(Icons.devices_outlined),
               title: Text(L10n.of(context).devices),
-              onTap: () => context.go('/rooms/settings/devices'),
-              tileColor: activeRoute.startsWith('/rooms/settings/devices')
-                  ? theme.colorScheme.surfaceContainerHigh
-                  : null,
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                context.go('/rooms/settings/devices');
+              },
             ),
-            ListTile(
-              leading: const Icon(Icons.forum_outlined),
-              title: Text(L10n.of(context).chat),
-              onTap: () => context.go('/rooms/settings/chat'),
-              tileColor: activeRoute.startsWith('/rooms/settings/chat')
-                  ? theme.colorScheme.surfaceContainerHigh
-                  : null,
-            ),
-            ListTile(
-              leading: const Icon(Icons.shield_outlined),
-              title: Text(L10n.of(context).security),
-              onTap: () => context.go('/rooms/settings/security'),
-              tileColor: activeRoute.startsWith('/rooms/settings/security')
-                  ? theme.colorScheme.surfaceContainerHigh
-                  : null,
-            ),
-            Divider(color: theme.dividerColor),
             ListTile(
               leading: const Icon(Icons.dns_outlined),
               title: Text(
@@ -190,10 +141,10 @@ class SettingsView extends StatelessWidget {
                   Matrix.of(context).client.userID?.domain ?? 'homeserver',
                 ),
               ),
-              onTap: () => context.go('/rooms/settings/homeserver'),
-              tileColor: activeRoute.startsWith('/rooms/settings/homeserver')
-                  ? theme.colorScheme.surfaceContainerHigh
-                  : null,
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                context.go('/rooms/settings/homeserver');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.privacy_tip_outlined),
@@ -201,17 +152,224 @@ class SettingsView extends StatelessWidget {
               onTap: () => launchUrlString(AppSettings.privacyPolicy.value),
             ),
             ListTile(
-              leading: const Icon(Icons.info_outline_rounded),
-              title: Text(L10n.of(context).about),
-              onTap: () => PlatformInfos.showDialog(context),
-            ),
-            Divider(color: theme.dividerColor),
-            ListTile(
               leading: const Icon(Icons.logout_outlined),
               title: Text(L10n.of(context).logout),
-              onTap: controller.logoutAction,
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                controller.logoutAction();
+              },
             ),
+            const SizedBox(height: 8),
           ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final backupOk = controller.cryptoIdentityConnected == true;
+
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text(
+          L10n.of(context).settings,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => context.go('/rooms'),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: ListView(
+        key: const Key('SettingsListViewContent'),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(4, 0, 4, 4),
+            child: Text(
+              'Settings',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 18),
+            child: Text(
+              'Manage your Vibe account & preferences',
+              style: TextStyle(fontSize: 17, color: cs.onSurfaceVariant),
+            ),
+          ),
+          FutureBuilder<Profile>(
+            future: controller.profileFuture,
+            builder: (context, snapshot) {
+              final mxid =
+                  Matrix.of(context).client.userID ?? L10n.of(context).user;
+              final name = snapshot.data?.displayName ?? mxid.localpart ?? mxid;
+              return _SettingsCard(
+                icon: Icons.person,
+                title: 'Account',
+                subtitle: name,
+                onTap: () => _accountSheet(context),
+              );
+            },
+          ),
+          _SettingsCard(
+            icon: Icons.verified_user_outlined,
+            title: 'Security & sign-in',
+            subtitle: 'Password, active sessions & sign-in',
+            onTap: () => context.go('/rooms/settings/security'),
+          ),
+          _SettingsCard(
+            icon: Icons.lock,
+            title: 'Encryption & Keys',
+            subtitle: 'End-to-end encryption status',
+            badge: backupOk ? 'Active' : 'Not set up',
+            badgeColor: backupOk ? Colors.green : Colors.amber,
+            onTap: () => controller.firstRunBootstrapAction(),
+          ),
+          _SettingsCard(
+            icon: Icons.notifications,
+            title: 'Notifications',
+            subtitle: 'In-app alerts & push notifications',
+            onTap: () => context.go('/rooms/settings/notifications'),
+          ),
+          _SettingsCard(
+            icon: Icons.contrast,
+            title: 'Appearance',
+            subtitle: 'Dark/light mode, font size & haptics',
+            onTap: () => context.go('/rooms/settings/style'),
+          ),
+          _SettingsCard(
+            icon: Icons.folder,
+            title: 'Chats & storage',
+            subtitle: 'Media downloads & link previews',
+            onTap: () => context.go('/rooms/settings/chat'),
+          ),
+          _SettingsCard(
+            icon: Icons.info,
+            title: 'About Vibe',
+            subtitle: 'App version & information',
+            onTap: () => PlatformInfos.showDialog(context),
+          ),
+          _SettingsCard(
+            icon: Icons.delete,
+            iconColor: Colors.redAccent,
+            title: 'Account management',
+            subtitle: 'Devices, homeserver & log out',
+            onTap: () => _managementSheet(context),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingsCard extends StatelessWidget {
+  final IconData icon;
+  final Color? iconColor;
+  final String title;
+  final String subtitle;
+  final String? badge;
+  final Color? badgeColor;
+  final VoidCallback onTap;
+
+  const _SettingsCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    this.iconColor,
+    this.badge,
+    this.badgeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: theme.dividerColor),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: cs.surfaceContainerHighest,
+                  ),
+                  child: Icon(icon, color: iconColor ?? cs.onSurface, size: 26),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (badge != null)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: (badgeColor ?? cs.primary).withAlpha(40),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: (badgeColor ?? cs.primary).withAlpha(140),
+                      ),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: badgeColor ?? cs.primary,
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 6),
+                Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+              ],
+            ),
+          ),
         ),
       ),
     );
