@@ -54,6 +54,7 @@ class Message extends StatelessWidget {
   final void Function()? onExpand;
   final bool isCollapsed;
   final Set<String> bigEmojis;
+  final void Function(Event)? onLongPress;
 
   const Message(
     this.event, {
@@ -79,6 +80,7 @@ class Message extends StatelessWidget {
     this.onExpand,
     required this.enterThread,
     this.isCollapsed = false,
+    this.onLongPress,
     super.key,
   });
 
@@ -120,6 +122,7 @@ class Message extends StatelessWidget {
       timeline: timeline,
       highlightMarker: highlightMarker,
       bigEmojis: bigEmojis,
+      onLongPress: onLongPress,
     );
     final client = Matrix.of(context).client;
     final ownMessage = event.senderId == client.userID;
