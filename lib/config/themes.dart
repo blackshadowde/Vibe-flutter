@@ -45,11 +45,22 @@ abstract class FluffyThemes {
     Brightness brightness, [
     Color? seed,
   ]) {
-    final colorScheme = ColorScheme.fromSeed(
+    final baseScheme = ColorScheme.fromSeed(
       brightness: brightness,
       seedColor: seed ?? Color(AppSettings.colorSchemeSeedInt.value),
       dynamicSchemeVariant: DynamicSchemeVariant.rainbow,
     );
+    // Vibe dark look: deep navy surfaces instead of the generated grey ones
+    final colorScheme = brightness == Brightness.dark
+        ? baseScheme.copyWith(
+            surface: const Color(0xFF10112A),
+            surfaceContainerLowest: const Color(0xFF0B0C1E),
+            surfaceContainerLow: const Color(0xFF14152F),
+            surfaceContainer: const Color(0xFF191A38),
+            surfaceContainerHigh: const Color(0xFF1F2042),
+            surfaceContainerHighest: const Color(0xFF26274C),
+          )
+        : baseScheme;
     final isColumnMode = FluffyThemes.isColumnMode(context);
     final dividerColor = brightness == Brightness.dark
         ? colorScheme.surfaceContainerHighest
