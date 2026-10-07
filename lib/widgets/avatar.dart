@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/utils/string_color.dart';
+import 'package:fluffychat/vibe/vibe_connection.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:fluffychat/widgets/presence_builder.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,31 @@ class Avatar extends StatelessWidget {
     final words = name.split(' ');
     if (words.length <= 1) return name.substring(0, 1);
     return '${words.first.substring(0, 1)}${words.last.substring(0, 1)}';
+  }
+
+  Widget _dot(ThemeData theme, Color dotColor) {
+    final ring = presenceBackgroundColor ?? theme.colorScheme.surface;
+    return Positioned(
+      bottom: -3,
+      right: -3,
+      child: Container(
+        width: 16,
+        height: 16,
+        decoration: BoxDecoration(
+          color: ring,
+          borderRadius: BorderRadius.circular(32),
+        ),
+        alignment: Alignment.center,
+        child: Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            color: dotColor,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -117,47 +143,27 @@ class Avatar extends StatelessWidget {
           ),
         ),
         if (presenceUserId != null)
-          PresenceBuilder(
-            client: client,
-            userId: presenceUserId,
-            builder: (context, presence) {
-              if (presence == null ||
-                  (presence.presence == PresenceType.offline &&
-                      presence.lastActiveTimestamp == null)) {
-                return const SizedBox.shrink();
-              }
-              final dotColor = presence.presence.isOnline
-                  ? Colors.green
-                  : presence.presence.isUnavailable
-                  ? Colors.orange
-                  : Colors.grey;
-              return Positioned(
-                bottom: -3,
-                right: -3,
-                child: Container(
-                  width: 16,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    color: presenceBackgroundColor ?? theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(32),
-                  ),
-                  alignment: Alignment.center,
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: dotColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        width: 1,
-                        color: theme.colorScheme.surface,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          if (client != null && presenceUserId == client!.userID)
+            VibeConnectionBuilder(
+              client: client!,
+              builder: (context, conn) =>
+                  _dot(theme, conn.color),
+            )
+          else
+            PresenceBuilder(
+              client: client,
+              userId: presenceUserId,
+              builder: (context, presence) {
+                final dotColor = presence == null
+                    ? vibeDotGrey
+                    : presence.presence.isOnline
+                    ? vibeDotGreen
+                    : presence.presence.isUnavailable
+                    ? vibeDotOrange
+                    : vibeDotGrey;
+                return _dot(theme, dotColor);
+              },
+            ),
       ],
     );
     if (onTap == null) return container;
