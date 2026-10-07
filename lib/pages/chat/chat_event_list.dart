@@ -180,7 +180,9 @@ class ChatEventList extends StatelessWidget {
                       onMention: () => controller.sendController.text +=
                           '${event.senderFromMemoryOrFallback.mention} ',
                       highlightMarker:
-                          controller.scrollToEventIdMarker == event.eventId,
+                          controller.scrollToEventIdMarker == event.eventId ||
+                          controller.replyEvent?.eventId == event.eventId ||
+                          controller.editEvent?.eventId == event.eventId,
                       onSelect: controller.onSelectMessage,
                       scrollToEventId: controller.scrollToEventId,
                       longPressSelect: controller.selectedEvents.isNotEmpty,
