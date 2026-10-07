@@ -3,69 +3,63 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'dart:async';
-
-import 'package:fluffychat/config/themes.dart';
 import 'package:flutter/material.dart';
 
+/// Three dots that fade between gray and near-black, one after the other.
 class TypingAnimation extends StatefulWidget {
   final double size;
-  const TypingAnimation({this.size = 8.0, super.key});
+  const TypingAnimation({this.size = 6.0, super.key});
 
   @override
   State<TypingAnimation> createState() => _TypingAnimationState();
 }
 
-class _TypingAnimationState extends State<TypingAnimation> {
-  int _tick = 0;
+class _TypingAnimationState extends State<TypingAnimation>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  )..repeat();
 
-  late final Timer _timer;
-
-  static const Duration animationDuration = Duration(milliseconds: 300);
-
-  @override
-  void initState() {
-    _timer = Timer.periodic(animationDuration, (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _tick = (_tick + 1) % 4;
-      });
-    });
-    super.initState();
-  }
+  static const Color _light = Color(0xFFB5BAC1);
+  static const Color _dark = Color(0xFF1A191E);
 
   @override
   void dispose() {
-    _timer.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final size = widget.size;
-
-    return Row(
-      mainAxisSize: .min,
-      children: [
-        for (var i = 1; i <= 3; i++)
-          AnimatedContainer(
-            duration: animationDuration * 1.5,
-            curve: FluffyThemes.animationCurve,
-            width: size,
-            height: _tick == i ? size * 2 : size,
-            margin: EdgeInsets.symmetric(
-              horizontal: size / 4,
-              vertical: _tick == i ? 4 : 8,
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < 3; i++)
+            Container(
+              width: size,
+              height: size,
+              margin: EdgeInsets.symmetric(horizontal: size * 0.5),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color.lerp(
+                  _light,
+                  _dark,
+                  _wave((_controller.value - i * 0.18) % 1.0),
+                ),
+              ),
             ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(size * 2),
-              color: theme.colorScheme.secondary,
-            ),
-          ),
-      ],
+        ],
+      ),
     );
+  }
+
+  /// 0 -> 1 -> 0 smooth pulse over one cycle.
+  double _wave(double t) {
+    final v = t < 0.5 ? t * 2 : (1 - t) * 2;
+    return Curves.easeInOut.transform(v);
   }
 }
