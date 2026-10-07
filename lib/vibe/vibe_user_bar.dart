@@ -5,6 +5,7 @@
 
 import 'package:fluffychat/vibe/vibe_connection.dart';
 import 'package:fluffychat/vibe/vibe_own_profile.dart';
+import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +27,11 @@ class VibeUserBar extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
         child: SizedBox(
           height: 76,
-          child: FutureBuilder<Profile?>(
-            future: client.fetchOwnProfile(),
-            builder: (context, snapshot) {
+          child: VibeOwnProfileBuilder(
+            client: client,
+            builder: (context, profile) {
               final name =
-                  snapshot.data?.displayName ?? client.userID?.localpart ?? '';
+                  profile?.displayName ?? client.userID?.localpart ?? '';
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -102,7 +103,7 @@ class VibeUserBar extends StatelessWidget {
                         color: theme.colorScheme.surface,
                       ),
                       child: Avatar(
-                        mxContent: snapshot.data?.avatarUrl,
+                        mxContent: profile?.avatarUrl,
                         name: name,
                         size: 64,
                         client: client,

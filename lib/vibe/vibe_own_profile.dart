@@ -2,6 +2,7 @@
 
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +56,7 @@ class _OwnSheetState extends State<_OwnSheet> {
   @override
   void initState() {
     super.initState();
-    _profile = client.fetchOwnProfile();
+    _profile = VibeProfileCache.get(client);
   }
 
   @override
@@ -66,8 +67,9 @@ class _OwnSheetState extends State<_OwnSheet> {
   }
 
   void _reload() {
+    VibeProfileCache.refresh();
     if (!mounted) return;
-    setState(() => _profile = client.fetchOwnProfile());
+    setState(() => _profile = VibeProfileCache.get(client));
   }
 
   Future<void> _photo(Profile? profile) async {

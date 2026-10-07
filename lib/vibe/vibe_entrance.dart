@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 /// Google-Messages style entrance for a brand new message: the row grows from
 /// the bottom (so the whole timeline glides up smoothly) while the bubble
-/// slides up, scales from its corner and fades in.
+/// slides up, scales from its corner and fades in. Messages that do not
+/// animate are returned untouched (zero overhead).
 class VibeEntrance extends StatefulWidget {
   final bool animate;
   final bool fromRight;
@@ -23,49 +24,58 @@ class VibeEntrance extends StatefulWidget {
 
 class _VibeEntranceState extends State<VibeEntrance>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 460),
-    value: widget.animate ? 0 : 1,
-  );
-
-  late final Animation<double> _size = CurvedAnimation(
-    parent: _c,
-    curve: const Interval(0.0, 0.8, curve: Curves.easeOutCubic),
-  );
-  late final Animation<double> _pop = CurvedAnimation(
-    parent: _c,
-    curve: Curves.easeOutBack,
-  );
-  late final Animation<double> _fade = CurvedAnimation(
-    parent: _c,
-    curve: const Interval(0.0, 0.55, curve: Curves.easeOut),
-  );
+  AnimationController? _c;
+  late final GlobalKey? _gk = widget.animate ? GlobalKey() : null;
+  Animation<double>? _size;
+  Animation<double>? _pop;
+  Animation<double>? _fade;
 
   @override
   void initState() {
     super.initState();
-    if (widget.animate) _c.forward();
+    if (!widget.animate) return;
+    final c = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 460),
+    );
+    _c = c;
+    _size = CurvedAnimation(
+      parent: c,
+      curve: const Interval(0.0, 0.8, curve: Curves.easeOutCubic),
+    );
+    _pop = CurvedAnimation(parent: c, curve: Curves.easeOutBack);
+    _fade = CurvedAnimation(
+      parent: c,
+      curve: const Interval(0.0, 0.55, curve: Curves.easeOut),
+    );
+    c.addStatusListener((s) {
+      if (s == AnimationStatus.completed && mounted) setState(() {});
+    });
+    c.forward();
   }
 
   @override
   void dispose() {
-    _c.dispose();
+    _c?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final c = _c;
+    if (c == null) return widget.child;
+    final inner = KeyedSubtree(key: _gk, child: widget.child);
+    if (c.isCompleted) return inner;
     return AnimatedBuilder(
-      animation: _c,
-      child: widget.child,
+      animation: c,
+      child: inner,
       builder: (context, child) {
-        final p = _pop.value;
+        final p = _pop!.value;
         return SizeTransition(
-          sizeFactor: _size,
+          sizeFactor: _size!,
           axisAlignment: 1.0,
           child: Opacity(
-            opacity: _fade.value.clamp(0.0, 1.0),
+            opacity: _fade!.value.clamp(0.0, 1.0),
             child: Transform.translate(
               offset: Offset(0, (1 - p) * 38),
               child: Transform.scale(

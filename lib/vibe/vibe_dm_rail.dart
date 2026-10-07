@@ -8,6 +8,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -45,11 +46,11 @@ class VibeDmRail extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              FutureBuilder<Profile?>(
-                future: client.fetchOwnProfile(),
-                builder: (context, snapshot) => Avatar(
-                  mxContent: snapshot.data?.avatarUrl,
-                  name: snapshot.data?.displayName ?? client.userID?.localpart,
+              VibeOwnProfileBuilder(
+                client: client,
+                builder: (context, profile) => Avatar(
+                  mxContent: profile?.avatarUrl,
+                  name: profile?.displayName ?? client.userID?.localpart,
                   size: 48,
                   client: client,
                   presenceUserId: client.userID,

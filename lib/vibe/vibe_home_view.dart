@@ -82,28 +82,32 @@ class _VibeHomeViewState extends State<VibeHomeView>
     _swipe.value = (_swipe.value - d.delta.dx / _width).clamp(0.0, 1.0);
   }
 
-  Future<void> _dragEnd(DragEndDetails d) async {
+  Future<void> _dragEnd(DragEndDetails d) => _finish(d.primaryVelocity ?? 0);
+
+  Future<void> _finish(double v) async {
     if (!_dragging) return;
     _dragging = false;
     _locked = true;
-    final v = d.primaryVelocity ?? 0; // negative = towards the left
-    final commit = v < -500 || (_swipe.value > 0.35 && v < 500);
-    final sim = SpringSimulation(
-      SpringDescription.withDampingRatio(mass: 1, stiffness: 420, ratio: 1),
-      _swipe.value,
-      commit ? 1.0 : 0.0,
-      -v / _width,
-    );
-    await _swipe.animateWith(sim);
-    if (!commit) _router?.go('/rooms');
-    // keep control until the route's own animation has finished
-    final wait = const Duration(milliseconds: 480) -
-        DateTime.now().difference(_startedAt);
-    if (!wait.isNegative) await Future<void>.delayed(wait);
-    VibeSwipe.reset();
-    _locked = false;
+    try {
+      final commit = v < -500 || (_swipe.value > 0.35 && v < 500);
+      final sim = SpringSimulation(
+        SpringDescription.withDampingRatio(mass: 1, stiffness: 420, ratio: 1),
+        _swipe.value,
+        commit ? 1.0 : 0.0,
+        -v / _width,
+      );
+      await _swipe.animateWith(sim);
+      if (!commit) _router?.go('/rooms');
+      // keep control until the route's own animation has finished
+      final wait =
+          const Duration(milliseconds: 480) -
+          DateTime.now().difference(_startedAt);
+      if (!wait.isNegative) await Future<void>.delayed(wait);
+    } finally {
+      VibeSwipe.reset();
+      _locked = false;
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +142,7 @@ class _VibeHomeViewState extends State<VibeHomeView>
             behavior: HitTestBehavior.translucent,
             onHorizontalDragUpdate: _dragUpdate,
             onHorizontalDragEnd: _dragEnd,
+            onHorizontalDragCancel: () => _finish(0),
             child: ColoredBox(
             color: theme.colorScheme.surfaceContainerLowest,
             child: Stack(
