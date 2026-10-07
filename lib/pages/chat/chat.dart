@@ -270,10 +270,26 @@ class ChatController extends State<ChatPageWithRoom>
     }
     if (!scrollController.hasClients) return;
     if (timeline?.allowNewEvent == false ||
-        scrollController.position.pixels > 0 && _scrolledUp == false) {
+        scrollController.position.pixels > _bottomSlack &&
+            _scrolledUp == false) {
       setState(() => _scrolledUp = true);
-    } else if (scrollController.position.pixels <= 0 && _scrolledUp == true) {
+    } else if (scrollController.position.pixels <= _bottomSlack &&
+        _scrolledUp == true) {
       setState(() => _scrolledUp = false);
+      setReadMarker();
+    }
+  }
+
+  /// A few pixels away from the newest message still counts as "at the
+  /// bottom", otherwise the chat is never marked as read.
+  static const double _bottomSlack = 120;
+
+  void _markReadIfAtBottom() {
+    if (!mounted || !scrollController.hasClients) return;
+    if (scrollController.position.pixels <= _bottomSlack) {
+      if (_scrolledUp && timeline?.allowNewEvent != false) {
+        setState(() => _scrolledUp = false);
+      }
       setReadMarker();
     }
   }
@@ -476,6 +492,11 @@ class ChatController extends State<ChatPageWithRoom>
       if (readMarkerEventIndex > 1) {
         Logs().v('Scroll up to visible event', readMarkerEventId);
         scrollToEventId(readMarkerEventId, highlightEvent: false);
+        // If the unread messages already fit on screen, mark them as read.
+        Future.delayed(
+          const Duration(milliseconds: 900),
+          _markReadIfAtBottom,
+        );
         return;
       } else if (readMarkerEventId.isNotEmpty && readMarkerEventIndex == -1) {
         _showScrollUpMaterialBanner(readMarkerEventId);
@@ -514,7 +535,7 @@ class ChatController extends State<ChatPageWithRoom>
 
   void updateView() {
     if (!mounted) return;
-    setReadMarker();
+    scrollController.hasClients ? _markReadIfAtBottom() : setReadMarker();
     setState(() {});
   }
 
