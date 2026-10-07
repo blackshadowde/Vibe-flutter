@@ -61,7 +61,7 @@ class Settings3PidView extends StatelessWidget {
                       leading: CircleAvatar(
                         backgroundColor: theme.scaffoldBackgroundColor,
                         foregroundColor: identifier.isEmpty
-                            ? Colors.orange
+                            ? Color(0xFF949BA4)
                             : Colors.grey,
                         child: Icon(
                           identifier.isEmpty
