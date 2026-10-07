@@ -25,29 +25,21 @@ class VibeHomeView extends StatefulWidget {
   State<VibeHomeView> createState() => _VibeHomeViewState();
 }
 
-class _VibeHomeViewState extends State<VibeHomeView>
-    with SingleTickerProviderStateMixin {
+class _VibeHomeViewState extends State<VibeHomeView> {
   String? selectedId;
   String? _lastOpenedId;
 
-  late final AnimationController _swipe = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 320),
-  );
   bool _dragging = false;
-  bool _locked = false;
+  double _progress = 0;
   double _width = 400;
-  DateTime _startedAt = DateTime.now();
+  AnimationController? _ctl;
+  NavigatorState? _nav;
   GoRouter? _router;
   List<Room> _rooms = const [];
 
   @override
   void dispose() {
-    _swipe.dispose();
-    if (VibeSwipe.anim == _swipe) {
-      VibeSwipe.anim = null;
-      VibeSwipe.reset();
-    }
+    VibeSwipe.reset();
     super.dispose();
   }
 
@@ -60,53 +52,80 @@ class _VibeHomeViewState extends State<VibeHomeView>
     return null;
   }
 
+  void _onRoute(PageRoute<dynamic> route) {
+    final c = route.controller;
+    if (c == null) return;
+    _ctl = c;
+    _nav = route.navigator;
+    c.stop();
+    c.value = _progress;
+    _nav?.didStartUserGesture();
+    if (!_dragging) _settle(0);
+  }
+
   void _dragUpdate(DragUpdateDetails d) {
-    if (_locked) return;
     if (!_dragging) {
-      if (d.delta.dx >= 0) return;
+      if (_busy || d.delta.dx >= 0) return;
       final id = _targetId();
       if (id == null) return;
       _dragging = true;
+      _busy = true;
+      _progress = 0;
+      _ctl = null;
+      _nav = null;
       _router = GoRouter.of(context);
       _width = MediaQuery.sizeOf(context).width;
       _lastOpenedId = id;
-      _swipe.stop();
-      _swipe.value = 0;
-      VibeSwipe.anim = _swipe;
-      VibeSwipe.targetRoute = null;
       VibeSwipe.pending = true;
-      VibeSwipe.active.value = true;
-      _startedAt = DateTime.now();
+      VibeSwipe.onRoute = _onRoute;
       _router!.go('/rooms/$id');
     }
-    _swipe.value = (_swipe.value - d.delta.dx / _width).clamp(0.0, 1.0);
+    _progress = (_progress - d.delta.dx / _width).clamp(0.0, 1.0);
+    _ctl?.value = _progress;
   }
 
-  Future<void> _dragEnd(DragEndDetails d) => _finish(d.primaryVelocity ?? 0);
+  bool _busy = false;
 
-  Future<void> _finish(double v) async {
+  void _dragEnd(DragEndDetails d) {
     if (!_dragging) return;
     _dragging = false;
-    _locked = true;
-    try {
-      final commit = v < -500 || (_swipe.value > 0.35 && v < 500);
-      final sim = SpringSimulation(
-        SpringDescription.withDampingRatio(mass: 1, stiffness: 420, ratio: 1),
-        _swipe.value,
-        commit ? 1.0 : 0.0,
-        -v / _width,
-      );
-      await _swipe.animateWith(sim);
-      if (!commit) _router?.go('/rooms');
-      // keep control until the route's own animation has finished
-      final wait =
-          const Duration(milliseconds: 480) -
-          DateTime.now().difference(_startedAt);
-      if (!wait.isNegative) await Future<void>.delayed(wait);
-    } finally {
-      VibeSwipe.reset();
-      _locked = false;
+    _settle(d.primaryVelocity ?? 0);
+  }
+
+  /// Finish the gesture: spring the real route animation open or shut.
+  Future<void> _settle(double v) async {
+    final c = _ctl;
+    if (c == null) {
+      // the route has not started yet; _onRoute settles it when it does
+      Future<void>.delayed(const Duration(seconds: 2), () {
+        if (_ctl == null) {
+          VibeSwipe.reset();
+          _busy = false;
+          _router?.go('/rooms');
+        }
+      });
+      return;
     }
+    final commit = v < -500 || (c.value > 0.35 && v < 500);
+    try {
+      await c.animateWith(
+        SpringSimulation(
+          SpringDescription.withDampingRatio(
+            mass: 1,
+            stiffness: 420,
+            ratio: 1,
+          ),
+          c.value,
+          commit ? 1.0 : 0.0,
+          -v / _width,
+        ),
+      );
+    } catch (_) {}
+    _nav?.didStopUserGesture();
+    if (!commit) _router?.go('/rooms');
+    _ctl = null;
+    _nav = null;
+    _busy = false;
   }
 
   @override
@@ -142,7 +161,7 @@ class _VibeHomeViewState extends State<VibeHomeView>
             behavior: HitTestBehavior.translucent,
             onHorizontalDragUpdate: _dragUpdate,
             onHorizontalDragEnd: _dragEnd,
-            onHorizontalDragCancel: () => _finish(0),
+            onHorizontalDragCancel: () => _dragEnd(DragEndDetails()),
             child: ColoredBox(
             color: theme.colorScheme.surfaceContainerLowest,
             child: Stack(

@@ -104,10 +104,11 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
             title: 'How Vibe keeps you safe',
             sub: 'Replay the welcome tour',
             trailing: Icons.chevron_right,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (ctx) =>
-                    VibeWelcome(onDone: () => Navigator.of(ctx).pop()),
+            onTap: () => showDialog<void>(
+              context: context,
+              useSafeArea: false,
+              builder: (ctx) => Dialog.fullscreen(
+                child: VibeWelcome(onDone: () => Navigator.of(ctx).pop()),
               ),
             ),
           ),

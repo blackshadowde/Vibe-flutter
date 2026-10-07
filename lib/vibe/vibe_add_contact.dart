@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/pages/new_private_chat/qr_scanner_modal.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -15,6 +16,7 @@ import 'package:matrix/matrix.dart';
 abstract class VibeAddContact {
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet<void>(
+      sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,

@@ -145,8 +145,7 @@ class _VibeEncryptionPageState extends State<VibeEncryptionPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
-            onPressed: () =>
-                Navigator.of(context).popUntil((r) => r.isFirst),
+            onPressed: () => context.go('/rooms'),
           ),
         ],
       ),

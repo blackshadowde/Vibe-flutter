@@ -8,15 +8,14 @@ import 'package:flutter/material.dart';
 /// State for the "drag the chat in with your finger" gesture on the home
 /// screen. While [active] the chat route [targetRoute] follows [anim].
 abstract class VibeSwipe {
-  static final ValueNotifier<bool> active = ValueNotifier<bool>(false);
-  static Animation<double>? anim;
+  /// Set right before navigating to the chat; the first route that starts its
+  /// forward transition while this is true is handed to [onRoute].
   static bool pending = false;
-  static Route<dynamic>? targetRoute;
+  static void Function(PageRoute<dynamic> route)? onRoute;
 
   static void reset() {
-    active.value = false;
     pending = false;
-    targetRoute = null;
+    onRoute = null;
   }
 }
 
@@ -34,29 +33,20 @@ class VibePageTransitionsBuilder extends PageTransitionsBuilder {
     Widget child,
   ) {
     if (route.isFirst) return child;
-    if (VibeSwipe.pending &&
-        VibeSwipe.targetRoute == null &&
-        animation.status == AnimationStatus.forward &&
-        animation.value < 0.5) {
-      VibeSwipe.targetRoute = route;
+    if (VibeSwipe.pending && animation.status == AnimationStatus.forward) {
       VibeSwipe.pending = false;
+      final cb = VibeSwipe.onRoute;
+      VibeSwipe.onRoute = null;
+      if (cb != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => cb(route));
+      }
     }
-    final isTarget = identical(route, VibeSwipe.targetRoute);
-    final page = RepaintBoundary(child: child);
     return _VibeBackSwipe<T>(
       route: route,
-      child: ValueListenableBuilder<bool>(
-        valueListenable: VibeSwipe.active,
-        builder: (ctx, on, _) {
-          final drag = VibeSwipe.anim;
-          final useDrag = on && isTarget && drag != null && route.isActive;
-          return _SlideOver(
-            route: route,
-            animation: useDrag ? drag : animation,
-            linear: useDrag,
-            child: page,
-          );
-        },
+      child: _SlideOver(
+        route: route,
+        animation: animation,
+        child: RepaintBoundary(child: child),
       ),
     );
   }
@@ -65,12 +55,10 @@ class VibePageTransitionsBuilder extends PageTransitionsBuilder {
 class _SlideOver extends StatelessWidget {
   final PageRoute<dynamic> route;
   final Animation<double> animation;
-  final bool linear;
   final Widget child;
   const _SlideOver({
     required this.route,
     required this.animation,
-    required this.linear,
     required this.child,
   });
 
@@ -79,7 +67,7 @@ class _SlideOver extends StatelessWidget {
     animation: animation,
     child: child,
     builder: (context, child) {
-      final gesture = linear || route.navigator?.userGestureInProgress == true;
+      final gesture = route.navigator?.userGestureInProgress == true;
       final v = animation.value.clamp(0.0, 1.0);
       final t = gesture ? v : Curves.easeOutCubic.transform(v);
       return FractionalTranslation(
@@ -134,8 +122,7 @@ class _VibeBackSwipeState<T> extends State<_VibeBackSwipe<T>> {
         r.animation?.status == AnimationStatus.completed &&
         r.navigator?.userGestureInProgress != true &&
         r.popDisposition == RoutePopDisposition.pop &&
-        !r.willHandlePopInternally &&
-        !VibeSwipe.active.value;
+        !r.willHandlePopInternally;
   }
 
   void _down(PointerDownEvent e) {

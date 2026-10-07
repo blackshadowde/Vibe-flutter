@@ -6,6 +6,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/pages/chat/send_file_dialog.dart';
@@ -21,6 +22,7 @@ abstract class VibeAttachSheet {
   static Future<void> show(BuildContext context, ChatController controller) {
     controller.inputFocus.unfocus();
     return showModalBottomSheet<void>(
+      sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
@@ -141,6 +143,7 @@ class _AttachSheetState extends State<_AttachSheet> {
         .where((r) => r.isDirectChat && r.directChatMatrixID != null)
         .toList();
     showModalBottomSheet<void>(
+      sheetAnimationStyle: vibeSheetStyle,
       context: c.context,
       useRootNavigator: true,
       isScrollControlled: true,

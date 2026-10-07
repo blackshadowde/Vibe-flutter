@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ abstract class VibeUserSheet {
   }) {
     final router = GoRouter.of(context);
     return showModalBottomSheet<void>(
+      sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,

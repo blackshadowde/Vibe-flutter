@@ -95,3 +95,11 @@ class _VibeStaggerState extends State<VibeStagger>
     ),
   );
 }
+
+/// The smooth, slow-out animation used by every sheet in the app.
+const AnimationStyle vibeSheetStyle = AnimationStyle(
+  duration: Duration(milliseconds: 460),
+  reverseDuration: Duration(milliseconds: 260),
+  curve: Curves.easeOutQuint,
+  reverseCurve: Curves.easeInCubic,
+);

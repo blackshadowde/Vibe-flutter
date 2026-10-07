@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
@@ -25,6 +26,7 @@ abstract class VibeMessageMenu {
   ) {
     final cs = Theme.of(context).colorScheme;
     return showModalBottomSheet<void>(
+      sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
@@ -76,6 +78,7 @@ class _Menu extends StatelessWidget {
     _close();
     if (!parent.mounted) return;
     final emoji = await showModalBottomSheet<String>(
+      sheetAnimationStyle: vibeSheetStyle,
       context: parent,
       useRootNavigator: true,
       isScrollControlled: true,
