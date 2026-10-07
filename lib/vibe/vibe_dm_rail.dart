@@ -7,6 +7,7 @@ import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
+import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,9 @@ class VibeDmRail extends StatelessWidget {
                   name: snapshot.data?.displayName ?? client.userID?.localpart,
                   size: 48,
                   client: client,
+                  presenceUserId: client.userID,
+                  presenceBackgroundColor:
+                      theme.colorScheme.surfaceContainerLowest,
                   onTap: onHome,
                 ),
               ),
@@ -110,15 +114,21 @@ class VibeDmRail extends StatelessWidget {
                                       : Colors.transparent,
                                 ),
                               ),
-                              child: Avatar(
-                                mxContent: room.avatar,
-                                name: name,
-                                size: 46,
-                                client: room.client,
-                                presenceUserId: room.directChatMatrixID,
-                                presenceBackgroundColor:
+                              child: VibeTypingOverlay(
+                                room: room,
+                                ringColor:
                                     theme.colorScheme.surfaceContainerLowest,
-                                onTap: () => onSelect(room),
+                                child: Avatar(
+                                  mxContent: room.avatar,
+                                  name: name,
+                                  size: 46,
+                                  client: room.client,
+                                  presenceUserId: room.directChatMatrixID,
+                                  presenceBackgroundColor: theme
+                                      .colorScheme
+                                      .surfaceContainerLowest,
+                                  onTap: () => onSelect(room),
+                                ),
                               ),
                             ),
                             if (room.notificationCount > 0)

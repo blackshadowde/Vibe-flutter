@@ -238,6 +238,7 @@ class _Menu extends StatelessWidget {
                     name: name,
                     size: 38,
                     client: event.room.client,
+                    presenceUserId: sender.id,
                   ),
                   const SizedBox(width: 14),
                   Expanded(

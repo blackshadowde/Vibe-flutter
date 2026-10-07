@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_connection.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -60,11 +61,15 @@ class VibeUserBar extends StatelessWidget {
                                       fontSize: 16,
                                     ),
                                   ),
-                                  Text(
-                                    'Online',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                  VibeConnectionBuilder(
+                                    client: client,
+                                    builder: (context, conn) => Text(
+                                      conn.label,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                      ),
                                     ),
                                   ),
                                 ],

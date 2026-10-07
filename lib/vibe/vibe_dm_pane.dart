@@ -209,12 +209,15 @@ class _DmTile extends StatelessWidget {
           onTap: onTap,
           onLongPress: onOpen,
           contentPadding: const EdgeInsets.only(left: 10, right: 0),
-          leading: Avatar(
-            mxContent: room.avatar,
-            name: name,
-            size: 42,
-            client: room.client,
-            presenceUserId: room.directChatMatrixID,
+          leading: VibeTypingOverlay(
+            room: room,
+            child: Avatar(
+              mxContent: room.avatar,
+              name: name,
+              size: 42,
+              client: room.client,
+              presenceUserId: room.directChatMatrixID,
+            ),
           ),
           title: Text(
             name,
@@ -277,6 +280,7 @@ class _InviteTile extends StatelessWidget {
             name: name,
             size: 42,
             client: room.client,
+            presenceUserId: room.directChatMatrixID,
           ),
           title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: const Text('Wants to chat with you'),
