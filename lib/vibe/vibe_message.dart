@@ -16,6 +16,7 @@ import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/string_color.dart';
+import 'package:fluffychat/vibe/vibe_heart_burst.dart';
 import 'package:fluffychat/vibe/vibe_user_sheet.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -652,7 +653,10 @@ class VibeMessage extends StatelessWidget {
       ],
     );
 
-    return Center(
+    return VibeHeartHost(
+      event: event,
+      timeline: timeline,
+      builder: (context, heart) => Center(
       child: Swipeable(
         key: ValueKey(event.transactionId ?? event.eventId),
         background: const Padding(
@@ -712,10 +716,12 @@ class VibeMessage extends StatelessWidget {
                           if (existing != null) {
                             existing.redactEvent();
                           } else {
+                            if (emoji.contains('❤')) heart.burst();
                             event.room.sendReaction(event.eventId, emoji);
                           }
                         }
                       : null,
+                  onDoubleTapDown: (d) => heart.noteTap(d.globalPosition),
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
                       14,
@@ -811,6 +817,7 @@ class VibeMessage extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }
