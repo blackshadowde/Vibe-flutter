@@ -99,7 +99,7 @@ class BackgroundPush {
       }
       await _flutterLocalNotificationsPlugin.initialize(
         settings: const InitializationSettings(
-          android: AndroidInitializationSettings('notifications_icon'),
+          android: AndroidInitializationSettings('vibe_notification'),
           iOS: DarwinInitializationSettings(),
         ),
         onDidReceiveNotificationResponse: (response) => notificationTap(

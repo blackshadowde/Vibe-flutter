@@ -159,7 +159,7 @@ abstract class ClientManager {
 
     await flutterLocalNotificationsPlugin.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('notifications_icon'),
+        android: AndroidInitializationSettings('vibe_notification'),
         iOS: DarwinInitializationSettings(),
       ),
     );
