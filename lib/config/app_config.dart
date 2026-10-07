@@ -6,7 +6,7 @@
 import 'dart:ui';
 
 abstract class AppConfig {
-  static const Color primaryColor = Color(0xFF261386);
+  static const Color primaryColor = Color(0xFF5865F2);
 
   static const Color chatColor = primaryColor;
   static const double messageFontSize = 16.0;
