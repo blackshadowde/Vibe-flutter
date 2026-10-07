@@ -68,6 +68,33 @@ class _Menu extends StatelessWidget {
     }
   }
 
+  /// Puts the message into the input box in "editing" mode.
+  void _edit() {
+    _close();
+    final timeline = controller.timeline;
+    if (timeline == null) return;
+    final text = event
+        .getDisplayEvent(timeline)
+        .calcLocalizedBodyFallback(
+          MatrixLocals(L10n.of(controller.context)),
+          withSenderNamePrefix: false,
+          hideReply: true,
+        );
+    // ignore: invalid_use_of_protected_member
+    controller.setState(() {
+      if (controller.editEvent == null) {
+        controller.pendingText = controller.sendController.text;
+      }
+      controller.replyEvent = null;
+      controller.editEvent = event;
+      controller.sendController.text = text;
+      controller.sendController.selection = TextSelection.collapsed(
+        offset: text.length,
+      );
+    });
+    controller.inputFocus.requestFocus();
+  }
+
   Future<void> _react(BuildContext context, String emoji) async {
     _close();
     await event.room.sendReaction(event.eventId, emoji);
@@ -111,7 +138,18 @@ class _Menu extends StatelessWidget {
     controller.selectedEvents
       ..clear()
       ..add(event);
-    final canEdit = controller.canEditSelectedEvents;
+    final canEdit =
+        !controller.isArchived &&
+        event.senderId == event.room.client.userID &&
+        event.type == EventTypes.Message &&
+        !event.redacted &&
+        const {
+          MessageTypes.Text,
+          MessageTypes.Notice,
+          MessageTypes.Emote,
+        }.contains(event.messageType) &&
+        event.status != EventStatus.error &&
+        event.status != EventStatus.sending;
     final canRedact = controller.canRedactSelectedEvents;
     controller.selectedEvents.clear();
 
@@ -279,6 +317,8 @@ class _Menu extends StatelessWidget {
                 _close();
                 controller.replyAction(replyTo: event);
               }),
+            if (canEdit)
+              item(Icons.edit_outlined, 'Edit', _edit, color: _blue),
             item(
               Icons.shortcut,
               'Forward',
@@ -300,14 +340,6 @@ class _Menu extends StatelessWidget {
                 VibeStarred.toggle(event.room.id, event.eventId);
               },
             ),
-            if (canEdit)
-              item(Icons.edit_outlined, 'Edit', () {
-                _close();
-                controller.selectedEvents
-                  ..clear()
-                  ..add(event);
-                controller.editSelectedEventAction();
-              }, color: _blue),
             item(Icons.info_outline, 'Info', () {
               _close();
               controller.showEventInfo(event);
