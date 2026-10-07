@@ -68,6 +68,7 @@ abstract class FluffyThemes {
     return ThemeData(
       visualDensity: VisualDensity.standard,
       useMaterial3: true,
+      fontFamily: 'GGSans',
       brightness: brightness,
       colorScheme: colorScheme,
       dividerColor: dividerColor,
