@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/config/app_config.dart';
+import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -130,11 +131,11 @@ abstract class FluffyThemes {
       dividerColor: dividerColor,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: VibePageTransitionsBuilder(),
+          TargetPlatform.iOS: VibePageTransitionsBuilder(),
+          TargetPlatform.linux: VibePageTransitionsBuilder(),
+          TargetPlatform.macOS: VibePageTransitionsBuilder(),
+          TargetPlatform.windows: VibePageTransitionsBuilder(),
         },
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
