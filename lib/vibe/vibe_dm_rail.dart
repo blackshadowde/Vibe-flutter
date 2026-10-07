@@ -15,13 +15,17 @@ import 'package:matrix/matrix.dart';
 /// Extreme-left rail: own avatar, round DM avatars, "+" button.
 class VibeDmRail extends StatelessWidget {
   final List<Room> rooms;
+  final String? selectedId;
   final String? activeRoomId;
-  final void Function(Room room) onTap;
+  final void Function(Room room) onSelect;
+  final VoidCallback onHome;
 
   const VibeDmRail({
     required this.rooms,
+    required this.selectedId,
     required this.activeRoomId,
-    required this.onTap,
+    required this.onSelect,
+    required this.onHome,
     super.key,
   });
 
@@ -45,7 +49,7 @@ class VibeDmRail extends StatelessWidget {
                   name: snapshot.data?.displayName ?? client.userID?.localpart,
                   size: 48,
                   client: client,
-                  onTap: () => context.go('/rooms/settings'),
+                  onTap: onHome,
                 ),
               ),
               Padding(
@@ -55,10 +59,31 @@ class VibeDmRail extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(bottom: 8),
-                  itemCount: rooms.length,
+                  itemCount: rooms.length + 1,
                   itemBuilder: (context, i) {
+                    if (i == rooms.length) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Center(
+                          child: Material(
+                            color: theme.colorScheme.surfaceContainerHigh,
+                            shape: const CircleBorder(),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.add,
+                                color: theme.colorScheme.primary,
+                              ),
+                              tooltip: L10n.of(context).newChat,
+                              onPressed: () =>
+                                  context.go('/rooms/newprivatechat'),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
                     final room = rooms[i];
-                    final active = room.id == activeRoomId;
+                    final active = room.id == (selectedId ?? activeRoomId);
+                    final invited = room.membership == Membership.invite;
                     final name = room.getLocalizedDisplayname(
                       MatrixLocals(L10n.of(context)),
                     );
@@ -80,6 +105,8 @@ class VibeDmRail extends StatelessWidget {
                                   width: 2,
                                   color: active
                                       ? theme.colorScheme.primary
+                                      : invited
+                                      ? Colors.orange
                                       : Colors.transparent,
                                 ),
                               ),
@@ -91,7 +118,7 @@ class VibeDmRail extends StatelessWidget {
                                 presenceUserId: room.directChatMatrixID,
                                 presenceBackgroundColor:
                                     theme.colorScheme.surfaceContainerLowest,
-                                onTap: () => onTap(room),
+                                onTap: () => onSelect(room),
                               ),
                             ),
                             if (room.notificationCount > 0)
@@ -128,18 +155,6 @@ class VibeDmRail extends StatelessWidget {
                       ),
                     );
                   },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12, top: 4),
-                child: Material(
-                  color: theme.colorScheme.surfaceContainerHigh,
-                  shape: const CircleBorder(),
-                  child: IconButton(
-                    icon: Icon(Icons.add, color: theme.colorScheme.primary),
-                    tooltip: L10n.of(context).newChat,
-                    onPressed: () => context.go('/rooms/newprivatechat'),
-                  ),
                 ),
               ),
             ],

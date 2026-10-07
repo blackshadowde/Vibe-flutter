@@ -17,12 +17,15 @@ class VibeUserBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final client = Matrix.of(context).client;
-    return Material(
-      color: theme.colorScheme.surfaceContainerLowest,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+        child: Material(
+          color: theme.colorScheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(32),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 6, 4, 6),
           child: FutureBuilder<Profile?>(
             future: client.fetchOwnProfile(),
             builder: (context, snapshot) {
@@ -37,7 +40,7 @@ class VibeUserBar extends StatelessWidget {
                     client: client,
                     presenceUserId: client.userID,
                     presenceBackgroundColor:
-                        theme.colorScheme.surfaceContainerLowest,
+                        theme.colorScheme.surfaceContainerHigh,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -53,9 +56,9 @@ class VibeUserBar extends StatelessWidget {
                         ),
                         Text(
                           'Online',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: Colors.green,
                           ),
                         ),
                       ],
@@ -72,6 +75,7 @@ class VibeUserBar extends StatelessWidget {
                 ],
               );
             },
+          ),
           ),
         ),
       ),

@@ -19,11 +19,13 @@ class VibeDmPane extends StatefulWidget {
   final List<Room> rooms;
   final String? activeRoomId;
   final void Function(Room room) onTap;
+  final void Function(Room room) onOpen;
 
   const VibeDmPane({
     required this.rooms,
     required this.activeRoomId,
     required this.onTap,
+    required this.onOpen,
     super.key,
   });
 
@@ -97,7 +99,11 @@ class _VibeDmPaneState extends State<VibeDmPane> {
                   if (invites.isNotEmpty) ...[
                     _SectionLabel('INVITES — ${invites.length}'),
                     for (final room in invites)
-                      _InviteTile(room: room, name: nameOf(room)),
+                      _InviteTile(
+                        room: room,
+                        name: nameOf(room),
+                        onTap: () => widget.onTap(room),
+                      ),
                   ],
                   _SectionLabel('DIRECT MESSAGES — ${joined.length}'),
                   for (final room in joined)
@@ -106,11 +112,7 @@ class _VibeDmPaneState extends State<VibeDmPane> {
                       name: nameOf(room),
                       active: room.id == widget.activeRoomId,
                       onTap: () => widget.onTap(room),
-                      onShared: () => VibeSharedPage.open(
-                        context,
-                        client,
-                        room: room,
-                      ),
+                      onOpen: () => widget.onOpen(room),
                     ),
                 ],
               ),
@@ -166,14 +168,14 @@ class _DmTile extends StatelessWidget {
   final String name;
   final bool active;
   final VoidCallback onTap;
-  final VoidCallback onShared;
+  final VoidCallback onOpen;
 
   const _DmTile({
     required this.room,
     required this.name,
     required this.active,
     required this.onTap,
-    required this.onShared,
+    required this.onOpen,
   });
 
   @override
@@ -187,7 +189,7 @@ class _DmTile extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: ListTile(
           onTap: onTap,
-          onLongPress: onShared,
+          onLongPress: onOpen,
           contentPadding: const EdgeInsets.only(left: 10, right: 0),
           leading: Avatar(
             mxContent: room.avatar,
@@ -224,17 +226,7 @@ class _DmTile extends StatelessWidget {
               ),
             ],
           ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              UnreadBubble(room: room),
-              IconButton(
-                icon: const Icon(Icons.perm_media_outlined, size: 20),
-                tooltip: 'Starred, media, links & files',
-                onPressed: onShared,
-              ),
-            ],
-          ),
+          trailing: UnreadBubble(room: room),
         ),
       ),
     );
@@ -244,7 +236,12 @@ class _DmTile extends StatelessWidget {
 class _InviteTile extends StatelessWidget {
   final Room room;
   final String name;
-  const _InviteTile({required this.room, required this.name});
+  final VoidCallback onTap;
+  const _InviteTile({
+    required this.room,
+    required this.name,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -255,6 +252,7 @@ class _InviteTile extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(12),
         child: ListTile(
+          onTap: onTap,
           contentPadding: const EdgeInsets.only(left: 10, right: 4),
           leading: Avatar(
             mxContent: room.avatar,
