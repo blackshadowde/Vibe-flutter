@@ -115,7 +115,7 @@ class Message extends StatelessWidget {
       scrollToEventId: scrollToEventId,
       onSwipe: onSwipe,
       onMention: onMention,
-      enterThread: enterThread,
+      enterThread: this.enterThread,
       longPressSelect: longPressSelect,
       selected: selected,
       singleSelected: singleSelected,
