@@ -114,8 +114,8 @@ class UserDeviceListItem extends StatelessWidget {
                 : keys.blocked
                 ? Colors.red
                 : keys.verified
-                ? Colors.green
-                : Colors.orange,
+                ? Color(0xFF5865F2)
+                : Color(0xFF949BA4),
             child: Icon(userDevice.icon),
           ),
           title: Text(
@@ -143,8 +143,8 @@ class UserDeviceListItem extends StatelessWidget {
                     color: keys.blocked
                         ? Colors.red
                         : keys.verified
-                        ? Colors.green
-                        : Colors.orange,
+                        ? Color(0xFF5865F2)
+                        : Color(0xFF949BA4),
                   ),
                 ),
         ),
