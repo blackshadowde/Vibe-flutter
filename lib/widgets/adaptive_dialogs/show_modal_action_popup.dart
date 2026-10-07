@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -22,6 +23,7 @@ Future<T?> showModalActionPopup<T>({
     case TargetPlatform.windows:
     case TargetPlatform.linux:
       return showModalBottomSheet(
+      sheetAnimationStyle: vibeSheetStyle,
         isScrollControlled: true,
         useRootNavigator: useRootNavigator,
         context: context,
