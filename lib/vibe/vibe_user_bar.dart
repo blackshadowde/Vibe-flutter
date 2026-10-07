@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/vibe_connection.dart';
+import 'package:fluffychat/vibe/vibe_own_profile.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -105,6 +106,7 @@ class VibeUserBar extends StatelessWidget {
                         name: name,
                         size: 64,
                         client: client,
+                        onTap: () => VibeOwnProfile.show(context, client),
                         presenceUserId: client.userID,
                         presenceBackgroundColor: theme.colorScheme.surface,
                       ),

@@ -36,10 +36,10 @@ class VibeHeartHost extends StatefulWidget {
 
 class _VibeHeartHostState extends State<VibeHeartHost> {
   Offset? _lastTap;
-  Set<String> _others = {};
+  Set<String> _seen = {};
 
-  Set<String> _heartSenders() {
-    final me = widget.event.room.client.userID;
+  /// All reactions on this message as "sender<NUL>key".
+  Set<String> _pairs() {
     final result = <String>{};
     for (final e in widget.event.aggregatedEvents(
       widget.timeline,
@@ -49,8 +49,8 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
       final key = e.content
           .tryGetMap<String, Object?>('m.relates_to')
           ?.tryGet<String>('key');
-      if (key == null || !key.contains('❤')) continue;
-      if (e.senderId != me) result.add(e.senderId);
+      if (key == null || key.isEmpty) continue;
+      result.add('${e.senderId}\u0000$key');
     }
     return result;
   }
@@ -58,20 +58,55 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
   @override
   void initState() {
     super.initState();
-    _others = _heartSenders();
+    _seen = _pairs();
   }
 
   @override
   void didUpdateWidget(VibeHeartHost oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final now = _heartSenders();
-    final isNew = now.difference(_others).isNotEmpty;
-    _others = now;
-    if (isNew) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _burst(fromOther: true);
-      });
+    final now = _pairs();
+    final fresh = now.difference(_seen);
+    _seen = now;
+    if (fresh.isEmpty) return;
+    final me = widget.event.room.client.userID;
+    var heartFromOther = false;
+    final emojis = <String, bool>{}; // emoji -> mine
+    for (final p in fresh) {
+      final i = p.indexOf('\u0000');
+      final sender = p.substring(0, i);
+      final key = p.substring(i + 1);
+      if (key.contains('❤')) {
+        if (sender != me) heartFromOther = true;
+      } else {
+        emojis[key] = (emojis[key] ?? false) || sender == me;
+      }
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (heartFromOther) _burst(fromOther: true);
+      for (final entry in emojis.entries.take(2)) {
+        _fall(entry.key, mine: entry.value);
+      }
+    });
+  }
+
+  void _fall(String emoji, {required bool mine}) {
+    final box = context.findRenderObject();
+    if (box is! RenderBox || !box.attached || !box.hasSize) return;
+    final rect = box.localToGlobal(Offset.zero) & box.size;
+    final overlay = Overlay.maybeOf(context, rootOverlay: true);
+    if (overlay == null) return;
+    HapticFeedback.selectionClick();
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (_) => _EmojiFall(
+        emoji: emoji,
+        rect: rect,
+        fromRight: mine,
+        onDone: () => entry.remove(),
+      ),
+    );
+    overlay.insert(entry);
   }
 
   void _burst({bool fromOther = false}) {
@@ -284,4 +319,155 @@ class _HeartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_HeartPainter old) => old.t != t;
+}
+
+
+// ---------------------------------------------------------------------------
+// Non-heart reactions: the emoji fly up from below and fall onto the message.
+// ---------------------------------------------------------------------------
+
+class _Drop {
+  final double delay; // seconds
+  final double flight; // seconds
+  final Offset from;
+  final Offset to;
+  final double spin;
+  final double tilt;
+  final TextPainter tp;
+  final double size;
+  const _Drop({
+    required this.delay,
+    required this.flight,
+    required this.from,
+    required this.to,
+    required this.spin,
+    required this.tilt,
+    required this.tp,
+    required this.size,
+  });
+}
+
+class _EmojiFall extends StatefulWidget {
+  final String emoji;
+  final Rect rect;
+  final bool fromRight;
+  final VoidCallback onDone;
+  const _EmojiFall({
+    required this.emoji,
+    required this.rect,
+    required this.fromRight,
+    required this.onDone,
+  });
+
+  @override
+  State<_EmojiFall> createState() => _EmojiFallState();
+}
+
+class _EmojiFallState extends State<_EmojiFall>
+    with SingleTickerProviderStateMixin {
+  static const double _total = 2.3; // seconds
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: Duration(milliseconds: (_total * 1000).round()),
+  );
+  late final List<_Drop> _drops;
+
+  @override
+  void initState() {
+    super.initState();
+    final r = math.Random();
+    final rect = widget.rect;
+    _drops = List.generate(9, (i) {
+      final size = 22.0 + r.nextDouble() * 14;
+      final tp = TextPainter(
+        text: TextSpan(text: widget.emoji, style: TextStyle(fontSize: size)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final ox = widget.fromRight
+          ? rect.right - 40 - r.nextDouble() * 50
+          : rect.left + 50 + r.nextDouble() * 60;
+      final from = Offset(ox, rect.bottom + 30 + r.nextDouble() * 20);
+      final to = Offset(
+        rect.left + rect.width * (0.22 + 0.6 * r.nextDouble()),
+        rect.top + rect.height * (0.3 + 0.5 * r.nextDouble()),
+      );
+      return _Drop(
+        delay: r.nextDouble() * 0.35,
+        flight: 0.7 + r.nextDouble() * 0.2,
+        from: from,
+        to: to,
+        spin: (r.nextDouble() - 0.5) * 9,
+        tilt: (r.nextDouble() - 0.5) * 0.7,
+        tp: tp,
+        size: size,
+      );
+    });
+    _c.forward().whenComplete(widget.onDone);
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => IgnorePointer(
+    child: AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) => CustomPaint(
+        size: Size.infinite,
+        painter: _FallPainter(_c.value * _total, _drops),
+      ),
+    ),
+  );
+}
+
+class _FallPainter extends CustomPainter {
+  final double sec;
+  final List<_Drop> drops;
+  _FallPainter(this.sec, this.drops);
+
+  static const double _g = 2400;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final fade = sec > 1.8 ? (1 - (sec - 1.8) / 0.5).clamp(0.0, 1.0) : 1.0;
+    for (final d in drops) {
+      final t = sec - d.delay;
+      if (t <= 0) continue;
+      final T = d.flight;
+      final Offset pos;
+      double scale;
+      double rot;
+      if (t < T) {
+        final dx = d.to.dx - d.from.dx;
+        final dy = d.to.dy - d.from.dy;
+        final vx = dx / T;
+        final vy = (dy - 0.5 * _g * T * T) / T;
+        pos = Offset(d.from.dx + vx * t, d.from.dy + vy * t + 0.5 * _g * t * t);
+        scale = 0.55 + 0.45 * Curves.easeOut.transform((t / 0.25).clamp(0.0, 1.0));
+        rot = d.spin * t;
+      } else {
+        final u = t - T;
+        final bounce = 12 * math.exp(-7 * u) * math.sin(16 * u).abs();
+        pos = d.to - Offset(0, bounce);
+        // squash on impact
+        scale = 1 - 0.18 * math.exp(-9 * u) * math.cos(18 * u).abs();
+        rot = d.spin * T + (d.tilt - d.spin * T) * (1 - math.exp(-6 * u));
+      }
+      canvas.saveLayer(
+        null,
+        Paint()..color = Colors.white.withValues(alpha: fade),
+      );
+      canvas.translate(pos.dx, pos.dy);
+      canvas.rotate(rot);
+      canvas.scale(scale);
+      d.tp.paint(canvas, Offset(-d.tp.width / 2, -d.tp.height / 2));
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(_FallPainter old) => old.sec != sec;
 }
