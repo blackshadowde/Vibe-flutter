@@ -106,6 +106,17 @@ flutter:
     - assets/logo/mini/
     - assets/sounds/
     - assets/vodozemac/
+  fonts:
+    - family: GGSans
+      fonts:
+        - asset: assets/fonts/GGSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/GGSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/GGSans-Semibold.ttf
+          weight: 600
+        - asset: assets/fonts/GGSans-Bold.ttf
+          weight: 700
 
 hooks:
   user_defines:
