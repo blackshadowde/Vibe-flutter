@@ -1,0 +1,66 @@
+name: Vibe build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply Vibe launcher icon
+        run: |
+          RES=android/app/src/main/res
+          SRC=vibe-icon.png
+          BG='#FFFFFF'
+          IM=$(command -v magick || command -v convert)
+
+          # remove every existing launcher icon so nothing conflicts
+          find "$RES" -type f -name 'ic_launcher*' -delete
+
+          # density:legacy-size:adaptive-canvas-size
+          for spec in mdpi:48:108 hdpi:72:162 xhdpi:96:216 xxhdpi:144:324 xxxhdpi:192:432; do
+            IFS=: read -r d legacy canvas <<< "$spec"
+            dir="$RES/mipmap-$d"
+            mkdir -p "$dir"
+            "$IM" "$SRC" -gravity center -crop 400x400+0+0 +repage -resize "${legacy}x${legacy}" "$dir/ic_launcher.png"
+            inner=$(( canvas * 92 / 100 ))
+            "$IM" -size "${canvas}x${canvas}" "xc:$BG" "$dir/vibe_icon_bg.png"
+            "$IM" -size "${canvas}x${canvas}" "xc:$BG" \( "$SRC" -resize "${inner}x${inner}" \) -gravity center -composite "$dir/vibe_icon_fg.png"
+          done
+
+          mkdir -p "$RES/mipmap-anydpi-v26"
+          cat > "$RES/mipmap-anydpi-v26/ic_launcher.xml" <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@mipmap/vibe_icon_bg"/>
+              <foreground android:drawable="@mipmap/vibe_icon_fg"/>
+          </adaptive-icon>
+          XML
+          echo "Vibe icons applied"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: .tool_versions.yaml
+          cache: true
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: flutter pub get
+
+      - run: flutter build apk --debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vibe-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
