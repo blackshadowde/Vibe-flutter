@@ -9,6 +9,7 @@ import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/vibe/vibe_media_saver.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/settings_switch_list_tile.dart';
@@ -58,6 +59,23 @@ class SettingsChatView extends StatelessWidget {
                 SettingsSwitchListTile.adaptive(
                   title: L10n.of(context).autoplayImages,
                   setting: AppSettings.autoplayImages,
+                ),
+              if (PlatformInfos.isMobile)
+                SettingsSwitchListTile.adaptive(
+                  title: 'Save media to gallery',
+                  subtitle:
+                      'Photos and videos you receive are saved to your '
+                      'phone automatically, so they stay even if the '
+                      'server deletes old media.',
+                  setting: AppSettings.vibeSaveMedia,
+                  onChanged: (on) async {
+                    if (!on) return;
+                    final ok = await VibeMediaSaver.requestPermission();
+                    if (!ok) {
+                      await AppSettings.vibeSaveMedia.setItem(false);
+                      controller.updateState();
+                    }
+                  },
                 ),
               SettingsSwitchListTile.adaptive(
                 title: L10n.of(context).sendOnEnter,
