@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_disappearing.dart';
 import 'package:fluffychat/vibe/vibe_media_saver.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
@@ -78,6 +79,7 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
         .listen(_onTyping);
     // Keep my time zone + status present in every direct chat.
     Future.delayed(const Duration(seconds: 20), () => VibeStatus.refresh(c));
+    VibeDisappearing.start(c);
     _msgSub = c.onTimelineEvent.stream.listen((e) {
       VibeMediaSaver.onEvent(e);
       _onMessage(e);

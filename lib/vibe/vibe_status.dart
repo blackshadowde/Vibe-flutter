@@ -407,3 +407,181 @@ abstract class VibeStatusSheet {
     text.dispose();
   }
 }
+
+/// Discord-style thought bubble under the chat header: custom status (if
+/// any) and the other person's local time. Tap to fold it away.
+class VibeStatusBubble extends StatefulWidget {
+  final Room room;
+  final String? userId;
+  const VibeStatusBubble({required this.room, required this.userId, super.key});
+
+  @override
+  State<VibeStatusBubble> createState() => _VibeStatusBubbleState();
+}
+
+class _VibeStatusBubbleState extends State<VibeStatusBubble> {
+  static final Set<String> _folded = {};
+  Timer? _tick;
+  StreamSubscription? _sub;
+
+  bool get _isFolded => _folded.contains(widget.room.id);
+
+  @override
+  void initState() {
+    super.initState();
+    _tick = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+    _sub = widget.room.client.onSync.stream
+        .where((u) => u.rooms?.join?.containsKey(widget.room.id) ?? false)
+        .listen((_) {
+          if (mounted) setState(() {});
+        });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  void _toggle() {
+    VibeHaptics.selection();
+    setState(() {
+      if (!_folded.remove(widget.room.id)) _folded.add(widget.room.id);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = VibeStatus.of(widget.room, widget.userId);
+    String? statusText;
+    if (s != null && s.active) {
+      final until = s.until;
+      statusText =
+          '${s.emoji.isEmpty ? '' : '${s.emoji} '}${s.text}'
+          '${until == null ? '' : ' · ${vibeUntil(context, until)}'}';
+    }
+    String? timeText;
+    final zone = s?.tzOffsetMin;
+    if (zone != null) {
+      final t = DateTime.now().toUtc().add(Duration(minutes: zone));
+      final night = t.hour < 6 || t.hour >= 21;
+      final clock = MaterialLocalizations.of(
+        context,
+      ).formatTimeOfDay(TimeOfDay(hour: t.hour, minute: t.minute));
+      timeText = '${night ? '🌙' : '☀️'} $clock there';
+    }
+    if (statusText == null && timeText == null) {
+      return const SizedBox.shrink();
+    }
+
+    final cs = Theme.of(context).colorScheme;
+    final fill = cs.surfaceContainerHigh;
+    final edge = Colors.white.withValues(alpha: 0.08);
+    Widget dot(double d) => Container(
+      width: d,
+      height: d,
+      decoration: BoxDecoration(
+        color: fill,
+        shape: BoxShape.circle,
+        border: Border.all(color: edge),
+      ),
+    );
+
+    final bubble = AnimatedSize(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topLeft,
+      child: Container(
+        padding: _isFolded
+            ? const EdgeInsets.symmetric(horizontal: 10, vertical: 6)
+            : const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width - 120,
+        ),
+        decoration: BoxDecoration(
+          color: fill,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: edge),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x55000000),
+              blurRadius: 10,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: _isFolded
+            ? Text(
+                s != null && s.active && s.emoji.isNotEmpty ? s.emoji : '💭',
+                style: const TextStyle(fontSize: 14),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (statusText != null)
+                    Text(
+                      statusText,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontStyle: FontStyle.italic,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                  if (timeText != null)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: statusText == null ? 0 : 2,
+                      ),
+                      child: Text(
+                        timeText,
+                        style: TextStyle(
+                          fontSize: statusText == null ? 15 : 12.5,
+                          fontStyle: statusText == null
+                              ? FontStyle.italic
+                              : FontStyle.normal,
+                          color: statusText == null
+                              ? cs.onSurface
+                              : cs.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+      ),
+    );
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 380),
+      curve: Curves.easeOutBack,
+      builder: (context, v, child) => Opacity(
+        opacity: v.clamp(0.0, 1.0),
+        child: Transform.scale(
+          scale: 0.85 + 0.15 * v,
+          alignment: Alignment.topLeft,
+          child: child,
+        ),
+      ),
+      child: GestureDetector(
+        onTap: _toggle,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(left: 0, top: 0, child: dot(8)),
+            Positioned(left: 9, top: 9, child: dot(13)),
+            Padding(
+              padding: const EdgeInsets.only(left: 18, top: 18),
+              child: bubble,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

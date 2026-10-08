@@ -16,6 +16,7 @@ import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/string_color.dart';
+import 'package:fluffychat/vibe/vibe_disappearing.dart';
 import 'package:fluffychat/vibe/vibe_heart_burst.dart';
 import 'package:fluffychat/vibe/vibe_user_sheet.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -337,6 +338,7 @@ class VibeMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (VibeDisappearing.isExpired(event)) return const SizedBox.shrink();
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final client = Matrix.of(context).client;
