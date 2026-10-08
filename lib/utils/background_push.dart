@@ -111,6 +111,20 @@ class BackgroundPush {
         onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
       );
       Logs().v('Flutter Local Notifications initialized');
+      // Vibe: make sure the message channel exists with HIGH importance, so
+      // notifications pop up on screen (heads-up). Pushes shown by Android
+      // itself also use this channel (see AndroidManifest meta-data).
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.createNotificationChannel(
+            const AndroidNotificationChannel(
+              AppConfig.pushNotificationsChannelId,
+              'Incoming messages',
+              importance: Importance.high,
+            ),
+          );
       //<GOOGLE_SERVICES>firebase.setListeners(
       //<GOOGLE_SERVICES>  onMessage: (message) => pushHelper(
       //<GOOGLE_SERVICES>    PushNotification.fromJson(
