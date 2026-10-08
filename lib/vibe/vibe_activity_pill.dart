@@ -10,6 +10,7 @@ import 'package:fluffychat/vibe/vibe_media_saver.dart';
 import 'package:fluffychat/vibe/vibe_send_later.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
+import 'package:fluffychat/vibe/vibe_whats_new.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -82,6 +83,9 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
     Future.delayed(const Duration(seconds: 20), () => VibeStatus.refresh(c));
     VibeDisappearing.start(c);
     VibeSendLater.start(c);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (c.isLogged()) VibeWhatsNew.maybeShow();
+    });
     _msgSub = c.onTimelineEvent.stream.listen((e) {
       VibeMediaSaver.onEvent(e);
       _onMessage(e);
