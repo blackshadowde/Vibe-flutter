@@ -8,7 +8,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:matrix/matrix.dart';
+import 'package:matrix/matrix.dart' hide Contact;
 
 /// "Share a contact" with two tabs: Matrix friends and phone contacts.
 class VibeContactShareSheet extends StatefulWidget {
@@ -206,7 +206,8 @@ class _VibeContactShareSheetState extends State<VibeContactShareSheet> {
             ),
           );
         }
-        final list = all.where((c) {
+        final List<Contact> contacts = all;
+        final list = contacts.where((c) {
           if (q.isEmpty) return true;
           return c.displayName.toLowerCase().contains(q) ||
               c.phones.any((p) => p.number.contains(q));
