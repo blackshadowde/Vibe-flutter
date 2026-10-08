@@ -12,6 +12,13 @@ import 'package:http/http.dart' as http;
 import 'package:matrix/matrix_api_lite/utils/logs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Push gateway (your Cloudflare Worker). Forks: set the GitHub repository
+/// variable VIBE_PUSH_GATEWAY and the release workflow bakes it in.
+const String _vibeGatewayFromBuild = String.fromEnvironment('VIBE_PUSH_GATEWAY');
+const String _vibeGateway = _vibeGatewayFromBuild == ''
+    ? 'https://summer-brook-a863.ashishboddu940.workers.dev/_matrix/push/v1/notify'
+    : _vibeGatewayFromBuild;
+
 enum AppSettings<T> {
   textMessageMaxLength<int>('textMessageMaxLength', 16384),
 
@@ -28,7 +35,7 @@ enum AppSettings<T> {
   unifiedPushEndpoint<String>('chat.fluffy.unifiedpush.endpoint', ''),
   pushNotificationsGatewayUrl<String>(
     'pushNotificationsGatewayUrl',
-    'https://summer-brook-a863.ashishboddu940.workers.dev/_matrix/push/v1/notify',
+    _vibeGateway,
   ),
   pushNotificationsPusherFormat<String>(
     'pushNotificationsPusherFormat',
