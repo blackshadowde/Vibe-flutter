@@ -19,6 +19,7 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/show_scaffold_dialog.dart';
 import 'package:fluffychat/utils/size_string.dart';
 import 'package:fluffychat/utils/start_push_foreground_service.dart';
+import 'package:fluffychat/vibe/vibe_chunks.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/dialog_text_field.dart';
 import 'package:flutter/cupertino.dart';
@@ -103,8 +104,7 @@ class SendFileDialogState extends State<SendFileDialog> {
       if (!mounted) return;
       Navigator.of(context, rootNavigator: false).pop();
       final clientConfig = await Result.capture(widget.room.client.getConfig());
-      final maxUploadSize =
-          clientConfig.asValue?.value.mUploadSize ?? 100 * 1000 * 1000;
+      final serverLimit = clientConfig.asValue?.value.mUploadSize;
 
       for (var i = 0; i < _files.length; i++) {
         final xfile = _files[i];
@@ -145,8 +145,21 @@ class SendFileDialogState extends State<SendFileDialog> {
           ).detectFileType;
         }
 
-        if (file.bytes.length > maxUploadSize) {
-          throw FileTooBigMatrixException(file.bytes.length, maxUploadSize);
+        // Vibe: too big for one upload -> warn, then send in parts.
+        if (VibeChunks.needsSplit(file.bytes.length, serverLimit)) {
+          final outer = widget.outerContext;
+          if (!outer.mounted) return;
+          scaffoldMessenger.clearSnackBars();
+          final ok = await VibeChunks.confirm(outer, file, serverLimit);
+          if (!ok) continue;
+          await VibeChunks.send(
+            widget.room,
+            file,
+            serverLimit,
+            threadRootEventId: widget.threadRootEventId,
+            threadLastEventId: widget.threadLastEventId,
+          );
+          continue;
         }
 
         final label = _labelTextController.text.trim();
