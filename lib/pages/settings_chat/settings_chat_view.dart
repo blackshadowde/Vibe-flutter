@@ -77,6 +77,49 @@ class SettingsChatView extends StatelessWidget {
                     }
                   },
                 ),
+              ListTile(
+                leading: const Icon(Icons.sd_storage_outlined),
+                title: const Text('Keep media on this phone'),
+                subtitle: Text(
+                  switch (AppSettings.vibeKeepMediaDays.value) {
+                    30 => '30 days',
+                    365 => '1 year',
+                    _ => 'Forever',
+                  },
+                ),
+                onTap: () async {
+                  final days = await showDialog<int>(
+                    context: context,
+                    builder: (ctx) => SimpleDialog(
+                      title: const Text('Keep media on this phone'),
+                      children: [
+                        for (final o in const [
+                          (0, 'Forever'),
+                          (365, '1 year'),
+                          (30, '30 days'),
+                        ])
+                          SimpleDialogOption(
+                            onPressed: () => Navigator.pop(ctx, o.$1),
+                            child: Text(o.$2),
+                          ),
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(24, 8, 24, 0),
+                          child: Text(
+                            'Photos, videos and files you open are kept on '
+                            'this phone, so they still show after the '
+                            'server deletes old media. Takes effect after '
+                            'restarting Vibe.',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (days == null) return;
+                  await AppSettings.vibeKeepMediaDays.setItem(days);
+                  controller.updateState();
+                },
+              ),
               SettingsSwitchListTile.adaptive(
                 title: L10n.of(context).sendOnEnter,
                 setting: AppSettings.sendOnEnter,
