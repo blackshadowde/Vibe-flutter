@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_media_saver.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
@@ -74,7 +75,10 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
               false,
         )
         .listen(_onTyping);
-    _msgSub = c.onTimelineEvent.stream.listen(_onMessage);
+    _msgSub = c.onTimelineEvent.stream.listen((e) {
+      VibeMediaSaver.onEvent(e);
+      _onMessage(e);
+    });
   }
 
   void _onTyping(SyncUpdate u) {

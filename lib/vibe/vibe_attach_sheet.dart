@@ -84,6 +84,12 @@ class _AttachSheetState extends State<_AttachSheet> {
       final paths = await PhotoManager.getAssetPathList(
         type: RequestType.common,
         onlyAll: true,
+        // Newest photos and videos first.
+        filterOption: FilterOptionGroup(
+          orders: [
+            const OrderOption(type: OrderOptionType.createDate, asc: false),
+          ],
+        ),
       );
       if (paths.isEmpty) {
         if (mounted) setState(() => _end = true);
