@@ -37,6 +37,7 @@ class VibeHeartHost extends StatefulWidget {
 
 class _VibeHeartHostState extends State<VibeHeartHost> {
   Offset? _lastTap;
+  DateTime _lastBurst = DateTime(2000);
   Set<String> _seen = {};
 
   /// All reactions on this message as "sender<NUL>key".
@@ -77,7 +78,12 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
       final sender = p.substring(0, i);
       final key = p.substring(i + 1);
       if (key.contains('❤')) {
-        if (sender != me) heartFromOther = true;
+        // Mine from the reaction menu too, unless a double-tap already
+        // played it a moment ago.
+        if (sender != me ||
+            DateTime.now().difference(_lastBurst).inSeconds >= 3) {
+          heartFromOther = true;
+        }
       } else {
         emojis[key] = (emojis[key] ?? false) || sender == me;
       }
@@ -94,16 +100,21 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
   void _fall(String emoji, {required bool mine}) {
     final box = context.findRenderObject();
     if (box is! RenderBox || !box.attached || !box.hasSize) return;
-    final rect = box.localToGlobal(Offset.zero) & box.size;
+    final topLeft = box.localToGlobal(Offset.zero);
+    final rect = topLeft & box.size;
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
     if (overlay == null) return;
-    VibeHaptics.selection();
+    VibeHaptics.light();
+    final origin =
+        topLeft + Offset(box.size.width * 0.5, box.size.height * 0.4);
+    final target = topLeft + Offset(86, box.size.height - 20);
     late OverlayEntry entry;
     entry = OverlayEntry(
-      builder: (_) => _EmojiFall(
+      builder: (_) => _ReactionBurst(
         emoji: emoji,
         rect: rect,
-        fromRight: mine,
+        origin: origin,
+        target: target,
         onDone: () => entry.remove(),
       ),
     );
@@ -111,6 +122,7 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
   }
 
   void _burst({bool fromOther = false}) {
+    _lastBurst = DateTime.now();
     final box = context.findRenderObject();
     if (box is! RenderBox || !box.attached || !box.hasSize) return;
     final size = box.size;
@@ -324,83 +336,183 @@ class _HeartPainter extends CustomPainter {
 
 
 // ---------------------------------------------------------------------------
-// Non-heart reactions: the emoji fly up from below and fall onto the message.
+// Non-heart reactions: the emoji pops up big over the message, the bubble
+// flashes in a matching colour, themed particles burst out (confetti,
+// sparkles, tears, flames…), then the emoji flies into its reaction chip.
 // ---------------------------------------------------------------------------
 
-class _Drop {
-  final double delay; // seconds
-  final double flight; // seconds
-  final Offset from;
-  final Offset to;
-  final double spin;
-  final double tilt;
-  final TextPainter tp;
-  final double size;
-  const _Drop({
-    required this.delay,
-    required this.flight,
-    required this.from,
-    required this.to,
-    required this.spin,
-    required this.tilt,
-    required this.tp,
-    required this.size,
+enum _PKind { dot, star, drop, confetti, glyph, ember }
+
+class _ReactionTheme {
+  final List<Color> colors; // bubble tint + particle colours
+  final List<_PKind> kinds;
+  final List<String> glyphs; // small text particles (besides the emoji)
+  final bool rise; // particles float up (fire) instead of falling
+  const _ReactionTheme(
+    this.colors,
+    this.kinds, {
+    this.glyphs = const [],
+    this.rise = false,
   });
 }
 
-class _EmojiFall extends StatefulWidget {
+_ReactionTheme _themeFor(String e) {
+  bool any(String chars) => chars.split(' ').any(e.contains);
+  if (any('😂 🤣 😆 😹')) {
+    return const _ReactionTheme(
+      [Color(0xFFFFC83D), Color(0xFF4FC3F7), Color(0xFF29B6F6)],
+      [_PKind.drop, _PKind.drop, _PKind.glyph],
+    );
+  }
+  if (any('😢 😭 🥲 😿 💔')) {
+    return const _ReactionTheme(
+      [Color(0xFF64B5F6), Color(0xFF90CAF9), Color(0xFF1E88E5)],
+      [_PKind.drop, _PKind.drop, _PKind.dot],
+    );
+  }
+  if (any('😮 😲 😯 🤯 😱 🙀')) {
+    return const _ReactionTheme(
+      [Color(0xFFB9F6CA), Color(0xFFFFF59D), Color(0xFF80DEEA)],
+      [_PKind.star, _PKind.star, _PKind.glyph],
+      glyphs: ['❗', '❕'],
+    );
+  }
+  if (any('🔥 💥 🌶')) {
+    return const _ReactionTheme(
+      [Color(0xFFFF7043), Color(0xFFFFB300), Color(0xFFFF3D00)],
+      [_PKind.ember, _PKind.ember, _PKind.glyph],
+      rise: true,
+    );
+  }
+  if (any('🎉 🥳 🎊 🎂 🍾')) {
+    return const _ReactionTheme(
+      [
+        Color(0xFFFF5252),
+        Color(0xFFFFD740),
+        Color(0xFF69F0AE),
+        Color(0xFF40C4FF),
+        Color(0xFFE040FB),
+      ],
+      [_PKind.confetti, _PKind.confetti, _PKind.confetti, _PKind.glyph],
+    );
+  }
+  if (any('😡 🤬 😠 👿 💢')) {
+    return const _ReactionTheme(
+      [Color(0xFFFF5252), Color(0xFFFF8A65), Color(0xFFD50000)],
+      [_PKind.dot, _PKind.glyph],
+      glyphs: ['💢'],
+    );
+  }
+  if (any('👍 👏 🙏 💪 ✅ 👌 🤝')) {
+    return const _ReactionTheme(
+      [Color(0xFFFFB74D), Color(0xFFF48FB1), Color(0xFFFFD54F)],
+      [_PKind.glyph, _PKind.glyph, _PKind.star],
+    );
+  }
+  if (any('👎')) {
+    return const _ReactionTheme(
+      [Color(0xFF90A4AE), Color(0xFFB0BEC5), Color(0xFF78909C)],
+      [_PKind.glyph, _PKind.dot],
+    );
+  }
+  if (any('😍 🥰 😘 💕 💖 💗 💘 💞 🧡 💛 💚 💙 💜 🤍 🖤')) {
+    return const _ReactionTheme(
+      [Color(0xFFFF80AB), Color(0xFFFF4081), Color(0xFFFFC1E3)],
+      [_PKind.glyph, _PKind.glyph, _PKind.dot],
+      glyphs: ['💕', '💖', '💗'],
+    );
+  }
+  // Anything else: copies of the emoji + golden sparkles.
+  return const _ReactionTheme(
+    [Color(0xFF8C96F6), Color(0xFFFFD54F), Color(0xFF80DEEA)],
+    [_PKind.glyph, _PKind.star, _PKind.dot],
+  );
+}
+
+class _P {
+  final _PKind kind;
+  final double angle;
+  final double speed;
+  final double size;
+  final double delay; // 0..1 of timeline
+  final double spin;
+  final Color color;
+  final TextPainter? tp;
+  const _P({
+    required this.kind,
+    required this.angle,
+    required this.speed,
+    required this.size,
+    required this.delay,
+    required this.spin,
+    required this.color,
+    this.tp,
+  });
+}
+
+class _ReactionBurst extends StatefulWidget {
   final String emoji;
   final Rect rect;
-  final bool fromRight;
+  final Offset origin;
+  final Offset target;
   final VoidCallback onDone;
-  const _EmojiFall({
+  const _ReactionBurst({
     required this.emoji,
     required this.rect,
-    required this.fromRight,
+    required this.origin,
+    required this.target,
     required this.onDone,
   });
 
   @override
-  State<_EmojiFall> createState() => _EmojiFallState();
+  State<_ReactionBurst> createState() => _ReactionBurstState();
 }
 
-class _EmojiFallState extends State<_EmojiFall>
+class _ReactionBurstState extends State<_ReactionBurst>
     with SingleTickerProviderStateMixin {
-  static const double _total = 2.3; // seconds
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: Duration(milliseconds: (_total * 1000).round()),
+    duration: const Duration(milliseconds: 1900),
   );
-  late final List<_Drop> _drops;
+  late final _ReactionTheme _theme = _themeFor(widget.emoji);
+  late final TextPainter _big = TextPainter(
+    text: TextSpan(text: widget.emoji, style: const TextStyle(fontSize: 84)),
+    textDirection: TextDirection.ltr,
+  )..layout();
+  late final List<_P> _ps;
 
   @override
   void initState() {
     super.initState();
     final r = math.Random();
-    final rect = widget.rect;
-    _drops = List.generate(9, (i) {
-      final size = 22.0 + r.nextDouble() * 14;
-      final tp = TextPainter(
-        text: TextSpan(text: widget.emoji, style: TextStyle(fontSize: size)),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      final ox = widget.fromRight
-          ? rect.right - 40 - r.nextDouble() * 50
-          : rect.left + 50 + r.nextDouble() * 60;
-      final from = Offset(ox, rect.bottom + 30 + r.nextDouble() * 20);
-      final to = Offset(
-        rect.left + rect.width * (0.22 + 0.6 * r.nextDouble()),
-        rect.top + rect.height * (0.3 + 0.5 * r.nextDouble()),
-      );
-      return _Drop(
-        delay: r.nextDouble() * 0.35,
-        flight: 0.7 + r.nextDouble() * 0.2,
-        from: from,
-        to: to,
-        spin: (r.nextDouble() - 0.5) * 9,
-        tilt: (r.nextDouble() - 0.5) * 0.7,
-        tp: tp,
+    final glyphs = _theme.glyphs.isEmpty ? [widget.emoji] : _theme.glyphs;
+    final tps = <String, TextPainter>{};
+    _ps = List.generate(22, (i) {
+      final kind = _theme.kinds[r.nextInt(_theme.kinds.length)];
+      TextPainter? tp;
+      var size = 6.0 + r.nextDouble() * 8;
+      if (kind == _PKind.glyph) {
+        size = 18 + r.nextDouble() * 14;
+        final g = glyphs[r.nextInt(glyphs.length)];
+        tp = tps.putIfAbsent(
+          '$g$size',
+          () => TextPainter(
+            text: TextSpan(text: g, style: TextStyle(fontSize: size)),
+            textDirection: TextDirection.ltr,
+          )..layout(),
+        );
+      }
+      final spread = _theme.rise ? math.pi * 0.9 : math.pi * 2;
+      final base = _theme.rise ? -math.pi / 2 : 0.0;
+      return _P(
+        kind: kind,
+        angle: base + (r.nextDouble() - 0.5) * spread,
+        speed: 90 + r.nextDouble() * 120,
         size: size,
+        delay: 0.08 + r.nextDouble() * 0.14,
+        spin: (r.nextDouble() - 0.5) * 10,
+        color: _theme.colors[r.nextInt(_theme.colors.length)],
+        tp: tp,
       );
     });
     _c.forward().whenComplete(widget.onDone);
@@ -418,57 +530,202 @@ class _EmojiFallState extends State<_EmojiFall>
       animation: _c,
       builder: (context, _) => CustomPaint(
         size: Size.infinite,
-        painter: _FallPainter(_c.value * _total, _drops),
+        painter: _BurstPainter(
+          t: _c.value,
+          rect: widget.rect,
+          origin: widget.origin,
+          target: widget.target,
+          theme: _theme,
+          big: _big,
+          ps: _ps,
+        ),
       ),
     ),
   );
 }
 
-class _FallPainter extends CustomPainter {
-  final double sec;
-  final List<_Drop> drops;
-  _FallPainter(this.sec, this.drops);
+class _BurstPainter extends CustomPainter {
+  final double t;
+  final Rect rect;
+  final Offset origin;
+  final Offset target;
+  final _ReactionTheme theme;
+  final TextPainter big;
+  final List<_P> ps;
+  _BurstPainter({
+    required this.t,
+    required this.rect,
+    required this.origin,
+    required this.target,
+    required this.theme,
+    required this.big,
+    required this.ps,
+  });
 
-  static const double _g = 2400;
+  Path _star(Offset c, double r) {
+    // 4-point sparkle
+    final p = Path()..moveTo(c.dx, c.dy - r);
+    p.quadraticBezierTo(c.dx, c.dy, c.dx + r, c.dy);
+    p.quadraticBezierTo(c.dx, c.dy, c.dx, c.dy + r);
+    p.quadraticBezierTo(c.dx, c.dy, c.dx - r, c.dy);
+    p.quadraticBezierTo(c.dx, c.dy, c.dx, c.dy - r);
+    return p..close();
+  }
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final fade = sec > 1.8 ? (1 - (sec - 1.8) / 0.5).clamp(0.0, 1.0) : 1.0;
-    for (final d in drops) {
-      final t = sec - d.delay;
-      if (t <= 0) continue;
-      final T = d.flight;
-      final Offset pos;
-      double scale;
-      double rot;
-      if (t < T) {
-        final dx = d.to.dx - d.from.dx;
-        final dy = d.to.dy - d.from.dy;
-        final vx = dx / T;
-        final vy = (dy - 0.5 * _g * T * T) / T;
-        pos = Offset(d.from.dx + vx * t, d.from.dy + vy * t + 0.5 * _g * t * t);
-        scale = 0.55 + 0.45 * Curves.easeOut.transform((t / 0.25).clamp(0.0, 1.0));
-        rot = d.spin * t;
-      } else {
-        final u = t - T;
-        final bounce = 12 * math.exp(-7 * u) * math.sin(16 * u).abs();
-        pos = d.to - Offset(0, bounce);
-        // squash on impact
-        scale = 1 - 0.18 * math.exp(-9 * u) * math.cos(18 * u).abs();
-        rot = d.spin * T + (d.tilt - d.spin * T) * (1 - math.exp(-6 * u));
-      }
-      canvas.saveLayer(
-        null,
-        Paint()..color = Colors.white.withValues(alpha: fade),
-      );
-      canvas.translate(pos.dx, pos.dy);
-      canvas.rotate(rot);
-      canvas.scale(scale);
-      d.tp.paint(canvas, Offset(-d.tp.width / 2, -d.tp.height / 2));
-      canvas.restore();
-    }
+  Path _drop(Offset c, double r) {
+    final p = Path()..moveTo(c.dx, c.dy - r * 1.6);
+    p.quadraticBezierTo(c.dx + r * 1.1, c.dy - r * 0.2, c.dx + r, c.dy + r * 0.3);
+    p.arcToPoint(
+      Offset(c.dx - r, c.dy + r * 0.3),
+      radius: Radius.circular(r),
+    );
+    p.quadraticBezierTo(c.dx - r * 1.1, c.dy - r * 0.2, c.dx, c.dy - r * 1.6);
+    return p..close();
   }
 
   @override
-  bool shouldRepaint(_FallPainter old) => old.sec != sec;
+  void paint(Canvas canvas, Size size) {
+    // ---- 1. bubble flash (Google Messages style) ----
+    final flash = t < 0.12
+        ? t / 0.12
+        : t < 0.5
+        ? 1.0
+        : (1 - (t - 0.5) / 0.3).clamp(0.0, 1.0);
+    if (flash > 0) {
+      final r = RRect.fromRectAndRadius(
+        rect.deflate(4),
+        const Radius.circular(14),
+      );
+      canvas.drawRRect(
+        r,
+        Paint()
+          ..shader = LinearGradient(
+            colors: [
+              theme.colors.first.withValues(alpha: 0.30 * flash),
+              theme.colors[1 % theme.colors.length].withValues(
+                alpha: 0.22 * flash,
+              ),
+            ],
+          ).createShader(rect),
+      );
+    }
+
+    // ---- 2. shockwave ring ----
+    final ringT = ((t - 0.08) / 0.35).clamp(0.0, 1.0);
+    if (ringT > 0 && ringT < 1) {
+      final e = Curves.easeOutCubic.transform(ringT);
+      canvas.drawCircle(
+        origin,
+        30 + 90 * e,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4 * (1 - e) + 0.5
+          ..color = theme.colors.first.withValues(alpha: 0.7 * (1 - e)),
+      );
+    }
+
+    // ---- 3. themed particles ----
+    for (final p in ps) {
+      final u = ((t - p.delay) / 0.6).clamp(0.0, 1.0);
+      if (u <= 0 || u >= 1) continue;
+      final e = Curves.easeOutCubic.transform(u);
+      final gravity = theme.rise ? -50.0 * u * u : 70.0 * u * u;
+      final pos =
+          origin +
+          Offset(math.cos(p.angle), math.sin(p.angle)) * (p.speed * e) +
+          Offset(0, gravity);
+      final alpha = (1 - Curves.easeIn.transform(u)).clamp(0.0, 1.0);
+      final paint = Paint()..color = p.color.withValues(alpha: alpha);
+      switch (p.kind) {
+        case _PKind.dot:
+          canvas.drawCircle(pos, p.size * 0.45 * (1 - 0.4 * u), paint);
+        case _PKind.star:
+          canvas.drawPath(_star(pos, p.size * (1 - 0.3 * u) + 2), paint);
+        case _PKind.drop:
+          canvas.drawPath(_drop(pos, p.size * 0.5), paint);
+        case _PKind.ember:
+          final flicker = 0.7 + 0.3 * math.sin((t * 40) + p.spin);
+          canvas.drawCircle(
+            pos,
+            p.size * 0.5 * (1 - 0.5 * u),
+            Paint()
+              ..color = p.color.withValues(alpha: alpha * flicker)
+              ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
+          );
+        case _PKind.confetti:
+          canvas.save();
+          canvas.translate(pos.dx, pos.dy);
+          canvas.rotate(p.spin * u);
+          canvas.drawRect(
+            Rect.fromCenter(
+              center: Offset.zero,
+              width: p.size,
+              height: p.size * 0.45,
+            ),
+            paint,
+          );
+          canvas.restore();
+        case _PKind.glyph:
+          final tp = p.tp;
+          if (tp == null) break;
+          canvas.saveLayer(
+            null,
+            Paint()..color = Colors.white.withValues(alpha: alpha),
+          );
+          canvas.translate(pos.dx, pos.dy);
+          canvas.rotate(p.spin * 0.08 * u);
+          canvas.scale(0.6 + 0.4 * Curves.easeOutBack.transform(e));
+          tp.paint(canvas, Offset(-tp.width / 2, -tp.height / 2));
+          canvas.restore();
+      }
+    }
+
+    // ---- 4. the big emoji: pop, wobble, fly into the chip ----
+    Offset pos;
+    double scale;
+    double alpha = 1;
+    double rot = 0;
+    if (t < 0.16) {
+      pos = origin;
+      scale = Curves.easeOutBack.transform(t / 0.16);
+    } else if (t < 0.46) {
+      final u = (t - 0.16) / 0.30;
+      pos = origin - Offset(0, 6 * math.sin(u * math.pi));
+      scale = 1.0 + 0.06 * math.sin(u * math.pi * 3);
+      rot = 0.12 * math.sin(u * math.pi * 4) * (1 - u);
+    } else if (t < 0.8) {
+      final u = Curves.easeInOutCubic.transform((t - 0.46) / 0.34);
+      // gentle arc on the way down to the chip
+      pos =
+          Offset.lerp(origin, target, u)! -
+          Offset(0, 40 * math.sin(u * math.pi));
+      scale = 1.0 - 0.78 * u;
+    } else {
+      pos = target;
+      final u = (t - 0.8) / 0.2;
+      scale = 0.22 + 0.06 * math.sin(u * math.pi);
+      alpha = (1 - Curves.easeIn.transform(u)).clamp(0.0, 1.0);
+    }
+    if (scale <= 0 || alpha <= 0) return;
+    // glow
+    canvas.drawCircle(
+      pos,
+      big.width * 0.55 * scale,
+      Paint()
+        ..color = theme.colors.first.withValues(alpha: 0.35 * alpha)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 18 * scale + 1),
+    );
+    canvas.saveLayer(
+      null,
+      Paint()..color = Colors.white.withValues(alpha: alpha),
+    );
+    canvas.translate(pos.dx, pos.dy);
+    canvas.rotate(rot);
+    canvas.scale(scale);
+    big.paint(canvas, Offset(-big.width / 2, -big.height / 2));
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_BurstPainter old) => old.t != t;
 }
