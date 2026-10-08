@@ -124,6 +124,8 @@ abstract class ClientManager {
       importantStateEvents: <String>{
         // To make room emotes work
         'im.ponies.room_emotes',
+        // Vibe custom status + time zone
+        'chat.vibe.status',
       },
       customImageResizer: PlatformInfos.supportsCustomImageResizer
           ? customImageResizer
