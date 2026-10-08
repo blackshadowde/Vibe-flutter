@@ -18,6 +18,7 @@ import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
+import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/chat_settings_popup_menu.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -384,6 +385,21 @@ class ChatView extends StatelessWidget {
                           onTap: controller.clearSingleSelectedEvent,
                           child: ChatEventList(controller: controller),
                         ),
+                        if (controller.room.isDirectChat &&
+                            AppSettings.vibeStatusBubble.value &&
+                            controller.selectedEvents.isEmpty)
+                          Positioned(
+                            top:
+                                MediaQuery.paddingOf(context).top +
+                                (theme.appBarTheme.toolbarHeight ?? 56) +
+                                appbarBottomHeight +
+                                2,
+                            left: 70,
+                            child: VibeStatusBubble(
+                              room: controller.room,
+                              userId: controller.room.directChatMatrixID,
+                            ),
+                          ),
                         Positioned(
                           bottom: 0,
                           left: 0,

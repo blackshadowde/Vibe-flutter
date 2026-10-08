@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
@@ -85,7 +86,7 @@ class ChatAppBarTitle extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                if (dmUser != null)
+                if (dmUser != null && !AppSettings.vibeStatusBubble.value)
                   VibeStatusLine(room: room, userId: dmUser),
                 StreamBuilder(
                   stream: room.client.onSyncStatus.stream,
