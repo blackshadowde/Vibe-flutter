@@ -476,7 +476,6 @@ class VibeMessage extends StatelessWidget {
                   L10n.of(context).edited,
                   style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                 ),
-              if (ownMessage) _StatusBits(event, timeline),
             ],
           );
         },
@@ -590,25 +589,43 @@ class VibeMessage extends StatelessWidget {
         if (first) header(),
         Align(
           alignment: Alignment.centerLeft,
-          child: VibeChunks.info(displayEvent) != null
-              ? VibeChunkCard(displayEvent)
-              : MessageContent(
-                  displayEvent,
-                  textColor: cs.onSurface,
-                  linkColor: cs.primary,
-                  onInfoTab: onInfoTab,
-                  borderRadius: BorderRadius.circular(14),
-                  timeline: timeline,
-                  selected: selected,
-                  bigEmojis: bigEmojis,
-                ),
+          child: Builder(
+            builder: (context) {
+              final content = VibeChunks.info(displayEvent) != null
+                  ? VibeChunkCard(displayEvent)
+                  : MessageContent(
+                      displayEvent,
+                      textColor: cs.onSurface,
+                      linkColor: cs.primary,
+                      onInfoTab: onInfoTab,
+                      borderRadius: BorderRadius.circular(14),
+                      timeline: timeline,
+                      selected: selected,
+                      bigEmojis: bigEmojis,
+                    );
+              // Sent/read ticks sit right after the text, like WhatsApp.
+              if (!ownMessage || !event.status.isSent) return content;
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(child: content),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 6, bottom: 3),
+                    child: _StatusBits(event, timeline),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
         if (hasReactions)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: MessageReactions(event, timeline),
           ),
-        if (ownMessage && !first)
+        // Sending / failed (with Retry and Cancel) stays under the message.
+        if (ownMessage && !event.status.isSent)
           Padding(
             padding: const EdgeInsets.only(top: 2),
             child: _StatusBits(event, timeline),
