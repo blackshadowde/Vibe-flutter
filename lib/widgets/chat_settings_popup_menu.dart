@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/vibe/vibe_disappearing.dart';
+import 'package:fluffychat/vibe/vibe_send_later.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,14 @@ import 'package:matrix/matrix.dart';
 
 import 'matrix.dart';
 
-enum ChatPopupMenuActions { details, encryption, disappearing, leave, search }
+enum ChatPopupMenuActions {
+  details,
+  encryption,
+  disappearing,
+  scheduled,
+  leave,
+  search,
+}
 
 class ChatSettingsPopupMenu extends StatefulWidget {
   final Room room;
@@ -89,6 +97,9 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               case ChatPopupMenuActions.disappearing:
                 await VibeDisappearing.pick(context, widget.room);
                 break;
+              case ChatPopupMenuActions.scheduled:
+                await VibeSendLater.showList(context, widget.room);
+                break;
             }
           },
           itemBuilder: (BuildContext context) => [
@@ -148,6 +159,19 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                         ),
                       ],
                     ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem<ChatPopupMenuActions>(
+              value: ChatPopupMenuActions.scheduled,
+              child: Row(
+                children: [
+                  const Icon(Icons.schedule_send_outlined),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Scheduled messages'
+                    '${VibeSendLater.forRoom(widget.room.id).isEmpty ? '' : ' (${VibeSendLater.forRoom(widget.room.id).length})'}',
                   ),
                 ],
               ),
