@@ -6,6 +6,7 @@
 import 'dart:async';
 
 import 'package:fluffychat/l10n/l10n.dart';
+import 'package:fluffychat/vibe/vibe_disappearing.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ import 'package:matrix/matrix.dart';
 
 import 'matrix.dart';
 
-enum ChatPopupMenuActions { details, encryption, leave, search }
+enum ChatPopupMenuActions { details, encryption, disappearing, leave, search }
 
 class ChatSettingsPopupMenu extends StatefulWidget {
   final Room room;
@@ -85,6 +86,9 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               case ChatPopupMenuActions.encryption:
                 context.go('/rooms/${widget.room.id}/encryption');
                 break;
+              case ChatPopupMenuActions.disappearing:
+                await VibeDisappearing.pick(context, widget.room);
+                break;
             }
           },
           itemBuilder: (BuildContext context) => [
@@ -116,6 +120,35 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                   const Icon(Icons.lock_outlined),
                   const SizedBox(width: 12),
                   Text(L10n.of(context).encryption),
+                ],
+              ),
+            ),
+            PopupMenuItem<ChatPopupMenuActions>(
+              value: ChatPopupMenuActions.disappearing,
+              child: Row(
+                children: [
+                  const Icon(Icons.timer_outlined),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Disappearing messages'),
+                        Text(
+                          VibeDisappearing.label(
+                            VibeDisappearing.of(widget.room)?.duration,
+                          ),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
