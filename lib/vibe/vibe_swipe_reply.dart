@@ -23,7 +23,7 @@ class _VibeSwipeReplyState extends State<VibeSwipeReply>
 
   late final AnimationController _back = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 260),
+    duration: const Duration(milliseconds: 200),
   );
   double _dx = 0; // always <= 0
   double _from = 0;
@@ -69,13 +69,20 @@ class _VibeSwipeReplyState extends State<VibeSwipeReply>
     _armed = false;
     _from = _dx;
     _back.forward(from: 0);
-    if (fire) widget.onReply();
+    // Let the bubble spring back on its own frames first, then open the
+    // reply bar (that rebuild + keyboard was causing the stutter).
+    if (fire) {
+      Future.delayed(const Duration(milliseconds: 140), () {
+        if (mounted) widget.onReply();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final progress = (-_dx / _threshold).clamp(0.0, 1.0);
-    return GestureDetector(
+    return RepaintBoundary(
+      child: GestureDetector(
       behavior: HitTestBehavior.translucent,
       dragStartBehavior: DragStartBehavior.down,
       onHorizontalDragUpdate: _update,
@@ -122,6 +129,7 @@ class _VibeSwipeReplyState extends State<VibeSwipeReply>
           ],
         ),
       ),
+    ),
     );
   }
 }

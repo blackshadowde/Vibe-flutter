@@ -10,6 +10,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
 
+/// Keep an animation point inside the part of the screen you can see:
+/// below the app bar, above the keyboard and the message box.
+Offset _visible(BuildContext context, Offset p) {
+  final view = View.of(context);
+  final dpr = view.devicePixelRatio;
+  final h = view.physicalSize.height / dpr;
+  final keyboard = view.viewInsets.bottom / dpr;
+  final top = 140.0;
+  final bottom = h - keyboard - 190; // composer + room for particles
+  if (bottom <= top) return p;
+  return Offset(p.dx, p.dy.clamp(top, bottom));
+}
+
 /// Handle given to the message so it can trigger the heart animation.
 class VibeHeartHandle {
   final void Function(Offset) noteTap;
@@ -105,9 +118,11 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
     if (overlay == null) return;
     VibeHaptics.light();
-    final origin =
-        topLeft + Offset(box.size.width * 0.5, box.size.height * 0.4);
-    final target = topLeft + Offset(86, box.size.height - 20);
+    final origin = _visible(
+      context,
+      topLeft + Offset(box.size.width * 0.5, box.size.height * 0.4),
+    );
+    final target = _visible(context, topLeft + Offset(86, box.size.height - 20));
     late OverlayEntry entry;
     entry = OverlayEntry(
       builder: (_) => _ReactionBurst(
@@ -128,9 +143,12 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
     final size = box.size;
     final topLeft = box.localToGlobal(Offset.zero);
     final tap = fromOther ? null : _lastTap;
-    final origin = tap ?? topLeft + Offset(size.width * 0.5, size.height * 0.45);
+    final origin = _visible(
+      context,
+      tap ?? topLeft + Offset(size.width * 0.5, size.height * 0.45),
+    );
     // Where the ❤ 1 chip shows up: under the message text.
-    final target = topLeft + Offset(86, size.height - 20);
+    final target = _visible(context, topLeft + Offset(86, size.height - 20));
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
     if (overlay == null) return;
     VibeHaptics.light();

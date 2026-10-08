@@ -4,11 +4,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat/events/video_player.dart';
-import 'package:fluffychat/pages/image_viewer/image_viewer.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/vibe_media_viewer.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
@@ -510,44 +509,48 @@ class _MediaGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(8);
-    return _Scroller(
-      child: GridView.builder(
-        shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 6,
-          crossAxisSpacing: 6,
-        ),
+    final radius = BorderRadius.circular(12);
+    // One horizontal strip that scrolls on its own, so Links and Files
+    // stay close no matter how many photos there are.
+    return SizedBox(
+      height: 132,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         itemCount: events.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final event = events[i];
-          if (event.messageType == MessageTypes.Video) {
-            return Material(
-              clipBehavior: Clip.hardEdge,
-              borderRadius: radius,
-              child: EventVideoPlayer(event),
-            );
-          }
-          return InkWell(
-            onTap: () => showDialog(
-              context: context,
-              builder: (_) => ImageViewer(event, outerContext: context),
-            ),
-            borderRadius: radius,
-            child: Material(
-              clipBehavior: Clip.hardEdge,
-              borderRadius: radius,
-              child: MxcImage(
-                event: event,
-                width: 128,
-                height: 128,
-                fit: BoxFit.cover,
-                animated: true,
-                isThumbnail: true,
+          final video = event.messageType == MessageTypes.Video;
+          return GestureDetector(
+            onTap: () => VibeMediaViewer.open(context, events, i),
+            child: ClipRRect(
+                borderRadius: radius,
+                child: SizedBox(
+                  width: 124,
+                  height: 124,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      MxcImage(
+                        event: event,
+                        width: 124,
+                        height: 124,
+                        fit: BoxFit.cover,
+                        isThumbnail: true,
+                      ),
+                      if (video)
+                        const Center(
+                          child: Icon(
+                            Icons.play_circle_fill,
+                            color: Colors.white,
+                            size: 34,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
-            ),
           );
         },
       ),
