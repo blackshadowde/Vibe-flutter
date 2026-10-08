@@ -104,32 +104,115 @@ class _IntroPageState extends State<IntroPage> {
     signUp,
   );
 
+  /// Popular servers shown first. `name` is what we connect to (server
+  /// discovery via .well-known finds the real address).
+  static const _quickServers = [
+    (name: 'matrix.org', note: 'Default · free 10 MB files'),
+    (name: 'mozilla.org', note: 'Mozilla · sign in with a Mozilla account'),
+    (name: '4d2.org', note: 'Community · 150 MiB files'),
+    (name: 'tchncs.de', note: 'Community · Germany'),
+  ];
+
   Future<void> _editHomeserver() async {
-    final ctrl = TextEditingController(text: _homeserver);
-    final value = await showDialog<String>(
+    final ctrl = TextEditingController();
+    final current = Uri.tryParse(_homeserver)?.host ?? _homeserver;
+    final value = await showModalBottomSheet<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Homeserver'),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          keyboardType: TextInputType.url,
-          decoration: const InputDecoration(hintText: 'https://matrix.org'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (ctx) {
+        final cs = Theme.of(ctx).colorScheme;
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-            child: const Text('Save'),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 0, 20, 4),
+                    child: Text(
+                      'Choose a server',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                    child: Text(
+                      'Your account lives on this server. People on any '
+                      'server can chat with each other.',
+                      style: TextStyle(color: cs.onSurfaceVariant),
+                    ),
+                  ),
+                  for (final s in _quickServers)
+                    ListTile(
+                      leading: Icon(
+                        s.name == current
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        color: s.name == current ? cs.primary : null,
+                      ),
+                      title: Text(
+                        s.name,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(s.note),
+                      onTap: () => Navigator.pop(ctx, s.name),
+                    ),
+                  ListTile(
+                    leading: const Icon(Icons.public),
+                    title: const Text(
+                      'Browse all public servers',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: const Text('Full list with details'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pop(ctx, 'vibe:browse'),
+                  ),
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                    child: TextField(
+                      controller: ctrl,
+                      keyboardType: TextInputType.url,
+                      autocorrect: false,
+                      textInputAction: TextInputAction.go,
+                      onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
+                      decoration: InputDecoration(
+                        labelText: 'Other / self-hosted server',
+                        hintText: 'example.com',
+                        prefixIcon: const Icon(Icons.dns_outlined),
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.arrow_forward),
+                          onPressed: () =>
+                              Navigator.pop(ctx, ctrl.text.trim()),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
     ctrl.dispose();
     if (value == null || value.isEmpty || !mounted) return;
+    if (value == 'vibe:browse') {
+      // FluffyChat's public server list (searchable), at <this page>/sign_in
+      var path = GoRouterState.of(context).uri.path;
+      if (path.endsWith('/')) path = path.substring(0, path.length - 1);
+      context.go('$path/sign_in');
+      return;
+    }
     setState(
       () => _homeserver = value.startsWith('http') ? value : 'https://$value',
     );
@@ -444,7 +527,7 @@ class _IntroPageState extends State<IntroPage> {
                               const SizedBox(width: 8),
                               Flexible(
                                 child: Text(
-                                  'Homeserver: $_homeserver',
+                                  'Server: ${_prettyHost(_homeserver)} · Change',
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 15,
