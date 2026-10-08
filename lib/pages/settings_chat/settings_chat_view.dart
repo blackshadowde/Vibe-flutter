@@ -121,6 +121,13 @@ class SettingsChatView extends StatelessWidget {
                 },
               ),
               SettingsSwitchListTile.adaptive(
+                title: 'Status bubble in chats',
+                subtitle:
+                    'Show the other person\'s status and local time in a '
+                    'bubble at the top of the chat.',
+                setting: AppSettings.vibeStatusBubble,
+              ),
+              SettingsSwitchListTile.adaptive(
                 title: L10n.of(context).sendOnEnter,
                 setting: AppSettings.sendOnEnter,
               ),
