@@ -84,6 +84,7 @@ enum AppSettings<T> {
   hideRoomsInSpaces<bool>('chat.fluffy.hideRoomsInSpaces', false),
   showThumbnailsInTimeline<bool>('chat.fluffy.showThumbnailsInTimeline', true),
   vibeHaptics<bool>('chat.vibe.haptics', true),
+  vibeSaveMedia<bool>('chat.vibe.save_media', false),
   doubleTapToReact<bool>('chat.fluffy.double_tap_to_react', false),
   doubleTapReaction<String>('chat.fluffy.double_tap_reaction', '❤️'),
   benchmarksInLogs<bool>('chat.fluffy.benchmarks_in_logs', false);
