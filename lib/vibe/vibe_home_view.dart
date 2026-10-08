@@ -5,6 +5,7 @@
 
 import 'package:fluffychat/pages/chat_list/chat_list.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
+import 'package:fluffychat/vibe/vibe_chat_actions.dart';
 import 'package:fluffychat/vibe/vibe_dm_detail.dart';
 import 'package:fluffychat/vibe/vibe_dm_pane.dart';
 import 'package:fluffychat/vibe/vibe_dm_rail.dart';
@@ -143,14 +144,16 @@ class _VibeHomeViewState extends State<VibeHomeView> {
             .where((s) => s.hasRoomUpdate)
             .rateLimit(const Duration(seconds: 1)),
         builder: (context, _) {
-          final rooms = client.rooms
-              .where(
-                (r) =>
-                    !r.isSpace &&
-                    (r.membership == Membership.join ||
-                        r.membership == Membership.invite),
-              )
-              .toList();
+          final rooms = VibeChatActions.pinnedFirst(
+            client.rooms
+                .where(
+                  (r) =>
+                      !r.isSpace &&
+                      (r.membership == Membership.join ||
+                          r.membership == Membership.invite),
+                )
+                .toList(),
+          );
           _rooms = rooms;
           Room? selected;
           for (final r in rooms) {
@@ -174,6 +177,14 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                       activeRoomId: controller.activeChat,
                       onSelect: (room) => setState(() => selectedId = room.id),
                       onHome: () => setState(() => selectedId = null),
+                      onLongPress: (room) => VibeChatActions.show(
+                        context,
+                        room,
+                        onOpen: () {
+                          _lastOpenedId = room.id;
+                          controller.onChatTap(room);
+                        },
+                      ),
                     ),
                     Expanded(
                       child: ClipRRect(

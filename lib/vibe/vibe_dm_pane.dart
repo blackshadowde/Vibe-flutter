@@ -7,6 +7,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/vibe/vibe_activity_pill.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
+import 'package:fluffychat/vibe/vibe_chat_actions.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_shared_page.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
@@ -63,6 +64,27 @@ class _VibeDmPaneState extends State<VibeDmPane> {
     final joined = visible
         .where((r) => r.membership != Membership.invite)
         .toList();
+    final pinned = joined.where((r) => r.isFavourite).toList();
+    final others = joined.where((r) => !r.isFavourite).toList();
+
+    Widget dmTile(Room r, int index) => VibeStagger(
+      key: ValueKey('dm_${r.id}'),
+      index: index,
+      child: VibePressable(
+        scale: 0.97,
+        child: _DmTile(
+          room: r,
+          name: nameOf(r),
+          active: r.id == widget.activeRoomId,
+          onTap: () => widget.onTap(r),
+          onLongPress: () => VibeChatActions.show(
+            context,
+            r,
+            onOpen: () => widget.onOpen(r),
+          ),
+        ),
+      ),
+    );
 
     return Material(
       color: theme.colorScheme.surface,
@@ -111,25 +133,17 @@ class _VibeDmPaneState extends State<VibeDmPane> {
                         ),
                       ),
                   ],
+                  if (pinned.isNotEmpty) ...[
+                    _SectionLabel('PINNED — ${pinned.length}'),
+                    for (var i = 0; i < pinned.length; i++)
+                      dmTile(pinned[i], i + invites.length + 1),
+                  ],
                   _SectionLabel(
-                    'DIRECT MESSAGES — ${joined.length}',
+                    'DIRECT MESSAGES — ${others.length}',
                     onAdd: () => VibeAddContact.show(context),
                   ),
-                  for (var i = 0; i < joined.length; i++)
-                    VibeStagger(
-                      key: ValueKey('dm_${joined[i].id}'),
-                      index: i + invites.length + 1,
-                      child: VibePressable(
-                        scale: 0.97,
-                        child: _DmTile(
-                          room: joined[i],
-                          name: nameOf(joined[i]),
-                          active: joined[i].id == widget.activeRoomId,
-                          onTap: () => widget.onTap(joined[i]),
-                          onOpen: () => widget.onOpen(joined[i]),
-                        ),
-                      ),
-                    ),
+                  for (var i = 0; i < others.length; i++)
+                    dmTile(others[i], i + invites.length + pinned.length + 1),
                 ],
               ),
             ),
@@ -199,14 +213,14 @@ class _DmTile extends StatelessWidget {
   final String name;
   final bool active;
   final VoidCallback onTap;
-  final VoidCallback onOpen;
+  final VoidCallback onLongPress;
 
   const _DmTile({
     required this.room,
     required this.name,
     required this.active,
     required this.onTap,
-    required this.onOpen,
+    required this.onLongPress,
   });
 
   @override
@@ -220,7 +234,7 @@ class _DmTile extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: ListTile(
           onTap: onTap,
-          onLongPress: onOpen,
+          onLongPress: onLongPress,
           contentPadding: const EdgeInsets.only(left: 10, right: 0),
           leading: VibeTypingOverlay(
             room: room,
@@ -232,13 +246,29 @@ class _DmTile extends StatelessWidget {
               presenceUserId: room.directChatMatrixID,
             ),
           ),
-          title: Text(
-            name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontWeight: room.isUnread ? FontWeight.bold : FontWeight.w600,
-            ),
+          title: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: room.isUnread
+                        ? FontWeight.bold
+                        : FontWeight.w600,
+                  ),
+                ),
+              ),
+              if (room.isFavourite) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.push_pin,
+                  size: 13,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ],
           ),
           subtitle: Row(
             children: [

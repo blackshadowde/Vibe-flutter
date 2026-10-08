@@ -23,6 +23,7 @@ class VibeDmRail extends StatelessWidget {
   final String? activeRoomId;
   final void Function(Room room) onSelect;
   final VoidCallback onHome;
+  final void Function(Room room)? onLongPress;
 
   const VibeDmRail({
     required this.rooms,
@@ -30,6 +31,7 @@ class VibeDmRail extends StatelessWidget {
     required this.activeRoomId,
     required this.onSelect,
     required this.onHome,
+    this.onLongPress,
     super.key,
   });
 
@@ -88,14 +90,21 @@ class VibeDmRail extends StatelessWidget {
                       );
                     }
                     final room = rooms[i];
+                    final pinnedCount = rooms
+                        .takeWhile((r) => r.isFavourite)
+                        .length;
                     final active = room.id == (selectedId ?? activeRoomId);
                     final invited = room.membership == Membership.invite;
                     final name = room.getLocalizedDisplayname(
                       MatrixLocals(L10n.of(context)),
                     );
-                    return Padding(
+                    final tile = Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Tooltip(
+                      child: GestureDetector(
+                        onLongPress: onLongPress == null
+                            ? null
+                            : () => onLongPress!(room),
+                        child: Tooltip(
                         message: name,
                         child: Stack(
                           alignment: Alignment.center,
@@ -171,6 +180,28 @@ class VibeDmRail extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            if (room.isFavourite)
+                              Positioned(
+                                bottom: 0,
+                                left: 8,
+                                child: IgnorePointer(
+                                  child: Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                      color: theme
+                                          .colorScheme
+                                          .surfaceContainerLowest,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.push_pin,
+                                      size: 12,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             if (room.notificationCount > 0)
                               Positioned(
                                 top: 0,
@@ -203,7 +234,27 @@ class VibeDmRail extends StatelessWidget {
                           ],
                         ),
                       ),
+                      ),
                     );
+                    if (i == pinnedCount && pinnedCount > 0) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 6,
+                              horizontal: 24,
+                            ),
+                            child: Divider(
+                              height: 1,
+                              color: theme.dividerColor,
+                            ),
+                          ),
+                          tile,
+                        ],
+                      );
+                    }
+                    return tile;
                   },
                 ),
               ),
