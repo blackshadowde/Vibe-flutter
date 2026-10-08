@@ -597,8 +597,8 @@ class ChatController extends State<ChatPageWithRoom>
     // We only set read marker if we are at the bottom
     if (_scrolledUp) return;
 
-    // We do not set read marker if we offer user the scroll up banner
-    if (scrollUpBannerEventId != null) return;
+    // Vibe: the "jump to last read" banner no longer blocks read markers.
+    // Being at the bottom means the newest messages are on screen.
 
     // We do not set read marker if timeline is empty
     final timeline = this.timeline;
@@ -624,8 +624,8 @@ class ChatController extends State<ChatPageWithRoom>
     // This is a sending event, we do not set a readmarker yet
     if (eventId.isValidMatrixIdStrict() == false) return;
 
-    // Already set a read marker on this event
-    if (room.fullyRead == eventId) return;
+    // Already set a read marker on this event (and the server agrees)
+    if (room.fullyRead == eventId && room.notificationCount == 0) return;
 
     // Set a readmarker on a specific event, not latest, but room is not unread
     // at all.
@@ -637,15 +637,30 @@ class ChatController extends State<ChatPageWithRoom>
 
     Logs().d('Set read marker...', eventId);
     // ignore: unawaited_futures
+    // Vibe: if the request fails (bad connection) the old code never cleared
+    // the future, so this chat stopped sending read markers until reopened.
     _setReadMarkerFuture = timeline
         .setReadMarker(
           eventId: eventId,
           public: AppSettings.sendPublicReadReceipts.value,
         )
-        .then((_) {
+        .then((_) => _readMarkerRetries = 0)
+        .catchError((Object e, StackTrace st) {
+          Logs().w('Unable to set read marker', e, st);
+          if (_readMarkerRetries < 5) {
+            _readMarkerRetries++;
+            Future.delayed(Duration(seconds: 3 * _readMarkerRetries), () {
+              if (mounted) _markReadIfAtBottom();
+            });
+          }
+          return 0;
+        })
+        .whenComplete(() {
           _setReadMarkerFuture = null;
         });
   }
+
+  int _readMarkerRetries = 0;
 
   @override
   void dispose() {
