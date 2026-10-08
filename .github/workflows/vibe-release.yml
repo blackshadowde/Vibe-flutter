@@ -131,7 +131,12 @@ jobs:
         run: flutter analyze --no-fatal-infos --no-fatal-warnings lib
 
       - name: Build release APK
-        run: flutter build apk --release --target-platform android-arm64
+        env:
+          VIBE_PUSH_GATEWAY: ${{ vars.VIBE_PUSH_GATEWAY }}
+        run: |
+          EXTRA=""
+          if [ -n "$VIBE_PUSH_GATEWAY" ]; then EXTRA="--dart-define=VIBE_PUSH_GATEWAY=$VIBE_PUSH_GATEWAY"; fi
+          flutter build apk --release --target-platform android-arm64 $EXTRA
 
       - uses: actions/upload-artifact@v4
         with:
