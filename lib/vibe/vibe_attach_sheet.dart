@@ -6,13 +6,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:fluffychat/vibe/vibe_contact_share.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/pages/chat/send_file_dialog.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/widgets/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' hide RequestType;
 import 'package:photo_manager/photo_manager.dart';
@@ -145,9 +143,6 @@ class _AttachSheetState extends State<_AttachSheet> {
   void _contacts() {
     final c = widget.controller;
     Navigator.of(context).pop();
-    final rooms = c.room.client.rooms
-        .where((r) => r.isDirectChat && r.directChatMatrixID != null)
-        .toList();
     showModalBottomSheet<void>(
       sheetAnimationStyle: vibeSheetStyle,
       context: c.context,
@@ -155,50 +150,7 @@ class _AttachSheetState extends State<_AttachSheet> {
       isScrollControlled: true,
       showDragHandle: true,
       builder: (sheetContext) => SafeArea(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.6,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: Text(
-                  'Share a contact',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: rooms.length,
-                  itemBuilder: (context, i) {
-                    final r = rooms[i];
-                    final name = r.getLocalizedDisplayname(
-                      MatrixLocals(L10n.of(context)),
-                    );
-                    final id = r.directChatMatrixID!;
-                    return ListTile(
-                      leading: Avatar(
-                        mxContent: r.avatar,
-                        name: name,
-                        size: 42,
-                        client: r.client,
-                      ),
-                      title: Text(name),
-                      subtitle: Text(id),
-                      onTap: () {
-                        Navigator.of(sheetContext).pop();
-                        c.room.sendTextEvent('https://matrix.to/#/$id');
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+        child: VibeContactShareSheet(room: c.room),
       ),
     );
   }
