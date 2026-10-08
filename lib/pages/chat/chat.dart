@@ -1202,7 +1202,11 @@ class ChatController extends State<ChatPageWithRoom>
       replyEvent = replyTo ?? selectedEvents.first;
       selectedEvents.clear();
     });
-    inputFocus.requestFocus();
+    // Open the keyboard after the reply bar has been laid out, so the two
+    // animations don't land on the same frame.
+    Future.delayed(const Duration(milliseconds: 60), () {
+      if (mounted) inputFocus.requestFocus();
+    });
   }
 
   Future<void> scrollToEventId(

@@ -170,7 +170,8 @@ class ChatEventList extends StatelessWidget {
                 key: ValueKey(event.transactionId ?? event.eventId),
                 index: i,
                 controller: controller.scrollController,
-                child: VibeEntrance(
+                child: RepaintBoundary(
+                  child: VibeEntrance(
                   animate: animateIn,
                   fromRight:
                       event.senderId == controller.room.client.userID,
@@ -226,6 +227,7 @@ class ChatEventList extends StatelessWidget {
                           : null,
                     ),
                   ],
+                ),
                 ),
                 ),
               );
