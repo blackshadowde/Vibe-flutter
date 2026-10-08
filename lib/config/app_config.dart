@@ -35,20 +35,22 @@ abstract class AppConfig {
   static const String appOpenUrlScheme = 'im.fluffychat';
   static const String appSsoUrlScheme = 'chat.vibe.auth';
 
+  // Vibe links (Vibe is based on FluffyChat, credited in About Vibe).
   static const String sourceCodeUrl =
-      'https://github.com/krille-chan/fluffychat';
+      'https://github.com/blackshadowde/Vibe-flutter';
   static const String supportUrl =
-      'https://github.com/krille-chan/fluffychat/issues';
-  static const String changelogUrl = 'https://fluffychat.im/changelog/';
+      'https://github.com/blackshadowde/Vibe-flutter/issues';
+  static const String changelogUrl =
+      'https://github.com/blackshadowde/Vibe-flutter/commits/Vibe';
   static const String helpUrl =
-      'https://fluffychat.im/faq/#how_can_i_support_fluffychat';
+      'https://github.com/blackshadowde/Vibe-flutter';
 
   static const Set<String> defaultReactions = {'👍', '❤️', '😂', '😮', '😢'};
 
   static final Uri newIssueUrl = Uri(
     scheme: 'https',
     host: 'github.com',
-    path: '/krille-chan/fluffychat/issues/new',
+    path: '/blackshadowde/Vibe-flutter/issues/new',
   );
 
   static final Uri homeserverList = Uri(
