@@ -24,7 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
-import 'package:swipe_to_action/swipe_to_action.dart';
+import 'package:fluffychat/vibe/vibe_swipe_reply.dart';
 
 const Color _ownNameColor = Color(0xFFB5BAC1);
 const Color _otherNameColor = Color(0xFFF2F3F5);
@@ -794,14 +794,9 @@ class VibeMessage extends StatelessWidget {
       event: event,
       timeline: timeline,
       builder: (context, heart) => Center(
-      child: Swipeable(
+      child: VibeSwipeReply(
         key: ValueKey(event.transactionId ?? event.eventId),
-        background: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.0),
-          child: Center(child: Icon(Icons.reply)),
-        ),
-        direction: SwipeDirection.endToStart,
-        onSwipe: (_) => onSwipe(),
+        onReply: onSwipe,
         child: Container(
           constraints: const BoxConstraints(
             maxWidth: FluffyThemes.maxTimelineWidth,
