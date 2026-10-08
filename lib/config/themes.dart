@@ -122,7 +122,7 @@ abstract class FluffyThemes {
     final dividerColor = brightness == Brightness.dark
         ? colorScheme.surfaceContainerHighest
         : colorScheme.surfaceContainer;
-    return ThemeData(
+    final base = ThemeData(
       visualDensity: VisualDensity.standard,
       useMaterial3: true,
       fontFamily: 'GGSans',
@@ -207,6 +207,20 @@ abstract class FluffyThemes {
           padding: const EdgeInsets.all(16),
           textStyle: const TextStyle(fontSize: 16),
         ),
+      ),
+    );
+    // Vibe: Discord's mobile app renders message and body text in gg sans
+    // Medium; Regular looked thin next to it.
+    TextStyle? w5(TextStyle? t) => t?.copyWith(fontWeight: FontWeight.w500);
+    final tt = base.textTheme;
+    return base.copyWith(
+      textTheme: tt.copyWith(
+        bodyLarge: w5(tt.bodyLarge),
+        bodyMedium: w5(tt.bodyMedium),
+        bodySmall: w5(tt.bodySmall),
+        titleSmall: w5(tt.titleSmall),
+        labelMedium: w5(tt.labelMedium),
+        labelSmall: w5(tt.labelSmall),
       ),
     );
   }
