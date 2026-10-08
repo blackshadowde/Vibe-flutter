@@ -126,6 +126,7 @@ abstract class ClientManager {
         'im.ponies.room_emotes',
         // Vibe custom status + time zone
         'chat.vibe.status',
+        'chat.vibe.disappearing',
       },
       customImageResizer: PlatformInfos.supportsCustomImageResizer
           ? customImageResizer
