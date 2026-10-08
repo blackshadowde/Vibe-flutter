@@ -6,6 +6,7 @@
 import 'package:fluffychat/vibe/vibe_connection.dart';
 import 'package:fluffychat/vibe/vibe_own_profile.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
+import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,11 @@ class VibeUserBar extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Column(
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () =>
+                                    VibeStatusSheet.show(context, client),
+                                child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -65,16 +70,29 @@ class VibeUserBar extends StatelessWidget {
                                   ),
                                   VibeConnectionBuilder(
                                     client: client,
-                                    builder: (context, conn) => Text(
-                                      conn.label,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color:
-                                            theme.colorScheme.onSurfaceVariant,
-                                      ),
+                                    builder: (context, conn) => StreamBuilder(
+                                      stream: client.onSync.stream,
+                                      builder: (context, _) {
+                                      final s = VibeStatus.mine(client);
+                                      final label = s != null && s.active
+                                          ? '${s.emoji} ${s.text}'.trim()
+                                          : conn.label;
+                                      return Text(
+                                        label,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: theme
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                        ),
+                                      );
+                                    },
                                     ),
                                   ),
                                 ],
+                              ),
                               ),
                             ),
                             IconButton(

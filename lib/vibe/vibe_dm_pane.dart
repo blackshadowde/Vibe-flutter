@@ -10,6 +10,7 @@ import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_shared_page.dart';
+import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -279,13 +280,17 @@ class _DmTile extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Expanded(
-                child: Text(
-                  room.encrypted
+                child: VibeStatusLine(
+                  room: room,
+                  userId: room.directChatMatrixID,
+                  showTime: false,
+                  fallback: room.encrypted
                       ? 'Encrypted Direct Message'
                       : 'Direct Message',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ],

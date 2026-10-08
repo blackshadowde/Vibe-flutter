@@ -9,6 +9,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_media_viewer.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
+import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
@@ -130,6 +131,11 @@ class VibeDmDetail extends StatelessWidget {
                                       fontSize: 19,
                                       fontWeight: FontWeight.bold,
                                     ),
+                                  ),
+                                  VibeStatusLine(
+                                    room: room,
+                                    userId: room.directChatMatrixID,
+                                    maxLines: 2,
                                   ),
                                   const SizedBox(height: 2),
                                   Row(
