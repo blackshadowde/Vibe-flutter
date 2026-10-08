@@ -5,6 +5,7 @@
 
 import 'dart:io';
 
+import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/client_manager.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
@@ -114,9 +115,14 @@ Future<MatrixSdkDatabase> _constructDatabase(String clientName) async {
   return await MatrixSdkDatabase.init(
     clientName,
     database: database,
-    maxFileSize: 1000 * 1000 * 10,
+    // Vibe: keep media on the phone (like Signal) so chats still show
+    // photos after the server deletes old media. Files up to 100 MB are
+    // kept; Settings > Chat > "Keep media on this phone" sets how long.
+    maxFileSize: 1000 * 1000 * 100,
     fileStorageLocation: fileStorageLocation?.uri,
-    deleteFilesAfterDuration: const Duration(days: 30),
+    deleteFilesAfterDuration: AppSettings.vibeKeepMediaDays.value <= 0
+        ? null
+        : Duration(days: AppSettings.vibeKeepMediaDays.value),
   );
 }
 
