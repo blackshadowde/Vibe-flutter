@@ -8,6 +8,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/sync_status_localization.dart';
+import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/vibe/vibe_user_sheet.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -84,6 +85,8 @@ class ChatAppBarTitle extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+                if (dmUser != null)
+                  VibeStatusLine(room: room, userId: dmUser),
                 StreamBuilder(
                   stream: room.client.onSyncStatus.stream,
                   builder: (context, snapshot) {
