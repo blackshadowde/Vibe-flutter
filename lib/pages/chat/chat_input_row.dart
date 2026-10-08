@@ -11,6 +11,7 @@ import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/pages/chat/recording_view_model.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_attach_sheet.dart';
+import 'package:fluffychat/vibe/vibe_send_later.dart';
 import 'package:fluffychat/utils/other_party_can_receive.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -296,16 +297,21 @@ class ChatInputRow extends StatelessWidget {
                               icon: const Icon(Icons.graphic_eq, size: 28),
                             ),
                           )
-                        : IconButton(
-                            key: Key('send_button'),
-                            tooltip: L10n.of(context).send,
-                            onPressed: controller.send,
-                            style: IconButton.styleFrom(
-                              backgroundColor: const Color(0xFFDCE4FF),
-                              foregroundColor: const Color(0xFF226DFD),
-                              fixedSize: const Size(56, 56),
+                        : GestureDetector(
+                            // Long-press: send later
+                            onLongPress: () =>
+                                VibeSendLater.pick(context, controller),
+                            child: IconButton(
+                              key: Key('send_button'),
+                              tooltip: L10n.of(context).send,
+                              onPressed: controller.send,
+                              style: IconButton.styleFrom(
+                                backgroundColor: const Color(0xFFDCE4FF),
+                                foregroundColor: const Color(0xFF226DFD),
+                                fixedSize: const Size(56, 56),
+                              ),
+                              icon: const Icon(Icons.send_rounded, size: 24),
                             ),
-                            icon: const Icon(Icons.send_rounded, size: 24),
                           ),
                   ),
                   const SizedBox(width: 10),
