@@ -85,6 +85,8 @@ enum AppSettings<T> {
   showThumbnailsInTimeline<bool>('chat.fluffy.showThumbnailsInTimeline', true),
   vibeHaptics<bool>('chat.vibe.haptics', true),
   vibeSaveMedia<bool>('chat.vibe.save_media', false),
+  // Days to keep downloaded media on this phone. 0 = forever.
+  vibeKeepMediaDays<int>('chat.vibe.keep_media_days', 0),
   doubleTapToReact<bool>('chat.fluffy.double_tap_to_react', false),
   doubleTapReaction<String>('chat.fluffy.double_tap_reaction', '❤️'),
   benchmarksInLogs<bool>('chat.fluffy.benchmarks_in_logs', false);
