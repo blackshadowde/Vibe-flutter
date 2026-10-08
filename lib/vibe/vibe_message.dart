@@ -25,6 +25,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
 import 'package:fluffychat/vibe/vibe_swipe_reply.dart';
+import 'package:fluffychat/vibe/vibe_chunks.dart';
 
 const Color _ownNameColor = Color(0xFFB5BAC1);
 const Color _otherNameColor = Color(0xFFF2F3F5);
@@ -589,16 +590,18 @@ class VibeMessage extends StatelessWidget {
         if (first) header(),
         Align(
           alignment: Alignment.centerLeft,
-          child: MessageContent(
-            displayEvent,
-            textColor: cs.onSurface,
-            linkColor: cs.primary,
-            onInfoTab: onInfoTab,
-            borderRadius: BorderRadius.circular(14),
-            timeline: timeline,
-            selected: selected,
-            bigEmojis: bigEmojis,
-          ),
+          child: VibeChunks.info(displayEvent) != null
+              ? VibeChunkCard(displayEvent)
+              : MessageContent(
+                  displayEvent,
+                  textColor: cs.onSurface,
+                  linkColor: cs.primary,
+                  onInfoTab: onInfoTab,
+                  borderRadius: BorderRadius.circular(14),
+                  timeline: timeline,
+                  selected: selected,
+                  bigEmojis: bigEmojis,
+                ),
         ),
         if (hasReactions)
           Padding(
