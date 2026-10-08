@@ -162,6 +162,43 @@ bool _readByOther(Event event, Timeline timeline) {
   return false;
 }
 
+class _MiniAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  const _MiniAction({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+    borderRadius: BorderRadius.circular(8),
+    onTap: onTap,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15, color: color),
+          const SizedBox(width: 3),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 /// Sending / sent (single tick) / read (two blue ticks) indicator.
 class _StatusBits extends StatelessWidget {
   final Event event;
@@ -174,14 +211,36 @@ class _StatusBits extends StatelessWidget {
     final status = event.status;
     final dim = theme.colorScheme.onSurfaceVariant;
     if (status == EventStatus.error) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
+      return Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 10,
         children: [
-          Icon(Icons.error_outline, size: 16, color: theme.colorScheme.error),
-          const SizedBox(width: 4),
-          Text(
-            L10n.of(context).couldNotBeSent,
-            style: TextStyle(fontSize: 12, color: theme.colorScheme.error),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 16,
+                color: theme.colorScheme.error,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                L10n.of(context).couldNotBeSent,
+                style: TextStyle(fontSize: 12, color: theme.colorScheme.error),
+              ),
+            ],
+          ),
+          _MiniAction(
+            icon: Icons.refresh,
+            label: 'Retry',
+            color: theme.colorScheme.primary,
+            onTap: () => event.sendAgain(),
+          ),
+          _MiniAction(
+            icon: Icons.close,
+            label: 'Cancel',
+            color: theme.colorScheme.error,
+            onTap: () => event.cancelSend(),
           ),
         ],
       );
@@ -203,6 +262,15 @@ class _StatusBits extends StatelessWidget {
             dimension: 11,
             child: CircularProgressIndicator(strokeWidth: 1.4, color: dim),
           ),
+          if (event.fileSendingStatus != null) ...[
+            const SizedBox(width: 10),
+            _MiniAction(
+              icon: Icons.close,
+              label: 'Cancel',
+              color: theme.colorScheme.error,
+              onTap: () => event.cancelSend(),
+            ),
+          ],
         ],
       );
     }
