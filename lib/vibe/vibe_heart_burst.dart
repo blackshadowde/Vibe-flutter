@@ -23,6 +23,19 @@ Offset _visible(BuildContext context, Offset p) {
   return Offset(p.dx, p.dy.clamp(top, bottom));
 }
 
+/// How far to lift an animation right now so it stays above the keyboard
+/// and the message box. Re-checked every frame, so it follows the keyboard
+/// when it slides back up after the reaction menu closes.
+double _lift(BuildContext context, Offset origin) {
+  final view = View.of(context);
+  final dpr = view.devicePixelRatio;
+  final h = view.physicalSize.height / dpr;
+  final keyboard = view.viewInsets.bottom / dpr;
+  final bottom = h - keyboard - 230; // composer + room for particles
+  if (bottom < 160) return 0;
+  return origin.dy > bottom ? origin.dy - bottom : 0;
+}
+
 /// Handle given to the message so it can trigger the heart animation.
 class VibeHeartHandle {
   final void Function(Offset) noteTap;
@@ -240,8 +253,8 @@ class _HeartBurstState extends State<_HeartBurst>
           size: Size.infinite,
           painter: _HeartPainter(
             t: _c.value,
-            origin: widget.origin,
-            target: widget.target,
+            origin: widget.origin - Offset(0, _lift(context, widget.origin)),
+            target: widget.target - Offset(0, _lift(context, widget.origin)),
             tiny: _tiny,
           ),
         ),
@@ -551,8 +564,8 @@ class _ReactionBurstState extends State<_ReactionBurst>
         painter: _BurstPainter(
           t: _c.value,
           rect: widget.rect,
-          origin: widget.origin,
-          target: widget.target,
+          origin: widget.origin - Offset(0, _lift(context, widget.origin)),
+          target: widget.target - Offset(0, _lift(context, widget.origin)),
           theme: _theme,
           big: _big,
           ps: _ps,
