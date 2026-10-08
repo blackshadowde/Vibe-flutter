@@ -111,7 +111,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="im.fluffychat.auth" android:path="/login"/>
+                <data android:scheme="chat.vibe.auth" android:path="/login"/>
             </intent-filter>
         </activity>
 
