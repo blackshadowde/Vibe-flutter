@@ -8,6 +8,7 @@ import 'package:fluffychat/pages/intro/flows/restore_backup_flow.dart';
 import 'package:fluffychat/pages/sign_in/view_model/model/public_homeserver_data.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/sign_in_flows/check_homeserver.dart';
+import 'package:fluffychat/vibe/vibe_sign_up.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -90,6 +91,41 @@ class _IntroPageState extends State<IntroPage> {
       if (mounted) setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Servers with a web sign-up (matrix.org: SSO / OIDC) open that page.
+  /// Classic servers (e.g. Unredacted) get Vibe's own sign-up form.
+  Future<void> _createAccount() async {
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final client = await Matrix.of(context).getLoginClient();
+      final (_, _, loginFlows, authMetadata) = await client.checkHomeserver(
+        Uri.parse(_homeserver),
+        fetchAuthMetadata: true,
+      );
+      final web =
+          authMetadata != null ||
+          loginFlows.any((f) => f.type == 'm.login.sso');
+      if (!mounted) return;
+      setState(() => _busy = false);
+      if (web) {
+        await _web(signUp: true);
+        return;
+      }
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              VibeSignUpPage(client: client, homeserver: _homeserver),
+        ),
+      );
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    } finally {
+      if (mounted && _busy) setState(() => _busy = false);
     }
   }
 
@@ -499,7 +535,7 @@ class _IntroPageState extends State<IntroPage> {
                     const SizedBox(height: 14),
                     Center(
                       child: TextButton(
-                        onPressed: _busy ? null : () => _web(signUp: true),
+                        onPressed: _busy ? null : _createAccount,
                         child: const Text(
                           'Create account',
                           style: TextStyle(
