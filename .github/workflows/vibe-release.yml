@@ -157,7 +157,29 @@ jobs:
 
       - name: Publish GitHub Release
         if: ${{ inputs.publish }}
-        run: cp build/app/outputs/flutter-apk/app-release.apk "Vibe-${VIBE_VERSION}.apk"
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk "Vibe-${VIBE_VERSION}.apk"
+          {
+            echo "## Vibe ${VIBE_VERSION}"
+            echo
+            if [ -s RELEASE_NOTES.md ]; then
+              echo "### What's new in this update"
+              echo
+              cat RELEASE_NOTES.md
+              echo
+            fi
+            echo "---"
+            echo
+            echo "A Discord-style, end-to-end encrypted messenger for Android, built on Matrix."
+            echo
+            echo "**Download:** tap \`Vibe-${VIBE_VERSION}.apk\` below, then open it to install"
+            echo "(allow \"Install unknown apps\" for your browser when Android asks)."
+            echo
+            echo "**Updating:** install the new APK over the old one; your chats stay."
+            echo
+            echo "Free and open source (AGPL-3.0), based on FluffyChat."
+          } > release-body.md
+          cat release-body.md
 
       - uses: softprops/action-gh-release@v2
         if: ${{ inputs.publish }}
@@ -167,15 +189,4 @@ jobs:
           target_commitish: ${{ github.sha }}
           make_latest: true
           files: Vibe-${{ env.VIBE_VERSION }}.apk
-          body: |
-            ## Vibe ${{ env.VIBE_VERSION }}
-
-            A Discord-style, end-to-end encrypted messenger for Android, built on Matrix.
-
-            **Download:** tap `Vibe-${{ env.VIBE_VERSION }}.apk` below, then open it to install
-            (allow "Install unknown apps" for your browser when Android asks).
-
-            **Updating:** install the new APK over the old one; your chats stay.
-            The app shows what's new the first time you open it.
-
-            Free and open source (AGPL-3.0), based on FluffyChat.
+          body_path: release-body.md
