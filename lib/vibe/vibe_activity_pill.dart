@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_disappearing.dart';
 import 'package:fluffychat/vibe/vibe_media_saver.dart';
 import 'package:fluffychat/vibe/vibe_send_later.dart';
@@ -99,7 +100,9 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
     final l10n = L10n.of(context);
     for (final id in u.rooms?.join?.keys ?? const <String>[]) {
       final room = c.getRoomById(id);
-      if (room == null || room.id == current) continue;
+      if (room == null || room.id == current || VibeLock.isLocked(id)) {
+        continue;
+      }
       final typers = room.typingUsers.where((x) => x.id != c.userID);
       if (typers.isNotEmpty) {
         _show(
@@ -128,6 +131,7 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
     final c = _client!;
     if (e.senderId == c.userID) return;
     if (e.room.id == _currentRoomId()) return;
+    if (VibeLock.isLocked(e.room.id)) return;
     if (e.type != EventTypes.Message && e.type != EventTypes.Encrypted) return;
     if (!e.status.isSynced) return;
     final body = e.calcLocalizedBodyFallback(

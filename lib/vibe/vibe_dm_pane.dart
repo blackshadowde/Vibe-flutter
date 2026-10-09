@@ -10,6 +10,7 @@ import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_shared_page.dart';
+import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -121,6 +122,13 @@ class _VibeDmPaneState extends State<VibeDmPane> {
                     label: 'Starred messages',
                     onTap: () => VibeSharedPage.open(context, client),
                   ),
+                  if (VibeLock.locked().isNotEmpty)
+                    _NavTile(
+                      icon: Icons.lock_outline,
+                      label: 'Locked chats',
+                      onTap: () =>
+                          VibeLock.openFolder(context, client, widget.onOpen),
+                    ),
                   if (invites.isNotEmpty) ...[
                     _SectionLabel('INVITES — ${invites.length}'),
                     for (var i = 0; i < invites.length; i++)

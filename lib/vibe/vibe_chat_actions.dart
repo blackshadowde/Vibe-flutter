@@ -3,6 +3,7 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
@@ -55,6 +56,20 @@ abstract class VibeChatActions {
               title: const Text('Open chat'),
               onTap: () => Navigator.pop(ctx, 'open'),
             ),
+            ListTile(
+              leading: Icon(
+                VibeLock.isLocked(room.id)
+                    ? Icons.lock_open_outlined
+                    : Icons.lock_outline,
+              ),
+              title: Text(
+                VibeLock.isLocked(room.id) ? 'Unlock chat' : 'Lock chat',
+              ),
+              subtitle: VibeLock.isLocked(room.id)
+                  ? null
+                  : const Text('Hide it behind your fingerprint'),
+              onTap: () => Navigator.pop(ctx, 'lock'),
+            ),
             if (room.isUnread)
               ListTile(
                 leading: const Icon(Icons.mark_chat_read_outlined),
@@ -79,6 +94,8 @@ abstract class VibeChatActions {
           );
         case 'open':
           onOpen();
+        case 'lock':
+          if (context.mounted) await VibeLock.toggle(context, room);
         case 'read':
           final last = room.lastEvent;
           if (room.markedUnread) await room.markUnread(false);

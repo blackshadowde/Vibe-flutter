@@ -6,6 +6,7 @@
 import 'package:fluffychat/pages/chat_list/chat_list.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
+import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_dm_detail.dart';
 import 'package:fluffychat/vibe/vibe_dm_pane.dart';
 import 'package:fluffychat/vibe/vibe_dm_rail.dart';
@@ -38,8 +39,19 @@ class _VibeHomeViewState extends State<VibeHomeView> {
   GoRouter? _router;
   List<Room> _rooms = const [];
 
+  void _onLockChange() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    VibeLock.changes.addListener(_onLockChange);
+  }
+
   @override
   void dispose() {
+    VibeLock.changes.removeListener(_onLockChange);
     VibeSwipe.reset();
     super.dispose();
   }
@@ -149,6 +161,7 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                 .where(
                   (r) =>
                       !r.isSpace &&
+                      !VibeLock.isLocked(r.id) &&
                       (r.membership == Membership.join ||
                           r.membership == Membership.invite),
                 )
