@@ -11,6 +11,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -1678,7 +1679,9 @@ class ChatController extends State<ChatPageWithRoom>
             },
       child: Row(
         children: [
-          Expanded(child: ChatView(this)),
+          Expanded(
+            child: VibeLockGate(roomId: roomId, child: ChatView(this)),
+          ),
           ValueListenableBuilder(
             valueListenable: _displayChatDetailsColumn,
             builder: (context, displayChatDetailsColumn, _) =>
