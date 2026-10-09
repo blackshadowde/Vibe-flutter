@@ -35,10 +35,11 @@ const Color _readTickColor = Color(0xFF5865F2);
 String vibeTime(DateTime ts) {
   final local = ts.toLocal();
   final now = DateTime.now();
-  final t = DateFormat('hh:mm a').format(local);
+  final t = DateFormat('h:mm a').format(local);
   final d = DateTime(local.year, local.month, local.day);
   final today = DateTime(now.year, now.month, now.day);
-  if (d == today) return 'Today at $t';
+  // Discord style: just the time for today.
+  if (d == today) return t;
   if (today.difference(d).inDays == 1) return 'Yesterday at $t';
   return '${DateFormat.yMd().format(local)} $t';
 }
@@ -375,7 +376,7 @@ class VibeMessage extends StatelessWidget {
     final showReactionPicker =
         singleSelected && event.room.canSendDefaultMessages;
     final enterThread = this.enterThread;
-    const avatarSize = 46.0;
+    const avatarSize = 40.0;
 
     final sentReactions = <String>{};
     if (singleSelected) {
@@ -448,8 +449,8 @@ class VibeMessage extends StatelessWidget {
                     : displayname.colorScheme.primaryContainer);
           return Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            runSpacing: 2,
+            spacing: 6,
+            runSpacing: 0,
             children: [
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 220),
@@ -458,23 +459,29 @@ class VibeMessage extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16.5,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    height: 1.15,
                     color: color,
                   ),
                 ),
               ),
-              Icon(
-                event.room.encrypted ? Icons.lock_outline : Icons.lock_open,
-                size: 16,
-                color: event.room.encrypted
-                    ? cs.onSurfaceVariant
-                    : Colors.redAccent,
-              ),
+              // Encrypted is the normal case (shown once in the chat
+              // header); only warn when a chat is NOT encrypted.
+              if (!event.room.encrypted)
+                const Icon(
+                  Icons.lock_open,
+                  size: 14,
+                  color: Colors.redAccent,
+                ),
               if (event.status.isSent)
                 Text(
                   vibeTime(event.originServerTs),
-                  style: TextStyle(fontSize: 12.5, color: cs.onSurfaceVariant),
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.15,
+                    color: cs.onSurfaceVariant,
+                  ),
                 ),
               if (isEdited)
                 Text(
@@ -881,10 +888,10 @@ class VibeMessage extends StatelessWidget {
                   onDoubleTapDown: (d) => heart.noteTap(d.globalPosition),
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
-                      14,
-                      first ? 12 : 1,
-                      14,
-                      last ? 6 : 1,
+                      12,
+                      first ? 10 : 0,
+                      12,
+                      last ? 4 : 0,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
