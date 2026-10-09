@@ -30,6 +30,17 @@ import 'package:fluffychat/vibe/vibe_chunks.dart';
 
 const Color _ownNameColor = Color(0xFFB5BAC1);
 const Color _otherNameColor = Color(0xFFF2F3F5);
+// Light mode: dark names (the dark-mode greys/whites vanish on white).
+const Color _ownNameColorLight = Color(0xFF4E5058);
+const Color _otherNameColorLight = Color(0xFF060607);
+
+/// Soft shadow under names in light mode, so they stand out on white.
+List<Shadow>? _nameShadows(ThemeData theme) =>
+    theme.brightness == Brightness.light
+    ? const [
+        Shadow(color: Color(0x40000000), blurRadius: 4, offset: Offset(0, 1)),
+      ]
+    : null;
 const Color _readTickColor = Color(0xFF5865F2);
 
 String vibeTime(DateTime ts) {
@@ -441,9 +452,9 @@ class VibeMessage extends StatelessWidget {
           final displayname =
               snapshot.data?.calcDisplayname() ?? sender.calcDisplayname();
           final color = ownMessage
-              ? _ownNameColor
+              ? (theme.brightness == Brightness.light ? _ownNameColorLight : _ownNameColor)
               : event.room.isDirectChat
-              ? _otherNameColor
+              ? (theme.brightness == Brightness.light ? _otherNameColorLight : _otherNameColor)
               : (theme.brightness == Brightness.light
                     ? displayname.colorScheme.primary
                     : displayname.colorScheme.primaryContainer);
@@ -463,6 +474,7 @@ class VibeMessage extends StatelessWidget {
                     fontSize: 16,
                     height: 1.15,
                     color: color,
+                    shadows: _nameShadows(theme),
                   ),
                 ),
               ),
@@ -519,9 +531,9 @@ class VibeMessage extends StatelessWidget {
             final rname = rs.calcDisplayname();
             final rown = replyEvent.senderId == client.userID;
             final rcolor = rown
-                ? _ownNameColor
+                ? (theme.brightness == Brightness.light ? _ownNameColorLight : _ownNameColor)
                 : event.room.isDirectChat
-                ? _otherNameColor
+                ? (theme.brightness == Brightness.light ? _otherNameColorLight : _otherNameColor)
                 : (theme.brightness == Brightness.light
                       ? rname.colorScheme.primary
                       : rname.colorScheme.primaryContainer);
@@ -553,6 +565,7 @@ class VibeMessage extends StatelessWidget {
                       fontSize: 13.5,
                       fontWeight: FontWeight.w600,
                       color: rcolor,
+                      shadows: _nameShadows(theme),
                     ),
                   ),
                 ),

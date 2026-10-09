@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
@@ -32,13 +33,15 @@ abstract class VibeUserSheet {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      builder: (sheetContext) => _Sheet(
-        client: client,
-        userId: userId,
-        displayName: displayName,
-        avatarUrl: avatarUrl,
-        currentRoomId: currentRoomId,
-        router: router,
+      builder: (sheetContext) => VibeSheetDragClose(
+        child: _Sheet(
+          client: client,
+          userId: userId,
+          displayName: displayName,
+          avatarUrl: avatarUrl,
+          currentRoomId: currentRoomId,
+          router: router,
+        ),
       ),
     );
   }

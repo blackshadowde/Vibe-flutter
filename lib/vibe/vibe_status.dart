@@ -573,10 +573,10 @@ class _VibeStatusBubbleState extends State<VibeStatusBubble> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Positioned(left: 0, top: 0, child: dot(8)),
-            Positioned(left: 9, top: 9, child: dot(13)),
+            Positioned(left: 0, top: 0, child: dot(7)),
+            Positioned(left: 6, top: 6, child: dot(11)),
             Padding(
-              padding: const EdgeInsets.only(left: 18, top: 18),
+              padding: const EdgeInsets.only(left: 12, top: 13),
               child: bubble,
             ),
           ],

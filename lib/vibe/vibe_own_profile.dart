@@ -3,6 +3,7 @@
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
+import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,9 @@ abstract class VibeOwnProfile {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      builder: (_) => _OwnSheet(client: client, router: router),
+      builder: (_) => VibeSheetDragClose(
+        child: _OwnSheet(client: client, router: router),
+      ),
     );
   }
 }
