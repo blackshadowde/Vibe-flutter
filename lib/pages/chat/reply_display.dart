@@ -56,7 +56,11 @@ class ReplyDisplay extends StatelessWidget {
     }
 
     return AnimatedSize(
-      duration: FluffyThemes.animationDuration,
+      // Opens smoothly, closes instantly: closing while the sent message
+      // lands in the timeline made the chat stutter.
+      duration: reply != null || editing
+          ? FluffyThemes.animationDuration
+          : Duration.zero,
       curve: FluffyThemes.animationCurve,
       clipBehavior: Clip.hardEdge,
       child: reply != null || editing

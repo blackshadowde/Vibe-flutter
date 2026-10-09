@@ -65,13 +65,22 @@ class ChatEventList extends StatelessWidget {
         data: MediaQuery.of(context).copyWith(
           textScaler: TextScaler.linear(AppSettings.fontSizeFactor.value),
         ),
-        child: ListView.custom(
+        child: ValueListenableBuilder<double?>(
+          valueListenable: controller.inputBarHeightNotifier,
+          // Only the space under the list changes; the messages themselves
+          // are not rebuilt while the input bar resizes.
+          builder: (context, barHeight, list) => Padding(
+            padding: EdgeInsets.only(
+              bottom:
+                  barHeight ??
+                  (72 + (FluffyThemes.isColumnMode(context) ? 16 : 0)),
+            ),
+            child: list,
+          ),
+          child: ListView.custom(
           padding: EdgeInsets.only(
             top: 8 + MediaQuery.paddingOf(context).top,
-            bottom:
-                8 +
-                (controller.inputBarHeight ??
-                    (72 + (FluffyThemes.isColumnMode(context) ? 16 : 0))),
+            bottom: 8,
             left: horizontalPadding,
             right: horizontalPadding,
           ),
@@ -236,6 +245,7 @@ class ChatEventList extends StatelessWidget {
             findChildIndexCallback: (key) =>
                 controller.findChildIndexCallback(key, thisEventsKeyMap),
           ),
+        ),
         ),
       );
   }

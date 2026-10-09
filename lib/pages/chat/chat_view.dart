@@ -392,9 +392,9 @@ class ChatView extends StatelessWidget {
                             top:
                                 MediaQuery.paddingOf(context).top +
                                 (theme.appBarTheme.toolbarHeight ?? 56) +
-                                appbarBottomHeight +
-                                2,
-                            left: 70,
+                                appbarBottomHeight -
+                                8,
+                            left: 62,
                             child: VibeStatusBubble(
                               room: controller.room,
                               userId: controller.room.directChatMatrixID,

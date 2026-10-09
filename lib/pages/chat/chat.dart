@@ -674,6 +674,7 @@ class ChatController extends State<ChatPageWithRoom>
     scrollController.dispose();
     inputFocus.removeListener(_inputFocusListener);
     inputFocus.dispose();
+    inputBarHeightNotifier.dispose();
     _displayChatDetailsColumn.dispose();
     web.window.removeEventListener('paste', _handleClipboardFilePasteWeb);
     if (currentlyTyping) room.setTyping(false);
@@ -1504,7 +1505,11 @@ class ChatController extends State<ChatPageWithRoom>
   Timer? _storeInputTimeoutTimer;
   static const Duration _storeInputTimeout = Duration(milliseconds: 500);
 
-  double? inputBarHeight;
+  /// Height of the floating input bar. A notifier (not setState) so a
+  /// resizing input bar only re-lays out the message list, instead of
+  /// rebuilding the whole chat screen on every animation frame.
+  final ValueNotifier<double?> inputBarHeightNotifier = ValueNotifier(null);
+  double? get inputBarHeight => inputBarHeightNotifier.value;
 
   void updateInputBarHeight() {
     RenderBox? renderBox;
@@ -1513,10 +1518,8 @@ class ChatController extends State<ChatPageWithRoom>
     }
 
     final height = renderBox?.size.height ?? 72.0;
-    if (height != inputBarHeight) {
-      setState(() {
-        inputBarHeight = height;
-      });
+    if (height != inputBarHeightNotifier.value) {
+      inputBarHeightNotifier.value = height;
     }
   }
 
