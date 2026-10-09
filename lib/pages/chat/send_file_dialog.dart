@@ -20,6 +20,7 @@ import 'package:fluffychat/utils/show_scaffold_dialog.dart';
 import 'package:fluffychat/utils/size_string.dart';
 import 'package:fluffychat/utils/start_push_foreground_service.dart';
 import 'package:fluffychat/vibe/vibe_chunks.dart';
+import 'package:fluffychat/vibe/vibe_low_data.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/dialog_text_field.dart';
 import 'package:flutter/cupertino.dart';
@@ -128,7 +129,10 @@ class SendFileDialogState extends State<SendFileDialog> {
           scaffoldMessenger.clearSnackBars();
           scaffoldMessenger.showLoadingSnackBar(l10n.compressingVideo);
           file = await xfile.getVideoInfo(
-            compress: length != null && length > minSizeToCompress && compress,
+            compress:
+                length != null &&
+                length > minSizeToCompress &&
+                (compress || VibeLowData.on),
           );
           scaffoldMessenger.clearSnackBars();
           if (!ForegroundServices.platformSupported) {
@@ -168,7 +172,9 @@ class SendFileDialogState extends State<SendFileDialog> {
           await widget.room.sendFileEvent(
             file,
             thumbnail: thumbnail,
-            shrinkImageMaxDimension: compress ? 1600 : null,
+            shrinkImageMaxDimension: compress
+                ? VibeLowData.sendMaxDimension
+                : null,
             extraContent: label.isEmpty ? null : {'body': label},
             threadRootEventId: widget.threadRootEventId,
             threadLastEventId: widget.threadLastEventId,
@@ -187,7 +193,9 @@ class SendFileDialogState extends State<SendFileDialog> {
           await widget.room.sendFileEvent(
             file,
             thumbnail: thumbnail,
-            shrinkImageMaxDimension: compress ? 1600 : null,
+            shrinkImageMaxDimension: compress
+                ? VibeLowData.sendMaxDimension
+                : null,
             extraContent: label.isEmpty ? null : {'body': label},
           );
         }
