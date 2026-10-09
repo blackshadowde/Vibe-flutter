@@ -248,7 +248,10 @@ class _StatusBits extends StatelessWidget {
       );
     }
     if (status == EventStatus.sending) {
+      final offline =
+          event.room.client.onSyncStatus.value?.status == SyncStatus.error;
       final label = switch (event.fileSendingStatus) {
+        null when offline => 'Waiting for connection…',
         null => event.room.encrypted ? 'Encrypting…' : 'Sending…',
         FileSendingStatus.generatingThumbnail =>
           L10n.of(context).generatingThumbnail,

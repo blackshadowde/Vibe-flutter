@@ -24,7 +24,9 @@ abstract class VibeMediaSaver {
   }
 
   static void onEvent(Event e) {
-    if (!AppSettings.vibeSaveMedia.value) return;
+    if (!AppSettings.vibeSaveMedia.value || AppSettings.vibeLowData.value) {
+      return;
+    }
     if (e.type != EventTypes.Message) return;
     if (e.senderId == e.room.client.userID) return;
     if (!e.status.isSynced || e.redacted) return;
