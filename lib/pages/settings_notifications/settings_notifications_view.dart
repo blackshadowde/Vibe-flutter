@@ -10,6 +10,7 @@ import 'package:fluffychat/pages/settings_notifications/push_rule_extensions.dar
 import 'package:fluffychat/utils/background_push.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/push_helper.dart';
+import 'package:fluffychat/vibe/vibe_push_mode_tiles.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/settings_switch_list_tile.dart';
 import 'package:flutter/foundation.dart';
@@ -65,6 +66,7 @@ class SettingsNotificationsView extends StatelessWidget {
             return SelectionArea(
               child: Column(
                 children: [
+                  if (PlatformInfos.isAndroid) const VibePushModeTiles(),
                   if (kDebugMode && lastReceivedPush != null)
                     ListTile(
                       title: Text('Last received push notification'),
