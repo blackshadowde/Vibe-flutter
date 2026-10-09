@@ -20,14 +20,15 @@ import 'package:matrix/matrix.dart';
 abstract class VibeChunks {
   static const key = 'chat.vibe.chunk';
 
-  /// Used when the server does not tell us its limit.
-  static const _fallbackLimit = 50 * 1000 * 1000;
+  /// Highest single upload we trust. matrix.org free accounts allow 10 MB
+  /// per file (premium 100 MB); the server does not always report this.
+  static const _fallbackLimit = 10 * 1000 * 1000;
 
   /// Part size. Small enough to finish quickly on a slow connection.
-  static const _partSize = 20 * 1000 * 1000;
+  static const _partSize = 8 * 1000 * 1000;
 
-  /// Never send more than this many parts (= 2 GB at 20 MB each).
-  static const _maxParts = 100;
+  /// Never send more than this many parts (= 200 MB at 8 MB each).
+  static const _maxParts = 25;
 
   static int _limit(int? serverLimit) =>
       min(serverLimit ?? _fallbackLimit, _fallbackLimit);
@@ -68,7 +69,9 @@ abstract class VibeChunks {
           'allowed size limit (${_limit(serverLimit).sizeString}).\n\n'
           'To send it, Vibe will split it into $parts parts.\n\n'
           'This only works if the person on the other side also uses Vibe. '
-          'Other Matrix apps will only see separate parts.',
+          'Other Matrix apps will only see separate parts.\n\n'
+          'Your server may also limit uploads per day '
+          '(matrix.org free accounts: 100 MB a day).',
       okLabel: 'Send in $parts parts',
       cancelLabel: 'Cancel',
     );
