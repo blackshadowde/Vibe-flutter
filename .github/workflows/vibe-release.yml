@@ -2,9 +2,14 @@ name: Vibe release
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish as a public GitHub Release (download page)'
+        type: boolean
+        default: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   release-apk:
@@ -149,3 +154,28 @@ jobs:
         with:
           name: vibe-${{ env.VIBE_VERSION }}
           path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Publish GitHub Release
+        if: ${{ inputs.publish }}
+        run: cp build/app/outputs/flutter-apk/app-release.apk "Vibe-${VIBE_VERSION}.apk"
+
+      - uses: softprops/action-gh-release@v2
+        if: ${{ inputs.publish }}
+        with:
+          tag_name: v${{ env.VIBE_VERSION }}
+          name: Vibe ${{ env.VIBE_VERSION }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          files: Vibe-${{ env.VIBE_VERSION }}.apk
+          body: |
+            ## Vibe ${{ env.VIBE_VERSION }}
+
+            A Discord-style, end-to-end encrypted messenger for Android, built on Matrix.
+
+            **Download:** tap `Vibe-${{ env.VIBE_VERSION }}.apk` below, then open it to install
+            (allow "Install unknown apps" for your browser when Android asks).
+
+            **Updating:** install the new APK over the old one; your chats stay.
+            The app shows what's new the first time you open it.
+
+            Free and open source (AGPL-3.0), based on FluffyChat.
