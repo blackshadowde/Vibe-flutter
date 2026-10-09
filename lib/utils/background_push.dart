@@ -24,6 +24,8 @@ import 'package:matrix/matrix.dart';
 import 'package:unifiedpush/unifiedpush.dart';
 import 'package:unifiedpush_ui/unifiedpush_ui.dart';
 
+import 'package:fluffychat/vibe/vibe_ntfy.dart';
+
 import '../config/app_config.dart';
 import '../config/setting_keys.dart';
 import '../widgets/matrix.dart';
@@ -277,8 +279,32 @@ class BackgroundPush {
 
   static bool _wentToRoomOnStartup = false;
 
+  /// Vibe built-in notifications (ntfy, no Google): register this device's
+  /// pusher at ntfy's Matrix gateway and keep a live connection.
+  Future<void> setupBuiltinPush() async {
+    for (final client in clients) {
+      if (!client.isLogged()) continue;
+      await setupPusher(
+        client: client,
+        gatewayUrl: VibeNtfy.gateway,
+        token: VibeNtfy.endpoint(),
+      );
+    }
+    await VibeNtfy.start(
+      (data) => pushHelper(
+        PushNotification.fromJson(data),
+        clients: clients,
+        l10n: l10n,
+        activeRoomId: matrix?.activeRoomId,
+        flutterLocalNotificationsPlugin: _flutterLocalNotificationsPlugin,
+      ),
+    );
+  }
+
   Future<void> setupPush(BuildContext context) async {
-    if (PlatformInfos.isAndroid &&
+    if (PlatformInfos.isAndroid && VibeNtfy.enabled) {
+      await setupBuiltinPush();
+    } else if (PlatformInfos.isAndroid &&
         (await UnifiedPush.getDistributors()).isNotEmpty &&
         context.mounted) {
       await UnifiedPushUi(
