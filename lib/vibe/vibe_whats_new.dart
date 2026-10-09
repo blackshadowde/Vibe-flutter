@@ -12,6 +12,10 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.0',
     items: [
+      ('💬', 'Chat looks more like Discord: smaller profile pictures, tighter spacing, and today\'s messages show just the time'),
+      ('☀️', 'Light mode: names are dark with a soft shadow, easy to read on white'),
+      ('👇', 'Swipe down to close your profile and other people\'s profiles'),
+      ('↩', 'Smoother replies: no more stutter when you send a reply'),
       ('🔔', 'Built-in notifications: Settings → Notifications → "Built-in, no Google" works without Firebase or extra apps'),
       ('🔒', 'Lock chats: long-press a chat → Lock chat. It hides behind your fingerprint under "Locked chats", and its notifications never show who or what'),
       ('📶', 'Low data mode: Settings → Chat. Photos load only when you tap, GIFs don\'t autoplay, photos you send are smaller'),
