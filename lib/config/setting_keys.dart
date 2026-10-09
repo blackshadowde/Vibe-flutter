@@ -86,6 +86,10 @@ enum AppSettings<T> {
   vibeHaptics<bool>('chat.vibe.haptics', true),
   vibeSaveMedia<bool>('chat.vibe.save_media', false),
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
+  // 'standard' (Firebase via the Worker) or 'builtin' (ntfy, no Google)
+  vibePushMode<String>('chat.vibe.push_mode', 'standard'),
+  vibeNtfyTopic<String>('chat.vibe.ntfy_topic', ''),
+  vibeNtfyLastId<String>('chat.vibe.ntfy_last_id', ''),
   // Days to keep downloaded media on this phone. 0 = forever.
   vibeKeepMediaDays<int>('chat.vibe.keep_media_days', 0),
   doubleTapToReact<bool>('chat.fluffy.double_tap_to_react', false),
