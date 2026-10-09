@@ -7,6 +7,7 @@ import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/utils/file_description.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
+import 'package:fluffychat/vibe/vibe_low_data.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -86,7 +87,15 @@ class ImageBubble extends StatelessWidget {
               children: [
                 Hero(
                   tag: event.eventId,
-                  child: AppSettings.showThumbnailsInTimeline.value
+                  child: VibeTapToLoad(
+                    event: event,
+                    placeholder: _ImageBubblePlaceholder(
+                      event: event,
+                      width: width,
+                      height: height,
+                      fit: fit,
+                    ),
+                    child: AppSettings.showThumbnailsInTimeline.value
                       ? MxcImage(
                           cacheKey: event.transactionId ?? event.eventId,
                           cacheName: event.room.id,
@@ -94,7 +103,7 @@ class ImageBubble extends StatelessWidget {
                           width: width,
                           height: height,
                           fit: fit,
-                          animated: animated,
+                          animated: animated && !VibeLowData.on,
                           isThumbnail: thumbnailOnly,
                           placeholder: event.messageType == MessageTypes.Sticker
                               ? null
@@ -111,6 +120,7 @@ class ImageBubble extends StatelessWidget {
                           height: height,
                           fit: fit,
                         ),
+                  ),
                 ),
               ],
             ),
