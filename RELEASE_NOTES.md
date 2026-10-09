@@ -1,0 +1,6 @@
+- 💬 **Chat looks more like Discord:** smaller profile pictures, tighter spacing, today's messages show just the time
+- ☀️ **Light mode:** names are dark with a soft shadow, easy to read on white
+- 👇 **Swipe down to close** your profile and other people's profiles
+- ↩️ **Smoother replies:** no more stutter when you send a reply
+- 💭 **Status bubble** sits closer to the profile picture
+- 🧹 Removed the chat wallpaper option from Appearance
