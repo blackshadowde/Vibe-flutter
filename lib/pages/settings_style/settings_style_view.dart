@@ -214,48 +214,17 @@ class SettingsStyleView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Divider(color: theme.dividerColor),
-                    ListTile(
-                      title: TextButton.icon(
-                        style: TextButton.styleFrom(
-                          backgroundColor: theme.colorScheme.secondaryContainer,
-                          foregroundColor:
-                              theme.colorScheme.onSecondaryContainer,
+                    // Vibe: no chat wallpapers. Only offer removing an
+                    // old one that was set before.
+                    if (accountConfig.wallpaperUrl != null)
+                      ListTile(
+                        leading: Icon(
+                          Icons.delete_outlined,
+                          color: theme.colorScheme.error,
                         ),
-                        onPressed: controller.setWallpaper,
-                        icon: const Icon(Icons.edit_outlined),
-                        label: Text(L10n.of(context).setWallpaper),
+                        title: const Text('Remove old chat wallpaper'),
+                        onTap: controller.deleteChatWallpaper,
                       ),
-                      trailing: accountConfig.wallpaperUrl == null
-                          ? null
-                          : IconButton(
-                              icon: const Icon(Icons.delete_outlined),
-                              color: theme.colorScheme.error,
-                              onPressed: controller.deleteChatWallpaper,
-                            ),
-                    ),
-                    if (accountConfig.wallpaperUrl != null) ...[
-                      ListTile(title: Text(L10n.of(context).opacity)),
-                      Slider.adaptive(
-                        min: 0.1,
-                        max: 1.0,
-                        divisions: 9,
-                        semanticFormatterCallback: (d) => d.toString(),
-                        value: controller.wallpaperOpacity,
-                        onChanged: controller.updateWallpaperOpacity,
-                        onChangeEnd: controller.saveWallpaperOpacity,
-                      ),
-                      ListTile(title: Text(L10n.of(context).blur)),
-                      Slider.adaptive(
-                        min: 0.0,
-                        max: 10.0,
-                        divisions: 10,
-                        semanticFormatterCallback: (d) => d.toString(),
-                        value: controller.wallpaperBlur,
-                        onChanged: controller.updateWallpaperBlur,
-                        onChangeEnd: controller.saveWallpaperBlur,
-                      ),
-                    ],
                   ],
                 );
               },
