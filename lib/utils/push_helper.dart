@@ -18,6 +18,7 @@ import 'package:fluffychat/utils/notification_avatar_extension.dart';
 import 'package:fluffychat/utils/notification_background_handler.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/start_push_foreground_service.dart';
+import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -204,6 +205,25 @@ Future<void> _tryPushHelper(
           event.type != EventTypes.CallInvite) ||
       event.type == 'org.matrix.call.sdp_stream_metadata_changed') {
     Logs().v('Push message was for a call, but not call invite.');
+    return;
+  }
+
+  // Vibe: locked chats never show who wrote or what.
+  if (VibeLock.isLocked(event.room.id)) {
+    await flutterLocalNotificationsPlugin.show(
+      id: '${client.clientName}_${notification.roomId}'.hashCode,
+      title: 'Vibe',
+      body: '🔒 New message',
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          AppConfig.pushNotificationsChannelId,
+          'Incoming messages',
+          importance: Importance.high,
+          priority: Priority.max,
+          category: AndroidNotificationCategory.message,
+        ),
+      ),
+    );
     return;
   }
 
