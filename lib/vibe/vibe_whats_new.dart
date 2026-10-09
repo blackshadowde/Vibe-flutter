@@ -10,6 +10,16 @@ import 'package:package_info_plus/package_info_plus.dart';
 /// number is added automatically by the release workflow).
 const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
+    version: '2.0',
+    items: [
+      ('🔔', 'Built-in notifications: Settings → Notifications → "Built-in, no Google" works without Firebase or extra apps'),
+      ('🔒', 'Lock chats: long-press a chat → Lock chat. It hides behind your fingerprint under "Locked chats", and its notifications never show who or what'),
+      ('📶', 'Low data mode: Settings → Chat. Photos load only when you tap, GIFs don\'t autoplay, photos you send are smaller'),
+      ('⏳', '"Waiting for connection…" on messages typed without signal; they send by themselves when you\'re back online'),
+      ('✨', 'Plus everything from 1.1: custom status, their time, disappearing messages, send later, new reactions and more'),
+    ],
+  ),
+  (
     version: '1.1',
     items: [
       ('💭', 'Custom status: tap your name at the bottom to set "On watch", "Busy at work"… with Clear after'),
