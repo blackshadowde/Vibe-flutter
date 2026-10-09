@@ -65,7 +65,7 @@ Vibe is free, with no ads and no tracking. If you'd like to help pay for the not
 
 <p align="center">
   <img src="docs/donate-upi.png" width="220" alt="UPI QR code for donations"><br>
-  <b>UPI:</b> <code>YOUR-UPI-ID@bank</code>
+  <b>UPI:</b> <code>ashish.boddu@ybl</code>
 </p>
 
 Thank you! ❤
