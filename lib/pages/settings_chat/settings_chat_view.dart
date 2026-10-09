@@ -38,6 +38,15 @@ class SettingsChatView extends StatelessWidget {
           child: Column(
             children: [
               SettingsSwitchListTile.adaptive(
+                title: 'Low data mode',
+                subtitle:
+                    'Photos load only when you tap them, GIFs don\'t '
+                    'autoplay, photos you send are smaller and nothing is '
+                    'saved to the gallery automatically.',
+                setting: AppSettings.vibeLowData,
+                onChanged: (_) => controller.updateState(),
+              ),
+              SettingsSwitchListTile.adaptive(
                 title: L10n.of(context).formattedMessages,
                 subtitle: L10n.of(context).formattedMessagesDescription,
                 setting: AppSettings.renderHtml,
