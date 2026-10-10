@@ -79,6 +79,14 @@ class SettingsSecurityView extends StatelessWidget {
                     subtitle: L10n.of(context).sendReadReceiptsDescription,
                     setting: AppSettings.sendPublicReadReceipts,
                   ),
+                  SettingsSwitchListTile.adaptive(
+                    title: 'Link previews',
+                    subtitle:
+                        'Show a card with title and picture under links. '
+                        'Your server fetches the page, so it can see which '
+                        'links are shared in your chats.',
+                    setting: AppSettings.vibeLinkPreviews,
+                  ),
                   ListTile(
                     trailing: const Icon(Icons.chevron_right_outlined),
                     title: Text(L10n.of(context).blockedUsers),
