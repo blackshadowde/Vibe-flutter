@@ -4,6 +4,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_support.dart';
+import 'package:fluffychat/vibe/vibe_updater.dart';
+import 'package:fluffychat/vibe/vibe_updates_page.dart';
 import 'package:async/async.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -224,7 +227,7 @@ class SettingsView extends StatelessWidget {
           _SettingsCard(
             icon: Icons.verified_user_outlined,
             title: 'Security & sign-in',
-            subtitle: 'Password, active sessions & sign-in',
+            subtitle: 'Password, sessions, privacy & link previews',
             onTap: () => context.go('/rooms/settings/security'),
           ),
           _SettingsCard(
@@ -252,8 +255,28 @@ class SettingsView extends StatelessWidget {
           _SettingsCard(
             icon: Icons.folder,
             title: 'Chats & storage',
-            subtitle: 'Media downloads & link previews',
+            subtitle: 'Media downloads & storage',
             onTap: () => context.go('/rooms/settings/chat'),
+          ),
+          ValueListenableBuilder<VibeRelease?>(
+            valueListenable: VibeUpdater.pending,
+            builder: (context, update, _) => _SettingsCard(
+              icon: Icons.system_update,
+              title: 'Updates',
+              subtitle: update == null
+                  ? 'Version, what\'s new & check for updates'
+                  : 'Vibe ${update.version} is ready to install',
+              badge: update == null ? null : 'Update',
+              badgeColor: const Color(0xFFF23F43),
+              onTap: () => VibeUpdatesPage.open(context),
+            ),
+          ),
+          _SettingsCard(
+            icon: Icons.favorite,
+            iconColor: const Color(0xFFF23F43),
+            title: 'Support Vibe',
+            subtitle: 'Donate with UPI: QR code & UPI ID',
+            onTap: () => VibeSupport.open(context),
           ),
           _SettingsCard(
             icon: Icons.info,
