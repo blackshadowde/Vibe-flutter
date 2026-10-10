@@ -87,6 +87,7 @@ enum AppSettings<T> {
   vibeSaveMedia<bool>('chat.vibe.save_media', false),
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),
+  vibeLinkPreviews<bool>('chat.vibe.link_previews', true),
   // 'standard' (Firebase via the Worker) or 'builtin' (ntfy, no Google)
   vibePushMode<String>('chat.vibe.push_mode', 'standard'),
   vibeNtfyTopic<String>('chat.vibe.ntfy_topic', ''),
