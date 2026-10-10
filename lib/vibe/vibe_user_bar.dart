@@ -7,6 +7,7 @@ import 'package:fluffychat/vibe/vibe_connection.dart';
 import 'package:fluffychat/vibe/vibe_own_profile.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
+import 'package:fluffychat/vibe/vibe_updater.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -102,7 +103,10 @@ class VibeUserBar extends StatelessWidget {
                                   context.go('/rooms/settings/notifications'),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.settings),
+                              // Red dot while an update is waiting.
+                              icon: const VibeUpdateDot(
+                                child: Icon(Icons.settings),
+                              ),
                               color: theme.colorScheme.onSurfaceVariant,
                               onPressed: () => context.go('/rooms/settings'),
                             ),

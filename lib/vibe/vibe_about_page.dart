@@ -2,6 +2,7 @@
 
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/vibe/vibe_app_info.dart';
+import 'package:fluffychat/vibe/vibe_updates_page.dart';
 import 'package:fluffychat/vibe/vibe_welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -99,6 +100,16 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
             ),
           ),
           const SizedBox(height: 24),
+          if (PlatformInfos.isAndroid) ...[
+            _AboutCard(
+              icon: Icons.system_update_alt,
+              title: 'Check for updates',
+              sub: 'Get the newest Vibe from GitHub',
+              trailing: Icons.chevron_right,
+              onTap: () => VibeUpdatesPage.open(context),
+            ),
+            const SizedBox(height: 12),
+          ],
           _AboutCard(
             icon: Icons.shield_outlined,
             title: 'How Vibe keeps you safe',

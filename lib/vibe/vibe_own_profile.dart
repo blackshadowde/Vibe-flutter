@@ -3,9 +3,10 @@
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
+import 'package:fluffychat/vibe/vibe_set_status.dart';
+import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -203,99 +204,27 @@ class _OwnSheetState extends State<_OwnSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Discord-style header: banner, round picture with the
+              // online dot, and the status thought bubble.
               SizedBox(
-                height: 340,
-                width: double.infinity,
+                height: 236,
                 child: Stack(
-                  fit: StackFit.expand,
+                  clipBehavior: Clip.none,
                   children: [
-                    if (avatar != null)
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 1.18, end: 1.0),
-                        duration: const Duration(milliseconds: 900),
-                        curve: Curves.easeOutCubic,
-                        builder: (context, v, child) =>
-                            Transform.scale(scale: v, child: child),
-                        child: MxcImage(
-                          client: client,
-                          uri: avatar,
-                          cacheKey: 'vibe_own_banner_$avatar',
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 340,
-                          isThumbnail: false,
-                        ),
-                      )
-                    else
-                      Container(
-                        color: cs.primaryContainer,
-                        alignment: Alignment.center,
-                        child: Text(
-                          name.isEmpty ? '@' : name.substring(0, 1).toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 120,
-                            fontWeight: FontWeight.bold,
-                            color: cs.onPrimaryContainer,
-                          ),
-                        ),
-                      ),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.transparent,
-                            cs.surface.withAlpha(235),
-                          ],
-                          stops: const [0, 0.45, 1],
-                        ),
-                      ),
-                    ),
+                    Container(height: 128, color: const Color(0xFF1F2624)),
                     Positioned(
                       left: 14,
-                      top: 18,
+                      top: 16,
                       child: _circleButton(
-                        Icons.arrow_back,
+                        Icons.close,
                         () => Navigator.of(context).pop(),
                       ),
                     ),
                     Positioned(
-                      left: 20,
-                      right: 20,
-                      bottom: 14,
+                      right: 14,
+                      top: 16,
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  name,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w800,
-                                    color: cs.onSurface,
-                                  ),
-                                ),
-                                Text(
-                                  userId,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: 'RobotoMono',
-                                    fontSize: 14,
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
                           _circleButton(
                             Icons.photo_camera_outlined,
                             () => _photo(profile),
@@ -311,6 +240,75 @@ class _OwnSheetState extends State<_OwnSheet> {
                             widget.router.go('/rooms/settings');
                           }),
                         ],
+                      ),
+                    ),
+                    Positioned(
+                      left: 16,
+                      top: 80,
+                      child: VibeRingAvatar(
+                        mxc: avatar,
+                        name: name,
+                        client: client,
+                        ring: cs.surface,
+                        size: 120,
+                      ),
+                    ),
+                    Positioned(
+                      left: 158,
+                      right: 16,
+                      top: 104,
+                      child: Builder(
+                        builder: (context) {
+                          final s = VibeStatus.mine(client);
+                          final active = s != null && s.active;
+                          return VibeThoughtBubble(
+                            text: active
+                                ? (s.emoji.isEmpty
+                                      ? s.text
+                                      : '${s.emoji} ${s.text}')
+                                : null,
+                            showPlus: true,
+                            onTap: () async {
+                              await VibeSetStatusPage.open(context, client);
+                              if (!mounted) return;
+                              setState(() {});
+                              // The new status arrives with the next sync.
+                              Future.delayed(
+                                const Duration(milliseconds: 1500),
+                                () {
+                                  if (mounted) setState(() {});
+                                },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                    Text(
+                      userId,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],

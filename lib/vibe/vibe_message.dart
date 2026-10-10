@@ -27,6 +27,7 @@ import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
 import 'package:fluffychat/vibe/vibe_swipe_reply.dart';
 import 'package:fluffychat/vibe/vibe_chunks.dart';
+import 'package:fluffychat/vibe/vibe_link_preview.dart';
 
 const Color _ownNameColor = Color(0xFFB5BAC1);
 const Color _otherNameColor = Color(0xFFF2F3F5);
@@ -644,6 +645,7 @@ class VibeMessage extends StatelessWidget {
             },
           ),
         ),
+        VibeLinkPreview(event: displayEvent),
         if (hasReactions)
           Padding(
             padding: const EdgeInsets.only(top: 4),
