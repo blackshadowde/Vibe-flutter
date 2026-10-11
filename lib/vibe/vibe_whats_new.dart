@@ -12,6 +12,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.0',
     items: [
+      ('🔔', 'Built-in notifications (no Google) now actually work. If you use them, just open Vibe once after updating'),
       ('❤️', 'Support Vibe: Settings → Support Vibe has a UPI QR code and UPI ID if you\'d like to donate'),
       ('💭', 'New status look: tap the thought bubble next to your picture in your profile to set a status'),
       ('🔗', 'Link previews: links show a card with title, description and picture. Turn off in Settings → Security & sign-in'),

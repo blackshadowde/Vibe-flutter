@@ -23,13 +23,24 @@ abstract class VibeNtfy {
 
   static bool get enabled => AppSettings.vibePushMode.value == 'builtin';
 
+  /// ntfy.sh only accepts Matrix (UnifiedPush, `?up=1`) pushes on topics
+  /// named "up" + 12 characters: the phone that subscribes then "pays" the
+  /// rate limit instead of the Matrix server. Any other name is rejected
+  /// with HTTP 507, which is why older Vibe topics ("vibe…") never got a
+  /// single notification.
+  static final RegExp _validTopic = RegExp(r'^up[A-Za-z0-9]{12}$');
+
   static String topic() {
     var t = AppSettings.vibeNtfyTopic.value;
-    if (t.isEmpty) {
-      const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    if (!_validTopic.hasMatch(t)) {
+      const chars =
+          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       final r = Random.secure();
-      t = 'vibe${List.generate(28, (_) => chars[r.nextInt(chars.length)]).join()}';
+      t = 'up${List.generate(12, (_) => chars[r.nextInt(chars.length)]).join()}';
       AppSettings.vibeNtfyTopic.setItem(t);
+      // New topic: old message ids mean nothing here.
+      AppSettings.vibeNtfyLastId.setItem('');
+      _lastId = null;
     }
     return t;
   }
