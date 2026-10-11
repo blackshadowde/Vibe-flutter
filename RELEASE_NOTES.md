@@ -1,3 +1,4 @@
+- 🔔 **Built-in notifications fixed:** "Built-in, no Google" mode now actually delivers notifications (the notification channel had the wrong name format). If you use it, open Vibe once after updating
 - 🚀 **In-app updates:** Vibe now tells you when a new version is out and installs it for you. A red dot on the ⚙ gear means an update is waiting; Settings → Updates shows your version, what's new and a refresh button
 - ❤️ **Support Vibe:** Settings → Support Vibe shows a UPI QR code and UPI ID, with a button to pay from GPay, PhonePe, Paytm or BHIM
 - 💭 **New status look:** your profile shows a round picture with a thought bubble. Tap the bubble to set your status, with a live preview and "Clear at"
