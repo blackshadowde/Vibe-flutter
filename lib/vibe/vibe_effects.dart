@@ -8,6 +8,7 @@ import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_low_data.dart';
 import 'package:fluffychat/vibe/vibe_send_later.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 // ignore: implementation_imports
@@ -306,7 +307,7 @@ abstract class VibeEffects {
     final text = controller.sendController.text.trim();
     if (text.isEmpty) return;
     VibeHaptics.medium();
-    final choice = await showModalBottomSheet<Object>(
+    final choice = await showVibeSheet<Object>(
       context: context,
       useRootNavigator: true,
       showDragHandle: true,

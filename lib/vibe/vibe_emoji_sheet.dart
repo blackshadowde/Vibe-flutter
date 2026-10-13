@@ -3,6 +3,7 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ abstract class VibeEmojiSheet {
   static const _popular = ['❤️', '👍', '😂', '🔥', '😮', '😢', '🎉', '🙏'];
 
   static Future<String?> pick(BuildContext context) {
-    return showModalBottomSheet<String>(
+    return showVibeSheet<String>(
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
@@ -25,7 +26,7 @@ abstract class VibeEmojiSheet {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (ctx) => const _Sheet(),
+      builder: (ctx) => const RepaintBoundary(child: _Sheet()),
     );
   }
 }
@@ -206,7 +207,8 @@ class _SheetState extends State<_Sheet> {
           children: [
             searchBox,
             if (_query.isEmpty) popular,
-            Expanded(child: body),
+            // The big emoji grid is built once the pane has slid up.
+            Expanded(child: VibeSettled(child: body)),
           ],
         ),
       ),

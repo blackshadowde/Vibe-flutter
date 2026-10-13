@@ -13,6 +13,8 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/blur_hash.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:fluffychat/vibe/vibe_media_saver.dart';
+import 'package:fluffychat/vibe/vibe_media_viewer.dart';
 import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -68,16 +70,20 @@ class EventVideoPlayer extends StatelessWidget {
           color: Colors.black,
           borderRadius: BorderRadius.circular(AppConfig.borderRadius),
           child: InkWell(
-            onTap: () => supportsVideoPlayer
-                ? showDialog(
+            // In a chat: the photo & video slideshow (Google Messages
+            // style). Inside the slideshow (no timeline): play it.
+            onTap: () => !supportsVideoPlayer
+                ? VibeMediaSaver.save(context, event)
+                : timeline != null
+                ? VibeMediaViewer.openFromTimeline(context, event, timeline)
+                : showDialog(
                     context: context,
                     builder: (_) => ImageViewer(
                       event,
                       timeline: timeline,
                       outerContext: context,
                     ),
-                  )
-                : event.saveFile(context),
+                  ),
             borderRadius: BorderRadius.circular(AppConfig.borderRadius),
             child: SizedBox(
               width: width,

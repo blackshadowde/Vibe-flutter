@@ -22,7 +22,7 @@ Future<T?> showModalActionPopup<T>({
     case TargetPlatform.fuchsia:
     case TargetPlatform.windows:
     case TargetPlatform.linux:
-      return showModalBottomSheet(
+      return showVibeSheet(
       sheetAnimationStyle: vibeSheetStyle,
         isScrollControlled: true,
         useRootNavigator: useRootNavigator,

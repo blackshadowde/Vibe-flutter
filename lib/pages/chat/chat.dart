@@ -12,6 +12,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluffychat/vibe/vibe_effects.dart';
+import 'package:fluffychat/vibe/vibe_media_saver.dart';
 import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/config/setting_keys.dart';
@@ -171,7 +172,7 @@ class ChatController extends State<ChatPageWithRoom>
       }.contains(selectedEvents.single.messageType);
 
   void saveSelectedEvent(BuildContext context) =>
-      selectedEvents.single.saveFile(context);
+      VibeMediaSaver.save(context, selectedEvents.single);
 
   List<Event> selectedEvents = [];
 

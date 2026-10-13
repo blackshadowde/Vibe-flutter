@@ -2,6 +2,7 @@
 
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -12,6 +13,8 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
+      ('🖼️', 'Tap a photo or video in a chat for a Google Messages style slideshow of the whole chat; long-press one to jump to it. The download button saves straight to your gallery'),
+      ('🪟', 'Panes slide up smoother everywhere: quicker Telegram-like timing, and heavy content (pictures, emoji, animations) appears right after the pane has opened instead of during the slide'),
       ('✉️', 'Sending feels calm: a message slides in once, then only the word after it changes: Encrypting… → ✓ → blue ✓✓. No more second animation or jump when it\'s confirmed'),
       ('💾', 'Storage & cache (Settings → Chat): choose how much space media may use (1 GB up to no limit), how long to keep it, and how much memory Vibe uses for smooth scrolling. Clear the cache any time'),
       ('#️⃣', 'New chat pane like Vibgram: big picture, online, # | chat and INFO channels (media, files, links, voice-messages, starred-messages, profile). Each opens its own pane from the bottom: tap to open, long-press to see it in the chat. Media opens a full-screen slideshow, and nothing reloads when you come back'),
@@ -105,7 +108,7 @@ abstract class VibeWhatsNew {
     final notes =
         vibeReleaseNotes.where((n) => n.version == short).firstOrNull ??
         vibeReleaseNotes.first;
-    return showModalBottomSheet<void>(
+    return showVibeSheet<void>(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,

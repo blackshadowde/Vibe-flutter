@@ -18,7 +18,7 @@ import 'package:matrix/matrix.dart';
 abstract class VibeOwnProfile {
   static Future<void> show(BuildContext context, Client client) {
     final router = GoRouter.of(context);
-    return showModalBottomSheet<void>(
+    return showVibeSheet<void>(
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
@@ -77,7 +77,7 @@ class _OwnSheetState extends State<_OwnSheet> {
   }
 
   Future<void> _photo(Profile? profile) async {
-    final action = await showModalBottomSheet<String>(
+    final action = await showVibeSheet<String>(
       context: context,
       useRootNavigator: true,
       showDragHandle: true,

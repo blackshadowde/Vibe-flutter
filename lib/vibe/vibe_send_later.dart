@@ -7,6 +7,7 @@ import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -172,7 +173,7 @@ abstract class VibeSendLater {
       if (theirMorning != null) ('Their morning (8 AM there)', theirMorning),
     ];
 
-    final picked = await showModalBottomSheet<Object>(
+    final picked = await showVibeSheet<Object>(
       context: context,
       showDragHandle: true,
       useRootNavigator: true,
@@ -261,7 +262,7 @@ abstract class VibeSendLater {
 
   /// List of scheduled messages for [room] (chat ⋮ menu).
   static Future<void> showList(BuildContext context, Room room) =>
-      showModalBottomSheet<void>(
+      showVibeSheet<void>(
         context: context,
         showDragHandle: true,
         useRootNavigator: true,

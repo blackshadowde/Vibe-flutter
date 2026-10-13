@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -258,7 +259,7 @@ abstract class VibeUpdater {
       _show(context, r);
 
   static Future<void> _show(BuildContext context, VibeRelease r) =>
-      showModalBottomSheet<void>(
+      showVibeSheet<void>(
         context: context,
         useRootNavigator: true,
         isScrollControlled: true,

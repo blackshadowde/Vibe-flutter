@@ -11,7 +11,7 @@ import 'package:fluffychat/pages/chat/events/poll.dart';
 import 'package:fluffychat/pages/chat/events/video_player.dart';
 import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
 import 'package:fluffychat/vibe/vibe_effects.dart';
-import 'package:fluffychat/pages/image_viewer/image_viewer.dart';
+import 'package:fluffychat/vibe/vibe_media_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -92,14 +92,10 @@ class MessageContent extends StatelessWidget {
               borderRadius: borderRadius,
               timeline: timeline,
               textColor: textColor,
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => ImageViewer(
-                  event,
-                  timeline: timeline,
-                  outerContext: context,
-                ),
-              ),
+              // Slideshow of the chat's photos and videos (Google Messages
+              // style), opening on this one.
+              onTap: () =>
+                  VibeMediaViewer.openFromTimeline(context, event, timeline),
             );
           case CuteEventContent.eventType:
             return CuteContent(event);

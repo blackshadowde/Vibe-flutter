@@ -5,6 +5,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/widgets/avatar.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -21,7 +22,7 @@ abstract class VibeChatActions {
     final name = room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
     final pinned = room.isFavourite;
     final messenger = ScaffoldMessenger.of(context);
-    final action = await showModalBottomSheet<String>(
+    final action = await showVibeSheet<String>(
       context: context,
       showDragHandle: true,
       backgroundColor: cs.surfaceContainerLow,

@@ -19,7 +19,7 @@ import 'package:photo_manager/photo_manager.dart';
 abstract class VibeAttachSheet {
   static Future<void> show(BuildContext context, ChatController controller) {
     controller.inputFocus.unfocus();
-    return showModalBottomSheet<void>(
+    return showVibeSheet<void>(
       sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
@@ -143,7 +143,7 @@ class _AttachSheetState extends State<_AttachSheet> {
   void _contacts() {
     final c = widget.controller;
     Navigator.of(context).pop();
-    showModalBottomSheet<void>(
+    showVibeSheet<void>(
       sheetAnimationStyle: vibeSheetStyle,
       context: c.context,
       useRootNavigator: true,

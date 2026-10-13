@@ -27,7 +27,7 @@ abstract class VibeMessageMenu {
     Event event,
   ) {
     final cs = Theme.of(context).colorScheme;
-    return showModalBottomSheet<void>(
+    return showVibeSheet<void>(
       sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
@@ -38,8 +38,15 @@ abstract class VibeMessageMenu {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      builder: (sheetContext) =>
-          _Menu(controller: controller, event: event, sheetContext: sheetContext),
+      // Own layer: sliding the menu up moves a picture of it instead of
+      // repainting it every frame.
+      builder: (sheetContext) => RepaintBoundary(
+        child: _Menu(
+          controller: controller,
+          event: event,
+          sheetContext: sheetContext,
+        ),
+      ),
     );
   }
 }

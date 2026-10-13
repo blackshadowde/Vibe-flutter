@@ -9,6 +9,7 @@ import 'package:fluffychat/utils/file_selector.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -261,7 +262,7 @@ class _VibeBackupPageState extends State<VibeBackupPage> {
     }
     if (bytes == null || !mounted) return;
     final name = 'vibe-backup-${VibeBackup._stamp(DateTime.now())}.vibebackup';
-    final where = await showModalBottomSheet<String>(
+    final where = await showVibeSheet<String>(
       context: context,
       builder: (ctx) => SafeArea(
         child: Column(

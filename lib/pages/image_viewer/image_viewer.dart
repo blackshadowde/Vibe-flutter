@@ -8,6 +8,7 @@ import 'package:fluffychat/pages/image_viewer/image_viewer_view.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/show_scaffold_dialog.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
+import 'package:fluffychat/vibe/vibe_media_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
@@ -105,7 +106,8 @@ class ImageViewerController extends State<ImageViewer> {
   );
 
   /// Save this file with a system call.
-  void saveFileAction(BuildContext context) => currentEvent.saveFile(context);
+  void saveFileAction(BuildContext context) =>
+      VibeMediaSaver.save(context, currentEvent);
 
   /// Save this file with a system call.
   void shareFileAction(BuildContext context) => currentEvent.shareFile(context);

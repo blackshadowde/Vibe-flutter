@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/vibe_low_data.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 
 /// Google's Noto Animated Emoji (CC BY 4.0): every emoji has its own
@@ -55,6 +56,12 @@ class _VibeAnimatedEmojiState extends State<VibeAnimatedEmoji> {
       ),
     );
     if (VibeLowData.on || _try >= _codes.length) return plain;
+    // Start decoding the animation only after the pane has slid in, so the
+    // slide stays smooth (the plain emoji looks the same meanwhile).
+    return VibeSettled(placeholder: plain, child: _network(plain));
+  }
+
+  Widget _network(Widget plain) {
     return Image.network(
       VibeAnimatedEmoji.url(_codes[_try]),
       key: ValueKey(_codes[_try]),

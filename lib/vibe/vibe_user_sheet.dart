@@ -23,7 +23,7 @@ abstract class VibeUserSheet {
     String? currentRoomId,
   }) {
     final router = GoRouter.of(context);
-    return showModalBottomSheet<void>(
+    return showVibeSheet<void>(
       sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,

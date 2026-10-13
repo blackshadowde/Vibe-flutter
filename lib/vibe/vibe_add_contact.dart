@@ -15,7 +15,7 @@ import 'package:matrix/matrix.dart';
 /// "Add Contact by Matrix ID" bottom sheet.
 abstract class VibeAddContact {
   static Future<void> show(BuildContext context) {
-    return showModalBottomSheet<void>(
+    return showVibeSheet<void>(
       sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,

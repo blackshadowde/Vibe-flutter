@@ -3,6 +3,8 @@
 import 'dart:io';
 
 import 'package:fluffychat/config/setting_keys.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -41,6 +43,39 @@ abstract class VibeMediaSaver {
     _queue = _queue.then((_) => _save(e)).catchError((Object err, StackTrace s) {
       Logs().w('Vibe: could not save media to gallery', err, s);
     });
+  }
+
+  /// The download button on a photo or video: straight into the phone's
+  /// gallery (no file picker). Other files still go through Save as.
+  static Future<void> save(BuildContext context, Event e) async {
+    final t = e.messageType;
+    if (t != MessageTypes.Image && t != MessageTypes.Video) {
+      await e.saveFile(context);
+      return;
+    }
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    void say(String text) {
+      messenger
+        ?..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(text)));
+    }
+
+    final perm = await PhotoManager.requestPermissionExtend();
+    if (!perm.hasAccess) {
+      say('Allow Vibe to add photos in your phone settings, then try again');
+      return;
+    }
+    say(t == MessageTypes.Image ? 'Saving photo…' : 'Saving video…');
+    try {
+      await _save(e);
+      _done.add(e.eventId);
+      say(t == MessageTypes.Image
+          ? 'Photo saved to your gallery'
+          : 'Video saved to your gallery');
+    } catch (err, s) {
+      Logs().w('Vibe: could not save to gallery', err, s);
+      say('Couldn\'t save: $err');
+    }
   }
 
   static Future<void> _save(Event e) async {

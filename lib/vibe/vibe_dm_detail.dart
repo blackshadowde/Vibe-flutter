@@ -419,7 +419,7 @@ class _DmSheet extends StatefulWidget {
 
   static Future<void> open(BuildContext context, Room room, _Kind kind) {
     final cs = Theme.of(context).colorScheme;
-    return showModalBottomSheet<void>(
+    return showVibeSheet<void>(
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
@@ -437,8 +437,9 @@ class _DmSheet extends StatefulWidget {
         maxChildSize: 0.96,
         snap: true,
         snapSizes: const [0.72],
-        builder: (ctx, scroll) =>
-            _DmSheet(room: room, kind: kind, scroll: scroll),
+        builder: (ctx, scroll) => RepaintBoundary(
+          child: _DmSheet(room: room, kind: kind, scroll: scroll),
+        ),
       ),
     );
   }
@@ -611,7 +612,14 @@ class _DmSheetState extends State<_DmSheet> {
       };
     }
 
-    return CustomScrollView(
+    // The list / grid (and its pictures) is built once the pane has slid
+    // up, so the slide itself stays smooth.
+    return VibeSettled(
+      placeholder: CustomScrollView(
+        controller: widget.scroll,
+        slivers: [header],
+      ),
+      child: CustomScrollView(
       controller: widget.scroll,
       slivers: [
         header,
@@ -625,6 +633,7 @@ class _DmSheetState extends State<_DmSheet> {
           ),
         const SliverToBoxAdapter(child: SizedBox(height: 24)),
       ],
+      ),
     );
   }
 

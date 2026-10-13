@@ -4,6 +4,7 @@ import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -109,7 +110,7 @@ class _VibePrivacyTilesState extends State<VibePrivacyTiles> {
         .split(',')
         .where((e) => e.isNotEmpty)
         .toSet();
-    final result = await showModalBottomSheet<Set<String>>(
+    final result = await showVibeSheet<Set<String>>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,

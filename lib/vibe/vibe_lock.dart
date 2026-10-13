@@ -6,6 +6,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_activity_pill.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/widgets/avatar.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:matrix/matrix.dart';
@@ -108,7 +109,7 @@ abstract class VibeLock {
     final ok = await authenticate('Unlock your locked chats');
     if (!ok || !context.mounted) return;
     final rooms = client.rooms.where((r) => isLocked(r.id)).toList();
-    await showModalBottomSheet<void>(
+    await showVibeSheet<void>(
       context: context,
       showDragHandle: true,
       useRootNavigator: true,

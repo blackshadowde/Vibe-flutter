@@ -10,6 +10,7 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/sign_in_flows/check_homeserver.dart';
 import 'package:fluffychat/vibe/vibe_sign_up.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -152,7 +153,7 @@ class _IntroPageState extends State<IntroPage>
   Future<void> _editHomeserver() async {
     final ctrl = TextEditingController();
     final current = Uri.tryParse(_homeserver)?.host ?? _homeserver;
-    final value = await showModalBottomSheet<String>(
+    final value = await showVibeSheet<String>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,

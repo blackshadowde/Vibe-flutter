@@ -2,6 +2,7 @@
 
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/encryption.dart';
@@ -83,7 +84,7 @@ class _VibeEncryptionPageState extends State<VibeEncryptionPage> {
         safe(() => state.keyBackupEnabled == true ? 'Enabled' : 'Not ready'),
       ),
     ];
-    showModalBottomSheet(
+    showVibeSheet(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,

@@ -30,7 +30,7 @@ class SettingsView extends StatelessWidget {
 
   void _accountSheet(BuildContext context) {
     final theme = Theme.of(context);
-    showModalBottomSheet<void>(
+    showVibeSheet<void>(
       sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,
@@ -121,7 +121,7 @@ class SettingsView extends StatelessWidget {
   }
 
   void _managementSheet(BuildContext context) {
-    showModalBottomSheet<void>(
+    showVibeSheet<void>(
       sheetAnimationStyle: vibeSheetStyle,
       context: context,
       useRootNavigator: true,

@@ -4,6 +4,7 @@ import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/avatar.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -259,7 +260,7 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
   }
 
   Future<void> _pickClear() async {
-    final picked = await showModalBottomSheet<_Clear>(
+    final picked = await showVibeSheet<_Clear>(
       context: context,
       useRootNavigator: true,
       showDragHandle: true,
@@ -291,7 +292,7 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
   }
 
   Future<void> _pickEmoji() async {
-    final picked = await showModalBottomSheet<String>(
+    final picked = await showVibeSheet<String>(
       context: context,
       useRootNavigator: true,
       showDragHandle: true,

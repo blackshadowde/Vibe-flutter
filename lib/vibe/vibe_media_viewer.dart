@@ -4,6 +4,9 @@ import 'package:fluffychat/pages/chat/events/video_player.dart';
 import 'package:fluffychat/pages/image_viewer/image_viewer.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
+import 'package:fluffychat/vibe/vibe_media_saver.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -44,6 +47,35 @@ class VibeMediaViewer extends StatefulWidget {
       ),
     ),
   );
+
+  /// Tapping a photo or video in a chat: a slideshow of every photo and
+  /// video loaded in that chat (oldest left, newest right), starting at it.
+  static Future<void> openFromTimeline(
+    BuildContext context,
+    Event event,
+    Timeline? timeline,
+  ) {
+    final media =
+        (timeline?.events ?? const <Event>[])
+            .where(
+              (e) =>
+                  !e.redacted &&
+                  e.type == EventTypes.Message &&
+                  {
+                    MessageTypes.Image,
+                    MessageTypes.Video,
+                  }.contains(e.messageType),
+            )
+            .toList()
+            .reversed
+            .toList();
+    var index = media.indexWhere((e) => e.eventId == event.eventId);
+    if (index < 0) {
+      media.add(event);
+      index = media.length - 1;
+    }
+    return open(context, media, index);
+  }
 
   @override
   State<VibeMediaViewer> createState() => _VibeMediaViewerState();
@@ -133,8 +165,8 @@ class _VibeMediaViewerState extends State<VibeMediaViewer> {
                       Icons.download_outlined,
                       color: Colors.white,
                     ),
-                    tooltip: 'Save',
-                    onPressed: () => event.saveFile(context),
+                    tooltip: 'Save to gallery',
+                    onPressed: () => VibeMediaSaver.save(context, event),
                   ),
                   IconButton(
                     icon: const Icon(Icons.share_outlined, color: Colors.white),
@@ -177,14 +209,10 @@ class _VibeMediaViewerState extends State<VibeMediaViewer> {
                         } else {
                           d = (i - _index).abs().toDouble();
                         }
+                        // Neighbours shrink a little (paint-only; no
+                        // see-through layer, which was costly per frame).
                         final s = (1 - 0.1 * d).clamp(0.85, 1.0);
-                        return Transform.scale(
-                          scale: s,
-                          child: Opacity(
-                            opacity: (1 - 0.4 * d).clamp(0.5, 1.0),
-                            child: child,
-                          ),
-                        );
+                        return Transform.scale(scale: s, child: child);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -193,7 +221,10 @@ class _VibeMediaViewerState extends State<VibeMediaViewer> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(18),
-                          child: _Slide(event: widget.events[i]),
+                          child: _Slide(
+                            event: widget.events[i],
+                            hero: i == widget.initial,
+                          ),
                         ),
                       ),
                     ),
@@ -277,7 +308,8 @@ class _VibeMediaViewerState extends State<VibeMediaViewer> {
 
 class _Slide extends StatelessWidget {
   final Event event;
-  const _Slide({required this.event});
+  final bool hero;
+  const _Slide({required this.event, this.hero = false});
 
   /// Long-press: close the slideshow (and any pane under it) and show this
   /// photo or video in the chat.
@@ -290,38 +322,65 @@ class _Slide extends StatelessWidget {
     router.go('/rooms/${event.room.id}?event=${event.eventId}');
   }
 
+  /// The chat's own thumbnail (already in memory), shown instantly.
+  Widget _thumb() => MxcImage(
+    key: ValueKey('chat_thumb_${VibeStableId.of(event)}'),
+    cacheName: event.room.id,
+    cacheKey: VibeStableId.of(event),
+    event: event,
+    fit: BoxFit.contain,
+    isThumbnail: true,
+    placeholder: (_) => const SizedBox.shrink(),
+  );
+
   @override
   Widget build(BuildContext context) {
+    Widget content;
     if (event.messageType == MessageTypes.Video) {
-      return GestureDetector(
-        onLongPress: () => _jump(context),
-        child: ColoredBox(
-          color: const Color(0xFF111214),
-          child: Center(child: EventVideoPlayer(event)),
-        ),
+      content = Stack(
+        fit: StackFit.expand,
+        children: [
+          _thumb(),
+          // The player starts once the slideshow has opened.
+          VibeSettled(child: Center(child: EventVideoPlayer(event))),
+        ],
+      );
+    } else {
+      content = Stack(
+        fit: StackFit.expand,
+        children: [
+          _thumb(),
+          // Full picture loads after the opening animation, on top of the
+          // thumbnail, so opening is instant and smooth.
+          VibeSettled(
+            child: MxcImage(
+              // Full pictures stay in memory while the slideshow is open, so
+              // swiping back doesn't load them again (freed on close).
+              key: ValueKey('full_${event.eventId}'),
+              cacheName: 'vibe-viewer',
+              cacheKey: 'full_${event.eventId}',
+              event: event,
+              fit: BoxFit.contain,
+              isThumbnail: false,
+              animated: true,
+              placeholder: (_) => const SizedBox.shrink(),
+            ),
+          ),
+        ],
       );
     }
+    content = ColoredBox(color: const Color(0xFF111214), child: content);
+    if (hero) content = Hero(tag: event.eventId, child: content);
     return GestureDetector(
       onLongPress: () => _jump(context),
-      // tap to zoom in the full image viewer
-      onTap: () => showDialog(
-        context: context,
-        builder: (_) => ImageViewer(event, outerContext: context),
-      ),
-      child: ColoredBox(
-        color: const Color(0xFF111214),
-        child: MxcImage(
-          // Full pictures stay in memory while the slideshow is open, so
-          // swiping back doesn't load them again (freed on close).
-          key: ValueKey('full_${event.eventId}'),
-          cacheName: 'vibe-viewer',
-          cacheKey: 'full_${event.eventId}',
-          event: event,
-          fit: BoxFit.contain,
-          isThumbnail: false,
-          animated: true,
-        ),
-      ),
+      // tap a photo to zoom in the full image viewer
+      onTap: event.messageType == MessageTypes.Video
+          ? null
+          : () => showDialog(
+              context: context,
+              builder: (_) => ImageViewer(event, outerContext: context),
+            ),
+      child: content,
     );
   }
 }

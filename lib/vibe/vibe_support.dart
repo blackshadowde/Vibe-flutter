@@ -2,6 +2,7 @@
 
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
@@ -76,7 +77,7 @@ abstract class VibeSupport {
       // Don't stack on top of another sheet or dialog (update, what's new).
       if (Navigator.of(ctx, rootNavigator: true).canPop()) return;
       await store.setInt(_lastAskKey, now);
-      await showModalBottomSheet<void>(
+      await showVibeSheet<void>(
         context: ctx,
         useRootNavigator: true,
         isScrollControlled: true,

@@ -40,7 +40,7 @@ Future<T?> showAdaptiveBottomSheet<T>({
     );
   }
 
-  return showModalBottomSheet<T>(
+  return showVibeSheet<T>(
       sheetAnimationStyle: vibeSheetStyle,
     context: context,
     builder: (context) => ConstrainedBox(

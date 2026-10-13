@@ -159,10 +159,103 @@ class _PixelSlide extends AnimatedWidget {
   );
 }
 
+/// Builds [child] only once the page or pane it lives in has finished
+/// sliding in. Heavy content (grids of pictures, emoji pickers, animated
+/// emoji) then never competes with the slide for frames: the pane moves
+/// like Telegram's, and the content appears right after. [placeholder] is
+/// shown meanwhile (keep it light).
+class VibeSettled extends StatefulWidget {
+  final Widget child;
+  final Widget placeholder;
+  const VibeSettled({
+    required this.child,
+    this.placeholder = const SizedBox.shrink(),
+    super.key,
+  });
+
+  /// True when the route of [context] has finished its opening animation.
+  static bool routeSettled(BuildContext context) {
+    final a = ModalRoute.of(context)?.animation;
+    return a == null || a.status == AnimationStatus.completed;
+  }
+
+  @override
+  State<VibeSettled> createState() => _VibeSettledState();
+}
+
+class _VibeSettledState extends State<VibeSettled> {
+  Animation<double>? _route;
+  bool _ready = false;
+
+  void _onStatus(AnimationStatus s) {
+    if (s == AnimationStatus.completed && mounted && !_ready) {
+      setState(() => _ready = true);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_ready) return;
+    final a = ModalRoute.of(context)?.animation;
+    if (a == null || a.status == AnimationStatus.completed) {
+      _ready = true;
+      return;
+    }
+    if (!identical(a, _route)) {
+      _route?.removeStatusListener(_onStatus);
+      _route = a..addStatusListener(_onStatus);
+    }
+  }
+
+  @override
+  void dispose() {
+    _route?.removeStatusListener(_onStatus);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      _ready ? widget.child : widget.placeholder;
+}
+
 /// The smooth, slow-out animation used by every sheet in the app.
+/// Telegram-like timing: quick, decelerating open; quicker close.
 const AnimationStyle vibeSheetStyle = AnimationStyle(
-  duration: Duration(milliseconds: 460),
-  reverseDuration: Duration(milliseconds: 260),
-  curve: Curves.easeOutQuint,
+  duration: Duration(milliseconds: 320),
+  reverseDuration: Duration(milliseconds: 220),
+  curve: Curves.easeOutCubic,
   reverseCurve: Curves.easeInCubic,
+);
+
+/// Every pane that slides up from the bottom goes through here, so they
+/// all move the same smooth way: Telegram-like timing, and the pane is its
+/// own layer (the slide moves a picture of it instead of repainting it on
+/// every frame). Same parameters as [showModalBottomSheet].
+Future<T?> showVibeSheet<T>({
+  required BuildContext context,
+  required WidgetBuilder builder,
+  Color? backgroundColor,
+  Clip? clipBehavior,
+  BoxConstraints? constraints,
+  bool isDismissible = true,
+  bool isScrollControlled = false,
+  ShapeBorder? shape,
+  AnimationStyle? sheetAnimationStyle,
+  bool? showDragHandle,
+  bool useRootNavigator = false,
+  bool useSafeArea = false,
+}) => showModalBottomSheet<T>(
+  context: context,
+  builder: (ctx) => RepaintBoundary(child: builder(ctx)),
+  backgroundColor: backgroundColor,
+  clipBehavior: clipBehavior,
+  constraints: constraints,
+  isDismissible: isDismissible,
+  isScrollControlled: isScrollControlled,
+  shape: shape,
+  sheetAnimationStyle: sheetAnimationStyle ?? vibeSheetStyle,
+  showDragHandle: showDragHandle,
+  useRootNavigator: useRootNavigator,
+  useSafeArea: useSafeArea,
 );

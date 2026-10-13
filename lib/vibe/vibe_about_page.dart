@@ -4,6 +4,7 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/vibe/vibe_app_info.dart';
 import 'package:fluffychat/vibe/vibe_updater.dart';
 import 'package:fluffychat/vibe/vibe_welcome.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -228,7 +229,7 @@ class _AboutButton extends StatelessWidget {
 class VibeCreditsSheet extends StatelessWidget {
   const VibeCreditsSheet({super.key});
 
-  static Future<void> show(BuildContext context) => showModalBottomSheet<void>(
+  static Future<void> show(BuildContext context) => showVibeSheet<void>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
