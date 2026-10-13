@@ -1,0 +1,70 @@
+name: Build TDLib (Telegram library)
+
+# Builds Telegram's official TDLib for Android from source and publishes it
+# as a pre-release ("tdlib-<version>"), so the Vibe builds can download it
+# instead of compiling it every time (it takes about an hour).
+# Run this once, and again only when TDLib should be updated.
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'TDLib commit to build'
+        default: 'c15d3f5a5de6e3ba5839822c451152e5e18bb700'
+      tag:
+        description: 'Release tag to publish'
+        default: 'tdlib-1.8.68'
+
+permissions:
+  contents: write
+
+jobs:
+  tdlib:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Tools
+        run: sudo apt-get update && sudo apt-get install -y gperf php-cli zip
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Get TDLib source
+        run: |
+          git clone https://github.com/tdlib/td.git td
+          cd td && git checkout "${{ inputs.commit }}"
+
+      - name: Android SDK and NDK
+        working-directory: td/example/android
+        run: ./fetch-sdk.sh
+
+      - name: OpenSSL
+        working-directory: td/example/android
+        run: ./build-openssl.sh
+
+      - name: TDLib (JSON interface for Java/Kotlin)
+        working-directory: td/example/android
+        # 64-bit and 32-bit ARM phones, Android 5.0+.
+        run: ./build-tdlib.sh '' '' '' '' 'JSONJava' 21 'arm64-v8a armeabi-v7a'
+
+      - name: Package
+        run: |
+          mkdir -p out
+          cp -r td/example/android/tdlib/libs out/
+          cp td/example/android/tdlib/java/org/drinkless/tdlib/JsonClient.java out/
+          cp td/LICENSE_1_0.txt out/
+          echo "${{ inputs.commit }}" > out/COMMIT
+          (cd out && zip -r ../tdlib-android.zip .)
+          ls -la out/libs/*
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete "${{ inputs.tag }}" --yes --cleanup-tag -R "$GITHUB_REPOSITORY" || true
+          gh release create "${{ inputs.tag }}" tdlib-android.zip -R "$GITHUB_REPOSITORY" \
+            --prerelease --latest=false --target "$GITHUB_SHA" \
+            --title "TDLib for Vibe (${{ inputs.tag }})" \
+            --notes "Telegram's TDLib built from source at commit ${{ inputs.commit }} (Boost Software License 1.0). Used by Vibe's Telegram support; not an app release."
