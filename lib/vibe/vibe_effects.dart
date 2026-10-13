@@ -425,8 +425,9 @@ class VibeEffectBadge extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => VibeEffects.play(context, effect),
+        // Bigger touch area than the little emoji itself.
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(6, 2, 2, 2),
+          padding: const EdgeInsets.fromLTRB(8, 8, 6, 4),
           child: Text(effect.emoji, style: const TextStyle(fontSize: 13)),
         ),
       ),

@@ -191,11 +191,13 @@ class _MiniAction extends StatelessWidget {
   });
 
   @override
+  // Retry / Cancel: at least 40 dp tall so they're easy to hit.
   Widget build(BuildContext context) => InkWell(
     borderRadius: BorderRadius.circular(8),
     onTap: onTap,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+    child: Container(
+      constraints: const BoxConstraints(minHeight: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

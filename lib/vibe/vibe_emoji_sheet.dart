@@ -112,7 +112,10 @@ class _SheetState extends State<_Sheet> {
                 _search.clear();
                 _onSearch('');
               },
-              child: Icon(Icons.close, size: 20, color: t2),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Icon(Icons.close, size: 20, color: t2),
+              ),
             ),
         ],
       ),

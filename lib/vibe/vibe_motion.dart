@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 
 /// Shrinks slightly while a finger is down and springs back on release.
 /// Uses a [Listener], so taps and long presses of the child keep working.
@@ -220,11 +221,56 @@ class _VibeSettledState extends State<VibeSettled> {
 }
 
 /// The smooth, slow-out animation used by every sheet in the app.
-/// Telegram-like timing: quick, decelerating open; quicker close.
-const AnimationStyle vibeSheetStyle = AnimationStyle(
-  duration: Duration(milliseconds: 320),
-  reverseDuration: Duration(milliseconds: 220),
-  curve: Curves.easeOutCubic,
+/// A spring as a curve (Apple's "Designing Fluid Interfaces"): motion
+/// that starts fast and settles the way a physical object does, instead of
+/// a canned ease-out. Critically damped by default: no overshoot, so a
+/// pane never lifts off the bottom edge.
+class VibeSpringCurve extends Curve {
+  VibeSpringCurve({double damping = 1.0, double stiffness = 380})
+    : _sim = SpringSimulation(
+        SpringDescription.withDampingRatio(
+          mass: 1,
+          stiffness: stiffness,
+          ratio: damping,
+        ),
+        0,
+        1,
+        0,
+      ) {
+    var t = 0.0;
+    while (!_sim.isDone(t) && t < 3) {
+      t += 1 / 240;
+    }
+    _end = t;
+  }
+
+  final SpringSimulation _sim;
+  late final double _end;
+
+  @override
+  double transformInternal(double t) => _sim.x(t * _end);
+}
+
+/// The spring every pane and page uses.
+final VibeSpringCurve vibeSpring = VibeSpringCurve();
+
+/// The same spring as a physics simulation, for gestures: starts from where
+/// the finger left it, with the finger's speed (velocity handoff).
+SpringSimulation vibeSpringFrom(double from, double to, double velocity) =>
+    SpringSimulation(
+      SpringDescription.withDampingRatio(mass: 1, stiffness: 420, ratio: 1),
+      from,
+      to,
+      velocity,
+    );
+
+/// Panes: spring open (Telegram-quick), quick ease-in close. A flick while
+/// dragging a pane carries its speed into the close (Flutter's sheets fling
+/// with the drag velocity), and a pane can be grabbed mid-slide.
+final AnimationStyle vibeSheetStyle = AnimationStyle(
+  duration: const Duration(milliseconds: 380),
+  reverseDuration: const Duration(milliseconds: 220),
+  curve: vibeSpring,
   reverseCurve: Curves.easeInCubic,
 );
 

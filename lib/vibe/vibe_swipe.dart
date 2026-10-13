@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/gestures.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 
 /// State for the "drag the chat in with your finger" gesture on the home
@@ -77,7 +77,8 @@ class _SlideOver extends StatelessWidget {
     builder: (context, child) {
       final gesture = route.navigator?.userGestureInProgress == true;
       final v = animation.value.clamp(0.0, 1.0);
-      final t = gesture ? v : Curves.easeOutCubic.transform(v);
+      // Finger: follow it 1:1. Otherwise: the spring.
+      final t = gesture ? v : vibeSpring.transform(v);
       // A soft gradient edge instead of a blurred shadow: a full-screen
       // blur had to be redrawn on every frame of the slide.
       return FractionalTranslation(
@@ -174,7 +175,9 @@ class _VibeBackSwipeState<T> extends State<_VibeBackSwipe<T>> {
         r.isCurrent &&
         !r.isFirst &&
         r.controller != null &&
-        r.animation?.status == AnimationStatus.completed &&
+        // Can be grabbed while it's still sliding in (interruptible).
+        (r.animation?.status == AnimationStatus.completed ||
+            r.animation?.status == AnimationStatus.forward) &&
         r.navigator?.userGestureInProgress != true &&
         r.popDisposition == RoutePopDisposition.pop &&
         !r.willHandlePopInternally;
@@ -232,33 +235,27 @@ class _VibeBackSwipeState<T> extends State<_VibeBackSwipe<T>> {
     _finish(vx / _width);
   }
 
+  /// Release: the page keeps the finger's speed (velocity handoff) and
+  /// settles on a spring, open or closed, from exactly where it was.
   void _finish(double v) {
     final c = _ctl!;
     final nav = _nav!;
     final forward = v.abs() >= 1 ? v <= 0 : c.value > 0.5;
+    // Controller value goes down as the finger moves right.
+    final velocity = -v;
     if (forward) {
-      c.animateTo(
-        1.0,
-        duration: Duration(
-          milliseconds: lerpDouble(800, 0, c.value)!.floor().clamp(0, 800),
-        ),
-        curve: Curves.fastLinearToSlowEaseIn,
-      );
+      c.animateWith(vibeSpringFrom(c.value, 1.0, velocity));
     } else {
       nav.pop();
-      if (c.isAnimating) {
-        c.animateBack(
-          0.0,
-          duration: Duration(
-            milliseconds: lerpDouble(0, 800, c.value)!.floor().clamp(0, 800),
-          ),
-          curve: Curves.fastLinearToSlowEaseIn,
-        );
-      }
+      c.animateBackWith(vibeSpringFrom(c.value, 0.0, velocity));
     }
     if (c.isAnimating) {
       late AnimationStatusListener l;
       l = (status) {
+        if (status == AnimationStatus.forward ||
+            status == AnimationStatus.reverse) {
+          return;
+        }
         c.removeStatusListener(l);
         nav.didStopUserGesture();
       };
