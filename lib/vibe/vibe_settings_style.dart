@@ -138,7 +138,11 @@ class VibeSettingsRow extends StatelessWidget {
         height: 54,
         child: Stack(
           children: [
-            Row(
+            // Fill the row so icon, title and chevron sit in the middle,
+            // with the divider at the bottom edge.
+            Positioned.fill(
+              child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(width: 16),
                 Icon(icon, size: 24, color: text),
@@ -170,6 +174,7 @@ class VibeSettingsRow extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
               ],
+              ),
             ),
             if (!last)
               Positioned(
