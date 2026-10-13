@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/utils/string_color.dart';
 import 'package:fluffychat/vibe/vibe_connection.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:fluffychat/widgets/presence_builder.dart';
@@ -84,7 +83,16 @@ class Avatar extends StatelessWidget {
         mxContent == null ||
         mxContent.toString().isEmpty ||
         mxContent.toString() == 'null';
+    // Round everywhere; a custom radius (the DM rail) gets a rounded square.
     final borderRadius = this.borderRadius ?? BorderRadius.circular(size / 2);
+    final ShapeBorder shape =
+        shapeBorder ??
+        (this.borderRadius == null
+            ? const CircleBorder()
+            : RoundedRectangleBorder(borderRadius: borderRadius));
+    // Vibgram-style placeholder: plain grey with white initials.
+    final dark = theme.brightness == Brightness.dark;
+    final grey = dark ? const Color(0xFF4E5058) : const Color(0xFFA4A9B1);
     final presenceUserId = this.presenceUserId;
     final container = Stack(
       children: [
@@ -95,12 +103,7 @@ class Avatar extends StatelessWidget {
             color: theme.brightness == Brightness.light
                 ? Colors.white
                 : Colors.black,
-            shape:
-                shapeBorder ??
-                RoundedSuperellipseBorder(
-                  borderRadius: borderRadius,
-                  side: BorderSide.none,
-                ),
+            shape: shape,
             clipBehavior: Clip.antiAlias,
             child: MxcImage(
               client: client,
@@ -111,34 +114,22 @@ class Avatar extends StatelessWidget {
               fit: BoxFit.cover,
               width: size,
               height: size,
-              placeholder: (_) => noPic
-                  ? Container(
-                      decoration: BoxDecoration(
-                        color:
-                            backgroundColor ??
-                            fallbackLetters.colorScheme.primaryContainer,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        fallbackLetters,
+              placeholder: (_) => Container(
+                color: backgroundColor ?? grey,
+                alignment: Alignment.center,
+                child: noPic
+                    ? Text(
+                        fallbackLetters.toUpperCase(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontFamily: 'RobotoMono',
-                          color:
-                              textColor ??
-                              fallbackLetters.colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                          fontSize: (size / 2.5).roundToDouble(),
+                          color: textColor ?? Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: (size / 2.4).roundToDouble(),
+                          height: 1,
                         ),
-                      ),
-                    )
-                  : Center(
-                      child: Icon(
-                        Icons.person_2,
-                        color: theme.colorScheme.tertiary,
-                        size: size / 1.5,
-                      ),
-                    ),
+                      )
+                    : null,
+              ),
             ),
           ),
         ),

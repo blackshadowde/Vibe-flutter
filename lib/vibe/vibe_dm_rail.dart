@@ -140,7 +140,7 @@ class VibeDmRail extends StatelessWidget {
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(
-                                    active ? 19 : 28,
+                                    active ? 15 : 18,
                                   ),
                                   border: Border.all(
                                     width: 2,
@@ -152,7 +152,7 @@ class VibeDmRail extends StatelessWidget {
                                   ),
                                 ),
                                 child: TweenAnimationBuilder<double>(
-                                  tween: Tween(end: active ? 15.0 : 23.0),
+                                  tween: Tween(end: active ? 12.0 : 15.0), // rounded squares, like Vibgram
                                   duration: const Duration(milliseconds: 280),
                                   curve: Curves.easeOutCubic,
                                   builder: (context, r, child) =>
