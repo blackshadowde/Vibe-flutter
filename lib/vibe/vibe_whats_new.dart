@@ -13,6 +13,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
+      ('🔠', 'Text size like Telegram: Settings → Style, 12 to 30 (16 is normal). Only message text changes; names and times stay the same. The preview now looks exactly like your chats'),
       ('🖼️', 'Tap a photo or video in a chat for a Google Messages style slideshow of the whole chat; long-press one to jump to it. The download button saves straight to your gallery'),
       ('🪟', 'Panes slide up smoother everywhere: quicker Telegram-like timing, and heavy content (pictures, emoji, animations) appears right after the pane has opened instead of during the slide'),
       ('✉️', 'Sending feels calm: a message slides in once, then only the word after it changes: Encrypting… → ✓ → blue ✓✓. No more second animation or jump when it\'s confirmed'),

@@ -5,6 +5,7 @@
 
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/vibe_text_size.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -35,7 +36,7 @@ class ReplyContent extends StatelessWidget {
     final displayEvent = timeline != null
         ? replyEvent.getDisplayEvent(timeline)
         : replyEvent;
-    const fontSize = AppConfig.messageFontSize;
+    final fontSize = VibeTextSize.message;
     final color = theme.brightness == Brightness.dark
         ? theme.colorScheme.onTertiaryContainer
         : ownMessage

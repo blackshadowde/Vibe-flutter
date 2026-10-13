@@ -43,6 +43,8 @@ enum AppSettings<T> {
   ),
   renderHtml<bool>('chat.fluffy.renderHtml', true),
   fontSizeFactor<double>('chat.fluffy.font_size_factor', 1.0),
+  // Telegram-style chat text size 12–30 (0 = not set yet: use the factor).
+  vibeTextSize<int>('chat.vibe.text_size', 0),
   hideRedactedEvents<bool>('chat.fluffy.hideRedactedEvents', false),
   hideUnknownEvents<bool>('chat.fluffy.hideUnknownEvents', true),
   autoplayImages<bool>('chat.fluffy.autoplay_images', true),

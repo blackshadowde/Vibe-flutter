@@ -9,6 +9,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:fluffychat/vibe/vibe_text_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:matrix/matrix.dart' hide Result;
@@ -77,12 +78,12 @@ class PollWidget extends StatelessWidget {
               textScaleFactor: MediaQuery.textScalerOf(context).scale(1),
               style: TextStyle(
                 color: textColor,
-                fontSize: AppConfig.messageFontSize,
+                fontSize: VibeTextSize.message,
               ),
               options: const LinkifyOptions(humanize: false),
               linkStyle: TextStyle(
                 color: linkColor,
-                fontSize: AppConfig.messageFontSize,
+                fontSize: VibeTextSize.message,
                 decoration: TextDecoration.underline,
                 decorationColor: linkColor,
               ),
@@ -120,7 +121,7 @@ class PollWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: textColor,
-                    fontSize: AppConfig.messageFontSize,
+                    fontSize: VibeTextSize.message,
                   ),
                 ),
                 subtitle: answersVisible

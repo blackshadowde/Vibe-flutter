@@ -8,6 +8,7 @@ import 'package:fluffychat/pages/chat/events/file_send_status_indicator.dart';
 import 'package:fluffychat/utils/file_description.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
+import 'package:fluffychat/vibe/vibe_text_size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:matrix/matrix.dart';
@@ -105,12 +106,12 @@ class MessageDownloadContent extends StatelessWidget {
               textScaleFactor: MediaQuery.textScalerOf(context).scale(1),
               style: TextStyle(
                 color: textColor,
-                fontSize: AppConfig.messageFontSize,
+                fontSize: VibeTextSize.message,
               ),
               options: const LinkifyOptions(humanize: false),
               linkStyle: TextStyle(
                 color: linkColor,
-                fontSize: AppConfig.messageFontSize,
+                fontSize: VibeTextSize.message,
                 decoration: TextDecoration.underline,
                 decorationColor: linkColor,
               ),

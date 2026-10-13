@@ -12,6 +12,7 @@ import 'package:fluffychat/pages/chat/events/video_player.dart';
 import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
 import 'package:fluffychat/vibe/vibe_effects.dart';
 import 'package:fluffychat/vibe/vibe_media_viewer.dart';
+import 'package:fluffychat/vibe/vibe_text_size.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -50,7 +51,7 @@ class MessageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const fontSize = AppConfig.messageFontSize;
+    final fontSize = VibeTextSize.message;
     final buttonTextColor = textColor;
     switch (event.type) {
       case EventTypes.Message:
@@ -202,10 +203,10 @@ class MessageContent extends StatelessWidget {
                 html: html,
                 textColor: textColor,
                 room: event.room,
-                fontSize: AppConfig.messageFontSize * (bigEmotes ? 5 : 1),
+                fontSize: VibeTextSize.message * (bigEmotes ? 5 : 1),
                 linkStyle: TextStyle(
                   color: linkColor,
-                  fontSize: AppConfig.messageFontSize,
+                  fontSize: VibeTextSize.message,
                   decoration: TextDecoration.underline,
                   decorationColor: linkColor,
                 ),

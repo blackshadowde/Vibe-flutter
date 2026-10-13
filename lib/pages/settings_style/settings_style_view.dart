@@ -16,6 +16,8 @@ import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/settings_switch_list_tile.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:fluffychat/vibe/vibe_text_size.dart';
+import 'package:fluffychat/vibe/vibe_text_size_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -92,127 +94,8 @@ class SettingsStyleView extends StatelessWidget {
                 return Column(
                   mainAxisSize: .min,
                   children: [
-                    MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        textScaler: TextScaler.linear(
-                          AppSettings.fontSizeFactor.value,
-                        ),
-                      ),
-                      child: AnimatedContainer(
-                        duration: FluffyThemes.animationDuration,
-                        curve: FluffyThemes.animationCurve,
-                        decoration: const BoxDecoration(),
-                        clipBehavior: Clip.hardEdge,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (accountConfig.wallpaperUrl != null)
-                              Opacity(
-                                opacity: controller.wallpaperOpacity,
-                                child: ImageFiltered(
-                                  imageFilter: ImageFilter.blur(
-                                    sigmaX: controller.wallpaperBlur,
-                                    sigmaY: controller.wallpaperBlur,
-                                  ),
-                                  child: MxcImage(
-                                    key: ValueKey(accountConfig.wallpaperUrl),
-                                    uri: accountConfig.wallpaperUrl,
-                                    fit: BoxFit.cover,
-                                    isThumbnail: true,
-                                    width: FluffyThemes.columnWidth * 2,
-                                    height: 212,
-                                  ),
-                                ),
-                              ),
-                            Column(
-                              mainAxisSize: .min,
-                              children: [
-                                const SizedBox(height: 16),
-                                StateMessage(
-                                  Event(
-                                    eventId: 'style_dummy',
-                                    room: Room(
-                                      id: '!style_dummy',
-                                      client: client,
-                                    ),
-                                    content: {'membership': 'join'},
-                                    type: EventTypes.RoomMember,
-                                    senderId: client.userID!,
-                                    originServerTs: DateTime.now(),
-                                    stateKey: client.userID,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 12 + 12 + Avatar.defaultSize,
-                                    right: 12,
-                                    top: accountConfig.wallpaperUrl == null
-                                        ? 0
-                                        : 12,
-                                    bottom: 12,
-                                  ),
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: theme.bubbleColor,
-                                      borderRadius: BorderRadius.circular(
-                                        AppConfig.borderRadius,
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      child: Text(
-                                        'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor',
-                                        style: TextStyle(
-                                          color: theme.onBubbleColor,
-                                          fontSize: AppConfig.messageFontSize,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      right: 12,
-                                      left: 12,
-                                      top: accountConfig.wallpaperUrl == null
-                                          ? 0
-                                          : 12,
-                                      bottom: 12,
-                                    ),
-                                    child: Material(
-                                      color: theme
-                                          .colorScheme
-                                          .surfaceContainerHigh,
-                                      borderRadius: BorderRadius.circular(
-                                        AppConfig.borderRadius,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 8,
-                                        ),
-                                        child: Text(
-                                          'Lorem ipsum dolor sit amet',
-                                          style: TextStyle(
-                                            color: theme.colorScheme.onSurface,
-                                            fontSize: AppConfig.messageFontSize,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    // Looks exactly like a Vibe chat (from Vibgram).
+                    VibeTextSizePreview(size: VibeTextSize.value),
                     // Vibe: no chat wallpapers. Only offer removing an
                     // old one that was set before.
                     if (accountConfig.wallpaperUrl != null)
@@ -228,17 +111,34 @@ class SettingsStyleView extends StatelessWidget {
                 );
               },
             ),
+            // Telegram's Text size: 12–30, default 16; only message text
+            // changes (names and times keep their size).
             ListTile(
-              title: Text(L10n.of(context).fontSize),
-              trailing: Text('× ${AppSettings.fontSizeFactor.value}'),
+              title: const Text('Text size'),
+              trailing: Text(
+                '${VibeTextSize.value}',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
             ),
-            Slider.adaptive(
-              min: 0.5,
-              max: 2.5,
-              divisions: 20,
-              value: AppSettings.fontSizeFactor.value,
-              semanticFormatterCallback: (d) => d.toString(),
-              onChanged: controller.changeFontSizeFactor,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  const Text('A', style: TextStyle(fontSize: 13)),
+                  Expanded(
+                    child: Slider.adaptive(
+                      min: VibeTextSize.min.toDouble(),
+                      max: VibeTextSize.max.toDouble(),
+                      divisions: VibeTextSize.max - VibeTextSize.min,
+                      value: VibeTextSize.value.toDouble(),
+                      label: '${VibeTextSize.value}',
+                      semanticFormatterCallback: (d) => '${d.round()}',
+                      onChanged: (d) => controller.changeTextSize(d.round()),
+                    ),
+                  ),
+                  const Text('A', style: TextStyle(fontSize: 24)),
+                ],
+              ),
             ),
             SettingsSwitchListTile.adaptive(
               title: 'Haptic feedback',

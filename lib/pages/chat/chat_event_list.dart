@@ -65,7 +65,9 @@ class ChatEventList extends StatelessWidget {
 
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(
-          textScaler: TextScaler.linear(AppSettings.fontSizeFactor.value),
+          // Like Telegram: message text uses the Text size setting, names
+          // and times keep their size (no scaling of the whole chat).
+          textScaler: TextScaler.noScaling,
         ),
         child: ValueListenableBuilder<double?>(
           valueListenable: controller.inputBarHeightNotifier,

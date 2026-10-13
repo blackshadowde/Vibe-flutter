@@ -9,6 +9,7 @@ import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/file_selector.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/theme_builder.dart';
+import 'package:fluffychat/vibe/vibe_text_size.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/matrix.dart';
@@ -133,6 +134,12 @@ class SettingsStyleController extends State<SettingsStyle> {
 
   Future<void> changeFontSizeFactor(double d) async {
     await AppSettings.fontSizeFactor.setItem(d);
+    setState(() {});
+  }
+
+  Future<void> changeTextSize(int size) async {
+    if (size == VibeTextSize.value) return;
+    await VibeTextSize.set(size);
     setState(() {});
   }
 
