@@ -21,6 +21,7 @@ import 'package:fluffychat/vibe/vibe_heart_burst.dart';
 import 'package:fluffychat/vibe/vibe_user_sheet.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -214,6 +215,12 @@ class _MiniAction extends StatelessWidget {
   );
 }
 
+/// Failed messages and file uploads show their status (with buttons) under
+/// the message; everything else shows it inline after the text.
+bool _statusBelow(Event e) =>
+    e.status == EventStatus.error ||
+    (e.status == EventStatus.sending && e.fileSendingStatus != null);
+
 /// Sending / sent (single tick) / read (two blue ticks) indicator.
 class _StatusBits extends StatelessWidget {
   final Event event;
@@ -271,6 +278,10 @@ class _StatusBits extends StatelessWidget {
         FileSendingStatus.encrypting => L10n.of(context).encrypting,
         FileSendingStatus.uploading => L10n.of(context).uploading,
       };
+      if (event.fileSendingStatus == null) {
+        // Inline, just the word: no spinner, nothing that jumps around.
+        return Text(label, style: TextStyle(fontSize: 12, color: dim));
+      }
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -633,7 +644,10 @@ class VibeMessage extends StatelessWidget {
               // small badge to play it again.
               final effect = VibeEffects.of(event);
               if (effect != null) VibeEffects.maybePlay(context, event);
-              final ticks = ownMessage && event.status.isSent;
+              // Status sits right after the text the whole time:
+              // "Encrypting…" → ✓ → blue ✓✓, changing in place. Only
+              // failures and file uploads (with Retry / Cancel) go below.
+              final ticks = ownMessage && !_statusBelow(event);
               if (!ticks && effect == null) return content;
               return Row(
                 mainAxisSize: MainAxisSize.min,
@@ -663,7 +677,7 @@ class VibeMessage extends StatelessWidget {
             child: MessageReactions(event, timeline),
           ),
         // Sending / failed (with Retry and Cancel) stays under the message.
-        if (ownMessage && !event.status.isSent)
+        if (ownMessage && _statusBelow(event))
           Padding(
             padding: const EdgeInsets.only(top: 2),
             child: _StatusBits(event, timeline),
@@ -768,7 +782,7 @@ class VibeMessage extends StatelessWidget {
       timeline: timeline,
       builder: (context, heart) => Center(
       child: VibeSwipeReply(
-        key: ValueKey(event.transactionId ?? event.eventId),
+        key: ValueKey(VibeStableId.of(event)),
         onReply: onSwipe,
         child: Container(
           constraints: const BoxConstraints(

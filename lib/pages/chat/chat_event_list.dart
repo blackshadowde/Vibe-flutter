@@ -53,9 +53,11 @@ class ChatEventList extends StatelessWidget {
 
     // create a map of eventId --> index to greatly improve performance of
     // ListView's findChildIndexCallback
+    // Keyed by the same stable id as the list items, so a message keeps its
+    // widget (and doesn't animate again) when its id changes after sending.
     final thisEventsKeyMap = <String, int>{};
     for (var i = 0; i < events.length; i++) {
-      thisEventsKeyMap[events[i].eventId] = i;
+      thisEventsKeyMap[controller.stableId(events[i])] = i;
     }
 
     final hasWallpaper =
@@ -156,9 +158,8 @@ class ChatEventList extends StatelessWidget {
 
               // The message at this index:
               final event = events[i];
-              final animateIn =
-                  (event.transactionId ?? event.eventId) ==
-                  controller.animateInEventId;
+              final stableId = controller.stableId(event);
+              final animateIn = stableId == controller.animateInEventId;
 
               final nextEvent = i + 1 < events.length ? events[i + 1] : null;
               final previousEvent = i > 0 ? events[i - 1] : null;
@@ -179,7 +180,7 @@ class ChatEventList extends StatelessWidget {
                   !event.originServerTs.sameDay(nextEvent.originServerTs);
 
               return AutoScrollTag(
-                key: ValueKey(event.transactionId ?? event.eventId),
+                key: ValueKey(stableId),
                 index: i,
                 controller: controller.scrollController,
                 child: RepaintBoundary(

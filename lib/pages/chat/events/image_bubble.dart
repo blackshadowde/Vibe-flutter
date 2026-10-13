@@ -9,6 +9,7 @@ import 'package:fluffychat/utils/file_description.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/vibe/vibe_low_data.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:matrix/matrix.dart';
@@ -97,7 +98,7 @@ class ImageBubble extends StatelessWidget {
                     ),
                     child: AppSettings.showThumbnailsInTimeline.value
                       ? MxcImage(
-                          cacheKey: event.transactionId ?? event.eventId,
+                          cacheKey: VibeStableId.of(event),
                           cacheName: event.room.id,
                           event: event,
                           width: width,

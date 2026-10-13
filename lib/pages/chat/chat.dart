@@ -12,6 +12,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluffychat/vibe/vibe_effects.dart';
+import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
@@ -529,10 +530,21 @@ class ChatController extends State<ChatPageWithRoom>
 
   String? animateInEventId;
 
+  /// One stable id per message for its whole life: the id it had while
+  /// sending (transaction id) stays its id after the server confirms it.
+  /// So "Sending… → ✓ → ✓✓" only updates the ticks; the message is never
+  /// rebuilt from scratch (which replayed its entrance animation).
+  String stableId(Event e) => VibeStableId.of(e);
+
+  /// Messages that already played their entrance (never again).
+  final Set<String> _animated = {};
+
   Future<void> _insert(int index) async {
     if (index > 0) return;
     final firstEvent = timeline?.events.firstOrNull;
-    final eventId = firstEvent?.transactionId ?? firstEvent?.eventId;
+    if (firstEvent == null) return;
+    final eventId = stableId(firstEvent);
+    if (!_animated.add(eventId)) return;
     animateInEventId = eventId;
     await Future.delayed(FluffyThemes.animationDuration);
     if (animateInEventId == eventId) animateInEventId = null;

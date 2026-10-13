@@ -13,6 +13,7 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/blur_hash.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:matrix/matrix.dart';
@@ -89,7 +90,7 @@ class EventVideoPlayer extends StatelessWidget {
                         AppSettings.showThumbnailsInTimeline.value)
                       MxcImage(
                         event: event,
-                        cacheKey: event.transactionId ?? event.eventId,
+                        cacheKey: VibeStableId.of(event),
                         cacheName: event.room.id,
                         isThumbnail: true,
                         width: width,

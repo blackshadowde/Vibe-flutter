@@ -20,6 +20,7 @@ import 'package:fluffychat/vibe/vibe_message.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/member_actions_popup_menu_button.dart';
+import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
@@ -243,7 +244,7 @@ class Message extends StatelessWidget {
 
     return Center(
       child: Swipeable(
-        key: ValueKey(event.transactionId ?? event.eventId),
+        key: ValueKey(VibeStableId.of(event)),
         background: const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.0),
           child: Center(child: Icon(Icons.check_outlined)),
@@ -456,7 +457,7 @@ class Message extends StatelessWidget {
                                       },
                                 child: _AnimateIn(
                                   key: ValueKey(
-                                    event.transactionId ?? event.eventId,
+                                    VibeStableId.of(event),
                                   ),
                                   animateIn: animateIn,
                                   child: Container(
