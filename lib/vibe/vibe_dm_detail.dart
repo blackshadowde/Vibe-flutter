@@ -4,14 +4,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/l10n/l10n.dart';
+import 'package:fluffychat/pages/chat/events/audio_player.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_media_viewer.dart';
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
+import 'package:fluffychat/vibe/vibe_user_sheet.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:fluffychat/widgets/presence_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -19,7 +23,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 final RegExp _urlRegex = RegExp(r'https?://\S+');
 
-/// Middle pane for one DM: profile card + Starred / Media / Links / Files.
+bool _isVoice(Event e) =>
+    e.messageType == MessageTypes.Audio &&
+    e.content.containsKey('org.matrix.msc3245.voice');
+
+/// Middle pane for one DM, like Vibgram: big picture, name, online state,
+/// then "# | chat" and the INFO channels. Nothing here loads media; each
+/// channel opens its own pane that slides up from the bottom.
 class VibeDmDetail extends StatelessWidget {
   final Room room;
   final VoidCallback onBack;
@@ -35,197 +45,243 @@ class VibeDmDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     final name = room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
     final invited = room.membership == Membership.invite;
+    final other = room.directChatMatrixID;
+
+    void open(_Kind kind) => _DmSheet.open(context, room, kind);
+
     return Material(
-      color: theme.colorScheme.surface,
+      color: cs.surface,
       child: SafeArea(
         bottom: false,
-        child: Column(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 120),
           children: [
-            // Header: ← Home      name
-            SizedBox(
-              height: 52,
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: onBack,
-                    borderRadius: BorderRadius.circular(20),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+            // Same search bar as Home: tapping it goes back to Home.
+            GestureDetector(
+              onTap: onBack,
+              child: Container(
+                height: 52,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: cs.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: cs.onSurfaceVariant),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Find or start a conversation',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: cs.onSurfaceVariant,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.arrow_back,
-                            size: 20,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Home',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      name,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 84),
-                ],
-              ),
-            ),
-            Divider(height: 1, color: theme.dividerColor),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 110),
-                children: [
-                  // Profile card
-                  Material(
-                    color: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
-                      side: BorderSide(color: theme.dividerColor),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: invited ? null : onOpenChat,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Avatar(
-                              mxContent: room.avatar,
-                              name: name,
-                              size: 60,
-                              client: room.client,
-                              presenceUserId: room.directChatMatrixID,
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  VibeStatusLine(
-                                    room: room,
-                                    userId: room.directChatMatrixID,
-                                    maxLines: 2,
-                                    alwaysTime: true,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        room.encrypted
-                                            ? Icons.lock_outline
-                                            : Icons.lock_open,
-                                        size: 16,
-                                        color:
-                                            theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        room.encrypted
-                                            ? 'End-to-End Encrypted'
-                                            : 'Not encrypted',
-                                        style: TextStyle(
-                                          color: theme
-                                              .colorScheme
-                                              .onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  if (!invited) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Tap to open chat screen →',
-                                      style: TextStyle(
-                                        color: theme.colorScheme.primary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (invited) _ApprovalBanner(room: room, name: name),
-                  if (!invited) ...[
-                    const SizedBox(height: 8),
-                    _StarredSection(room: room),
-                    _PagedSection(
-                      room: room,
-                      icon: Icons.image_outlined,
-                      color: Colors.indigoAccent,
-                      label: 'media',
-                      emptyText: 'No media shared in this chat.',
-                      searchFunc: (e) => {
-                        MessageTypes.Image,
-                        MessageTypes.Video,
-                      }.contains(e.messageType),
-                      bodyBuilder: (context, events) => _MediaGrid(events),
-                    ),
-                    _PagedSection(
-                      room: room,
-                      icon: Icons.link,
-                      color: Colors.indigoAccent,
-                      label: 'links',
-                      emptyText: 'No links shared in this chat.',
-                      searchFunc: (e) =>
-                          e.type == EventTypes.Message &&
-                          _urlRegex.hasMatch(e.body),
-                      bodyBuilder: (context, events) => _LinkList(events),
-                    ),
-                    _PagedSection(
-                      room: room,
-                      icon: Icons.description_outlined,
-                      color: const Color(0xFFB5BAC1),
-                      label: 'files',
-                      emptyText: 'No files shared in this chat.',
-                      searchFunc: (e) =>
-                          e.messageType == MessageTypes.File ||
-                          (e.messageType == MessageTypes.Audio &&
-                              !e.content.containsKey(
-                                'org.matrix.msc3245.voice',
-                              )),
-                      bodyBuilder: (context, events) => _FileList(events),
                     ),
                   ],
-                ],
+                ),
               ),
             ),
+            const SizedBox(height: 22),
+            Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: GestureDetector(
+                  onTap: invited ? null : onOpenChat,
+                  child: Avatar(
+                    mxContent: room.avatar,
+                    name: name,
+                    size: 76,
+                    client: room.client,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 6, top: 2),
+              child: PresenceBuilder(
+                client: room.client,
+                userId: other,
+                builder: (context, p) {
+                  final online = p?.presence.isOnline == true;
+                  final last = p?.lastActiveTimestamp;
+                  final text = online
+                      ? 'online'
+                      : last != null
+                      ? 'last seen ${last.localizedTimeShort(context)}'
+                      : '';
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (text.isNotEmpty)
+                        Text(
+                          text,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ),
+                      VibeStatusLine(
+                        room: room,
+                        userId: other,
+                        maxLines: 2,
+                        alwaysTime: true,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 14),
+            if (invited)
+              _ApprovalBanner(room: room, name: name)
+            else ...[
+              _HashRow(
+                label: 'chat',
+                subtitle: room.encrypted
+                    ? '🔒 End-to-end encrypted'
+                    : null,
+                onTap: onOpenChat,
+              ),
+              const _Header('INFO'),
+              _HashRow(
+                label: 'media',
+                subtitle: 'Photos and videos',
+                onTap: () => open(_Kind.media),
+              ),
+              _HashRow(label: 'files', onTap: () => open(_Kind.files)),
+              _HashRow(label: 'links', onTap: () => open(_Kind.links)),
+              _HashRow(
+                label: 'voice-messages',
+                onTap: () => open(_Kind.voice),
+              ),
+              _HashRow(
+                label: 'pinned-messages',
+                onTap: () => open(_Kind.pinned),
+              ),
+              _HashRow(
+                label: 'starred-messages',
+                onTap: () => open(_Kind.starred),
+              ),
+              if (other != null)
+                _HashRow(
+                  label: 'profile',
+                  onTap: () => VibeUserSheet.show(
+                    context,
+                    client: room.client,
+                    userId: other,
+                    displayName: name,
+                    avatarUrl: room.avatar,
+                    currentRoomId: room.id,
+                  ),
+                ),
+            ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  final String text;
+  const _Header(this.text);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(6, 22, 6, 6),
+    child: Text(
+      text,
+      style: TextStyle(
+        fontSize: 13.5,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.4,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    ),
+  );
+}
+
+/// "#   | label" with an optional line under it, Vibgram style.
+class _HashRow extends StatelessWidget {
+  final String label;
+  final String? subtitle;
+  final VoidCallback onTap;
+  const _HashRow({required this.label, required this.onTap, this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final muted = cs.onSurfaceVariant;
+    return VibePressable(
+      scale: 0.97,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 34,
+                child: Text(
+                  '#',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 26, color: muted),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '|  ',
+                            style: TextStyle(color: muted.withAlpha(0x88)),
+                          ),
+                          TextSpan(text: label),
+                        ],
+                      ),
+                      style: TextStyle(fontSize: 19, color: muted),
+                    ),
+                    if (subtitle != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          subtitle!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 14.5, color: muted),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -307,54 +363,199 @@ class _ApprovalBanner extends StatelessWidget {
   }
 }
 
-/// Collapsible section with header (icon, label, count) and a contained,
-/// scrollable body.
-class _Section extends StatefulWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-  final String count;
-  final Widget child;
+// ---------------------------------------------------------------------------
+// The channels' panes: slide up from the bottom. Tap an item to open it,
+// long-press to jump to it in the chat.
+// ---------------------------------------------------------------------------
 
-  const _Section({
-    required this.icon,
-    required this.color,
-    required this.label,
-    required this.count,
-    required this.child,
-  });
+enum _Kind { media, files, links, voice, pinned, starred }
 
-  @override
-  State<_Section> createState() => _SectionState();
+extension on _Kind {
+  String get label => switch (this) {
+    _Kind.media => 'media',
+    _Kind.files => 'files',
+    _Kind.links => 'links',
+    _Kind.voice => 'voice-messages',
+    _Kind.pinned => 'pinned-messages',
+    _Kind.starred => 'starred-messages',
+  };
+
+  String get empty => switch (this) {
+    _Kind.media => 'No photos or videos in this chat yet.',
+    _Kind.files => 'No files in this chat yet.',
+    _Kind.links => 'No links in this chat yet.',
+    _Kind.voice => 'No voice messages in this chat yet.',
+    _Kind.pinned => 'Nothing is pinned in this chat.',
+    _Kind.starred => 'You haven\'t starred anything in this chat.',
+  };
+
+  bool Function(Event)? get filter => switch (this) {
+    _Kind.media => (e) => {
+      MessageTypes.Image,
+      MessageTypes.Video,
+    }.contains(e.messageType),
+    _Kind.files => (e) =>
+        e.messageType == MessageTypes.File ||
+        (e.messageType == MessageTypes.Audio && !_isVoice(e)),
+    _Kind.links => (e) =>
+        e.type == EventTypes.Message &&
+        e.messageType == MessageTypes.Text &&
+        _urlRegex.hasMatch(e.body),
+    _Kind.voice => _isVoice,
+    _ => null,
+  };
 }
 
-class _SectionState extends State<_Section> {
-  bool open = true;
+/// What was found so far, kept while Vibe runs so a pane opens instantly
+/// the second time (no searching or reloading pictures again).
+class _Found {
+  final List<Event> events = [];
+  String? nextBatch;
+  bool end = false;
+  bool loading = false;
+}
+
+class _DmSheet extends StatefulWidget {
+  final Room room;
+  final _Kind kind;
+  final ScrollController scroll;
+  const _DmSheet({required this.room, required this.kind, required this.scroll});
+
+  static final Map<String, _Found> _cache = {};
+
+  static Future<void> open(BuildContext context, Room room, _Kind kind) {
+    final cs = Theme.of(context).colorScheme;
+    return showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      useSafeArea: true,
+      sheetAnimationStyle: vibeSheetStyle,
+      backgroundColor: cs.surface,
+      clipBehavior: Clip.antiAlias,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.72,
+        minChildSize: 0.4,
+        maxChildSize: 0.96,
+        snap: true,
+        snapSizes: const [0.72],
+        builder: (ctx, scroll) =>
+            _DmSheet(room: room, kind: kind, scroll: scroll),
+      ),
+    );
+  }
+
+  @override
+  State<_DmSheet> createState() => _DmSheetState();
+}
+
+class _DmSheetState extends State<_DmSheet> {
+  late final _Found _found = _DmSheet._cache.putIfAbsent(
+    '${widget.room.id}|${widget.kind.name}',
+    _Found.new,
+  );
+
+  // Pinned / starred: a fixed list of ids, loaded one by one.
+  List<String> _ids = const [];
+  final Map<String, Event?> _byId = {};
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.kind.filter != null) {
+      if (_found.events.isEmpty && !_found.end) _more();
+      widget.scroll.addListener(_onScroll);
+    } else {
+      _loadIds();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.scroll.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final p = widget.scroll.position;
+    if (p.pixels > p.maxScrollExtent - 500) _more();
+  }
+
+  Future<void> _more() async {
+    final f = _found;
+    if (f.loading || f.end) return;
+    setState(() => f.loading = true);
+    try {
+      final result = await widget.room.searchEvents(
+        searchFunc: widget.kind.filter!,
+        nextBatch: f.nextBatch,
+      );
+      final known = f.events.map((e) => e.eventId).toSet();
+      f.events.addAll(result.events.where((e) => known.add(e.eventId)));
+      f.nextBatch = result.nextBatch;
+      f.end = result.nextBatch == null;
+    } catch (_) {
+      f.end = true;
+    }
+    f.loading = false;
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadIds() async {
+    _ids = widget.kind == _Kind.pinned
+        ? widget.room.pinnedEventIds.reversed.toList()
+        : VibeStarred.ids(widget.room.id).toList();
+    setState(() {});
+    for (final id in _ids) {
+      if (_byId.containsKey(id)) continue;
+      final e = await widget.room.getEventById(id).catchError((_) => null);
+      if (!mounted) return;
+      setState(() => _byId[id] = e);
+    }
+  }
+
+  /// Long-press: close the pane and show the message in the chat.
+  void _jump(Event e) {
+    final router = GoRouter.of(context);
+    Navigator.of(context).pop();
+    router.go('/rooms/${widget.room.id}?event=${e.eventId}');
+  }
+
+  String _who(Event e) => e.senderFromMemoryOrFallback.calcDisplayname(
+    i18n: MatrixLocals(L10n.of(context)),
+  );
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InkWell(
-          onTap: () => setState(() => open = !open),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+    final cs = Theme.of(context).colorScheme;
+    final muted = cs.onSurfaceVariant;
+    final listKind = widget.kind.filter != null;
+    final count = listKind ? _found.events.length : _ids.length;
+    final loading = listKind && _found.loading;
+
+    final header = SliverToBoxAdapter(
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          Container(
+            width: 40,
+            height: 5,
+            decoration: BoxDecoration(
+              color: muted.withAlpha(0x66),
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 4),
             child: Row(
               children: [
-                // Vibgram style "# | media": a hash where the icon was, a
-                // faded bar, then the name.
-                SizedBox(
-                  width: 22,
-                  child: Text(
-                    '#',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+                Text(
+                  '#',
+                  style: TextStyle(fontSize: 24, color: muted),
                 ),
                 const SizedBox(width: 12),
                 Text.rich(
@@ -362,369 +563,264 @@ class _SectionState extends State<_Section> {
                     children: [
                       TextSpan(
                         text: '|  ',
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurfaceVariant.withAlpha(
-                            0x99,
-                          ),
-                        ),
+                        style: TextStyle(color: muted.withAlpha(0x88)),
                       ),
-                      TextSpan(text: widget.label),
+                      TextSpan(text: widget.kind.label),
                     ],
                   ),
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: const TextStyle(
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    widget.count,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                 ),
                 const Spacer(),
-                Icon(
-                  open ? Icons.expand_more : Icons.chevron_right,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+                if (count > 0)
+                  Text(
+                    listKind && !_found.end ? '$count+' : '$count',
+                    style: TextStyle(color: muted, fontWeight: FontWeight.w600),
+                  ),
               ],
             ),
           ),
-        ),
-        if (open)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: widget.child,
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Tap to open · long-press to see it in the chat',
+                style: TextStyle(fontSize: 12.5, color: muted),
+              ),
+            ),
           ),
+        ],
+      ),
+    );
+
+    final Widget body;
+    if (count == 0) {
+      body = SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(
+          child: loading || (!listKind && _ids.isNotEmpty)
+              ? const CircularProgressIndicator.adaptive()
+              : Text(widget.kind.empty, style: TextStyle(color: muted)),
+        ),
+      );
+    } else {
+      body = switch (widget.kind) {
+        _Kind.media => _mediaGrid(),
+        _Kind.links => _links(),
+        _ => SliverList.builder(
+          itemCount: listKind ? _found.events.length : _ids.length,
+          itemBuilder: (context, i) => listKind
+              ? _row(_found.events[i])
+              : _idRow(_ids[i]),
+        ),
+      };
+    }
+
+    return CustomScrollView(
+      controller: widget.scroll,
+      slivers: [
+        header,
+        body,
+        if (loading && count > 0)
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator.adaptive()),
+            ),
+          ),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
       ],
     );
   }
-}
 
-class _Scroller extends StatelessWidget {
-  final Widget child;
-  const _Scroller({required this.child});
-
-  @override
-  Widget build(BuildContext context) =>
-      ConstrainedBox(constraints: const BoxConstraints(maxHeight: 240), child: child);
-}
-
-class _Empty extends StatelessWidget {
-  final String text;
-  const _Empty(this.text);
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    child: Text(
-      text,
-      style: TextStyle(
-        fontStyle: FontStyle.italic,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-    ),
-  );
-}
-
-class _PagedSection extends StatefulWidget {
-  final Room room;
-  final IconData icon;
-  final Color color;
-  final String label;
-  final String emptyText;
-  final bool Function(Event) searchFunc;
-  final Widget Function(BuildContext, List<Event>) bodyBuilder;
-
-  const _PagedSection({
-    required this.room,
-    required this.icon,
-    required this.color,
-    required this.label,
-    required this.emptyText,
-    required this.searchFunc,
-    required this.bodyBuilder,
-  });
-
-  @override
-  State<_PagedSection> createState() => _PagedSectionState();
-}
-
-class _PagedSectionState extends State<_PagedSection> {
-  final List<Event> events = [];
-  String? nextBatch;
-  bool endReached = false;
-  bool isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _more();
-  }
-
-  Future<void> _more() async {
-    if (isLoading || endReached) return;
-    setState(() => isLoading = true);
-    try {
-      final result = await widget.room.searchEvents(
-        searchFunc: widget.searchFunc,
-        nextBatch: nextBatch,
-      );
-      if (!mounted) return;
-      setState(() {
-        isLoading = false;
-        events.addAll(result.events);
-        nextBatch = result.nextBatch;
-        endReached = result.nextBatch == null;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        isLoading = false;
-        endReached = true;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final count = '${events.length}${endReached ? '' : '+'}';
-    return _Section(
-      icon: widget.icon,
-      color: widget.color,
-      label: widget.label,
-      count: count,
-      child: events.isEmpty
-          ? (isLoading
-                ? const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  )
-                : _Empty(widget.emptyText))
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                widget.bodyBuilder(context, events),
-                if (!endReached)
-                  TextButton(
-                    onPressed: isLoading ? null : _more,
-                    child: Text(isLoading ? 'Loading…' : 'Load more'),
-                  ),
-              ],
-            ),
-    );
-  }
-}
-
-class _MediaGrid extends StatelessWidget {
-  final List<Event> events;
-  const _MediaGrid(this.events);
-
-  @override
-  Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(12);
-    // One horizontal strip that scrolls on its own, so Links and Files
-    // stay close no matter how many photos there are.
-    return SizedBox(
-      height: 132,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+  Widget _mediaGrid() {
+    final events = _found.events;
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      sliver: SliverGrid.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisSpacing: 4,
+          crossAxisSpacing: 4,
+        ),
         itemCount: events.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
-          final event = events[i];
-          final video = event.messageType == MessageTypes.Video;
+          final e = events[i];
           return GestureDetector(
             onTap: () => VibeMediaViewer.open(context, events, i),
+            onLongPress: () => _jump(e),
             child: ClipRRect(
-                borderRadius: radius,
-                child: SizedBox(
-                  width: 124,
-                  height: 124,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      MxcImage(
-                        event: event,
-                        width: 124,
-                        height: 124,
-                        fit: BoxFit.cover,
-                        isThumbnail: true,
-                      ),
-                      if (video)
-                        const Center(
-                          child: Icon(
-                            Icons.play_circle_fill,
-                            color: Colors.white,
-                            size: 34,
-                          ),
-                        ),
-                    ],
+              borderRadius: BorderRadius.circular(10),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ColoredBox(color: Theme.of(context).colorScheme.surfaceContainerHigh),
+                  LayoutBuilder(
+                    builder: (context, c) => MxcImage(
+                      // Kept in memory: scrolling back or reopening the
+                      // pane doesn't download / decrypt it again.
+                      key: ValueKey('thumb_${e.eventId}'),
+                      cacheKey: 'thumb_${e.eventId}',
+                      event: e,
+                      width: c.maxWidth,
+                      height: c.maxWidth,
+                      fit: BoxFit.cover,
+                      isThumbnail: true,
+                      placeholder: (_) => const SizedBox.shrink(),
+                    ),
                   ),
-                ),
+                  if (e.messageType == MessageTypes.Video)
+                    const Center(
+                      child: Icon(
+                        Icons.play_circle_fill,
+                        color: Colors.white,
+                        size: 34,
+                      ),
+                    ),
+                ],
               ),
+            ),
           );
         },
       ),
     );
   }
-}
 
-class _LinkList extends StatelessWidget {
-  final List<Event> events;
-  const _LinkList(this.events);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _links() {
     final links = <(Event, String)>[];
-    for (final e in events) {
+    for (final e in _found.events) {
       for (final m in _urlRegex.allMatches(e.body)) {
         links.add((e, m.group(0)!));
       }
     }
-    return _Scroller(
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: links.length,
-        itemBuilder: (context, i) {
-          final (event, url) = links[i];
-          return ListTile(
-            dense: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-            leading: Icon(
-              Icons.link,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            title: Text(url, maxLines: 2, overflow: TextOverflow.ellipsis),
-            subtitle: Text(event.originServerTs.localizedTime(context)),
-            onTap: () =>
-                launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _FileList extends StatelessWidget {
-  final List<Event> events;
-  const _FileList(this.events);
-
-  @override
-  Widget build(BuildContext context) {
-    return _Scroller(
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: events.length,
-        itemBuilder: (context, i) {
-          final event = events[i];
-          final filename =
-              event.content.tryGet<String>('filename') ??
-              event.content.tryGet<String>('body') ??
-              'File';
-          return ListTile(
-            dense: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-            leading: const Icon(Icons.file_present_outlined),
-            title: Text(filename, maxLines: 1, overflow: TextOverflow.ellipsis),
-            subtitle: Text(
-              '${event.sizeString ?? ''} · ${event.originServerTs.localizedTime(context)}',
-            ),
-            onTap: () => event.saveFile(context),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _StarredSection extends StatelessWidget {
-  final Room room;
-  const _StarredSection({required this.room});
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<int>(
-      valueListenable: VibeStarred.revision,
-      builder: (context, _, _) {
-        final ids = VibeStarred.ids(room.id);
-        return _Section(
-          icon: Icons.star,
-          color: const Color(0xFFB5BAC1),
-          label: 'starred-messages',
-          count: '${ids.length}',
-          child: ids.isEmpty
-              ? const _Empty('No starred messages in this chat.')
-              : _Scroller(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: ids.length,
-                    itemBuilder: (context, i) {
-                      final id = ids[i];
-                      return FutureBuilder<Event?>(
-                        future: room.getEventById(id),
-                        builder: (context, snapshot) {
-                          final event = snapshot.data;
-                          if (event == null) {
-                            return const ListTile(dense: true, title: Text('…'));
-                          }
-                          final sender = event.senderFromMemoryOrFallback;
-                          final name = sender.calcDisplayname(
-                            i18n: MatrixLocals(L10n.of(context)),
-                          );
-                          return ListTile(
-                            dense: true,
-                            contentPadding: const EdgeInsets.only(left: 8),
-                            title: Text(
-                              '$name · ${event.originServerTs.localizedTimeShort(context)}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                            subtitle: Text(
-                              event.body,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(
-                                Icons.star,
-                                color: const Color(0xFFB5BAC1),
-                                size: 20,
-                              ),
-                              onPressed: () => VibeStarred.toggle(room.id, id),
-                            ),
-                            onTap: () =>
-                                context.go('/rooms/${room.id}?event=$id'),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
+    return SliverList.builder(
+      itemCount: links.length,
+      itemBuilder: (context, i) {
+        final (e, url) = links[i];
+        final host = Uri.tryParse(url)?.host ?? url;
+        return ListTile(
+          leading: CircleAvatar(
+            backgroundColor: const Color(0xFF5865F2).withAlpha(0x33),
+            child: const Icon(Icons.link, color: Color(0xFF8C96F6)),
+          ),
+          title: Text(host, maxLines: 1, overflow: TextOverflow.ellipsis),
+          subtitle: Text(
+            '$url\n${_who(e)} · ${e.originServerTs.localizedTimeShort(context)}',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          isThreeLine: true,
+          onTap: () =>
+              launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+          onLongPress: () => _jump(e),
         );
       },
     );
   }
+
+  Widget _row(Event e) {
+    final cs = Theme.of(context).colorScheme;
+    final when = e.originServerTs.localizedTimeShort(context);
+    switch (widget.kind) {
+      case _Kind.voice:
+        return GestureDetector(
+          onLongPress: () => _jump(e),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${_who(e)} · $when',
+                  style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
+                ),
+                AudioPlayerWidget(
+                  e,
+                  color: cs.onSurface,
+                  linkColor: cs.primary,
+                  fontSize: 15,
+                ),
+              ],
+            ),
+          ),
+        );
+      default:
+        final name =
+            e.content.tryGet<String>('filename') ??
+            e.content.tryGet<String>('body') ??
+            'File';
+        return ListTile(
+          leading: CircleAvatar(
+            backgroundColor: const Color(0xFF5865F2).withAlpha(0x33),
+            child: Icon(
+              e.messageType == MessageTypes.Audio
+                  ? Icons.music_note_outlined
+                  : Icons.insert_drive_file_outlined,
+              color: const Color(0xFF8C96F6),
+            ),
+          ),
+          title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
+          subtitle: Text(
+            '${e.sizeString ?? ''}${e.sizeString == null ? '' : ' · '}${_who(e)} · $when',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          onTap: () => e.saveFile(context),
+          onLongPress: () => _jump(e),
+        );
+    }
+  }
+
+  Widget _idRow(String id) {
+    final cs = Theme.of(context).colorScheme;
+    final e = _byId[id];
+    if (e == null) {
+      return ListTile(
+        title: Text(
+          _byId.containsKey(id) ? 'Message not available' : '…',
+          style: TextStyle(color: cs.onSurfaceVariant),
+        ),
+      );
+    }
+    return ListTile(
+      leading: Avatar(
+        mxContent: e.senderFromMemoryOrFallback.avatarUrl,
+        name: _who(e),
+        size: 40,
+        client: widget.room.client,
+      ),
+      title: Text(
+        '${_who(e)} · ${e.originServerTs.localizedTimeShort(context)}',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      ),
+      subtitle: Text(
+        e.calcLocalizedBodyFallback(
+          MatrixLocals(L10n.of(context)),
+          hideReply: true,
+        ),
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: widget.kind == _Kind.starred
+          ? IconButton(
+              tooltip: 'Unstar',
+              icon: const Icon(Icons.star, color: Color(0xFFFAA61A)),
+              onPressed: () async {
+                await VibeStarred.toggle(widget.room.id, id);
+                if (mounted) setState(() => _ids = List.of(_ids)..remove(id));
+              },
+            )
+          : null,
+      // Pinned and starred messages are messages: opening one shows it in
+      // the chat (tap or long-press).
+      onTap: () => _jump(e),
+      onLongPress: () => _jump(e),
+    );
+  }
 }
+

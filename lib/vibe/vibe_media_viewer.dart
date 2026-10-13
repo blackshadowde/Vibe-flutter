@@ -6,6 +6,7 @@ import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
 /// Google Messages style media slideshow: swipe through every photo and
@@ -67,6 +68,7 @@ class _VibeMediaViewerState extends State<VibeMediaViewer> {
 
   @override
   void dispose() {
+    MxcImage.clearCache('vibe-viewer');
     _pages.dispose();
     _strip.dispose();
     super.dispose();
@@ -240,6 +242,8 @@ class _VibeMediaViewerState extends State<VibeMediaViewer> {
                               fit: StackFit.expand,
                               children: [
                                 MxcImage(
+                                  key: ValueKey('thumb_${e.eventId}'),
+                                  cacheKey: 'thumb_${e.eventId}',
                                   event: e,
                                   width: _thumb,
                                   height: _thumb,
@@ -275,15 +279,30 @@ class _Slide extends StatelessWidget {
   final Event event;
   const _Slide({required this.event});
 
+  /// Long-press: close the slideshow (and any pane under it) and show this
+  /// photo or video in the chat.
+  void _jump(BuildContext context) {
+    final router = GoRouter.of(context);
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).popUntil((r) => r.settings is Page || r.isFirst);
+    router.go('/rooms/${event.room.id}?event=${event.eventId}');
+  }
+
   @override
   Widget build(BuildContext context) {
     if (event.messageType == MessageTypes.Video) {
-      return ColoredBox(
-        color: const Color(0xFF111214),
-        child: Center(child: EventVideoPlayer(event)),
+      return GestureDetector(
+        onLongPress: () => _jump(context),
+        child: ColoredBox(
+          color: const Color(0xFF111214),
+          child: Center(child: EventVideoPlayer(event)),
+        ),
       );
     }
     return GestureDetector(
+      onLongPress: () => _jump(context),
       // tap to zoom in the full image viewer
       onTap: () => showDialog(
         context: context,
@@ -292,6 +311,11 @@ class _Slide extends StatelessWidget {
       child: ColoredBox(
         color: const Color(0xFF111214),
         child: MxcImage(
+          // Full pictures stay in memory while the slideshow is open, so
+          // swiping back doesn't load them again (freed on close).
+          key: ValueKey('full_${event.eventId}'),
+          cacheName: 'vibe-viewer',
+          cacheKey: 'full_${event.eventId}',
           event: event,
           fit: BoxFit.contain,
           isThumbnail: false,
