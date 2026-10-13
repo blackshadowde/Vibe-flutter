@@ -66,29 +66,44 @@ class _VibeEntranceState extends State<VibeEntrance>
     if (c == null) return widget.child;
     final inner = KeyedSubtree(key: _gk, child: widget.child);
     if (c.isCompleted) return inner;
-    return AnimatedBuilder(
-      animation: c,
-      child: inner,
-      builder: (context, child) {
-        final p = _pop!.value;
-        return SizeTransition(
-          sizeFactor: _size!,
-          axisAlignment: 1.0,
-          child: Opacity(
-            opacity: _fade!.value.clamp(0.0, 1.0),
-            child: Transform.translate(
-              offset: Offset(0, (1 - p) * 38),
-              child: Transform.scale(
-                scale: 0.86 + 0.14 * p,
-                alignment: widget.fromRight
-                    ? Alignment.bottomRight
-                    : Alignment.bottomLeft,
-                child: child,
-              ),
-            ),
-          ),
-        );
-      },
+    // Size grows (so the timeline glides up); fade, rise and pop are
+    // paint-only transitions, so the message isn't rebuilt every frame.
+    return SizeTransition(
+      sizeFactor: _size!,
+      axisAlignment: 1.0,
+      child: FadeTransition(
+        opacity: _fade!,
+        child: _Pop(
+          pop: _pop!,
+          alignment: widget.fromRight
+              ? Alignment.bottomRight
+              : Alignment.bottomLeft,
+          child: inner,
+        ),
+      ),
+    );
+  }
+}
+
+class _Pop extends AnimatedWidget {
+  final Alignment alignment;
+  final Widget child;
+  const _Pop({
+    required Animation<double> pop,
+    required this.alignment,
+    required this.child,
+  }) : super(listenable: pop);
+
+  @override
+  Widget build(BuildContext context) {
+    final p = (listenable as Animation<double>).value;
+    return Transform.translate(
+      offset: Offset(0, (1 - p) * 38),
+      child: Transform.scale(
+        scale: 0.86 + 0.14 * p,
+        alignment: alignment,
+        child: child,
+      ),
     );
   }
 }

@@ -12,6 +12,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
+      ('🧈', 'Smoother everywhere: pages slide over with the page below drifting back (like Telegram), new messages and lists animate without redrawing the whole screen, scrolling no longer squeezes the row under your finger, and the home screen only refreshes when something changes'),
       ('👋', 'New start screen: create your account right in Vibe (on Unredacted by default, confirmed by email). Already have one? Tap Log in'),
       ('🖼️', 'Profile pictures like Vibgram: grey with initials when there\'s no picture, round everywhere, rounded squares in the left rail'),
       ('🎉', 'Send with effects: type a message, long-press the send button and pick Like, Love, Fire, Party, LOL, Dislike, Poop or Balloons. It plays for you and for them, and the small emoji next to the message plays it again'),

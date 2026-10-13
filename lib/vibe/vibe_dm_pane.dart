@@ -114,46 +114,58 @@ class _VibeDmPaneState extends State<VibeDmPane> {
               ),
             ),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(bottom: 110),
-                children: [
-                  _NavTile(
-                    icon: Icons.star_outline,
-                    label: 'Starred messages',
-                    onTap: () => VibeSharedPage.open(context, client),
-                  ),
-                  if (VibeLock.locked().isNotEmpty)
-                    _NavTile(
-                      icon: Icons.lock_outline,
-                      label: 'Locked chats',
-                      onTap: () =>
-                          VibeLock.openFolder(context, client, widget.onOpen),
+              // Built lazily: only rows on (or near) the screen exist, so a
+              // long chat list scrolls and animates as lightly as a short one.
+              child: Builder(
+                builder: (context) {
+                  final rows = <Widget Function()>[
+                    () => _NavTile(
+                      icon: Icons.star_outline,
+                      label: 'Starred messages',
+                      onTap: () => VibeSharedPage.open(context, client),
                     ),
-                  if (invites.isNotEmpty) ...[
-                    _SectionLabel('INVITES — ${invites.length}'),
-                    for (var i = 0; i < invites.length; i++)
-                      VibeStagger(
-                        key: ValueKey('inv_${invites[i].id}'),
-                        index: i,
-                        child: _InviteTile(
-                          room: invites[i],
-                          name: nameOf(invites[i]),
-                          onTap: () => widget.onTap(invites[i]),
-                        ),
+                    if (VibeLock.locked().isNotEmpty)
+                      () => _NavTile(
+                        icon: Icons.lock_outline,
+                        label: 'Locked chats',
+                        onTap: () =>
+                            VibeLock.openFolder(context, client, widget.onOpen),
                       ),
-                  ],
-                  if (pinned.isNotEmpty) ...[
-                    _SectionLabel('PINNED — ${pinned.length}'),
-                    for (var i = 0; i < pinned.length; i++)
-                      dmTile(pinned[i], i + invites.length + 1),
-                  ],
-                  _SectionLabel(
-                    'DIRECT MESSAGES — ${others.length}',
-                    onAdd: () => VibeAddContact.show(context),
-                  ),
-                  for (var i = 0; i < others.length; i++)
-                    dmTile(others[i], i + invites.length + pinned.length + 1),
-                ],
+                    if (invites.isNotEmpty) ...[
+                      () => _SectionLabel('INVITES — ${invites.length}'),
+                      for (var i = 0; i < invites.length; i++)
+                        () => VibeStagger(
+                          key: ValueKey('inv_${invites[i].id}'),
+                          index: i,
+                          child: _InviteTile(
+                            room: invites[i],
+                            name: nameOf(invites[i]),
+                            onTap: () => widget.onTap(invites[i]),
+                          ),
+                        ),
+                    ],
+                    if (pinned.isNotEmpty) ...[
+                      () => _SectionLabel('PINNED — ${pinned.length}'),
+                      for (var i = 0; i < pinned.length; i++)
+                        () => dmTile(pinned[i], i + invites.length + 1),
+                    ],
+                    () => _SectionLabel(
+                      'DIRECT MESSAGES — ${others.length}',
+                      onAdd: () => VibeAddContact.show(context),
+                    ),
+                    for (var i = 0; i < others.length; i++)
+                      () => dmTile(
+                        others[i],
+                        i + invites.length + pinned.length + 1,
+                      ),
+                  ];
+                  return ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 110),
+                    cacheExtent: 600,
+                    itemCount: rows.length,
+                    itemBuilder: (context, i) => rows[i](),
+                  );
+                },
               ),
             ),
           ],

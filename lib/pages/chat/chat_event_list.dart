@@ -85,6 +85,9 @@ class ChatEventList extends StatelessWidget {
             right: horizontalPadding,
           ),
           reverse: true,
+          // Build (and start loading pictures for) about a screen and a half
+          // beyond the edge, so messages are ready before they scroll in.
+          cacheExtent: 1200,
           controller: controller.scrollController,
           keyboardDismissBehavior: PlatformInfos.isIOS
               ? ScrollViewKeyboardDismissBehavior.onDrag

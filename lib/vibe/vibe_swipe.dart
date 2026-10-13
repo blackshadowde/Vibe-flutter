@@ -32,7 +32,10 @@ class VibePageTransitionsBuilder extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    if (route.isFirst) return child;
+    // The page underneath drifts left and dims a little while a new page
+    // slides over it (like Telegram). Paint-only, so it costs almost nothing.
+    final under = _Underneath(animation: secondaryAnimation, child: child);
+    if (route.isFirst) return under;
     if (VibeSwipe.pending && animation.status == AnimationStatus.forward) {
       VibeSwipe.pending = false;
       final cb = VibeSwipe.onRoute;
@@ -46,7 +49,7 @@ class VibePageTransitionsBuilder extends PageTransitionsBuilder {
       child: _SlideOver(
         route: route,
         animation: animation,
-        child: RepaintBoundary(child: child),
+        child: RepaintBoundary(child: under),
       ),
     );
   }
@@ -70,21 +73,68 @@ class _SlideOver extends StatelessWidget {
       final gesture = route.navigator?.userGestureInProgress == true;
       final v = animation.value.clamp(0.0, 1.0);
       final t = gesture ? v : Curves.easeOutCubic.transform(v);
+      // A soft gradient edge instead of a blurred shadow: a full-screen
+      // blur had to be redrawn on every frame of the slide.
       return FractionalTranslation(
         translation: Offset(1 - t, 0),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            boxShadow: t < 0.995
-                ? [
-                    BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, 0.45 * t),
-                      blurRadius: 24,
-                      offset: const Offset(-8, 0),
+        child: Stack(
+          clipBehavior: Clip.none,
+          // Same children every frame, so the page's state is never lost.
+          children: [
+            child!,
+            Positioned(
+              left: -18,
+              top: 0,
+              bottom: 0,
+              width: 18,
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: t < 0.995 ? t : 0,
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                        colors: [Color(0x55000000), Color(0x00000000)],
+                      ),
                     ),
-                  ]
-                : const [],
-          ),
-          child: child,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+/// Moves the covered page a little to the left and dims it.
+class _Underneath extends StatelessWidget {
+  final Animation<double> animation;
+  final Widget child;
+  const _Underneath({required this.animation, required this.child});
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: animation,
+    child: child,
+    builder: (context, child) {
+      final v = animation.value.clamp(0.0, 1.0);
+      // Always the same widgets (only values change), so the page keeps
+      // its state when something opens on top of it.
+      return FractionalTranslation(
+        translation: Offset(-0.22 * v, 0),
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [
+            child!,
+            Positioned.fill(
+              child: IgnorePointer(
+                child: ColoredBox(color: Color.fromRGBO(0, 0, 0, 0.28 * v)),
+              ),
+            ),
+          ],
         ),
       );
     },

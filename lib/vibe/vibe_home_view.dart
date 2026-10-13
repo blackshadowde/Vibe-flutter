@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
+
 import 'package:fluffychat/pages/chat_list/chat_list.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
@@ -150,12 +152,10 @@ class _VibeHomeViewState extends State<VibeHomeView> {
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) setState(() => selectedId = null);
       },
-      child: StreamBuilder(
+      child: _RoomListBuilder(
         key: ValueKey(client.userID.toString()),
-        stream: client.onSync.stream
-            .where((s) => s.hasRoomUpdate)
-            .rateLimit(const Duration(seconds: 1)),
-        builder: (context, _) {
+        client: client,
+        builder: (context) {
           final rooms = VibeChatActions.pinnedFirst(
             client.rooms
                 .where(
@@ -242,4 +242,70 @@ class _VibeHomeViewState extends State<VibeHomeView> {
       ),
     );
   }
+}
+
+/// Rebuilds the home screen only when something it shows changed (order,
+/// unread counts, names, pictures, last messages, invites), not on every
+/// sync. Keeps animations and scrolling free of needless rebuilds.
+class _RoomListBuilder extends StatefulWidget {
+  final Client client;
+  final WidgetBuilder builder;
+  const _RoomListBuilder({
+    required this.client,
+    required this.builder,
+    super.key,
+  });
+
+  @override
+  State<_RoomListBuilder> createState() => _RoomListBuilderState();
+}
+
+class _RoomListBuilderState extends State<_RoomListBuilder> {
+  StreamSubscription? _sub;
+  int _sig = 0;
+
+  int _signature() {
+    var h = widget.client.rooms.length;
+    for (final r in widget.client.rooms) {
+      h = Object.hash(
+        h,
+        r.id,
+        r.membership,
+        r.notificationCount,
+        r.highlightCount,
+        r.isFavourite,
+        r.lastEvent?.eventId,
+        r.lastEvent?.status,
+        r.lastEvent?.body,
+        r.avatar,
+        r.getLocalizedDisplayname(),
+        r.isUnreadOrInvited,
+      );
+    }
+    return h;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _sig = _signature();
+    _sub = widget.client.onSync.stream
+        .where((s) => s.hasRoomUpdate)
+        .rateLimit(const Duration(milliseconds: 500))
+        .listen((_) {
+          final sig = _signature();
+          if (sig == _sig || !mounted) return;
+          _sig = sig;
+          setState(() {});
+        });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context);
 }

@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
+
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 
 /// Shrinks slightly while a finger is down and springs back on release.
 /// Uses a [Listener], so taps and long presses of the child keep working.
+///
+/// Like Telegram, the press only shows once the finger has stayed put for a
+/// moment: starting to scroll a list never squeezes (or buzzes) the row
+/// under your finger.
 class VibePressable extends StatefulWidget {
   final Widget child;
   final double scale;
@@ -15,20 +21,55 @@ class VibePressable extends StatefulWidget {
 }
 
 class _VibePressableState extends State<VibePressable> {
+  static const _slop = 8.0; // px a finger may wobble and still be a press
   bool _down = false;
+  Timer? _timer;
+  Offset? _start;
 
   void _set(bool v) {
     if (_down != v && mounted) setState(() => _down = v);
   }
 
+  void _cancel() {
+    _timer?.cancel();
+    _timer = null;
+    _start = null;
+    _set(false);
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => Listener(
-    onPointerDown: (_) {
-      VibeHaptics.selection();
-      _set(true);
+    onPointerDown: (e) {
+      _start = e.position;
+      _timer?.cancel();
+      _timer = Timer(const Duration(milliseconds: 70), () {
+        if (_start == null) return;
+        VibeHaptics.selection();
+        _set(true);
+      });
     },
-    onPointerUp: (_) => _set(false),
-    onPointerCancel: (_) => _set(false),
+    onPointerMove: (e) {
+      final s = _start;
+      if (s != null && (e.position - s).distance > _slop) _cancel();
+    },
+    onPointerUp: (_) {
+      // A quick tap: show the squeeze briefly so it still feels pressed.
+      if (_timer?.isActive ?? false) {
+        _timer!.cancel();
+        _set(true);
+        Future<void>.delayed(const Duration(milliseconds: 90), () => _set(false));
+        _start = null;
+        return;
+      }
+      _cancel();
+    },
+    onPointerCancel: (_) => _cancel(),
     child: AnimatedScale(
       scale: _down ? widget.scale : 1,
       duration: Duration(milliseconds: _down ? 90 : 320),
@@ -59,7 +100,12 @@ class VibeStagger extends StatefulWidget {
 
 class _VibeStaggerState extends State<VibeStagger>
     with SingleTickerProviderStateMixin {
-  late final bool _play = widget.index <= widget.maxIndex;
+  /// Rows that already played: a lazily built list re-creates rows that
+  /// scroll back in, and they shouldn't fade in a second time.
+  static final Set<Key> _seen = {};
+  late final bool _play =
+      widget.index <= widget.maxIndex &&
+      (widget.key == null || _seen.add(widget.key!));
   late final AnimationController _c = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 460),
@@ -86,17 +132,30 @@ class _VibeStaggerState extends State<VibeStagger>
     super.dispose();
   }
 
+  late final Animation<Offset> _rise = Tween<Offset>(
+    begin: Offset(0, widget.dy),
+    end: Offset.zero,
+  ).animate(_curve);
+
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: _curve,
-    child: widget.child,
-    builder: (context, child) => Opacity(
-      opacity: _curve.value.clamp(0.0, 1.0),
-      child: Transform.translate(
-        offset: Offset(0, (1 - _curve.value) * widget.dy),
-        child: child,
-      ),
-    ),
+  Widget build(BuildContext context) => FadeTransition(
+    opacity: _curve,
+    child: _PixelSlide(offset: _rise, child: widget.child),
+  );
+}
+
+/// Moves its child by an animated offset in pixels. Paint-only: the child is
+/// never rebuilt or laid out again while it moves.
+class _PixelSlide extends AnimatedWidget {
+  final Widget child;
+  const _PixelSlide({required Animation<Offset> offset, required this.child})
+    : super(listenable: offset);
+
+  @override
+  Widget build(BuildContext context) => Transform.translate(
+    offset: (listenable as Animation<Offset>).value,
+    transformHitTests: false,
+    child: child,
   );
 }
 
