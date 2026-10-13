@@ -277,10 +277,13 @@ abstract class VibeEffects {
       final bottom = screen.height - media.viewInsets.bottom - 200;
       // Effects start in the middle of the screen at the message's height;
       // a tapped emoji bursts right where it is.
-      final x = effect.id == 'emoji'
-          ? c.dx.clamp(80.0, math.max(80.0, screen.width - 80))
+      final double x = effect.id == 'emoji'
+          ? c.dx.clamp(80.0, math.max(80.0, screen.width - 80)).toDouble()
           : screen.width / 2;
-      origin = Offset(x, bottom > top ? c.dy.clamp(top, bottom) : c.dy);
+      final double y = bottom > top
+          ? c.dy.clamp(top, bottom).toDouble()
+          : c.dy;
+      origin = Offset(x, y);
     }
     VibeHaptics.medium();
     late OverlayEntry entry;
