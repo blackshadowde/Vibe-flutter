@@ -8,6 +8,7 @@ import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/sticker_picker_dialog.dart';
 import 'package:fluffychat/pages/chat/trust_user_key_dialog.dart';
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -19,7 +20,6 @@ class ChatEmojiPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return AnimatedContainer(
       duration: FluffyThemes.animationDuration,
       curve: FluffyThemes.animationCurve,
@@ -49,28 +49,27 @@ class ChatEmojiPicker extends StatelessWidget {
                             locale: Localizations.localeOf(context),
                             emojiViewConfig: EmojiViewConfig(
                               noRecents: const NoRecent(),
-                              backgroundColor:
-                                  theme.colorScheme.onInverseSurface,
+                              backgroundColor: VibeSettingsStyle.page(context),
                             ),
                             bottomActionBarConfig: const BottomActionBarConfig(
                               enabled: false,
                             ),
+                            // Vibe colours: grey icons, blurple selection.
                             categoryViewConfig: CategoryViewConfig(
-                              backspaceColor: theme.colorScheme.primary,
-                              iconColor: theme.colorScheme.primary.withAlpha(
-                                128,
-                              ),
-                              iconColorSelected: theme.colorScheme.primary,
-                              indicatorColor: theme.colorScheme.primary,
-                              backgroundColor: theme.colorScheme.surface,
+                              backspaceColor: VibeSettingsStyle.text2(context),
+                              iconColor: VibeSettingsStyle.text2(
+                                context,
+                              ).withAlpha(150),
+                              iconColorSelected: const Color(0xFF5865F2),
+                              indicatorColor: const Color(0xFF5865F2),
+                              backgroundColor: VibeSettingsStyle.page(context),
+                              dividerColor: VibeSettingsStyle.line(context),
                             ),
                             skinToneConfig: SkinToneConfig(
-                              dialogBackgroundColor: Color.lerp(
-                                theme.colorScheme.surface,
-                                theme.colorScheme.primaryContainer,
-                                0.75,
-                              )!,
-                              indicatorColor: theme.colorScheme.onSurface,
+                              dialogBackgroundColor: VibeSettingsStyle.card(
+                                context,
+                              ),
+                              indicatorColor: VibeSettingsStyle.text2(context),
                             ),
                           ),
                         ),

@@ -11,6 +11,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fluffychat/vibe/vibe_effects.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
@@ -189,6 +190,9 @@ class ChatController extends State<ChatPageWithRoom>
   final int _loadHistoryCount = 100;
 
   String pendingText = '';
+
+  /// Set by "Send with effect" (long-press send) for the next message.
+  VibeEffect? sendEffect;
 
   bool showEmojiPicker = false;
 
@@ -740,14 +744,29 @@ class ChatController extends State<ChatPageWithRoom>
       room.setTyping(false);
     }
 
-    // ignore: unawaited_futures
-    room.sendTextEvent(
-      sendController.text,
-      inReplyTo: replyEvent,
-      editEventId: editEvent?.eventId,
-      parseCommands: parseCommands,
-      threadRootEventId: activeThreadId,
-    );
+    final effect = sendEffect;
+    sendEffect = null;
+    if (effect != null &&
+        editEvent == null &&
+        !sendController.text.startsWith('/')) {
+      // ignore: unawaited_futures
+      VibeEffects.send(
+        room,
+        sendController.text,
+        effect,
+        inReplyTo: replyEvent,
+        threadRootEventId: activeThreadId,
+      );
+    } else {
+      // ignore: unawaited_futures
+      room.sendTextEvent(
+        sendController.text,
+        inReplyTo: replyEvent,
+        editEventId: editEvent?.eventId,
+        parseCommands: parseCommands,
+        threadRootEventId: activeThreadId,
+      );
+    }
     sendController.value = TextEditingValue(
       text: pendingText,
       selection: const TextSelection.collapsed(offset: 0),

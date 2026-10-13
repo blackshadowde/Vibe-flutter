@@ -4,9 +4,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/vibe/vibe_low_data.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
+import 'package:fluffychat/vibe/vibe_emoji_sheet.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
@@ -106,24 +106,7 @@ class _Menu extends StatelessWidget {
     final parent = controller.context;
     _close();
     if (!parent.mounted) return;
-    final emoji = await showModalBottomSheet<String>(
-      sheetAnimationStyle: vibeSheetStyle,
-      context: parent,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      builder: (c) => SizedBox(
-        height: 400,
-        child: EmojiPicker(
-          onEmojiSelected: (_, e) => Navigator.of(c).pop(e.emoji),
-          config: const Config(
-            emojiViewConfig: EmojiViewConfig(
-              backgroundColor: Colors.transparent,
-            ),
-            bottomActionBarConfig: BottomActionBarConfig(enabled: false),
-          ),
-        ),
-      ),
-    );
+    final emoji = await VibeEmojiSheet.pick(parent);
     if (emoji != null) await event.room.sendReaction(event.eventId, emoji);
   }
 
@@ -238,7 +221,7 @@ class _Menu extends StatelessWidget {
                           child: SizedBox(
                             width: 48,
                             height: 48,
-                            child: Center(child: _AnimatedEmoji(e)),
+                            child: Center(child: VibeAnimatedEmoji(e, size: 32)),
                           ),
                         ),
                       ),
@@ -391,24 +374,3 @@ const Map<String, String> _quickEmojis = {
 /// An animated emoji, like Vibgram's animated reactions. Loaded once from
 /// Google's Noto Animated Emoji and kept in the image cache; shows the plain
 /// emoji while loading, offline, or in Low data mode.
-class _AnimatedEmoji extends StatelessWidget {
-  final String emoji;
-  const _AnimatedEmoji(this.emoji);
-
-  @override
-  Widget build(BuildContext context) {
-    final plain = Text(emoji, style: const TextStyle(fontSize: 23));
-    final code = _quickEmojis[emoji];
-    if (code == null || VibeLowData.on) return plain;
-    return Image.network(
-      'https://fonts.gstatic.com/s/e/notoemoji/latest/$code/512.webp',
-      width: 32,
-      height: 32,
-      filterQuality: FilterQuality.medium,
-      gaplessPlayback: true,
-      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) =>
-          frame == null && !wasSynchronouslyLoaded ? plain : child,
-      errorBuilder: (_, _, _) => plain,
-    );
-  }
-}

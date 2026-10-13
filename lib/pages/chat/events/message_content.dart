@@ -9,6 +9,8 @@ import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/events/poll.dart';
 import 'package:fluffychat/pages/chat/events/video_player.dart';
+import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
+import 'package:fluffychat/vibe/vibe_effects.dart';
 import 'package:fluffychat/pages/image_viewer/image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
@@ -180,6 +182,23 @@ class MessageContent extends StatelessWidget {
 
             final bigEmotes =
                 !event.isRichMessage && bigEmojis.contains(event.body);
+
+            // A message that is just one emoji: Vibe plays its own animation
+            // for it (Noto Animated Emoji). Tap it for a burst.
+            if (bigEmotes && event.messageType != MessageTypes.Emote) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Builder(
+                  builder: (ctx) => GestureDetector(
+                    onTap: () => VibeEffects.play(
+                      ctx,
+                      VibeEffects.forEmoji(event.body),
+                    ),
+                    child: VibeAnimatedEmoji(event.body, size: 110),
+                  ),
+                ),
+              );
+            }
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),

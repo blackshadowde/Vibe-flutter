@@ -11,7 +11,7 @@ import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/pages/chat/recording_view_model.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_attach_sheet.dart';
-import 'package:fluffychat/vibe/vibe_send_later.dart';
+import 'package:fluffychat/vibe/vibe_effects.dart';
 import 'package:fluffychat/utils/other_party_can_receive.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -297,9 +297,9 @@ class ChatInputRow extends StatelessWidget {
                             ),
                           )
                         : GestureDetector(
-                            // Long-press: send later
+                            // Long-press: send with effect / send later
                             onLongPress: () =>
-                                VibeSendLater.pick(context, controller),
+                                VibeEffects.showSendOptions(context, controller),
                             child: IconButton(
                               key: Key('send_button'),
                               tooltip: L10n.of(context).send,

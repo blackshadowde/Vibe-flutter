@@ -3,16 +3,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_effects.dart';
+import 'package:fluffychat/vibe/vibe_emoji_sheet.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:collection/collection.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/events/message_content.dart';
 import 'package:fluffychat/pages/chat/events/message_reactions.dart';
-import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/string_color.dart';
@@ -629,17 +629,28 @@ class VibeMessage extends StatelessWidget {
                       selected: selected,
                       bigEmojis: bigEmojis,
                     );
-              // Sent/read ticks sit right after the text, like WhatsApp.
-              if (!ownMessage || !event.status.isSent) return content;
+              // Sent with an effect: play it once as it arrives, and keep a
+              // small badge to play it again.
+              final effect = VibeEffects.of(event);
+              if (effect != null) VibeEffects.maybePlay(context, event);
+              final ticks = ownMessage && event.status.isSent;
+              if (!ticks && effect == null) return content;
               return Row(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Flexible(child: content),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 6, bottom: 3),
-                    child: _StatusBits(event, timeline),
-                  ),
+                  if (effect != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 1),
+                      child: VibeEffectBadge(effect),
+                    ),
+                  // Sent/read ticks sit right after the text, like WhatsApp.
+                  if (ticks)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 6, bottom: 3),
+                      child: _StatusBits(event, timeline),
+                    ),
                 ],
               );
             },
@@ -721,93 +732,8 @@ class VibeMessage extends StatelessWidget {
                                                     context,
                                                   ).customReaction,
                                                   onPressed: () async {
-                                                    final emoji = await showAdaptiveBottomSheet<String>(
-                                                      context: context,
-                                                      builder: (context) => Scaffold(
-                                                        appBar: AppBar(
-                                                          title: Text(
-                                                            L10n.of(
-                                                              context,
-                                                            ).customReaction,
-                                                          ),
-                                                          leading: CloseButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                  context,
-                                                                ).pop(null),
-                                                          ),
-                                                        ),
-                                                        body: SizedBox(
-                                                          height:
-                                                              double.infinity,
-                                                          child: EmojiPicker(
-                                                            onEmojiSelected:
-                                                                (_, emoji) =>
-                                                                    Navigator.of(
-                                                                      context,
-                                                                    ).pop(
-                                                                      emoji
-                                                                          .emoji,
-                                                                    ),
-                                                            config: Config(
-                                                              locale:
-                                                                  Localizations.localeOf(
-                                                                    context,
-                                                                  ),
-                                                              emojiViewConfig:
-                                                                  const EmojiViewConfig(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .transparent,
-                                                                  ),
-                                                              bottomActionBarConfig:
-                                                                  const BottomActionBarConfig(
-                                                                    enabled:
-                                                                        false,
-                                                                  ),
-                                                              categoryViewConfig: CategoryViewConfig(
-                                                                initCategory:
-                                                                    Category
-                                                                        .SMILEYS,
-                                                                backspaceColor: theme
-                                                                    .colorScheme
-                                                                    .primary,
-                                                                iconColor: theme
-                                                                    .colorScheme
-                                                                    .primary
-                                                                    .withAlpha(
-                                                                      128,
-                                                                    ),
-                                                                iconColorSelected:
-                                                                    theme
-                                                                        .colorScheme
-                                                                        .primary,
-                                                                indicatorColor: theme
-                                                                    .colorScheme
-                                                                    .primary,
-                                                                backgroundColor:
-                                                                    theme
-                                                                        .colorScheme
-                                                                        .surface,
-                                                              ),
-                                                              skinToneConfig: SkinToneConfig(
-                                                                dialogBackgroundColor: Color.lerp(
-                                                                  theme
-                                                                      .colorScheme
-                                                                      .surface,
-                                                                  theme
-                                                                      .colorScheme
-                                                                      .primaryContainer,
-                                                                  0.75,
-                                                                )!,
-                                                                indicatorColor: theme
-                                                                    .colorScheme
-                                                                    .onSurface,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
+                                                    final emoji = await VibeEmojiSheet.pick(
+                                                      context,
                                                     );
                                                     if (emoji == null) {
                                                       return;

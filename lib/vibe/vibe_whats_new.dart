@@ -10,6 +10,15 @@ import 'package:package_info_plus/package_info_plus.dart';
 /// number is added automatically by the release workflow).
 const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
+    version: '2.2',
+    items: [
+      ('🎉', 'Send with effects: type a message, long-press the send button and pick Like, Love, Fire, Party, LOL, Dislike, Poop or Balloons. It plays for you and for them, and the small emoji next to the message plays it again'),
+      ('😂', 'Animated emoji: a message that is just one emoji is shown big and animated, each emoji with its own animation. Tap it for a burst'),
+      ('🔍', 'Search emoji when reacting: long-press a message, tap the smiley and type to find any emoji'),
+      ('🎨', 'Emoji picker in Vibe colours, with your favourites animated at the top'),
+    ],
+  ),
+  (
     version: '2.1',
     items: [
       ('🔔', 'Notifications like Vibgram: Vibe stays connected and shows messages the moment they arrive. Settings → Notifications → Direct connection'),
