@@ -12,7 +12,6 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
-      ('✈️', 'Telegram inside Vibe (early preview): tap the paper plane in the left rail, log in with your number or a QR code, and read and send Telegram messages in Vibe\'s chat look. Swipe to reply, long-press to react, copy, edit or delete, + to send photos, videos and files; photos, videos, stickers, files and voice messages play right in the chat'),
       ('🎉', 'Send with effects: type a message, long-press the send button and pick Like, Love, Fire, Party, LOL, Dislike, Poop or Balloons. It plays for you and for them, and the small emoji next to the message plays it again'),
       ('😂', 'Animated emoji: a message that is just one emoji is shown big and animated, each emoji with its own animation. Tap it for a burst'),
       ('🔍', 'Search emoji when reacting: long-press a message, tap the smiley and type to find any emoji'),

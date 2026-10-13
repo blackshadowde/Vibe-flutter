@@ -265,14 +265,8 @@ class VibeCreditsSheet extends StatelessWidget {
     ],
     ['GG Sans', 'Typeface', '© Discord Inc.', null],
     [
-      'TDLib',
-      'Telegram inside Vibe',
-      'Boost Software License 1.0 · Telegram',
-      'https://github.com/tdlib/td',
-    ],
-    [
       'Noto Animated Emoji',
-      'Animated emoji, reactions and effects',
+      'Animated reactions in the message menu',
       'CC BY 4.0 · Google',
       'https://googlefonts.github.io/noto-emoji-animation/',
     ],
