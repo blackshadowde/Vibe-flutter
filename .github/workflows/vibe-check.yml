@@ -1,0 +1,55 @@
+name: Vibe check
+
+# Code check only (no APK): about 3 minutes. Shows every error on the run's
+# summary page. Use it before "Vibe release" to catch mistakes quickly.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: .tool_versions.yaml
+          cache: true
+
+      - name: Push notifications (Firebase)
+        env:
+          GSJ: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GSJ:-}" ]; then
+            echo "::warning::GOOGLE_SERVICES_JSON secret is not set - building WITHOUT push notifications"
+            exit 0
+          fi
+          # accept the raw JSON file contents or a base64 of it
+          if printf '%s' "$GSJ" | python3 -c 'import sys,json; json.load(sys.stdin)' 2>/dev/null; then
+            printf '%s' "$GSJ" > android/app/google-services.json
+          else
+            printf '%s' "$GSJ" | base64 -d > android/app/google-services.json
+          fi
+          PKG=$(python3 -c 'import json; print(json.load(open("android/app/google-services.json"))["client"][0]["client_info"]["android_client_info"]["package_name"])')
+          echo "Firebase package name: $PKG"
+          sed -i -E "s/applicationId = \"[^\"]*\"/applicationId = \"$PKG\"/" android/app/build.gradle.kts
+          grep -n "applicationId" android/app/build.gradle.kts
+          ./scripts/add-firebase-messaging.sh
+          echo "Push notifications: ENABLED ($PKG)"
+
+      - run: flutter pub get
+
+      - name: Check code
+        run: |
+          set -o pipefail
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib 2>&1 | tee analyze.txt || {
+            grep -E "^\s*error " analyze.txt | head -50 | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
+          echo "### Code check" >> "$GITHUB_STEP_SUMMARY"
+          tail -1 analyze.txt >> "$GITHUB_STEP_SUMMARY"

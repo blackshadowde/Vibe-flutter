@@ -133,7 +133,13 @@ jobs:
       - run: flutter pub get
 
       - name: Check code (fails fast with the exact error)
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib
+        run: |
+          set -o pipefail
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib 2>&1 | tee analyze.txt || {
+            # Each error also shows on the run's summary page.
+            grep -E "^\s*error " analyze.txt | head -50 | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
 
       - name: Build release APK
         env:

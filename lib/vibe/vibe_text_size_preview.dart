@@ -5,6 +5,7 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:matrix/matrix.dart';
 
 /// Settings > Style: the Text size preview, drawn exactly like Vibe's chat
 /// (and Vibgram's): picture, name and time above the text, the reply line
