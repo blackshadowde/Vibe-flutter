@@ -12,7 +12,8 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
-      ('#️⃣', 'New chat pane like Vibgram: big picture, online, # | chat and INFO channels (media, files, links, voice-messages, pinned-messages, starred-messages, profile). Each opens its own pane from the bottom: tap to open, long-press to see it in the chat. Media opens a full-screen slideshow, and nothing reloads when you come back'),
+      ('💾', 'Storage & cache (Settings → Chat): choose how much space media may use (1 GB up to no limit), how long to keep it, and how much memory Vibe uses for smooth scrolling. Clear the cache any time'),
+      ('#️⃣', 'New chat pane like Vibgram: big picture, online, # | chat and INFO channels (media, files, links, voice-messages, starred-messages, profile). Each opens its own pane from the bottom: tap to open, long-press to see it in the chat. Media opens a full-screen slideshow, and nothing reloads when you come back'),
       ('🧈', 'Smoother everywhere: pages slide over with the page below drifting back (like Telegram), new messages and lists animate without redrawing the whole screen, scrolling no longer squeezes the row under your finger, and the home screen only refreshes when something changes'),
       ('👋', 'New start screen: create your account right in Vibe (on Unredacted by default, confirmed by email). Already have one? Tap Log in'),
       ('🖼️', 'Profile pictures like Vibgram: grey with initials when there\'s no picture, round everywhere, rounded squares in the left rail'),

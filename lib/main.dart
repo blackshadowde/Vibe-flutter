@@ -21,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_html/universal_html.dart' as web;
 
 import 'config/setting_keys.dart';
+import 'vibe/vibe_storage.dart';
 import 'utils/background_push.dart';
 import 'widgets/fluffy_chat_app.dart';
 
@@ -56,6 +57,8 @@ void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final store = await AppSettings.init();
+  // Telegram-style caches: pictures in memory, media on the phone.
+  VibeStorage.start();
   Logs().i('Welcome to ${AppSettings.applicationName.value} <3');
 
   kEnableMatrixSdkBenchmarks = AppSettings.benchmarksInLogs.value;

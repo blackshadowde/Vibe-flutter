@@ -34,7 +34,12 @@ class VibePageTransitionsBuilder extends PageTransitionsBuilder {
   ) {
     // The page underneath drifts left and dims a little while a new page
     // slides over it (like Telegram). Paint-only, so it costs almost nothing.
-    final under = _Underneath(animation: secondaryAnimation, child: child);
+    // Its own layer: moving / dimming the covered page each frame must not
+    // repaint everything on it (that was the stutter when closing a chat).
+    final under = _Underneath(
+      animation: secondaryAnimation,
+      child: RepaintBoundary(child: child),
+    );
     if (route.isFirst) return under;
     if (VibeSwipe.pending && animation.status == AnimationStatus.forward) {
       VibeSwipe.pending = false;
@@ -49,7 +54,7 @@ class VibePageTransitionsBuilder extends PageTransitionsBuilder {
       child: _SlideOver(
         route: route,
         animation: animation,
-        child: RepaintBoundary(child: under),
+        child: under,
       ),
     );
   }

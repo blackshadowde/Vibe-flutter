@@ -57,26 +57,26 @@ class VibeDmDetail extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 120),
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 120),
           children: [
             // Same search bar as Home: tapping it goes back to Home.
             GestureDetector(
               onTap: onBack,
               child: Container(
-                height: 52,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                height: 46,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
                   color: cs.surfaceContainerLowest,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.search, color: cs.onSurfaceVariant),
-                    const SizedBox(width: 12),
+                    Icon(Icons.search, size: 22, color: cs.onSurfaceVariant),
+                    const SizedBox(width: 10),
                     Text(
                       'Find or start a conversation',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         color: cs.onSurfaceVariant,
                       ),
                     ),
@@ -84,7 +84,7 @@ class VibeDmDetail extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 18),
             Padding(
               padding: const EdgeInsets.only(left: 6),
               child: Align(
@@ -94,13 +94,13 @@ class VibeDmDetail extends StatelessWidget {
                   child: Avatar(
                     mxContent: room.avatar,
                     name: name,
-                    size: 76,
+                    size: 62,
                     client: room.client,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.only(left: 6),
               child: Text(
@@ -108,7 +108,7 @@ class VibeDmDetail extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -133,7 +133,7 @@ class VibeDmDetail extends StatelessWidget {
                         Text(
                           text,
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 13.5,
                             color: cs.onSurfaceVariant,
                           ),
                         ),
@@ -143,7 +143,7 @@ class VibeDmDetail extends StatelessWidget {
                         maxLines: 2,
                         alwaysTime: true,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: cs.onSurfaceVariant,
                         ),
                       ),
@@ -152,7 +152,7 @@ class VibeDmDetail extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 8),
             if (invited)
               _ApprovalBanner(room: room, name: name)
             else ...[
@@ -174,10 +174,6 @@ class VibeDmDetail extends StatelessWidget {
               _HashRow(
                 label: 'voice-messages',
                 onTap: () => open(_Kind.voice),
-              ),
-              _HashRow(
-                label: 'pinned-messages',
-                onTap: () => open(_Kind.pinned),
               ),
               _HashRow(
                 label: 'starred-messages',
@@ -209,11 +205,11 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(6, 22, 6, 6),
+    padding: const EdgeInsets.fromLTRB(6, 16, 6, 4),
     child: Text(
       text,
       style: TextStyle(
-        fontSize: 13.5,
+        fontSize: 12.5,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.4,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -239,18 +235,18 @@ class _HashRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
           child: Row(
             children: [
               SizedBox(
-                width: 34,
+                width: 28,
                 child: Text(
                   '#',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 26, color: muted),
+                  style: TextStyle(fontSize: 21, color: muted),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,16 +261,16 @@ class _HashRow extends StatelessWidget {
                           TextSpan(text: label),
                         ],
                       ),
-                      style: TextStyle(fontSize: 19, color: muted),
+                      style: TextStyle(fontSize: 16, color: muted),
                     ),
                     if (subtitle != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: 2),
+                        padding: const EdgeInsets.only(top: 1),
                         child: Text(
                           subtitle!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 14.5, color: muted),
+                          style: TextStyle(fontSize: 13, color: muted),
                         ),
                       ),
                   ],
@@ -368,7 +364,7 @@ class _ApprovalBanner extends StatelessWidget {
 // long-press to jump to it in the chat.
 // ---------------------------------------------------------------------------
 
-enum _Kind { media, files, links, voice, pinned, starred }
+enum _Kind { media, files, links, voice, starred }
 
 extension on _Kind {
   String get label => switch (this) {
@@ -376,7 +372,6 @@ extension on _Kind {
     _Kind.files => 'files',
     _Kind.links => 'links',
     _Kind.voice => 'voice-messages',
-    _Kind.pinned => 'pinned-messages',
     _Kind.starred => 'starred-messages',
   };
 
@@ -385,7 +380,6 @@ extension on _Kind {
     _Kind.files => 'No files in this chat yet.',
     _Kind.links => 'No links in this chat yet.',
     _Kind.voice => 'No voice messages in this chat yet.',
-    _Kind.pinned => 'Nothing is pinned in this chat.',
     _Kind.starred => 'You haven\'t starred anything in this chat.',
   };
 
@@ -459,7 +453,7 @@ class _DmSheetState extends State<_DmSheet> {
     _Found.new,
   );
 
-  // Pinned / starred: a fixed list of ids, loaded one by one.
+  // Starred: a fixed list of ids, loaded one by one.
   List<String> _ids = const [];
   final Map<String, Event?> _byId = {};
 
@@ -506,9 +500,7 @@ class _DmSheetState extends State<_DmSheet> {
   }
 
   Future<void> _loadIds() async {
-    _ids = widget.kind == _Kind.pinned
-        ? widget.room.pinnedEventIds.reversed.toList()
-        : VibeStarred.ids(widget.room.id).toList();
+    _ids = VibeStarred.ids(widget.room.id).toList();
     setState(() {});
     for (final id in _ids) {
       if (_byId.containsKey(id)) continue;
@@ -816,8 +808,8 @@ class _DmSheetState extends State<_DmSheet> {
               },
             )
           : null,
-      // Pinned and starred messages are messages: opening one shows it in
-      // the chat (tap or long-press).
+      // Starred messages are messages: opening one shows it in the chat
+      // (tap or long-press).
       onTap: () => _jump(e),
       onLongPress: () => _jump(e),
     );

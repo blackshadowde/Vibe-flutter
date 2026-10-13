@@ -109,6 +109,10 @@ enum AppSettings<T> {
   vibeNtfyLastId<String>('chat.vibe.ntfy_last_id', ''),
   // Days to keep downloaded media on this phone. 0 = forever.
   vibeKeepMediaDays<int>('chat.vibe.keep_media_days', 0),
+  // Media cache limit in MB on this phone. 0 = no limit.
+  vibeCacheLimitMb<int>('chat.vibe.cache_limit_mb', 0),
+  // Decoded pictures kept in memory while Vibe runs (MB).
+  vibeMemoryCacheMb<int>('chat.vibe.memory_cache_mb', 256),
   doubleTapToReact<bool>('chat.fluffy.double_tap_to_react', false),
   doubleTapReaction<String>('chat.fluffy.double_tap_reaction', '❤️'),
   benchmarksInLogs<bool>('chat.fluffy.benchmarks_in_logs', false);
