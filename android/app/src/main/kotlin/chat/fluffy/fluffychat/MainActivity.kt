@@ -56,6 +56,7 @@ class MainActivity : FlutterFragmentActivity() {
             val eng = FlutterEngine(context, emptyArray(), true, false)
             VibeUpdater.register(context, eng)
             VibeBackupNative.register(context, eng)
+            VibeTelegramNative.register(context, eng)
             engine = eng
             return eng
         }

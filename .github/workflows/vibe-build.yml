@@ -107,6 +107,23 @@ jobs:
           ./scripts/add-firebase-messaging.sh
           echo "Push notifications: ENABLED ($PKG)"
 
+      - name: Telegram library (TDLib)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download tdlib-1.8.68 -R "$GITHUB_REPOSITORY" -p tdlib-android.zip -D /tmp/tdlib; then
+            unzip -q /tmp/tdlib/tdlib-android.zip -d /tmp/tdlib/x
+            for abi in arm64-v8a armeabi-v7a; do
+              if [ -f "/tmp/tdlib/x/libs/$abi/libtdjsonjava.so" ]; then
+                mkdir -p "android/app/src/main/jniLibs/$abi"
+                cp "/tmp/tdlib/x/libs/$abi/libtdjsonjava.so" "android/app/src/main/jniLibs/$abi/"
+              fi
+            done
+            echo "Telegram: included"
+          else
+            echo "::warning::Telegram library not found. Run the 'Build TDLib' workflow once to include Telegram."
+          fi
+
       - run: flutter pub get
 
       - name: Check code (fails fast with the exact error)
@@ -118,7 +135,18 @@ jobs:
             exit 1
           }
 
-      - run: flutter build apk --debug
+      - name: Build debug APK
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+        run: |
+          EXTRA=""
+          if [ -n "$TG_API_ID" ] && [ -n "$TG_API_HASH" ]; then
+            EXTRA="--dart-define=TG_API_ID=$TG_API_ID --dart-define=TG_API_HASH=$TG_API_HASH"
+          else
+            echo "::warning::TG_API_ID / TG_API_HASH secrets are missing: Telegram stays off in this build."
+          fi
+          flutter build apk --debug $EXTRA
 
       - uses: actions/upload-artifact@v4
         with:

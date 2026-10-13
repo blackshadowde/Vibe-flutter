@@ -5,6 +5,7 @@
 
 import 'package:fluffychat/pages/chat_list/chat_list.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
+import 'package:fluffychat/vibe/telegram/telegram_pane.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_dm_detail.dart';
@@ -29,6 +30,7 @@ class VibeHomeView extends StatefulWidget {
 
 class _VibeHomeViewState extends State<VibeHomeView> {
   String? selectedId;
+  bool _telegram = false;
   String? _lastOpenedId;
 
   bool _dragging = false;
@@ -146,9 +148,14 @@ class _VibeHomeViewState extends State<VibeHomeView> {
     final controller = widget.controller;
     final client = Matrix.of(context).client;
     return PopScope(
-      canPop: selectedId == null,
+      canPop: selectedId == null && !_telegram,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) setState(() => selectedId = null);
+        if (!didPop) {
+          setState(() {
+            selectedId = null;
+            _telegram = false;
+          });
+        }
       },
       child: StreamBuilder(
         key: ValueKey(client.userID.toString()),
@@ -188,8 +195,19 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                       rooms: rooms,
                       selectedId: selected?.id,
                       activeRoomId: controller.activeChat,
-                      onSelect: (room) => setState(() => selectedId = room.id),
-                      onHome: () => setState(() => selectedId = null),
+                      onSelect: (room) => setState(() {
+                        selectedId = room.id;
+                        _telegram = false;
+                      }),
+                      onHome: () => setState(() {
+                        selectedId = null;
+                        _telegram = false;
+                      }),
+                      onTelegram: () => setState(() {
+                        selectedId = null;
+                        _telegram = true;
+                      }),
+                      telegramActive: _telegram,
                       onLongPress: (room) => VibeChatActions.show(
                         context,
                         room,
@@ -204,7 +222,9 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(24),
                         ),
-                        child: selected == null
+                        child: _telegram
+                            ? const TelegramPane()
+                            : selected == null
                             ? VibeDmPane(
                                 rooms: rooms,
                                 activeRoomId: controller.activeChat,

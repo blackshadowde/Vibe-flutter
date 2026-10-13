@@ -25,6 +25,10 @@ class VibeDmRail extends StatelessWidget {
   final VoidCallback onHome;
   final void Function(Room room)? onLongPress;
 
+  /// Telegram inside Vibe: the paper-plane icon under your picture.
+  final VoidCallback? onTelegram;
+  final bool telegramActive;
+
   const VibeDmRail({
     required this.rooms,
     required this.selectedId,
@@ -32,6 +36,8 @@ class VibeDmRail extends StatelessWidget {
     required this.onSelect,
     required this.onHome,
     this.onLongPress,
+    this.onTelegram,
+    this.telegramActive = false,
     super.key,
   });
 
@@ -65,6 +71,69 @@ class VibeDmRail extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
                 child: Divider(height: 1, color: theme.dividerColor),
               ),
+              if (onTelegram != null) ...[
+                Tooltip(
+                  message: 'Telegram',
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 260),
+                            curve: Curves.easeOutCubic,
+                            width: 4,
+                            height: telegramActive ? 30 : 0,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.onSurface,
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(4),
+                                bottomRight: Radius.circular(4),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      VibePressable(
+                        child: GestureDetector(
+                          onTap: onTelegram,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 280),
+                            curve: Curves.easeOutCubic,
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: telegramActive
+                                  ? const Color(0xFF2AABEE)
+                                  : theme.colorScheme.surfaceContainerHigh,
+                              borderRadius: BorderRadius.circular(
+                                telegramActive ? 16 : 24,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.send_rounded,
+                              size: 22,
+                              color: telegramActive
+                                  ? Colors.white
+                                  : const Color(0xFF2AABEE),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 20,
+                  ),
+                  child: Divider(height: 1, color: theme.dividerColor),
+                ),
+              ],
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(bottom: 8),
