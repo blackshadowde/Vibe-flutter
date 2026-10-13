@@ -83,7 +83,7 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
         )
         .listen(_onTyping);
     // Keep my time zone + status present in every direct chat.
-    Future.delayed(const Duration(seconds: 20), () => VibeStatus.refresh(c));
+    VibeStatus.watch(c);
     VibeDisappearing.start(c);
     VibeSendLater.start(c);
     Future.delayed(const Duration(seconds: 3), () {

@@ -137,6 +137,67 @@ class VibeStatus {
     return ok;
   }
 
+  static StreamSubscription? _watchSub;
+  static Timer? _watchTimer;
+  static Timer? _debounce;
+  static Client? _watched;
+  static Set<String> _knownDms = {};
+  static int _knownZone = 0;
+  static bool _running = false;
+
+  static Set<String> _dms(Client c) => {
+    for (final r in c.rooms)
+      if (r.isDirectChat && r.membership == Membership.join) r.id,
+  };
+
+  /// Keeps my time zone (and status) present in every direct chat while
+  /// Vibe runs: soon after start, whenever a new direct chat appears (new
+  /// contact, accepted invite), when the phone's time zone changes, and
+  /// every 30 minutes as a safety net.
+  static void watch(Client client) {
+    if (identical(_watched, client)) return;
+    _watchSub?.cancel();
+    _watchTimer?.cancel();
+    _watched = client;
+    _knownDms = {};
+    _knownZone = DateTime.now().timeZoneOffset.inMinutes;
+    _schedule(client, const Duration(seconds: 20));
+    _watchSub = client.onSync.stream.listen((u) {
+      final zone = DateTime.now().timeZoneOffset.inMinutes;
+      final joined = u.rooms?.join?.keys ?? const <String>[];
+      final changed =
+          zone != _knownZone ||
+          joined.any((id) => !_knownDms.contains(id)) ||
+          (u.accountData?.any((e) => e.type == 'm.direct') ?? false);
+      if (!changed) return;
+      final now = _dms(client);
+      if (zone != _knownZone || !now.every(_knownDms.contains)) {
+        _schedule(client, const Duration(seconds: 5));
+      }
+    });
+    _watchTimer = Timer.periodic(
+      const Duration(minutes: 30),
+      (_) => _schedule(client, Duration.zero),
+    );
+  }
+
+  static void _schedule(Client client, Duration wait) {
+    _debounce?.cancel();
+    _debounce = Timer(wait, () async {
+      if (_running || !client.isLogged()) return;
+      _running = true;
+      try {
+        await refresh(client);
+        _knownDms = _dms(client);
+        _knownZone = DateTime.now().timeZoneOffset.inMinutes;
+      } catch (e) {
+        Logs().d('Vibe status refresh failed', e);
+      } finally {
+        _running = false;
+      }
+    });
+  }
+
   /// Keep the time zone current and add the status to new direct chats.
   /// Cheap: only writes where something is missing or out of date.
   static Future<void> refresh(Client client) async {
@@ -154,7 +215,11 @@ class VibeStatus {
         final s = had == null || had['hidden'] == true
             ? null
             : VibeStatus.fromContent(had);
-        if (s != null && s.tzOffsetMin == zone && s.text == current.text) {
+        if (s != null &&
+            s.tzOffsetMin == zone &&
+            s.text == current.text &&
+            s.emoji == current.emoji &&
+            s.untilMs == current.untilMs) {
           continue;
         }
       }
