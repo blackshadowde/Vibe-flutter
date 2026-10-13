@@ -107,6 +107,11 @@ abstract class VibeNtfy {
     } catch (_) {}
   }
 
+  /// The always-on service, shared with Direct connection notifications.
+  static Future<void> keepAlive() => _startService();
+
+  static Future<void> releaseKeepAlive() => _stopService();
+
   /// Asks Android not to put Vibe to sleep (needed on many phones).
   static Future<void> askBatteryExemption() async {
     try {

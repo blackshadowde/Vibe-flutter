@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -35,7 +36,7 @@ class SettingsChatView extends StatelessWidget {
       body: ListTileTheme(
         iconColor: theme.textTheme.bodyLarge!.color,
         child: MaxWidthBody(
-          child: Column(
+          child: VibeGroups(
             children: [
               SettingsSwitchListTile.adaptive(
                 title: 'Low data mode',

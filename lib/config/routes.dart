@@ -41,6 +41,7 @@ import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffychat/vibe/vibe_about_page.dart';
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_encryption_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -235,7 +236,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const VibeEncryptionPage(),
+                        const VibeSettingsTheme(child: VibeEncryptionPage()),
                       ),
                       redirect: loggedOutRedirect,
                     ),
@@ -252,7 +253,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const SettingsNotifications(),
+                        const VibeSettingsTheme(child: SettingsNotifications()),
                       ),
                       redirect: loggedOutRedirect,
                     ),
@@ -261,7 +262,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const SettingsStyle(),
+                        const VibeSettingsTheme(child: SettingsStyle()),
                       ),
                       redirect: loggedOutRedirect,
                     ),
@@ -270,7 +271,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const DevicesSettings(),
+                        const VibeSettingsTheme(child: DevicesSettings()),
                       ),
                       redirect: loggedOutRedirect,
                     ),
@@ -279,7 +280,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const SettingsChat(),
+                        const VibeSettingsTheme(child: SettingsChat()),
                       ),
                       routes: [
                         GoRoute(
@@ -287,8 +288,10 @@ abstract class AppRoutes {
                           pageBuilder: (context, state) => defaultPageBuilder(
                             context,
                             state,
-                            EmotesSettings(
-                              roomId: state.pathParameters['roomid'],
+                            VibeSettingsTheme(
+                              child: EmotesSettings(
+                                roomId: state.pathParameters['roomid'],
+                              ),
                             ),
                           ),
                         ),
@@ -339,7 +342,7 @@ abstract class AppRoutes {
                         return defaultPageBuilder(
                           context,
                           state,
-                          const SettingsHomeserver(),
+                          const VibeSettingsTheme(child: SettingsHomeserver()),
                         );
                       },
                       redirect: loggedOutRedirect,
@@ -350,7 +353,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const SettingsSecurity(),
+                        const VibeSettingsTheme(child: SettingsSecurity()),
                       ),
                       routes: [
                         GoRoute(
@@ -359,7 +362,7 @@ abstract class AppRoutes {
                             return defaultPageBuilder(
                               context,
                               state,
-                              const SettingsPassword(),
+                              const VibeSettingsTheme(child: SettingsPassword()),
                             );
                           },
                           redirect: loggedOutRedirect,
@@ -370,8 +373,10 @@ abstract class AppRoutes {
                             return defaultPageBuilder(
                               context,
                               state,
-                              SettingsIgnoreList(
-                                initialUserId: state.extra?.toString(),
+                              VibeSettingsTheme(
+                                child: SettingsIgnoreList(
+                                  initialUserId: state.extra?.toString(),
+                                ),
                               ),
                             );
                           },
@@ -382,7 +387,7 @@ abstract class AppRoutes {
                           pageBuilder: (context, state) => defaultPageBuilder(
                             context,
                             state,
-                            const Settings3Pid(),
+                            const VibeSettingsTheme(child: Settings3Pid()),
                           ),
                           redirect: loggedOutRedirect,
                         ),

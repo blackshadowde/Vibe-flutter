@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_low_data.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -224,7 +225,7 @@ class _Menu extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    for (final e in const ['❤️', '👍', '🔥', '😂', '🎉'])
+                    for (final e in _quickEmojis.keys)
                       Material(
                         color: cs.surfaceContainerHigh,
                         shape: const CircleBorder(),
@@ -237,12 +238,7 @@ class _Menu extends StatelessWidget {
                           child: SizedBox(
                             width: 48,
                             height: 48,
-                            child: Center(
-                              child: Text(
-                                e,
-                                style: const TextStyle(fontSize: 23),
-                              ),
-                            ),
+                            child: Center(child: _AnimatedEmoji(e)),
                           ),
                         ),
                       ),
@@ -379,6 +375,40 @@ class _Menu extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Quick reactions and their Noto Animated Emoji code (Google, CC BY 4.0).
+const Map<String, String> _quickEmojis = {
+  '❤️': '2764_fe0f',
+  '👍': '1f44d',
+  '🔥': '1f525',
+  '😂': '1f602',
+  '🎉': '1f389',
+};
+
+/// An animated emoji, like Vibgram's animated reactions. Loaded once from
+/// Google's Noto Animated Emoji and kept in the image cache; shows the plain
+/// emoji while loading, offline, or in Low data mode.
+class _AnimatedEmoji extends StatelessWidget {
+  final String emoji;
+  const _AnimatedEmoji(this.emoji);
+
+  @override
+  Widget build(BuildContext context) {
+    final plain = Text(emoji, style: const TextStyle(fontSize: 23));
+    final code = _quickEmojis[emoji];
+    if (code == null || VibeLowData.on) return plain;
+    return Image.network(
+      'https://fonts.gstatic.com/s/e/notoemoji/latest/$code/512.webp',
+      width: 32,
+      height: 32,
+      filterQuality: FilterQuality.medium,
+      gaplessPlayback: true,
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) =>
+          frame == null && !wasSynchronouslyLoaded ? plain : child,
+      errorBuilder: (_, _, _) => plain,
     );
   }
 }

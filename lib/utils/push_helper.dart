@@ -30,6 +30,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final Map<String, DateTime> lastReceivedPushNotification = {};
 
+/// Events already notified (Direct connection and the Firebase backup can
+/// both deliver the same message): each is shown once.
+final Set<String> _shownEventIds = {};
+
 Future<void> pushHelper(
   PushNotification notification, {
   List<Client>? clients,
@@ -100,6 +104,15 @@ Future<void> _tryPushHelper(
   String? activeRoomId,
   required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
 }) async {
+  final shownId = notification.eventId;
+  if (shownId != null) {
+    if (!_shownEventIds.add(shownId)) {
+      Logs().v('Push helper: already shown $shownId');
+      return;
+    }
+    if (_shownEventIds.length > 300) _shownEventIds.remove(_shownEventIds.first);
+  }
+
   final isBackgroundMessage = clients == null;
   Logs().v(
     'Push helper has been started (background=$isBackgroundMessage).',

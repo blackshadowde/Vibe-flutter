@@ -5,6 +5,7 @@
 
 import 'dart:ui';
 
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -37,10 +38,8 @@ class SettingsStyleView extends StatelessWidget {
         centerTitle: FluffyThemes.isColumnMode(context),
         title: Text(L10n.of(context).changeTheme),
       ),
-      backgroundColor: theme.colorScheme.surface,
       body: MaxWidthBody(
-        child: Column(
-          crossAxisAlignment: .stretch,
+        child: VibeGroups(
           children: [
             Padding(
               padding: const EdgeInsets.all(12.0),

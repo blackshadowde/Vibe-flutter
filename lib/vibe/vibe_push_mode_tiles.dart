@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/config/setting_keys.dart';
+import 'package:fluffychat/vibe/vibe_direct.dart';
 import 'package:fluffychat/vibe/vibe_ntfy.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 
-/// Settings > Notifications: Standard (Firebase) or Built-in (no Google).
+/// Settings > Notifications: Direct connection (like Vibgram, default),
+/// Standard (Firebase) or Built-in (ntfy, no Google).
 class VibePushModeTiles extends StatefulWidget {
   const VibePushModeTiles({super.key});
 
@@ -23,19 +25,21 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
     setState(() => _busy = true);
     try {
       await AppSettings.vibePushMode.setItem(mode);
-      if (mode == 'builtin') {
+      if (mode != 'direct') await VibeDirect.stop();
+      if (mode == 'builtin' || mode == 'direct') {
         await VibeNtfy.askBatteryExemption();
-      } else {
-        await VibeNtfy.stop();
       }
+      if (mode != 'builtin') await VibeNtfy.stop();
       if (!mounted) return;
       await push?.setupPush(context);
       messenger.showSnackBar(
         SnackBar(
           content: Text(
-            mode == 'builtin'
-                ? 'Built-in notifications on'
-                : 'Standard notifications on',
+            switch (mode) {
+              'direct' => 'Direct connection on',
+              'builtin' => 'Built-in notifications on',
+              _ => 'Standard notifications on',
+            },
           ),
         ),
       );
@@ -84,10 +88,19 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
               : null,
         ),
         _tile(
+          'direct',
+          'Direct connection (recommended)',
+          'Like Vibgram: Vibe stays connected to your server and shows '
+              'messages the moment they arrive, with nothing in between. '
+              'Shows a small permanent notification.',
+          Icons.bolt,
+        ),
+        _tile(
           'standard',
-          'Standard (recommended)',
-          'Through Google Firebase. Best battery life and most reliable.',
-          Icons.bolt_outlined,
+          'Google Firebase',
+          'Through Google\'s push service. Uses the least battery, but '
+              'messages can arrive late.',
+          Icons.cloud_outlined,
         ),
         _tile(
           'builtin',
@@ -97,7 +110,6 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
               'little more battery.',
           Icons.cell_tower,
         ),
-        Divider(color: theme.dividerColor),
       ],
     );
   }

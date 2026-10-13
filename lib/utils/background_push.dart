@@ -12,6 +12,7 @@ import 'dart:isolate';
 import 'dart:ui';
 
 //<GOOGLE_SERVICES>import 'package:fcm_shared_isolate/fcm_shared_isolate.dart';
+import 'package:fluffychat/vibe/vibe_direct.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/main.dart';
 import 'package:fluffychat/utils/notification_background_handler.dart';
@@ -301,8 +302,34 @@ class BackgroundPush {
     );
   }
 
+  /// Vibe Direct connection (like Vibgram): Vibe's own Matrix connection
+  /// stays open and notifies straight away; Firebase is only a backup.
+  Future<void> setupDirectPush() async {
+    await VibeNtfy.stop();
+    await VibeDirect.start(
+      clients,
+      (client, event) => pushHelper(
+        VibeDirect.pushFor(client, event),
+        clients: clients,
+        l10n: l10n,
+        activeRoomId: matrix?.activeRoomId,
+        flutterLocalNotificationsPlugin: _flutterLocalNotificationsPlugin,
+      ),
+    );
+    if (firebaseEnabled) {
+      for (final client in clients) {
+        if (client.isLogged()) await setupFirebase(client);
+      }
+    }
+  }
+
   Future<void> setupPush(BuildContext context) async {
-    if (PlatformInfos.isAndroid && VibeNtfy.enabled) {
+    if (!(PlatformInfos.isAndroid && VibeDirect.enabled)) {
+      await VibeDirect.stop();
+    }
+    if (PlatformInfos.isAndroid && VibeDirect.enabled) {
+      await setupDirectPush();
+    } else if (PlatformInfos.isAndroid && VibeNtfy.enabled) {
       await setupBuiltinPush();
     } else if (PlatformInfos.isAndroid &&
         (await UnifiedPush.getDistributors()).isNotEmpty &&

@@ -187,7 +187,7 @@ class VibeDmDetail extends StatelessWidget {
                       room: room,
                       icon: Icons.image_outlined,
                       color: Colors.indigoAccent,
-                      label: 'MEDIA',
+                      label: 'media',
                       emptyText: 'No media shared in this chat.',
                       searchFunc: (e) => {
                         MessageTypes.Image,
@@ -199,7 +199,7 @@ class VibeDmDetail extends StatelessWidget {
                       room: room,
                       icon: Icons.link,
                       color: Colors.indigoAccent,
-                      label: 'LINKS',
+                      label: 'links',
                       emptyText: 'No links shared in this chat.',
                       searchFunc: (e) =>
                           e.type == EventTypes.Message &&
@@ -210,7 +210,7 @@ class VibeDmDetail extends StatelessWidget {
                       room: room,
                       icon: Icons.description_outlined,
                       color: const Color(0xFFB5BAC1),
-                      label: 'FILES',
+                      label: 'files',
                       emptyText: 'No files shared in this chat.',
                       searchFunc: (e) =>
                           e.messageType == MessageTypes.File ||
@@ -342,13 +342,37 @@ class _SectionState extends State<_Section> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
             child: Row(
               children: [
-                Icon(widget.icon, color: widget.color, size: 22),
+                // Vibgram style "# | media": a hash where the icon was, a
+                // faded bar, then the name.
+                SizedBox(
+                  width: 22,
+                  child: Text(
+                    '#',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Text(
-                  widget.label,
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '|  ',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant.withAlpha(
+                            0x99,
+                          ),
+                        ),
+                      ),
+                      TextSpan(text: widget.label),
+                    ],
+                  ),
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -384,7 +408,6 @@ class _SectionState extends State<_Section> {
             padding: const EdgeInsets.only(bottom: 8),
             child: widget.child,
           ),
-        Divider(height: 1, color: theme.dividerColor),
       ],
     );
   }
@@ -645,7 +668,7 @@ class _StarredSection extends StatelessWidget {
         return _Section(
           icon: Icons.star,
           color: const Color(0xFFB5BAC1),
-          label: 'STARRED',
+          label: 'starred-messages',
           count: '${ids.length}',
           child: ids.isEmpty
               ? const _Empty('No starred messages in this chat.')

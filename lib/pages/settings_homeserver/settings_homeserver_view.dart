@@ -5,6 +5,7 @@
 
 import 'dart:convert';
 
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -42,8 +43,7 @@ class SettingsHomeserverView extends StatelessWidget {
       body: MaxWidthBody(
         withScrolling: true,
         child: SelectionArea(
-          child: Column(
-            mainAxisSize: .min,
+          child: VibeGroups(
             children: [
               ListTile(
                 title: Text(

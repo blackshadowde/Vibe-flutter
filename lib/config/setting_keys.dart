@@ -88,8 +88,10 @@ enum AppSettings<T> {
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),
   vibeLinkPreviews<bool>('chat.vibe.link_previews', true),
-  // 'standard' (Firebase via the Worker) or 'builtin' (ntfy, no Google)
-  vibePushMode<String>('chat.vibe.push_mode', 'standard'),
+  // 'direct' (own connection, like Vibgram - default), 'standard' (Firebase
+  // via the Worker) or 'builtin' (ntfy, no Google)
+  vibePushMode<String>('chat.vibe.push_mode', 'direct'),
+  vibeDirectBatteryAsked<bool>('chat.vibe.direct_battery_asked', false),
   vibeNtfyTopic<String>('chat.vibe.ntfy_topic', ''),
   vibeNtfyLastId<String>('chat.vibe.ntfy_last_id', ''),
   // Days to keep downloaded media on this phone. 0 = forever.

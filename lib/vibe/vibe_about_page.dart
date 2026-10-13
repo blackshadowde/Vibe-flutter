@@ -2,11 +2,15 @@
 
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/vibe/vibe_app_info.dart';
-import 'package:fluffychat/vibe/vibe_updates_page.dart';
+import 'package:fluffychat/vibe/vibe_updater.dart';
 import 'package:fluffychat/vibe/vibe_welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+const _blurple = Color(0xFF5865F2);
+
+/// About Vibe, laid out like Vibgram's About: logo, name, tagline, version
+/// pill, update status, one blurple button and outlined buttons below.
 class VibeAboutPage extends StatefulWidget {
   const VibeAboutPage({super.key});
 
@@ -16,6 +20,8 @@ class VibeAboutPage extends StatefulWidget {
 
 class _VibeAboutPageState extends State<VibeAboutPage> {
   String _version = VibeAppInfo.version;
+  String _status = '';
+  bool _checking = false;
 
   @override
   void initState() {
@@ -27,94 +33,127 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
     }).catchError((_) {});
   }
 
+  Future<void> _check() async {
+    if (_checking) return;
+    setState(() {
+      _checking = true;
+      _status = 'Checking…';
+    });
+    try {
+      final r = await VibeUpdater.refresh();
+      if (!mounted) return;
+      if (r == null) {
+        setState(() => _status = "You're on the latest version");
+      } else {
+        setState(() => _status = 'Vibe ${r.version} is available');
+        await VibeUpdater.install(context, r);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _status = 'No connection to GitHub');
+    } finally {
+      if (mounted) setState(() => _checking = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     return Scaffold(
       backgroundColor: cs.surface,
       appBar: AppBar(
-        title: const Text(
-          'About',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-        ),
+        backgroundColor: cs.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
         children: [
-          const SizedBox(height: 12),
           Center(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(32),
               child: Image.asset(
                 'assets/logo/mini/logo_mini.png',
-                width: 96,
-                height: 96,
+                width: 120,
+                height: 120,
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => Container(
-                  width: 96,
-                  height: 96,
-                  color: cs.primary,
+                  width: 120,
+                  height: 120,
+                  color: _blurple,
                   alignment: Alignment.center,
-                  child: Icon(Icons.chat_bubble, size: 44, color: cs.onPrimary),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Text(
-              VibeAppInfo.name,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: cs.primary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(99),
-              ),
-              child: Text(
-                'Version $_version',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFFC9CFFF),
+                  child: const Icon(
+                    Icons.chat_bubble,
+                    size: 54,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
           ),
           const SizedBox(height: 14),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'A private messenger built on Matrix. Your messages are '
-              'end-to-end encrypted, and the keys stay on your devices.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                height: 1.45,
-                color: cs.onSurfaceVariant,
+          Text(
+            VibeAppInfo.name,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: cs.onSurface,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'A private messenger built on Matrix',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15, color: cs.onSurfaceVariant),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                'Version $_version  ·  Matrix',
+                style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          if (PlatformInfos.isAndroid) ...[
-            _AboutCard(
-              icon: Icons.system_update_alt,
-              title: 'Check for updates',
-              sub: 'Get the newest Vibe from GitHub',
-              trailing: Icons.chevron_right,
-              onTap: () => VibeUpdatesPage.open(context),
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 20,
+            child: Text(
+              _status,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
             ),
-            const SizedBox(height: 12),
+          ),
+          if (PlatformInfos.isAndroid) ...[
+            const SizedBox(height: 10),
+            _AboutButton(
+              text: 'Check for updates',
+              filled: true,
+              onTap: _check,
+            ),
           ],
-          _AboutCard(
-            icon: Icons.shield_outlined,
-            title: 'How Vibe keeps you safe',
-            sub: 'Replay the welcome tour',
-            trailing: Icons.chevron_right,
+          const SizedBox(height: 10),
+          _AboutButton(
+            text: 'Source code on GitHub',
+            onTap: () => launchUrlString(
+              VibeAppInfo.githubUrl,
+              mode: LaunchMode.externalApplication,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _AboutButton(
+            text: 'Credits',
+            onTap: () => VibeCreditsSheet.show(context),
+          ),
+          const SizedBox(height: 10),
+          _AboutButton(
+            text: 'How Vibe keeps you safe',
             onTap: () => showDialog<void>(
               context: context,
               useSafeArea: false,
@@ -123,89 +162,159 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          _AboutCard(
-            icon: Icons.code,
-            title: 'Source code on GitHub',
-            sub: VibeAppInfo.githubUrl.replaceFirst('https://', ''),
-            extra: VibeAppInfo.githubOwner,
-            trailing: Icons.open_in_new,
-            onTap: () => launchUrlString(
-              VibeAppInfo.githubUrl,
-              mode: LaunchMode.externalApplication,
+          const SizedBox(height: 16),
+          Text(
+            'Free software based on FluffyChat (GNU AGPL v3).\n'
+            'Your messages are end-to-end encrypted and the keys stay on your devices.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              height: 1.4,
+              color: cs.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: _cardDeco(cs),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'THE TEAM',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
-                    color: cs.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                for (final m in VibeAppInfo.team)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: cs.primary,
-                          child: Text(
-                            _initials(m.name),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: cs.onPrimary,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              m.name,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              m.role,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: cs.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 28),
-          Center(
+        ],
+      ),
+    );
+  }
+}
+
+/// Vibgram-style button: blurple pill, or outlined pill.
+class _AboutButton extends StatelessWidget {
+  final String text;
+  final bool filled;
+  final VoidCallback onTap;
+
+  const _AboutButton({
+    required this.text,
+    required this.onTap,
+    this.filled = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return SizedBox(
+      height: 48,
+      child: Material(
+        color: filled ? _blurple : Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: filled
+              ? BorderSide.none
+              : BorderSide(color: theme.dividerColor),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Center(
             child: Text(
-              'Built on the Matrix open standard',
-              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: filled ? Colors.white : cs.onSurface,
+              ),
             ),
           ),
-          const SizedBox(height: 4),
-          Center(
+        ),
+      ),
+    );
+  }
+}
+
+/// Credits: who made Vibe and what it is built on (like Vibgram's Credits).
+class VibeCreditsSheet extends StatelessWidget {
+  const VibeCreditsSheet({super.key});
+
+  static Future<void> show(BuildContext context) => showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    builder: (_) => const VibeCreditsSheet(),
+  );
+
+  // name, what it is, licence / note, link (or null)
+  static const List<List<String?>> _madeBy = [
+    [
+      'blackshadowde',
+      'Creator of Vibe and Vibgram',
+      'Design, features and builds',
+      'https://github.com/blackshadowde',
+    ],
+  ];
+
+  static final List<List<String?>> _team = [
+    for (final m in VibeAppInfo.team) [m.name, m.role, null, null],
+  ];
+
+  static const List<List<String?>> _builtOn = [
+    [
+      'FluffyChat',
+      'The app Vibe is built on',
+      'GNU AGPL v3 · Christian Kußowski and contributors',
+      'https://github.com/krille-chan/fluffychat',
+    ],
+    [
+      'Matrix',
+      'The open standard Vibe talks over',
+      'Apache License 2.0 · The Matrix.org Foundation',
+      'https://matrix.org',
+    ],
+    ['GG Sans', 'Typeface', '© Discord Inc.', null],
+    [
+      'Noto Animated Emoji',
+      'Animated reactions in the message menu',
+      'CC BY 4.0 · Google',
+      'https://googlefonts.github.io/noto-emoji-animation/',
+    ],
+    [
+      'ntfy',
+      'Optional notifications without Google',
+      'Apache License 2.0 / GPL v2',
+      'https://ntfy.sh',
+    ],
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.85,
+      maxChildSize: 0.95,
+      builder: (context, scroll) => ListView(
+        controller: scroll,
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
-              '© ${DateTime.now().year} ${VibeAppInfo.name}',
+              'Credits',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: cs.onSurface,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 0),
+            child: Text(
+              'The people and projects behind Vibe',
+              style: TextStyle(fontSize: 15, color: cs.onSurfaceVariant),
+            ),
+          ),
+          ..._section(context, 'MADE BY', _madeBy),
+          if (_team.isNotEmpty) ..._section(context, 'TEAM', _team),
+          ..._section(context, 'BUILT ON', _builtOn),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 18, 4, 0),
+            child: Text(
+              'Vibe is free software under the GNU AGPL v3, like FluffyChat. '
+              'It is not made by or affiliated with Discord. Tap a card to open its page.',
               style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
             ),
           ),
@@ -214,96 +323,80 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
     );
   }
 
-  static String _initials(String name) {
-    final letters = name.replaceAll(RegExp(r'[^A-Za-z ]'), ' ').trim();
-    final parts = letters.split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
-    if (parts.isEmpty) return '?';
-    return parts.take(2).map((p) => p[0].toUpperCase()).join();
-  }
-}
-
-BoxDecoration _cardDeco(ColorScheme cs) => BoxDecoration(
-  color: cs.surfaceContainerHigh,
-  borderRadius: BorderRadius.circular(24),
-  border: Border.all(color: cs.outlineVariant),
-);
-
-class _AboutCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String sub;
-  final String? extra;
-  final IconData trailing;
-  final VoidCallback onTap;
-
-  const _AboutCard({
-    required this.icon,
-    required this.title,
-    required this.sub,
-    required this.trailing,
-    required this.onTap,
-    this.extra,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24),
-        onTap: onTap,
-        child: Ink(
-          padding: const EdgeInsets.all(16),
-          decoration: _cardDeco(cs),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: cs.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
+  List<Widget> _section(
+    BuildContext context,
+    String label,
+    List<List<String?>> rows,
+  ) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(4, 20, 4, 6),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+            color: cs.onSurfaceVariant,
+          ),
+        ),
+      ),
+      for (final r in rows)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Material(
+            color: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: theme.dividerColor),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: r[3] == null
+                  ? null
+                  : () => launchUrlString(
+                      r[3]!,
+                      mode: LaunchMode.externalApplication,
+                    ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
                 ),
-                child: Icon(icon, size: 22, color: const Color(0xFFC9CFFF)),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
+                      r[0] ?? '',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: r[3] != null ? _blurple : cs.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      sub,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: cs.onSurfaceVariant,
-                      ),
+                      r[1] ?? '',
+                      style: TextStyle(fontSize: 14, color: cs.onSurface),
                     ),
-                    if (extra != null)
+                    if (r[2] != null) ...[
+                      const SizedBox(height: 2),
                       Text(
-                        extra!,
+                        r[2]!,
                         style: TextStyle(
-                          fontSize: 10.5,
-                          fontFamily: 'RobotoMono',
+                          fontSize: 13,
                           color: cs.onSurfaceVariant,
                         ),
                       ),
+                    ],
                   ],
                 ),
               ),
-              Icon(trailing, size: 20, color: cs.onSurfaceVariant),
-            ],
+            ),
           ),
         ),
-      ),
-    );
+    ];
   }
 }

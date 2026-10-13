@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
@@ -56,7 +57,7 @@ class SettingsSecurityView extends StatelessWidget {
                   ),
                 );
               }
-              return Column(
+              return VibeGroups(
                 children: [
                   ListTile(
                     title: Text(

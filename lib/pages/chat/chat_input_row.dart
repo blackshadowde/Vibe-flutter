@@ -139,7 +139,9 @@ class ChatInputRow extends StatelessWidget {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(10, 6, 0, 8),
-                      padding: const EdgeInsets.all(6),
+                      // Vibgram proportions: slimmer pill, so the whole
+                      // "# Message | name" hint fits.
+                      padding: const EdgeInsets.fromLTRB(6, 4, 2, 4),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(32),
@@ -176,9 +178,7 @@ class ChatInputRow extends StatelessWidget {
                             ),
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
+                              padding: const EdgeInsets.only(left: 12, right: 4),
                               child: InputBar(
                                 room: controller.room,
                                 minLines: 1,
@@ -200,8 +200,13 @@ class ChatInputRow extends StatelessWidget {
                                   ),
                                   counter: const SizedBox.shrink(),
                                   hintText:
-                                      'Message | ${controller.room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)))}',
+                                      '# Message | ${controller.room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)))}',
                                   hintMaxLines: 1,
+                                  hintStyle: TextStyle(
+                                    fontSize: 16,
+                                    overflow: TextOverflow.ellipsis,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
                                   border: InputBorder.none,
                                   enabledBorder: InputBorder.none,
                                   focusedBorder: InputBorder.none,
@@ -230,6 +235,7 @@ class ChatInputRow extends StatelessWidget {
                           ),
                           IconButton(
                             tooltip: L10n.of(context).emojis,
+                            visualDensity: VisualDensity.compact,
                             icon: Icon(
                               controller.showEmojiPicker
                                   ? Icons.keyboard
@@ -238,15 +244,8 @@ class ChatInputRow extends StatelessWidget {
                             ),
                             onPressed: controller.emojiPickerAction,
                           ),
-                          if (PlatformInfos.isMobile)
-                            IconButton(
-                              tooltip: L10n.of(context).takeAPhoto,
-                              icon: const Icon(Icons.photo_camera_outlined),
-                              onPressed: () =>
-                                  controller.onAddPopupMenuButtonSelected(
-                                    AddPopupMenuActions.photoCamera,
-                                  ),
-                            ),
+                          // Camera lives in the + sheet (like Vibgram), so the
+                          // text field gets the room for the full hint.
                         ],
                       ),
                         ],

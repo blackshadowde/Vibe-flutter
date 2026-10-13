@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -64,9 +65,10 @@ class SettingsNotificationsView extends StatelessWidget {
                   context,
                 ).client.clientName];
             return SelectionArea(
-              child: Column(
+              child: VibeGroups(
                 children: [
                   if (PlatformInfos.isAndroid) const VibePushModeTiles(),
+                  if (PlatformInfos.isAndroid) const Divider(),
                   if (kDebugMode && lastReceivedPush != null)
                     ListTile(
                       title: Text('Last received push notification'),

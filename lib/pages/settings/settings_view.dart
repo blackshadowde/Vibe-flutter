@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_support.dart';
 import 'package:fluffychat/vibe/vibe_updater.dart';
 import 'package:fluffychat/vibe/vibe_updates_page.dart';
@@ -173,229 +174,119 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
     final backupOk = controller.cryptoIdentityConnected == true;
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          L10n.of(context).settings,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => context.go('/rooms'),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: ListView(
-        key: const Key('SettingsListViewContent'),
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(4, 0, 4, 4),
-            child: Text(
-              'Settings',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+    // Vibgram's Discord-style settings: title on the line of the close
+    // button, grey group titles, rounded cards with filled icons.
+    return VibeSettingsTheme(
+      child: Builder(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            leading: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => context.go('/rooms'),
+            ),
+            titleSpacing: 4,
+            title: Text(
+              L10n.of(context).settings,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 18),
-            child: Text(
-              'Manage your Vibe account & preferences',
-              style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
-            ),
-          ),
-          FutureBuilder<Profile>(
-            future: controller.profileFuture,
-            builder: (context, snapshot) {
-              final mxid =
-                  Matrix.of(context).client.userID ?? L10n.of(context).user;
-              final name = snapshot.data?.displayName ?? mxid.localpart ?? mxid;
-              return _SettingsCard(
-                icon: Icons.person,
-                title: 'Account',
-                subtitle: name,
-                onTap: () => _accountSheet(context),
-              );
-            },
-          ),
-          _SettingsCard(
-            icon: Icons.verified_user_outlined,
-            title: 'Security & sign-in',
-            subtitle: 'Password, sessions, privacy & link previews',
-            onTap: () => context.go('/rooms/settings/security'),
-          ),
-          _SettingsCard(
-            icon: Icons.lock,
-            title: 'Encryption & Keys',
-            subtitle: 'End-to-end encryption status',
-            badge: backupOk ? 'Active' : 'Not set up',
-            badgeColor: backupOk
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.error,
-            onTap: () => context.go('/rooms/settings/vibe-encryption'),
-          ),
-          _SettingsCard(
-            icon: Icons.notifications,
-            title: 'Notifications',
-            subtitle: 'In-app alerts & push notifications',
-            onTap: () => context.go('/rooms/settings/notifications'),
-          ),
-          _SettingsCard(
-            icon: Icons.contrast,
-            title: 'Appearance',
-            subtitle: 'Dark/light mode, font size & haptics',
-            onTap: () => context.go('/rooms/settings/style'),
-          ),
-          _SettingsCard(
-            icon: Icons.folder,
-            title: 'Chats & storage',
-            subtitle: 'Media downloads & storage',
-            onTap: () => context.go('/rooms/settings/chat'),
-          ),
-          ValueListenableBuilder<VibeRelease?>(
-            valueListenable: VibeUpdater.pending,
-            builder: (context, update, _) => _SettingsCard(
-              icon: Icons.system_update,
-              title: 'Updates',
-              subtitle: update == null
-                  ? 'Version, what\'s new & check for updates'
-                  : 'Vibe ${update.version} is ready to install',
-              badge: update == null ? null : 'Update',
-              badgeColor: const Color(0xFFF23F43),
-              onTap: () => VibeUpdatesPage.open(context),
-            ),
-          ),
-          _SettingsCard(
-            icon: Icons.favorite,
-            iconColor: const Color(0xFFF23F43),
-            title: 'Support Vibe',
-            subtitle: 'Donate with UPI: QR code & UPI ID',
-            onTap: () => VibeSupport.open(context),
-          ),
-          _SettingsCard(
-            icon: Icons.info,
-            title: 'About Vibe',
-            subtitle: 'App version & information',
-            onTap: () => context.go('/rooms/settings/vibe-about'),
-          ),
-          _SettingsCard(
-            icon: Icons.delete,
-            iconColor: Colors.redAccent,
-            title: 'Account management',
-            subtitle: 'Devices, homeserver & log out',
-            onTap: () => _managementSheet(context),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SettingsCard extends StatelessWidget {
-  final IconData icon;
-  final Color? iconColor;
-  final String title;
-  final String subtitle;
-  final String? badge;
-  final Color? badgeColor;
-  final VoidCallback onTap;
-
-  const _SettingsCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    this.iconColor,
-    this.badge,
-    this.badgeColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: theme.dividerColor),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-            child: Row(
-              children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: cs.surfaceContainerHighest,
+          body: ListView(
+            key: const Key('SettingsListViewContent'),
+            padding: const EdgeInsets.only(bottom: 32),
+            children: [
+              VibeSettingsGroup(
+                title: 'Account Settings',
+                rows: [
+                  FutureBuilder<Profile>(
+                    future: controller.profileFuture,
+                    builder: (context, snapshot) {
+                      final mxid =
+                          Matrix.of(context).client.userID ??
+                          L10n.of(context).user;
+                      final name =
+                          snapshot.data?.displayName ?? mxid.localpart ?? mxid;
+                      return VibeSettingsRow(
+                        icon: Icons.person,
+                        title: 'Account',
+                        value: name,
+                        onTap: () => _accountSheet(context),
+                      );
+                    },
                   ),
-                  child: Icon(icon, color: iconColor ?? cs.onSurface, size: 26),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+                  VibeSettingsRow(
+                    icon: Icons.shield,
+                    title: 'Security & sign-in',
+                    onTap: () => context.go('/rooms/settings/security'),
                   ),
-                ),
-                if (badge != null)
-                  Container(
-                    margin: const EdgeInsets.only(left: 8),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: (badgeColor ?? cs.primary).withAlpha(40),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: (badgeColor ?? cs.primary).withAlpha(140),
-                      ),
-                    ),
-                    child: Text(
-                      badge!,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: badgeColor ?? cs.primary,
-                      ),
+                  VibeSettingsRow(
+                    icon: Icons.lock,
+                    title: 'Encryption & Keys',
+                    value: backupOk ? 'Active' : 'Not set up',
+                    valueColor: backupOk
+                        ? null
+                        : const Color(0xFFF23F43),
+                    onTap: () =>
+                        context.go('/rooms/settings/vibe-encryption'),
+                  ),
+                  VibeSettingsRow(
+                    icon: Icons.devices,
+                    title: 'Account management',
+                    last: true,
+                    onTap: () => _managementSheet(context),
+                  ),
+                ],
+              ),
+              VibeSettingsGroup(
+                title: 'App Settings',
+                rows: [
+                  VibeSettingsRow(
+                    icon: Icons.notifications,
+                    title: 'Notifications',
+                    onTap: () => context.go('/rooms/settings/notifications'),
+                  ),
+                  VibeSettingsRow(
+                    icon: Icons.palette,
+                    title: 'Appearance',
+                    onTap: () => context.go('/rooms/settings/style'),
+                  ),
+                  VibeSettingsRow(
+                    icon: Icons.chat_bubble,
+                    title: 'Chats & storage',
+                    last: true,
+                    onTap: () => context.go('/rooms/settings/chat'),
+                  ),
+                ],
+              ),
+              VibeSettingsGroup(
+                title: 'Support',
+                rows: [
+                  ValueListenableBuilder<VibeRelease?>(
+                    valueListenable: VibeUpdater.pending,
+                    builder: (context, update, _) => VibeSettingsRow(
+                      icon: Icons.system_update,
+                      title: 'Updates',
+                      value: update == null ? null : 'Update ready',
+                      valueColor: const Color(0xFFF23F43),
+                      onTap: () => VibeUpdatesPage.open(context),
                     ),
                   ),
-                const SizedBox(width: 6),
-                Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
-              ],
-            ),
+                  VibeSettingsRow(
+                    icon: Icons.favorite,
+                    title: 'Support Vibe',
+                    onTap: () => VibeSupport.open(context),
+                  ),
+                  VibeSettingsRow(
+                    icon: Icons.info,
+                    title: 'About Vibe',
+                    last: true,
+                    onTap: () => context.go('/rooms/settings/vibe-about'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
