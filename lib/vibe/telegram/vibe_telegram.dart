@@ -68,6 +68,7 @@ class VibeTelegram extends ChangeNotifier {
   final Map<int, Map<String, dynamic>> users = {};
   final Map<int, String> _paths = {}; // file id -> local path
   final Set<int> _downloading = {};
+  final Map<int, double> _progress = {};
   bool _allChatsLoaded = false;
 
   /// Every raw update, for open chat screens.
@@ -230,11 +231,18 @@ class VibeTelegram extends ChangeNotifier {
       case 'updateFile':
         final f = (u['file'] as Map).cast<String, dynamic>();
         final local = (f['local'] as Map?)?.cast<String, dynamic>();
+        final id = _int(f['id']);
         if (local?['is_downloading_completed'] == true) {
-          final id = _int(f['id']);
           _paths[id] = local!['path'] as String;
           _downloading.remove(id);
+          _progress.remove(id);
           _changed();
+        } else if (local?['is_downloading_active'] == true) {
+          final size = _int(f['size']) > 0 ? _int(f['size']) : _int(f['expected_size']);
+          if (size > 0) {
+            _progress[id] = (_int(local!['downloaded_size']) / size).clamp(0.0, 1.0).toDouble();
+            _changed();
+          }
         }
     }
     updates.add(u);
@@ -331,7 +339,11 @@ class VibeTelegram extends ChangeNotifier {
   // ---- files and names ----
 
   /// Local path of a TDLib file, starting the download when needed.
-  String? pathOf(Map<String, dynamic>? file) {
+  String? pathOf(
+    Map<String, dynamic>? file, {
+    bool download = true,
+    int priority = 1,
+  }) {
     if (file == null) return null;
     final id = _int(file['id']);
     final known = _paths[id];
@@ -342,17 +354,48 @@ class VibeTelegram extends ChangeNotifier {
       _paths[id] = p;
       return p;
     }
-    if (_downloading.add(id)) {
+    if (download && _downloading.add(id)) {
       send({
         '@type': 'downloadFile',
         'file_id': id,
-        'priority': 1,
+        'priority': priority,
         'offset': 0,
         'limit': 0,
         'synchronous': false,
       }).ignore();
     }
     return null;
+  }
+
+  /// Downloads a file now (high priority) and returns its local path.
+  Future<String?> fetch(Map<String, dynamic>? file) async {
+    if (file == null) return null;
+    final ready = pathOf(file, download: false);
+    if (ready != null) return ready;
+    final id = _int(file['id']);
+    _downloading.add(id);
+    final f = await send({
+      '@type': 'downloadFile',
+      'file_id': id,
+      'priority': 32,
+      'offset': 0,
+      'limit': 0,
+      'synchronous': true,
+    });
+    final local = (f['local'] as Map?)?.cast<String, dynamic>();
+    if (local?['is_downloading_completed'] == true) {
+      final p = local!['path'] as String;
+      _paths[id] = p;
+      _downloading.remove(id);
+      return p;
+    }
+    return null;
+  }
+
+  /// 0..1 while a file downloads, null when not downloading.
+  double? progressOf(Map<String, dynamic>? file) {
+    if (file == null) return null;
+    return _progress[_int(file['id'])];
   }
 
   String userName(int id) {
