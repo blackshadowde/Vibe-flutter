@@ -15,8 +15,9 @@ import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-/// Vibe sign-in screen (matches the web app): username + password, or the
-/// matrix.org web login, plus create account.
+/// Vibe start screen. Opens on "Create your account" (on Unredacted by
+/// default, all inside the app); "Already have an account? Log in" switches
+/// to username + password.
 class IntroPage extends StatefulWidget {
   final bool isLoading, hasPresetHomeserver;
   final String? loggingInToHomeserver, welcomeText;
@@ -35,7 +36,11 @@ class IntroPage extends StatefulWidget {
   State<IntroPage> createState() => _IntroPageState();
 }
 
-class _IntroPageState extends State<IntroPage> {
+class _IntroPageState extends State<IntroPage>
+    with VibeSignUpMixin<IntroPage> {
+  /// Start on "Create your account": most people are new to Matrix.
+  bool _creating = true;
+
   final TextEditingController _user = TextEditingController();
   final TextEditingController _pass = TextEditingController();
   bool _showPass = false;
@@ -46,7 +51,9 @@ class _IntroPageState extends State<IntroPage> {
   static String _initialHomeserver() {
     final preset = AppSettings.presetHomeserver.value;
     final def = AppSettings.defaultHomeserver.value;
-    final raw = preset.isNotEmpty ? preset : (def.isNotEmpty ? def : 'matrix.org');
+    final raw = preset.isNotEmpty
+        ? preset
+        : (def.isNotEmpty ? def : 'matrix.unredacted.org');
     return raw.startsWith('http') ? raw : 'https://$raw';
   }
 
@@ -56,6 +63,18 @@ class _IntroPageState extends State<IntroPage> {
     _pass.dispose();
     super.dispose();
   }
+
+  @override
+  String get suHomeserver => _homeserver;
+
+  @override
+  Future<Client> suClient() => Matrix.of(context).getLoginClient();
+
+  @override
+  Future<void> suOpenWebSignUp() => _web(signUp: true);
+
+  @override
+  bool get suEmailRequired => true;
 
   Future<void> _signIn() async {
     final username = _user.text.trim();
@@ -69,6 +88,14 @@ class _IntroPageState extends State<IntroPage> {
       _error = null;
     });
     try {
+      // "@you:server" logs in on that server, whatever is picked below.
+      final full = RegExp(r'^@[^:\s]+:([^\s]+)$').firstMatch(username);
+      if (full != null) {
+        final server = full.group(1)!;
+        if (Uri.tryParse(_homeserver)?.host != server) {
+          setState(() => _homeserver = 'https://$server');
+        }
+      }
       final client = await Matrix.of(context).getLoginClient();
       await client.checkHomeserver(Uri.parse(_homeserver));
       final AuthenticationIdentifier identifier =
@@ -94,41 +121,6 @@ class _IntroPageState extends State<IntroPage> {
     }
   }
 
-  /// Servers with a web sign-up (matrix.org: SSO / OIDC) open that page.
-  /// Classic servers (e.g. Unredacted) get Vibe's own sign-up form.
-  Future<void> _createAccount() async {
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    try {
-      final client = await Matrix.of(context).getLoginClient();
-      final (_, _, loginFlows, authMetadata) = await client.checkHomeserver(
-        Uri.parse(_homeserver),
-        fetchAuthMetadata: true,
-      );
-      final web =
-          authMetadata != null ||
-          loginFlows.any((f) => f.type == 'm.login.sso');
-      if (!mounted) return;
-      setState(() => _busy = false);
-      if (web) {
-        await _web(signUp: true);
-        return;
-      }
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) =>
-              VibeSignUpPage(client: client, homeserver: _homeserver),
-        ),
-      );
-    } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
-    } finally {
-      if (mounted && _busy) setState(() => _busy = false);
-    }
-  }
-
   Future<void> _web({required bool signUp}) => connectToHomeserverFlow(
     PublicHomeserverData(name: _homeserver),
     context,
@@ -143,10 +135,18 @@ class _IntroPageState extends State<IntroPage> {
   /// Popular servers shown first. `name` is what we connect to (server
   /// discovery via .well-known finds the real address).
   static const _quickServers = [
-    (name: 'matrix.org', note: 'Default · free 10 MB files'),
-    (name: 'mozilla.org', note: 'Mozilla · sign in with a Mozilla account'),
-    (name: '4d2.org', note: 'Community · 150 MiB files'),
-    (name: 'tchncs.de', note: 'Community · Germany'),
+    (
+      name: 'matrix.unredacted.org',
+      title: 'Unredacted',
+      note: 'Recommended · free · sign up right here · 100 MB files',
+    ),
+    (
+      name: 'matrix.org',
+      title: 'Matrix.org',
+      note: 'Largest server · sign-up opens in the browser',
+    ),
+    (name: '4d2.org', title: '4d2.org', note: 'Community · 150 MiB files'),
+    (name: 'tchncs.de', title: 'tchncs.de', note: 'Community · Germany'),
   ];
 
   Future<void> _editHomeserver() async {
@@ -195,7 +195,7 @@ class _IntroPageState extends State<IntroPage> {
                         color: s.name == current ? cs.primary : null,
                       ),
                       title: Text(
-                        s.name,
+                        s.title,
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(s.note),
@@ -310,7 +310,8 @@ class _IntroPageState extends State<IntroPage> {
           ),
         );
 
-    Widget label(String t, {Widget? trailing}) => Padding(
+    Widget label(String t, {Widget? trailing, bool optional = false}) =>
+        Padding(
       padding: const EdgeInsets.only(bottom: 8, top: 4),
       child: Row(
         children: [
@@ -323,10 +324,23 @@ class _IntroPageState extends State<IntroPage> {
               color: muted,
             ),
           ),
-          const Text(
-            ' *',
-            style: TextStyle(color: Color(0xFFF23F42), fontWeight: FontWeight.w700),
-          ),
+          if (optional)
+            Text(
+              '  OPTIONAL',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: muted.withValues(alpha: 0.7),
+              ),
+            )
+          else
+            const Text(
+              ' *',
+              style: TextStyle(
+                color: Color(0xFFF23F42),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           const Spacer(),
           ?trailing,
         ],
@@ -371,7 +385,7 @@ class _IntroPageState extends State<IntroPage> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Welcome back!',
+                      _creating ? 'Create your account' : 'Welcome back!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 26,
@@ -381,168 +395,275 @@ class _IntroPageState extends State<IntroPage> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      "We're so excited to see you again!",
+                      _creating
+                          ? 'Free and end-to-end encrypted. No phone number needed.'
+                          : "We're so excited to see you again!",
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 15, color: muted),
                     ),
                     const SizedBox(height: 26),
-                    label('ACCOUNT / USERNAME'),
-                    TextField(
-                      controller: _user,
-                      enabled: !_busy,
-                      autocorrect: false,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      style: TextStyle(color: text, fontSize: 16),
-                      decoration: deco(
-                        'username or @user:matrix.org',
-                        Icons.person_outline,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    label(
-                      'PASSWORD',
-                      trailing: GestureDetector(
-                        onTap: () => launchUrlString(
-                          'https://app.element.io/#/forgot_password',
-                          mode: LaunchMode.externalApplication,
+                    if (_creating) ...[
+                      label('USERNAME'),
+                      TextField(
+                        controller: suUser,
+                        enabled: !suBusy,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.next,
+                        style: TextStyle(color: text, fontSize: 16),
+                        decoration: deco(
+                          'Pick a username',
+                          Icons.alternate_email,
                         ),
-                        child: const Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: link,
+                      ),
+                      const SizedBox(height: 14),
+                      label('PASSWORD'),
+                      TextField(
+                        controller: suPass,
+                        enabled: !suBusy,
+                        obscureText: !suShowPass,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.next,
+                        style: TextStyle(color: text, fontSize: 16),
+                        decoration: deco(
+                          'At least 8 characters',
+                          Icons.lock_outline,
+                          suffix: IconButton(
+                            icon: Icon(
+                              suShowPass
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: muted,
+                            ),
+                            onPressed: () =>
+                                setState(() => suShowPass = !suShowPass),
                           ),
                         ),
                       ),
-                    ),
-                    TextField(
-                      controller: _pass,
-                      enabled: !_busy,
-                      obscureText: !_showPass,
-                      autocorrect: false,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => _signIn(),
-                      style: TextStyle(color: text, fontSize: 16),
-                      decoration: deco(
-                        'Enter your password',
-                        Icons.lock_outline,
-                        suffix: IconButton(
-                          icon: Icon(
-                            _showPass
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            color: muted,
-                          ),
-                          onPressed: () =>
-                              setState(() => _showPass = !_showPass),
+                      const SizedBox(height: 14),
+                      label('REPEAT PASSWORD'),
+                      TextField(
+                        controller: suPass2,
+                        enabled: !suBusy,
+                        obscureText: !suShowPass,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.next,
+                        style: TextStyle(color: text, fontSize: 16),
+                        decoration: deco('Type it again', Icons.lock_outline),
+                      ),
+                      const SizedBox(height: 14),
+                      label('EMAIL'),
+                      TextField(
+                        controller: suEmail,
+                        enabled: !suBusy,
+                        autocorrect: false,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => suBusy ? null : suSubmit(),
+                        style: TextStyle(color: text, fontSize: 16),
+                        decoration: deco(
+                          'We\'ll send a link to confirm your account',
+                          Icons.mail_outline,
                         ),
                       ),
-                    ),
-                    if (_error != null) ...[
+                      if (suError != null) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          suError!,
+                          style: const TextStyle(
+                            color: Color(0xFFF23F42),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: 54,
+                        child: FilledButton(
+                          onPressed: suBusy ? null : suSubmit,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: blurple,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: blurple.withValues(
+                              alpha: 0.55,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          child: suBusy
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.4,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(suStatus ?? 'Please wait…'),
+                                  ],
+                                )
+                              : const Text('Create account'),
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       Text(
-                        _error!,
-                        style: const TextStyle(
-                          color: Color(0xFFF23F42),
-                          fontSize: 13,
+                        'Your account lives on ${VibeSignUpMixin.prettyServer(_homeserver)}. '
+                        'Open the confirmation email, tap the link, then come '
+                        'back to Vibe to finish.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12.5, color: muted),
+                      ),
+                    ] else ...[
+                      label('ACCOUNT / USERNAME'),
+                      TextField(
+                        controller: _user,
+                        enabled: !_busy,
+                        autocorrect: false,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        style: TextStyle(color: text, fontSize: 16),
+                        decoration: deco(
+                          'username or @you:server',
+                          Icons.person_outline,
                         ),
                       ),
-                    ],
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      height: 54,
-                      child: FilledButton(
-                        onPressed: _busy ? null : _signIn,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: blurple,
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor: blurple.withValues(
-                            alpha: 0.55,
+                      const SizedBox(height: 14),
+                      label(
+                        'PASSWORD',
+                        trailing: GestureDetector(
+                          onTap: () => launchUrlString(
+                            'https://app.element.io/#/forgot_password',
+                            mode: LaunchMode.externalApplication,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          textStyle: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        child: _busy
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.4,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text('Sign In'),
-                                  SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward, size: 20),
-                                ],
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Row(
-                      children: [
-                        Expanded(child: Divider(color: border)),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          child: Text(
-                            'OR',
+                          child: const Text(
+                            'Forgot Password?',
                             style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: muted,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: link,
                             ),
                           ),
                         ),
-                        Expanded(child: Divider(color: border)),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    SizedBox(
-                      height: 54,
-                      child: OutlinedButton.icon(
-                        onPressed: _busy ? null : () => _web(signUp: false),
-                        icon: const Icon(
-                          Icons.open_in_new,
-                          size: 20,
-                          color: link,
-                        ),
-                        label: Text(
-                          'Log in with ${Uri.tryParse(_homeserver)?.host.isNotEmpty == true ? _prettyHost(_homeserver) : 'Matrix.org'}',
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: text,
-                          backgroundColor: field,
-                          side: BorderSide(color: border),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          textStyle: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
+                      ),
+                      TextField(
+                        controller: _pass,
+                        enabled: !_busy,
+                        obscureText: !_showPass,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _signIn(),
+                        style: TextStyle(color: text, fontSize: 16),
+                        decoration: deco(
+                          'Enter your password',
+                          Icons.lock_outline,
+                          suffix: IconButton(
+                            icon: Icon(
+                              _showPass
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: muted,
+                            ),
+                            onPressed: () =>
+                                setState(() => _showPass = !_showPass),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
+                      if (_error != null) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          _error!,
+                          style: const TextStyle(
+                            color: Color(0xFFF23F42),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: 54,
+                        child: FilledButton(
+                          onPressed: _busy ? null : _signIn,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: blurple,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: blurple.withValues(
+                              alpha: 0.55,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          child: _busy
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.4,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('Sign In'),
+                                    SizedBox(width: 8),
+                                    Icon(Icons.arrow_forward, size: 20),
+                                  ],
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Center(
+                        child: TextButton(
+                          onPressed: _busy ? null : () => _web(signUp: false),
+                          child: Text(
+                            'Use the server\'s own login page',
+                            style: TextStyle(fontSize: 14, color: muted),
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
                     Center(
                       child: TextButton(
-                        onPressed: _busy ? null : _createAccount,
-                        child: const Text(
-                          'Create account',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: link,
+                        onPressed: suBusy || _busy
+                            ? null
+                            : () => setState(() {
+                                _creating = !_creating;
+                                _error = null;
+                                suError = null;
+                              }),
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: _creating
+                                    ? 'Already have an account? '
+                                    : 'New to Vibe? ',
+                                style: TextStyle(color: muted),
+                              ),
+                              TextSpan(
+                                text: _creating ? 'Log in' : 'Create an account',
+                                style: const TextStyle(
+                                  color: link,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
+                          style: const TextStyle(fontSize: 15),
                         ),
                       ),
                     ),
@@ -563,7 +684,7 @@ class _IntroPageState extends State<IntroPage> {
                               const SizedBox(width: 8),
                               Flexible(
                                 child: Text(
-                                  'Server: ${_prettyHost(_homeserver)} · Change',
+                                  'Server: ${VibeSignUpMixin.prettyServer(_homeserver)} · Change',
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 15,
@@ -607,11 +728,5 @@ class _IntroPageState extends State<IntroPage> {
         ),
       ),
     );
-  }
-
-  static String _prettyHost(String url) {
-    final h = Uri.parse(url).host;
-    if (h.isEmpty) return 'Matrix.org';
-    return h == 'matrix.org' ? 'Matrix.org' : h;
   }
 }

@@ -12,6 +12,8 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
+      ('👋', 'New start screen: create your account right in Vibe (on Unredacted by default, confirmed by email). Already have one? Tap Log in'),
+      ('🖼️', 'Profile pictures like Vibgram: grey with initials when there\'s no picture, round everywhere, rounded squares in the left rail'),
       ('🎉', 'Send with effects: type a message, long-press the send button and pick Like, Love, Fire, Party, LOL, Dislike, Poop or Balloons. It plays for you and for them, and the small emoji next to the message plays it again'),
       ('😂', 'Animated emoji: a message that is just one emoji is shown big and animated, each emoji with its own animation. Tap it for a burst'),
       ('🔍', 'Search emoji when reacting: long-press a message, tap the smiley and type to find any emoji'),
