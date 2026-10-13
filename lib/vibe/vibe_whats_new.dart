@@ -16,6 +16,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
       ('😂', 'Animated emoji: a message that is just one emoji is shown big and animated, each emoji with its own animation. Tap it for a burst'),
       ('🔍', 'Search emoji when reacting: long-press a message, tap the smiley and type to find any emoji'),
       ('🎨', 'Emoji picker in Vibe colours, with your favourites animated at the top'),
+      ('🕐', 'Status and local time fixed: new contacts see them right away, they stay the same on all your devices, and their profile always shows their time (or "same time as you")'),
     ],
   ),
   (

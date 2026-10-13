@@ -136,6 +136,7 @@ class VibeDmDetail extends StatelessWidget {
                                     room: room,
                                     userId: room.directChatMatrixID,
                                     maxLines: 2,
+                                    alwaysTime: true,
                                   ),
                                   const SizedBox(height: 2),
                                   Row(

@@ -24,12 +24,17 @@ class VibeStatus {
   final int? tzOffsetMin; // minutes from UTC when last updated
   final String? tzName;
 
+  /// When the status was last changed (ms). The newest one wins when you
+  /// use Vibe on more than one device.
+  final int updatedMs;
+
   const VibeStatus({
     this.emoji = '',
     this.text = '',
     this.untilMs,
     this.tzOffsetMin,
     this.tzName,
+    this.updatedMs = 0,
   });
 
   factory VibeStatus.fromContent(Map<String, Object?> c) => VibeStatus(
@@ -38,6 +43,7 @@ class VibeStatus {
     untilMs: c['until'] is int ? c['until'] as int : null,
     tzOffsetMin: c['tz_offset'] is int ? c['tz_offset'] as int : null,
     tzName: c['tz_name'] is String ? c['tz_name'] as String : null,
+    updatedMs: c['updated'] is int ? c['updated'] as int : 0,
   );
 
   Map<String, Object?> toContent() => {
@@ -46,7 +52,15 @@ class VibeStatus {
     if (untilMs != null) 'until': untilMs,
     if (tzOffsetMin != null) 'tz_offset': tzOffsetMin,
     if (tzName != null) 'tz_name': tzName,
+    if (updatedMs > 0) 'updated': updatedMs,
   };
+
+  /// Same status (ignoring the time zone, which every device adds itself).
+  bool sameAs(VibeStatus o) =>
+      emoji == o.emoji &&
+      text == o.text &&
+      untilMs == o.untilMs &&
+      updatedMs == o.updatedMs;
 
   bool get active =>
       text.trim().isNotEmpty &&
@@ -63,23 +77,38 @@ class VibeStatus {
     return VibeStatus.fromContent(c);
   }
 
-  /// My status: kept on this phone (so it survives hiding it from people),
-  /// otherwise read from any direct chat that has it.
-  static VibeStatus? mine(Client client) {
+  static VibeStatus? _saved() {
     final saved = AppSettings.vibeMyStatus.value;
-    if (saved.isNotEmpty) {
-      try {
-        final c = jsonDecode(saved);
-        if (c is Map) return VibeStatus.fromContent(Map<String, Object?>.from(c));
-      } catch (_) {}
-    }
+    if (saved.isEmpty) return null;
+    try {
+      final c = jsonDecode(saved);
+      if (c is Map) return VibeStatus.fromContent(Map<String, Object?>.from(c));
+    } catch (_) {}
+    return null;
+  }
+
+  /// Newest copy of my status found in my direct chats (set from any of my
+  /// devices), or null.
+  static VibeStatus? _newestInChats(Client client) {
+    VibeStatus? best;
     for (final r in client.rooms) {
       if (!r.isDirectChat || r.membership != Membership.join) continue;
       final c = r.getState(type, client.userID!)?.content;
       if (c == null || c['hidden'] == true) continue;
-      return VibeStatus.fromContent(c);
+      final s = VibeStatus.fromContent(c);
+      if (best == null || s.updatedMs > best.updatedMs) best = s;
     }
-    return null;
+    return best;
+  }
+
+  /// My status: the newest of the copy on this phone (kept so it survives
+  /// hiding it from people) and what my other devices set.
+  static VibeStatus? mine(Client client) {
+    final saved = _saved();
+    final chats = _newestInChats(client);
+    if (saved == null) return chats;
+    if (chats != null && chats.updatedMs > saved.updatedMs) return chats;
+    return saved;
   }
 
   /// Status privacy: may the person in direct chat [room] see my status and
@@ -112,29 +141,65 @@ class VibeStatus {
       untilMs: s.untilMs,
       tzOffsetMin: now.timeZoneOffset.inMinutes,
       tzName: now.timeZoneName,
+      updatedMs: s.updatedMs,
     );
   }
 
-  /// Save [s] to every direct chat. Rooms where it can't be set are skipped.
-  static Future<int> publish(Client client, VibeStatus s) async {
-    await AppSettings.vibeMyStatus.setItem(jsonEncode(s.toContent()));
-    final content = _withMyZone(s).toContent();
+  /// Writes my status (or the hidden placeholder) into one chat.
+  static Future<bool> _write(
+    Client client,
+    Room r,
+    Map<String, Object?> content,
+  ) async {
+    try {
+      await client.setRoomStateWithKey(
+        r.id,
+        type,
+        client.userID!,
+        visibleIn(r) ? content : _hiddenContent,
+      );
+      _failed.remove(r.id);
+      return true;
+    } catch (e) {
+      // Usually: not allowed to change this chat's settings.
+      _failed.add(r.id);
+      Logs().d('Vibe status: could not set in ${r.id}', e);
+      return false;
+    }
+  }
+
+  /// Chats where writing failed; tried again only every few hours.
+  static final Set<String> _failed = {};
+  static DateTime _failedSince = DateTime.now();
+
+  /// Runs [jobs] a few at a time, so a phone with many chats is quick
+  /// without hitting the server's rate limit.
+  static Future<int> _inBatches(List<Future<bool> Function()> jobs) async {
     var ok = 0;
-    for (final r in client.rooms.toList()) {
-      if (!r.isDirectChat || r.membership != Membership.join) continue;
-      try {
-        await client.setRoomStateWithKey(
-          r.id,
-          type,
-          client.userID!,
-          visibleIn(r) ? content : _hiddenContent,
-        );
-        ok++;
-      } catch (e) {
-        Logs().d('Vibe status: could not set in ${r.id}', e);
-      }
+    for (var i = 0; i < jobs.length; i += 4) {
+      final results = await Future.wait(
+        jobs.skip(i).take(4).map((j) => j()),
+      );
+      ok += results.where((r) => r).length;
     }
     return ok;
+  }
+
+  /// Save [s] to every direct chat. Returns in how many chats it was set.
+  static Future<int> publish(Client client, VibeStatus s) async {
+    final stamped = VibeStatus(
+      emoji: s.emoji,
+      text: s.text,
+      untilMs: s.untilMs,
+      updatedMs: DateTime.now().millisecondsSinceEpoch,
+    );
+    await AppSettings.vibeMyStatus.setItem(jsonEncode(stamped.toContent()));
+    final content = _withMyZone(stamped).toContent();
+    _failed.clear();
+    final rooms = client.rooms
+        .where((r) => r.isDirectChat && r.membership == Membership.join)
+        .toList();
+    return _inBatches([for (final r in rooms) () => _write(client, r, content)]);
   }
 
   static StreamSubscription? _watchSub;
@@ -202,36 +267,43 @@ class VibeStatus {
   /// Cheap: only writes where something is missing or out of date.
   static Future<void> refresh(Client client) async {
     if (!client.isLogged()) return;
+    // A newer status from another of my devices becomes this phone's too.
+    final saved = _saved();
+    final fromChats = _newestInChats(client);
+    if (fromChats != null &&
+        (saved == null || fromChats.updatedMs > saved.updatedMs)) {
+      await AppSettings.vibeMyStatus.setItem(
+        jsonEncode(
+          VibeStatus(
+            emoji: fromChats.emoji,
+            text: fromChats.text,
+            untilMs: fromChats.untilMs,
+            updatedMs: fromChats.updatedMs,
+          ).toContent(),
+        ),
+      );
+    }
     final current = mine(client) ?? const VibeStatus();
     final zone = DateTime.now().timeZoneOffset.inMinutes;
     final content = _withMyZone(current).toContent();
+    if (DateTime.now().difference(_failedSince).inHours >= 6) {
+      _failed.clear();
+      _failedSince = DateTime.now();
+    }
+    final jobs = <Future<bool> Function()>[];
     for (final r in client.rooms.toList()) {
       if (!r.isDirectChat || r.membership != Membership.join) continue;
+      if (_failed.contains(r.id)) continue;
       final had = r.getState(type, client.userID!)?.content;
-      final visible = visibleIn(r);
-      if (!visible) {
+      if (!visibleIn(r)) {
         if (had != null && had['hidden'] == true) continue;
-      } else {
-        final s = had == null || had['hidden'] == true
-            ? null
-            : VibeStatus.fromContent(had);
-        if (s != null &&
-            s.tzOffsetMin == zone &&
-            s.text == current.text &&
-            s.emoji == current.emoji &&
-            s.untilMs == current.untilMs) {
-          continue;
-        }
+      } else if (had != null && had['hidden'] != true) {
+        final s = VibeStatus.fromContent(had);
+        if (s.tzOffsetMin == zone && s.sameAs(current)) continue;
       }
-      try {
-        await client.setRoomStateWithKey(
-          r.id,
-          type,
-          client.userID!,
-          visible ? content : _hiddenContent,
-        );
-      } catch (_) {}
+      jobs.add(() => _write(client, r, content));
     }
+    await _inBatches(jobs);
   }
 }
 
@@ -260,6 +332,9 @@ class VibeStatusLine extends StatefulWidget {
   final Room room;
   final String? userId;
   final bool showTime;
+
+  /// Also show their time when it's the same as yours ("same time as you").
+  final bool alwaysTime;
   final TextStyle? style;
   final String? fallback;
   final int maxLines;
@@ -267,6 +342,7 @@ class VibeStatusLine extends StatefulWidget {
     required this.room,
     required this.userId,
     this.showTime = true,
+    this.alwaysTime = false,
     this.style,
     this.fallback,
     this.maxLines = 1,
@@ -314,13 +390,19 @@ class _VibeStatusLineState extends State<VibeStatusLine> {
     }
     final myZone = DateTime.now().timeZoneOffset.inMinutes;
     final theirZone = s?.tzOffsetMin;
-    if (widget.showTime && theirZone != null && theirZone != myZone) {
+    if (widget.showTime &&
+        theirZone != null &&
+        (theirZone != myZone || widget.alwaysTime)) {
       final t = DateTime.now().toUtc().add(Duration(minutes: theirZone));
       final night = t.hour < 6 || t.hour >= 21;
       final clock = MaterialLocalizations.of(
         context,
       ).formatTimeOfDay(TimeOfDay(hour: t.hour, minute: t.minute));
-      parts.add('${night ? '🌙' : '☀️'} $clock there');
+      parts.add(
+        theirZone == myZone
+            ? '${night ? '🌙' : '☀️'} $clock · same time as you'
+            : '${night ? '🌙' : '☀️'} $clock there',
+      );
     }
     final text = parts.isEmpty ? widget.fallback : parts.join('  ·  ');
     if (text == null || text.isEmpty) return const SizedBox.shrink();
