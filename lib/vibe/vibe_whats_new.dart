@@ -10,6 +10,22 @@ import 'package:package_info_plus/package_info_plus.dart';
 /// number is added automatically by the release workflow).
 const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
+    version: '2.1',
+    items: [
+      ('🔔', 'Notifications like Vibgram: Vibe stays connected and shows messages the moment they arrive. Settings → Notifications → Direct connection'),
+      ('💾', 'Chat backups: save every chat to a password-locked file on your phone or Google Drive, and open it any time to read old chats. Settings → Backups'),
+      ('🔁', 'Automatic backups every day or week, kept in Downloads/Vibe backups even if Vibe is uninstalled'),
+      ('🙈', 'Status privacy: choose who sees your status and local time (everyone, people you pick, or nobody). Settings → Security & sign-in'),
+      ('👻', 'Hide online and last seen: nobody sees when you\'re online or were last active'),
+      ('⚙️', 'New Settings look: rounded cards, filled icons and the same calm colours on every page'),
+      ('😂', 'Animated emojis in the message menu'),
+      ('✍️', 'New typing indicator: their picture and three bouncing dots, right above the message box'),
+      ('#️⃣', 'Middle pane: # | media, # | links, # | files and # | starred-messages'),
+      ('⌨️', 'Roomier message box: "# Message | name" fits, and the camera moved into the + menu'),
+      ('ℹ️', 'A cleaner About page and a new Credits page'),
+    ],
+  ),
+  (
     version: '2.0',
     items: [
       ('🔔', 'Built-in notifications (no Google) now actually work. If you use them, just open Vibe once after updating'),

@@ -7,6 +7,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
+import 'package:fluffychat/vibe/vibe_privacy.dart';
 import 'package:fluffychat/vibe/vibe_direct.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/client_manager.dart';
@@ -318,6 +319,7 @@ class MatrixState extends State<Matrix> {
 
   void initMatrix() {
     for (final c in widget.clients) {
+      if (VibePrivacy.hidePresence) c.syncPresence = PresenceType.offline;
       _registerSubs(c.clientName);
     }
 
@@ -367,9 +369,10 @@ class MatrixState extends State<Matrix> {
         state != AppLifecycleState.inactive &&
         state != AppLifecycleState.paused;
     for (final client in widget.clients) {
-      client.syncPresence = state == AppLifecycleState.resumed
-          ? null
-          : PresenceType.unavailable;
+      // Vibe privacy: "Hide online and last seen" always sends offline.
+      client.syncPresence = VibePrivacy.presenceFor(
+        resumed: state == AppLifecycleState.resumed,
+      );
       if (PlatformInfos.isMobile) {
         // Vibe Direct connection keeps the connection open in the background.
         client.backgroundSync = foreground || VibeDirect.enabled;

@@ -2,6 +2,9 @@
 
 import 'dart:async';
 
+import 'dart:convert';
+
+import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_set_status.dart';
 import 'package:flutter/material.dart';
@@ -60,15 +63,46 @@ class VibeStatus {
     return VibeStatus.fromContent(c);
   }
 
-  /// My status (from any direct chat that has it).
+  /// My status: kept on this phone (so it survives hiding it from people),
+  /// otherwise read from any direct chat that has it.
   static VibeStatus? mine(Client client) {
+    final saved = AppSettings.vibeMyStatus.value;
+    if (saved.isNotEmpty) {
+      try {
+        final c = jsonDecode(saved);
+        if (c is Map) return VibeStatus.fromContent(Map<String, Object?>.from(c));
+      } catch (_) {}
+    }
     for (final r in client.rooms) {
       if (!r.isDirectChat || r.membership != Membership.join) continue;
-      final s = of(r, client.userID);
-      if (s != null) return s;
+      final c = r.getState(type, client.userID!)?.content;
+      if (c == null || c['hidden'] == true) continue;
+      return VibeStatus.fromContent(c);
     }
     return null;
   }
+
+  /// Status privacy: may the person in direct chat [room] see my status and
+  /// local time? (Settings > Security & sign-in > Status & local time.)
+  static bool visibleIn(Room room) {
+    switch (AppSettings.vibeStatusAudience.value) {
+      case 'nobody':
+        return false;
+      case 'picked':
+        final other = room.directChatMatrixID;
+        if (other == null) return false;
+        return AppSettings.vibeStatusAllowed.value.split(',').contains(other);
+      default:
+        return true;
+    }
+  }
+
+  /// What a person who may not see my status gets: nothing, not even my time.
+  static const Map<String, Object?> _hiddenContent = {
+    'emoji': '',
+    'text': '',
+    'hidden': true,
+  };
 
   static VibeStatus _withMyZone(VibeStatus s) {
     final now = DateTime.now();
@@ -83,12 +117,18 @@ class VibeStatus {
 
   /// Save [s] to every direct chat. Rooms where it can't be set are skipped.
   static Future<int> publish(Client client, VibeStatus s) async {
+    await AppSettings.vibeMyStatus.setItem(jsonEncode(s.toContent()));
     final content = _withMyZone(s).toContent();
     var ok = 0;
     for (final r in client.rooms.toList()) {
       if (!r.isDirectChat || r.membership != Membership.join) continue;
       try {
-        await client.setRoomStateWithKey(r.id, type, client.userID!, content);
+        await client.setRoomStateWithKey(
+          r.id,
+          type,
+          client.userID!,
+          visibleIn(r) ? content : _hiddenContent,
+        );
         ok++;
       } catch (e) {
         Logs().d('Vibe status: could not set in ${r.id}', e);
@@ -106,12 +146,25 @@ class VibeStatus {
     final content = _withMyZone(current).toContent();
     for (final r in client.rooms.toList()) {
       if (!r.isDirectChat || r.membership != Membership.join) continue;
-      final s = of(r, client.userID);
-      if (s != null && s.tzOffsetMin == zone && s.text == current.text) {
-        continue;
+      final had = r.getState(type, client.userID!)?.content;
+      final visible = visibleIn(r);
+      if (!visible) {
+        if (had != null && had['hidden'] == true) continue;
+      } else {
+        final s = had == null || had['hidden'] == true
+            ? null
+            : VibeStatus.fromContent(had);
+        if (s != null && s.tzOffsetMin == zone && s.text == current.text) {
+          continue;
+        }
       }
       try {
-        await client.setRoomStateWithKey(r.id, type, client.userID!, content);
+        await client.setRoomStateWithKey(
+          r.id,
+          type,
+          client.userID!,
+          visible ? content : _hiddenContent,
+        );
       } catch (_) {}
     }
   }

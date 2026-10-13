@@ -156,7 +156,9 @@ class AppStarter with WidgetsBindingObserver {
     // Switching to foreground mode needs to reenable send online sync presence.
     for (final client in clients) {
       client.backgroundSync = true;
-      client.syncPresence = PresenceType.online;
+      client.syncPresence = AppSettings.vibeHidePresence.value
+          ? PresenceType.offline
+          : PresenceType.online;
     }
     startGui(clients, store);
     // We must make sure that the GUI is only started once.

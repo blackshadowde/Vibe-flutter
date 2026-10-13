@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_privacy.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/setting_keys.dart';
@@ -88,6 +89,7 @@ class SettingsSecurityView extends StatelessWidget {
                         'links are shared in your chats.',
                     setting: AppSettings.vibeLinkPreviews,
                   ),
+                  const VibePrivacyTiles(),
                   ListTile(
                     trailing: const Icon(Icons.chevron_right_outlined),
                     title: Text(L10n.of(context).blockedUsers),

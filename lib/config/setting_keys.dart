@@ -92,6 +92,16 @@ enum AppSettings<T> {
   // via the Worker) or 'builtin' (ntfy, no Google)
   vibePushMode<String>('chat.vibe.push_mode', 'direct'),
   vibeDirectBatteryAsked<bool>('chat.vibe.direct_battery_asked', false),
+  // Privacy: hide online / last seen; who sees my status and local time
+  // ('everyone', 'picked' or 'nobody'); picked = comma-separated user ids.
+  vibeHidePresence<bool>('chat.vibe.hide_presence', false),
+  vibeStatusAudience<String>('chat.vibe.status_audience', 'everyone'),
+  vibeStatusAllowed<String>('chat.vibe.status_allowed', ''),
+  vibeMyStatus<String>('chat.vibe.my_status', ''),
+  // Chat backups: auto backup 'off', 'daily' or 'weekly'.
+  vibeAutoBackup<String>('chat.vibe.auto_backup', 'off'),
+  vibeLastAutoBackup<int>('chat.vibe.last_auto_backup', 0),
+  vibeAutoBackupResult<String>('chat.vibe.auto_backup_result', ''),
   vibeNtfyTopic<String>('chat.vibe.ntfy_topic', ''),
   vibeNtfyLastId<String>('chat.vibe.ntfy_last_id', ''),
   // Days to keep downloaded media on this phone. 0 = forever.

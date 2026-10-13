@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_backup.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_support.dart';
@@ -255,8 +256,21 @@ class SettingsView extends StatelessWidget {
                   VibeSettingsRow(
                     icon: Icons.chat_bubble,
                     title: 'Chats & storage',
-                    last: true,
                     onTap: () => context.go('/rooms/settings/chat'),
+                  ),
+                  VibeSettingsRow(
+                    icon: Icons.backup,
+                    title: 'Backups',
+                    value: AppSettings.vibeAutoBackup.value == 'off'
+                        ? null
+                        : 'Auto',
+                    last: true,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const VibeSettingsTheme(child: VibeBackupPage()),
+                      ),
+                    ),
                   ),
                 ],
               ),

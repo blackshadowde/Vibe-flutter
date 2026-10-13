@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:cross_file/cross_file.dart';
+import 'package:fluffychat/vibe/vibe_backup.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_list/chat_list_view.dart';
@@ -388,6 +389,8 @@ class ChatListController extends State<ChatList>
           context,
         ).store.getString(_serverStoreNamespace);
         Matrix.of(context).backgroundPush?.setupPush(context);
+        // Vibe automatic chat backup, when one is due.
+        VibeBackup.maybeAuto(Matrix.of(context).client);
         UpdateNotifier.showUpdateDialog(context);
       }
 
