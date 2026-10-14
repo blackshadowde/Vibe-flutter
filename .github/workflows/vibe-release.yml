@@ -130,9 +130,6 @@ jobs:
             echo "storeFile=../key.jks"
           } > android/key.properties
 
-      - name: Element Call (voice and video calls)
-        run: ./scripts/fetch_element_call.sh
-
       - run: flutter pub get
 
       - name: Check code (fails fast with the exact error)

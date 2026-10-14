@@ -9,7 +9,7 @@ publish_to: none
 # On version bump please also increase:
 # 1. The build number (for F-Droid)
 # 2. The version in /snap/snapcraft.yaml
-version: 3.0.0+1
+version: 3.1.0+1
 
 environment:
   sdk: ">=3.11.1 <4.0.0"
@@ -42,7 +42,7 @@ dependencies:
   flutter_shortcuts_new: ^2.0.0
   flutter_vodozemac: ^0.7.1
   flutter_web_auth_2: ^5.0.3
-  flutter_webrtc: ^1.5.2
+  flutter_webrtc: ^1.6.2
   geolocator: ^14.0.3
   go_router: ^17.3.0
   handy_window: ^0.4.2
@@ -55,6 +55,7 @@ dependencies:
   just_audio: ^0.10.6
   latlong2: ^0.10.1
   local_auth: ^3.0.2
+  livekit_client: ^2.13.1
   matrix: ^10.0.1
   mime: ^2.0.0
   photo_manager: ^3.0.0
@@ -88,8 +89,6 @@ dependencies:
   video_compress: ^3.1.4
   video_player: ^2.13.0
   wakelock_plus: ^1.7.0
-  webview_flutter: ^4.14.1
-  webview_flutter_android: ^4.14.1
   webrtc_interface: ^1.5.1
 
 dev_dependencies:
@@ -110,9 +109,6 @@ flutter:
     - assets/logo/mini/
     - assets/sounds/
     - assets/vodozemac/
-    - assets/vibe_call/
-    - assets/element-call/
-    - assets/element-call/assets/
   fonts:
     # Figtree (SIL Open Font License, assets/fonts/Figtree-OFL.txt)
     - family: Figtree

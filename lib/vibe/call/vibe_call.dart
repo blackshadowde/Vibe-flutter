@@ -5,25 +5,46 @@ import 'dart:convert';
 
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/start_push_foreground_service.dart';
-import 'package:fluffychat/vibe/call/vibe_call_driver.dart';
+import 'package:fluffychat/vibe/call/vibe_call_keys.dart';
 import 'package:fluffychat/vibe/call/vibe_call_members.dart';
-import 'package:fluffychat/vibe/call/vibe_call_server.dart';
+import 'package:fluffychat/vibe/call/vibe_rtc_session.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
+import 'package:livekit_client/livekit_client.dart' as lk;
 import 'package:matrix/matrix.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 enum VibeCallStage { idle, connecting, inCall, leaving }
 
-/// One voice / video call at a time, like Sable: Element Call runs in a
-/// WebView that stays alive while you move around the app. The call can be
-/// full screen or shrunk to the green bar at the top.
+/// One person's picture in the call: camera, screen share, speaking.
+class VibeCallTile {
+  final String participantId;
+  final String userId;
+  final bool local;
+  final lk.VideoTrack? camera;
+  final lk.VideoTrack? screen;
+  final bool speaking;
+  final bool muted;
+
+  const VibeCallTile({
+    required this.participantId,
+    required this.userId,
+    required this.local,
+    required this.camera,
+    required this.screen,
+    required this.speaking,
+    required this.muted,
+  });
+}
+
+/// Native voice / video calls (Vibe 3.1). Same calls as Element Call,
+/// Element X and Sable (MatrixRTC on a LiveKit call server), but run by
+/// Vibe itself: LiveKit's Flutter SDK carries the audio and video, and
+/// Vibe writes the Matrix side (membership, ringing, encryption keys).
 class VibeCall extends ChangeNotifier {
   VibeCall._();
   static final VibeCall instance = VibeCall._();
@@ -32,9 +53,15 @@ class VibeCall extends ChangeNotifier {
 
   Room? room;
   VibeCallStage stage = VibeCallStage.idle;
-  WebViewController? web;
-  VibeCallDriver? _driver;
-  Map<String, Object?>? _config;
+
+  lk.Room? _lk;
+  lk.EventsListener<lk.RoomEvent>? _lkEvents;
+  VibeRtcSession? _session;
+  VibeCallKeys? _keys;
+  StreamSubscription? _stateSub;
+  StreamSubscription? _declineSub;
+  String? _ringEventId;
+  Timer? _noAnswer;
 
   /// Full screen (true) or the green bar (false).
   bool expanded = true;
@@ -43,19 +70,19 @@ class VibeCall extends ChangeNotifier {
   bool videoOn = false;
   bool soundOn = true;
   bool speakerOn = false;
+  bool screenOn = false;
+  bool frontCamera = true;
   bool _wantVideo = false;
-  bool _firstMedia = true;
   bool _hadService = false;
+
+  /// Your video big and theirs small (tap your video, like WhatsApp).
+  bool swapped = false;
 
   DateTime? joinedAt;
 
-  /// Show Element Call's video view (video calls, or "show video" in a
-  /// voice call). Otherwise Vibe's own call screen is shown.
+  /// Show the video view (video calls, or "show video" in a voice call).
+  /// Otherwise Vibe's voice call screen is shown.
   bool showStage = false;
-
-  /// Playing video streams in the call (yours included), and whether you
-  /// closed the video view yourself (then it doesn't pop back up).
-  int _videoCount = 0;
   bool _stageDismissed = false;
 
   /// Something went wrong before the call connected.
@@ -73,17 +100,20 @@ class VibeCall extends ChangeNotifier {
 
   Future<void> copyLog() async {
     final head = [
-      'Vibe call log',
+      'Vibe call log (native)',
       'room: ${room?.id}',
       'server: ${room?.client.homeserver}',
       'stage: ${stage.name}',
-      'call service: ${VibeCallServer.livekitServiceUrl ?? 'none found'}',
+      'call service: ${_serviceUrl ?? VibeCallSupport.lastServiceUrl ?? 'none found'}',
+      'encrypted: ${room?.encrypted}, keys received: ${_keys?.receivedCount ?? 0}',
     ];
     await Clipboard.setData(ClipboardData(text: [...head, ...log].join('\n')));
     _snack('Call log copied');
   }
 
-  /// People in the call other than you.
+  String? _serviceUrl;
+
+  /// People in the call other than you (from Matrix).
   List<String> get others {
     final r = room;
     if (r == null) return const [];
@@ -91,163 +121,7 @@ class VibeCall extends ChangeNotifier {
     return VibeCallMembers.userIds(r).where((u) => u != me).toList();
   }
 
-  Timer? _connectTimeout;
-  Completer<void>? _left;
-
-  /// One-to-one calls end when the other person leaves (like a phone call).
-  Timer? _aloneTimer;
-  bool _sawOthers = false;
-  int _aloneTicks = 0;
-
-  void _watchAlone() {
-    _aloneTimer?.cancel();
-    _sawOthers = false;
-    _aloneTicks = 0;
-    _aloneTimer = Timer.periodic(const Duration(seconds: 2), (_) {
-      final r = room;
-      if (r == null || !active) return;
-      final n = others.length;
-      if (n > 0) {
-        _sawOthers = true;
-        _aloneTicks = 0;
-        return;
-      }
-      if (!_sawOthers || !r.isDirectChat || stage != VibeCallStage.inCall) {
-        return;
-      }
-      // a couple of checks in a row, so a quick reconnect doesn't end it
-      if (++_aloneTicks >= 2) {
-        _log('the other person left, ending the call');
-        _snack('Call ended');
-        unawaited(hangup());
-      }
-    });
-  }
-
-  /// Call memberships of this device left behind by an earlier run of the
-  /// app (killed mid-call, crashed) make chats show a call forever. Clear
-  /// them once at start.
-  static Future<void> cleanupStale(Client client) async {
-    final device = client.deviceID;
-    final me = client.userID;
-    if (device == null || me == null) return;
-    for (final r in client.rooms) {
-      if (instance.isIn(r)) continue;
-      final states = r.states[VibeCallMembers.memberType];
-      if (states == null) continue;
-      final mine = states.entries.any(
-        (e) =>
-            e.value.senderId == me &&
-            e.value.content.isNotEmpty &&
-            e.key.contains(device),
-      );
-      if (!mine) continue;
-      Logs().i('Vibe call: clearing old call membership in ${r.id}');
-      await VibeCallDriver.clearOwnMembership(client, r.id);
-    }
-  }
-
-  /// Send an emoji reaction to everyone in the call (Element Call shows
-  /// it on your tile, and so does Vibe).
-  Future<void> react(String emoji, String name) async {
-    final r = room;
-    final target = _driver?.ownMembershipEventId;
-    if (r == null || target == null || stage != VibeCallStage.inCall) {
-      _snack('Reactions work once the call has connected.');
-      return;
-    }
-    VibeHaptics.light();
-    reactions.value = [...reactions.value, VibeCallReaction(emoji, r.client.userID!)];
-    try {
-      await r.sendEvent(
-        {
-          'm.relates_to': {'rel_type': 'm.reference', 'event_id': target},
-          'emoji': emoji,
-          'name': name,
-        },
-        type: VibeCallReaction.type,
-        displayPendingEvent: false,
-      );
-    } catch (e) {
-      _log('reaction failed: $e');
-    }
-  }
-
-  /// Raise or lower your hand.
-  String? _handEventId;
-  bool get handRaised => _handEventId != null;
-
-  Future<void> toggleHand() async {
-    final r = room;
-    final target = _driver?.ownMembershipEventId;
-    if (r == null || target == null || stage != VibeCallStage.inCall) {
-      _snack('Wait until the call has connected.');
-      return;
-    }
-    VibeHaptics.selection();
-    final old = _handEventId;
-    if (old == '') return; // still sending
-    if (old != null) {
-      _handEventId = null;
-      notifyListeners();
-      try {
-        await r.redactEvent(old);
-      } catch (e) {
-        _log('lower hand failed: $e');
-      }
-      return;
-    }
-    _handEventId = '';
-    notifyListeners();
-    try {
-      final id = await r.sendEvent(
-        {
-          'm.relates_to': {
-            'rel_type': 'm.annotation',
-            'event_id': target,
-            'key': '🖐️',
-          },
-        },
-        type: EventTypes.Reaction,
-        displayPendingEvent: false,
-      );
-      _handEventId = id;
-    } catch (e) {
-      _handEventId = null;
-      _log('raise hand failed: $e');
-    }
-    notifyListeners();
-  }
-
-  /// Reactions to float up the call screen (yours and other people's).
-  final ValueNotifier<List<VibeCallReaction>> reactions = ValueNotifier(
-    const [],
-  );
-  StreamSubscription? _reactionSub;
-
-  void _listenReactions(Room room) {
-    _reactionSub?.cancel();
-    _reactionSub = room.client.onTimelineEvent.stream
-        .where(
-          (e) =>
-              e.roomId == room.id &&
-              e.type == VibeCallReaction.type &&
-              e.senderId != room.client.userID,
-        )
-        .listen((e) {
-          final emoji = e.content['emoji'];
-          if (emoji is! String || emoji.isEmpty) return;
-          if (DateTime.now().difference(e.originServerTs).inSeconds > 20) {
-            return;
-          }
-          reactions.value = [
-            ...reactions.value,
-            VibeCallReaction(emoji, e.senderId),
-          ];
-        });
-  }
-
-  bool get active => web != null;
+  bool get active => room != null && stage != VibeCallStage.idle;
   bool isIn(Room r) => active && room?.id == r.id;
 
   String get roomName => room?.getLocalizedDisplayname() ?? 'Call';
@@ -259,6 +133,72 @@ class VibeCall extends ChangeNotifier {
     final ctx = _navContext;
     if (ctx == null) return;
     ScaffoldMessenger.maybeOf(ctx)?.showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  // ---------------------------------------------------------------------
+  // Pictures
+  // ---------------------------------------------------------------------
+
+  static String _userOf(String identity) {
+    // "@user:server:DEVICE" -> "@user:server"
+    final i = identity.lastIndexOf(':');
+    if (i <= 0 || !identity.startsWith('@')) return identity;
+    final first = identity.indexOf(':');
+    return i == first ? identity : identity.substring(0, i);
+  }
+
+  static lk.VideoTrack? _video(lk.Participant p, lk.TrackSource source) {
+    for (final pub in p.videoTrackPublications) {
+      if (pub.source != source || pub.muted) continue;
+      final t = pub.track;
+      if (t is lk.VideoTrack) return t;
+    }
+    return null;
+  }
+
+  /// Everyone's picture, you first.
+  List<VibeCallTile> get tiles {
+    final r = _lk;
+    if (r == null) return const [];
+    final out = <VibeCallTile>[];
+    final me = r.localParticipant;
+    if (me != null) {
+      out.add(
+        VibeCallTile(
+          participantId: me.identity,
+          userId: room?.client.userID ?? _userOf(me.identity),
+          local: true,
+          camera: videoOn ? _video(me, lk.TrackSource.camera) : null,
+          screen: _video(me, lk.TrackSource.screenShareVideo),
+          speaking: me.isSpeaking,
+          muted: !micOn,
+        ),
+      );
+    }
+    for (final p in r.remoteParticipants.values) {
+      out.add(
+        VibeCallTile(
+          participantId: p.identity,
+          userId: _userOf(p.identity),
+          local: false,
+          camera: _video(p, lk.TrackSource.camera),
+          screen: _video(p, lk.TrackSource.screenShareVideo),
+          speaking: p.isSpeaking,
+          muted: p.isMuted,
+        ),
+      );
+    }
+    return out;
+  }
+
+  int get _remoteVideo =>
+      tiles.where((t) => !t.local && (t.camera != null || t.screen != null)).length;
+
+  void _onLiveKitChange() {
+    if (_remoteVideo > 0 && !showStage && !_stageDismissed && expanded) {
+      showStage = true;
+    }
+    notifyListeners();
   }
 
   // ---------------------------------------------------------------------
@@ -298,10 +238,6 @@ class VibeCall extends ChangeNotifier {
       if (ok != true) return;
       await call.hangup();
     }
-    if (!await VibeCallServer.available()) {
-      _snack('Calls aren\'t included in this build of Vibe.');
-      return;
-    }
     if (!context.mounted) return;
     if (!await VibeCallSupport.ensure(context, room)) return;
     if (!context.mounted) return;
@@ -322,16 +258,10 @@ class VibeCall extends ChangeNotifier {
         if (!cam.isGranted) video = false;
       }
     }
-    if (!context.mounted) return;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    await call._start(room, video: video, dark: dark);
+    await call._start(room, video: video);
   }
 
-  Future<void> _start(
-    Room room, {
-    required bool video,
-    required bool dark,
-  }) async {
+  Future<void> _start(Room room, {required bool video}) async {
     final client = room.client;
     this.room = room;
     stage = VibeCallStage.connecting;
@@ -340,242 +270,254 @@ class VibeCall extends ChangeNotifier {
     videoOn = video;
     _wantVideo = video;
     soundOn = true;
-    // Earpiece for one-to-one voice calls (like a phone call, and no
-    // feedback between two phones in the same room); loudspeaker for
-    // video and group calls.
+    screenOn = false;
+    swapped = false;
+    frontCamera = true;
+    // Earpiece for one-to-one voice calls, loudspeaker for video / groups.
     speakerOn = video || !room.isDirectChat;
-    _videoCount = 0;
     _stageDismissed = false;
     showStage = video;
-    _firstMedia = true;
     joinedAt = null;
     problem = null;
+    _handEventId = null;
+    reactions.value = const [];
     log.clear();
     _log('start ${room.id} video=$video encrypted=${room.encrypted}');
     notifyListeners();
     VibeHaptics.medium();
-
-    try {
-      await room.postLoad();
-      final count = room.summary.mJoinedMemberCount ?? 0;
-      if (count > 0 && count <= 300) {
-        await room.requestParticipants([Membership.join]);
-      }
-    } catch (e) {
-      Logs().w('Vibe call: could not load room members', e);
-    }
-
-    final origin = await VibeCallServer.start();
-    final dm = room.isDirectChat;
-    final ongoing = VibeCallMembers.active(room);
-    final intent = dm
-        ? (ongoing
-              ? (video ? 'join_existing_dm' : 'join_existing_dm_voice')
-              : (video ? 'start_call_dm' : 'start_call_dm_voice'))
-        : (ongoing ? 'join_existing' : 'start_call');
-    _log('intent $intent, already in call: ${VibeCallMembers.userIds(room)}');
-    const widgetId = 'vibe-call';
-    final params = <String, String>{
-      'widgetId': widgetId,
-      'parentUrl': origin.toString(),
-      'baseUrl': client.homeserver.toString(),
-      'roomId': room.id,
-      'userId': client.userID!,
-      'deviceId': client.deviceID ?? '',
-      'intent': intent,
-      'skipLobby': 'true',
-      'returnToLobby': 'false',
-      'confineToRoom': 'true',
-      'appPrompt': 'false',
-      'preload': 'false',
-      'hideScreensharing': 'true',
-      'perParticipantE2EE': room.encrypted.toString(),
-      'lang': 'en',
-      'theme': dark ? 'dark' : 'light',
-      // Vibe has its own header and controls
-      'header': 'none',
-      'hideHeader': 'true',
-      'showControls': 'false',
-      // Vibe routes the audio itself (earpiece / speaker button); without
-      // this, Element Call waits for a native audio-device bridge that
-      // only Element X has.
-      'controlledAudioDevices': 'false',
-      'allowIceFallback': 'true',
-    };
-    final url = origin
-        .replace(path: '/element-call/index.html', queryParameters: params)
-        .toString();
-    _config = {
-      'widgetId': widgetId,
-      'userId': client.userID,
-      'roomId': room.id,
-      'url': url,
-      'knownRooms': [room.id],
-    };
-
-    final driver = VibeCallDriver(
-      client: client,
-      roomId: room.id,
-      toWidget: _js,
-      onMembership: (inCall) {
-        _log('own membership: ${inCall ? 'joined' : 'left'}');
-        if (inCall) _markJoined();
-      },
-    );
-    _driver = driver;
-
-    final PlatformWebViewControllerCreationParams params0 =
-        WebViewPlatform.instance is AndroidWebViewPlatform
-        ? AndroidWebViewControllerCreationParams()
-        : const PlatformWebViewControllerCreationParams();
-    final c = WebViewController.fromPlatformCreationParams(
-      params0,
-      // Our own bundled Element Call, on our own loopback origin.
-      onPermissionRequest: (request) => request.grant(),
-    );
-    await c.setJavaScriptMode(JavaScriptMode.unrestricted);
-    await c.setOnConsoleMessage((m) {
-      if (m.level == JavaScriptLogLevel.error ||
-          m.level == JavaScriptLogLevel.warning) {
-        _log('js ${m.level.name}: ${m.message}');
-      }
-    });
-    await c.setBackgroundColor(
-      dark ? const Color(0xFF1A191E) : const Color(0xFFF2F3F5),
-    );
-    await c.addJavaScriptChannel(
-      'VibeHost',
-      onMessageReceived: (m) => _onMessage(m.message),
-    );
-    await c.setNavigationDelegate(
-      NavigationDelegate(
-        onNavigationRequest: (req) {
-          final u = Uri.tryParse(req.url);
-          if (u == null) return NavigationDecision.prevent;
-          if (u.host == origin.host && u.port == origin.port) {
-            return NavigationDecision.navigate;
-          }
-          if (u.scheme == 'about' || u.scheme == 'blob' || u.scheme == 'data') {
-            return NavigationDecision.navigate;
-          }
-          // links from inside the call open in the browser
-          unawaited(launchUrl(u, mode: LaunchMode.externalApplication));
-          return NavigationDecision.prevent;
-        },
-        onWebResourceError: (e) {
-          _log(
-            'load error ${e.errorCode} ${e.description} '
-            '${e.url ?? ''} main=${e.isForMainFrame}',
-          );
-        },
-      ),
-    );
-    final platform = c.platform;
-    if (platform is AndroidWebViewController) {
-      await platform.setMediaPlaybackRequiresUserGesture(false);
-    }
-    web = c;
-    notifyListeners();
-    await c.loadRequest(origin.replace(path: '/vibe_call/host.html'));
-
-    driver.startFeeding();
-    _watchAlone();
-    _listenReactions(room);
-    _handEventId = null;
-    reactions.value = const [];
     unawaited(_startService());
-    _connectTimeout?.cancel();
-    _connectTimeout = Timer(const Duration(seconds: 30), () {
-      if (stage == VibeCallStage.connecting) {
-        _log('timed out connecting');
-        problem =
-            'The call didn\'t connect. Copy the call log and send it to '
-            'support so we can see what went wrong.';
-        notifyListeners();
+
+    try {
+      try {
+        await room.postLoad();
+        final count = room.summary.mJoinedMemberCount ?? 0;
+        if (count > 0 && count <= 300) {
+          await room.requestParticipants([Membership.join]);
+        }
+      } catch (e) {
+        _log('could not load members: $e');
+      }
+
+      // 1) Which call server? The one the call already uses (the oldest
+      //    membership's), else your own server's.
+      final me = '${client.userID}:${client.deviceID}';
+      final existing = VibeCallMembers.sessions(
+        room,
+      ).where((m) => m.participantId != me).toList();
+      final first = existing.isEmpty ? null : existing.first.focus;
+      final own = await VibeCallSupport.serviceUrl(client);
+      final url = first?.url ?? own;
+      if (url == null) {
+        throw const _CallProblem(
+          'Your server doesn\'t offer Matrix calls, and nobody else is in '
+          'this call yet.',
+        );
+      }
+      final alias = (first?.alias.isNotEmpty ?? false) ? first!.alias : room.id;
+      _serviceUrl = url;
+      final foci = <Map<String, Object?>>[
+        {'type': 'livekit', 'livekit_service_url': url, 'livekit_alias': alias},
+        if (own != null && own != url)
+          {
+            'type': 'livekit',
+            'livekit_service_url': own,
+            'livekit_alias': room.id,
+          },
+      ];
+      _log('call server $url (${first != null ? 'from the call' : 'yours'})');
+
+      // 2) A LiveKit pass for that server, via your Matrix OpenID token.
+      final openId = await client.requestOpenIdToken(client.userID!, {});
+      final res = await client.httpClient.post(
+        Uri.parse('${url.replaceAll(RegExp(r'/+$'), '')}/sfu/get'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'room': alias,
+          'openid_token': openId.toJson(),
+          'device_id': client.deviceID,
+        }),
+      );
+      if (res.statusCode != 200) {
+        throw _CallProblem(
+          'The call server said no (${res.statusCode}). Try again in a bit.',
+        );
+      }
+      final sfu = jsonDecode(res.body) as Map<String, Object?>;
+      final sfuUrl = sfu['url'] as String?;
+      final jwt = sfu['jwt'] as String?;
+      if (sfuUrl == null || jwt == null) {
+        throw const _CallProblem('The call server sent an odd answer.');
+      }
+      _log('got call pass for $sfuUrl');
+      if (this.room?.id != room.id) return; // hung up meanwhile
+
+      // 3) Encryption keys (Element Call compatible).
+      VibeCallKeys? keys;
+      if (room.encrypted) {
+        keys = await VibeCallKeys.create(
+          client: client,
+          roomId: room.id,
+          log: _log,
+        );
+        keys.start();
+        _keys = keys;
+      }
+
+      // 4) Connect to the call server.
+      await lk.AudioManager.instance.setSpeakerOutputPreferred(speakerOn);
+      final lkRoom = lk.Room(
+        roomOptions: lk.RoomOptions(
+          adaptiveStream: true,
+          dynacast: true,
+          defaultAudioCaptureOptions: const lk.AudioCaptureOptions(
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          ),
+          defaultCameraCaptureOptions: const lk.CameraCaptureOptions(
+            params: lk.VideoParametersPresets.h720_169,
+          ),
+          defaultScreenShareCaptureOptions: const lk.ScreenShareCaptureOptions(
+            useiOSBroadcastExtension: false,
+            params: lk.VideoParametersPresets.screenShareH1080FPS15,
+          ),
+          encryption: keys == null
+              ? null
+              : lk.E2EEOptions(keyProvider: keys.keyProvider),
+        ),
+      );
+      _lk = lkRoom;
+      lkRoom.addListener(_onLiveKitChange);
+      final events = lkRoom.createListener();
+      _lkEvents = events;
+      events
+        ..on<lk.RoomDisconnectedEvent>((e) {
+          _log('call server disconnected: ${e.reason}');
+          if (stage == VibeCallStage.inCall) {
+            _snack('Call ended: connection lost');
+            unawaited(hangup());
+          }
+        })
+        ..on<lk.RoomReconnectingEvent>((_) => _log('reconnecting'))
+        ..on<lk.RoomReconnectedEvent>((_) => _log('reconnected'))
+        ..on<lk.ParticipantConnectedEvent>(
+          (e) => _log('joined: ${e.participant.identity}'),
+        )
+        ..on<lk.ParticipantDisconnectedEvent>(
+          (e) => _log('left: ${e.participant.identity}'),
+        )
+        ..on<lk.TrackSubscribedEvent>((e) {
+          _log('${e.participant.identity}: ${e.publication.source.name}');
+          if (!soundOn) _applySound();
+        })
+        ..on<lk.TrackE2EEStateEvent>(
+          (e) => _log('e2ee ${e.participant.identity}: ${e.state.name}'),
+        );
+      await lkRoom.connect(sfuUrl, jwt);
+      _log('connected to the call server');
+      if (this.room?.id != room.id) {
+        await lkRoom.disconnect();
+        return;
+      }
+      final local = lkRoom.localParticipant;
+      await local?.setMicrophoneEnabled(true);
+      if (video) {
+        try {
+          await local?.setCameraEnabled(true);
+        } catch (e) {
+          videoOn = false;
+          _log('camera failed: $e');
+        }
+      }
+      await _applySpeaker();
+
+      // 5) Tell Matrix you're in the call.
+      final session = VibeRtcSession(
+        room: room,
+        fociPreferred: foci,
+        intent: video ? 'video' : 'audio',
+        log: _log,
+      );
+      _session = session;
+      await session.join();
+      _stateSub = client.onRoomState.stream
+          .where(
+            (u) =>
+                u.roomId == room.id &&
+                u.state.type == VibeCallMembers.memberType,
+          )
+          .listen((_) => _membershipsChanged());
+      _membershipsChanged();
+
+      // 6) Ring them if you're the first one in.
+      if (existing.isEmpty && !VibeCallMembers.isVoiceRoom(room)) {
+        final dm = room.isDirectChat;
+        _ringEventId = await session.notify(ring: dm);
+        if (dm) _watchRing(room);
+      }
+
+      _markJoined();
+    } on _CallProblem catch (e) {
+      _log('problem: ${e.message}');
+      problem = e.message;
+      notifyListeners();
+    } catch (e, s) {
+      _log('failed: $e');
+      Logs().w('Vibe call failed', e, s);
+      problem =
+          'The call didn\'t connect. Copy the call log and send it to '
+          'support so we can see what went wrong.';
+      notifyListeners();
+    }
+  }
+
+  void _membershipsChanged() {
+    final r = room;
+    if (r == null) return;
+    final members = VibeCallMembers.sessions(r);
+    _keys?.update(members);
+    final me = r.client.userID;
+    if (members.any((m) => m.userId != me)) _noAnswer?.cancel();
+    notifyListeners();
+  }
+
+  /// Outgoing DM call: stop when declined, or after 30 s with no answer.
+  void _watchRing(Room room) {
+    _noAnswer?.cancel();
+    _noAnswer = Timer(const Duration(seconds: 35), () {
+      if (isIn(room) && others.isEmpty) {
+        _snack('No answer');
+        unawaited(hangup());
       }
     });
-  }
-
-  // ---------------------------------------------------------------------
-  // Messages from the host page
-  // ---------------------------------------------------------------------
-
-  void _js(String fn, List<Object?> args) {
-    final w = web;
-    if (w == null) return;
-    final code = 'window.vibe && vibe.$fn(${args.map(jsonEncode).join(',')});';
-    w.runJavaScript(code).catchError((Object e) {
-      Logs().v('Vibe call js failed: $e');
-    });
-  }
-
-  Future<void> _onMessage(String raw) async {
-    Map<String, Object?> m;
-    try {
-      m = Map<String, Object?>.from(jsonDecode(raw) as Map);
-    } catch (_) {
-      return;
-    }
-    final data = m['data'] is Map
-        ? Map<String, Object?>.from(m['data'] as Map)
-        : const <String, Object?>{};
-    switch (m['kind']) {
-      case 'host_ready':
-        if (_config != null) _js('start', [_config]);
-      case 'rpc':
-        await _rpc(m);
-      case 'joined':
-        _log('element call joined');
-        _markJoined();
-      case 'error':
-        _log('error ${data['where']}: ${data['message']}');
-      case 'videos':
-        _videoCount = (data['count'] as num?)?.toInt() ?? 0;
-        final remote = _videoCount - (videoOn ? 1 : 0);
-        _log('video streams: $_videoCount');
-        // Someone turned their camera on: show the video.
-        if (remote > 0 && !showStage && !_stageDismissed && expanded) {
-          showStage = true;
-          notifyListeners();
-        }
-      case 'ready':
-      case 'preparing':
-      case 'frame_loaded':
-        _log(m['kind'] as String);
-      case 'media':
-        final a = data['audio_enabled'];
-        final v = data['video_enabled'];
-        if (_firstMedia) {
-          // Element Call tells us its starting state once; apply ours.
-          _firstMedia = false;
-          _js('action', [
-            'io.element.device_mute',
-            {'audio_enabled': micOn, 'video_enabled': _wantVideo},
-          ]);
-        } else {
-          if (a is bool) micOn = a;
-          if (v is bool) videoOn = v;
-          notifyListeners();
-        }
-      case 'hangup':
-      case 'close':
-        _log('element call ${m['kind']}');
-        if (_left?.isCompleted == false) _left?.complete();
-        await _teardown();
-    }
+    _declineSub?.cancel();
+    _declineSub = room.client.onTimelineEvent.stream
+        .where(
+          (e) =>
+              e.roomId == room.id &&
+              e.type == VibeCallMembers.declineType &&
+              e.senderId != room.client.userID,
+        )
+        .listen((e) {
+          final rel = e.content.tryGetMap<String, Object?>('m.relates_to');
+          if (rel?['event_id'] != _ringEventId) return;
+          if (others.isNotEmpty) return;
+          _snack('Call declined');
+          unawaited(hangup());
+        });
   }
 
   void _markJoined() {
     if (stage == VibeCallStage.inCall || stage == VibeCallStage.leaving) {
       return;
     }
-    _connectTimeout?.cancel();
     stage = VibeCallStage.inCall;
     joinedAt = DateTime.now();
     problem = null;
     VibeHaptics.light();
+    _watchAlone();
+    _listenReactions();
     notifyListeners();
-    unawaited(_applySpeaker());
     final r = room;
     if (r != null) unawaited(markCallRead(r));
   }
@@ -598,22 +540,129 @@ class VibeCall extends ChangeNotifier {
     }
   }
 
-  Future<void> _rpc(Map<String, Object?> m) async {
-    final id = m['id'];
-    final method = m['method'] as String? ?? '';
-    final args = m['args'] is Map
-        ? Map<String, Object?>.from(m['args'] as Map)
-        : <String, Object?>{};
-    final driver = _driver;
-    if (driver == null) return;
+  // ---------------------------------------------------------------------
+  // Ending
+  // ---------------------------------------------------------------------
+
+  /// One-to-one calls end when the other person leaves (like a phone call).
+  Timer? _aloneTimer;
+  bool _sawOthers = false;
+  int _aloneTicks = 0;
+
+  void _watchAlone() {
+    _aloneTimer?.cancel();
+    _sawOthers = false;
+    _aloneTicks = 0;
+    _aloneTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      final r = room;
+      if (r == null || !active) return;
+      final n = others.length;
+      if (n > 0) {
+        _sawOthers = true;
+        _aloneTicks = 0;
+        return;
+      }
+      if (!_sawOthers || !r.isDirectChat || stage != VibeCallStage.inCall) {
+        return;
+      }
+      if (++_aloneTicks >= 2) {
+        _log('the other person left, ending the call');
+        _snack('Call ended');
+        unawaited(hangup());
+      }
+    });
+  }
+
+  /// Call memberships of this device left behind by an earlier run of the
+  /// app (killed mid-call, crashed) make chats show a call forever. Clear
+  /// them once at start.
+  static Future<void> cleanupStale(Client client) async {
+    final device = client.deviceID;
+    final me = client.userID;
+    if (device == null || me == null) return;
+    for (final r in client.rooms) {
+      if (instance.isIn(r)) continue;
+      final states = r.states[VibeCallMembers.memberType];
+      if (states == null) continue;
+      for (final e in states.entries.toList()) {
+        if (e.value.senderId != me ||
+            e.value.content.isEmpty ||
+            !e.key.contains(device)) {
+          continue;
+        }
+        Logs().i('Vibe call: clearing old call membership in ${r.id}');
+        try {
+          await client.setRoomStateWithKey(
+            r.id,
+            VibeCallMembers.memberType,
+            e.key,
+            {},
+          );
+        } catch (err) {
+          Logs().v('Vibe call: could not clear $err');
+        }
+      }
+    }
+  }
+
+  /// Leave the call.
+  Future<void> hangup() async {
+    if (!active || stage == VibeCallStage.leaving) return;
+    VibeHaptics.medium();
+    stage = VibeCallStage.leaving;
+    notifyListeners();
+    _aloneTimer?.cancel();
+    _noAnswer?.cancel();
+    await _declineSub?.cancel();
+    _declineSub = null;
+    await _stateSub?.cancel();
+    _stateSub = null;
+    await _reactionSub?.cancel();
+    _reactionSub = null;
+
+    final lkRoom = _lk;
+    final session = _session;
+    final keys = _keys;
+    final r = room;
+    _lk = null;
+    _session = null;
+    _keys = null;
+    _lkEvents?.dispose();
+    _lkEvents = null;
+    lkRoom?.removeListener(_onLiveKitChange);
+
+    // Tell Matrix first, so the chat stops showing the call right away.
     try {
-      final result = await driver.handle(method, args);
-      final n = result is List ? ' (${result.length})' : '';
-      _log('$method ${args['type'] ?? ''} ok$n');
-      _js('reply', [id, true, result]);
+      await session?.leave().timeout(const Duration(seconds: 8));
     } catch (e) {
-      _log('$method ${args['type'] ?? ''} FAILED: $e');
-      _js('reply', [id, false, VibeCallDriver.errorJson(e)]);
+      _log('leave: $e');
+    }
+    try {
+      await lkRoom?.disconnect().timeout(const Duration(seconds: 5));
+    } catch (_) {}
+    try {
+      await lkRoom?.dispose();
+    } catch (_) {}
+    keys?.dispose();
+
+    room = null;
+    stage = VibeCallStage.idle;
+    joinedAt = null;
+    expanded = true;
+    showStage = false;
+    screenOn = false;
+    swapped = false;
+    _handEventId = null;
+    reactions.value = const [];
+    notifyListeners();
+    if (PlatformInfos.isAndroid) {
+      try {
+        await _system.invokeMethod('resetAudio');
+      } catch (_) {}
+    }
+    await _stopService();
+    if (r != null) {
+      Future<void>.delayed(const Duration(seconds: 3), () => markCallRead(r));
     }
   }
 
@@ -640,19 +689,27 @@ class VibeCall extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleMic() {
+  void toggleSwap() {
+    if (!active) return;
+    VibeHaptics.selection();
+    swapped = !swapped;
+    notifyListeners();
+  }
+
+  Future<void> toggleMic() async {
     if (!active) return;
     VibeHaptics.selection();
     micOn = !micOn;
     if (micOn && !soundOn) {
       soundOn = true;
-      _js('setSound', [true]);
+      _applySound();
     }
-    _js('action', [
-      'io.element.device_mute',
-      {'audio_enabled': micOn, 'video_enabled': videoOn},
-    ]);
     notifyListeners();
+    try {
+      await _lk?.localParticipant?.setMicrophoneEnabled(micOn);
+    } catch (e) {
+      _log('mic: $e');
+    }
   }
 
   Future<void> toggleVideo() async {
@@ -664,14 +721,85 @@ class VibeCall extends ChangeNotifier {
         _snack('Vibe needs the camera for video.');
         return;
       }
+      if (!_wantVideo) {
+        _wantVideo = true;
+        unawaited(_startService());
+      }
     }
     videoOn = !videoOn;
     if (videoOn) showStage = true;
-    _js('action', [
-      'io.element.device_mute',
-      {'audio_enabled': micOn, 'video_enabled': videoOn},
-    ]);
+    notifyListeners();
+    try {
+      await _lk?.localParticipant?.setCameraEnabled(
+        videoOn,
+        cameraCaptureOptions: lk.CameraCaptureOptions(
+          cameraPosition: frontCamera
+              ? lk.CameraPosition.front
+              : lk.CameraPosition.back,
+          params: lk.VideoParametersPresets.h720_169,
+        ),
+      );
+    } catch (e) {
+      videoOn = false;
+      _log('camera: $e');
+      notifyListeners();
+    }
     if (videoOn && !speakerOn) await setSpeaker(true);
+  }
+
+  Future<void> flipCamera() async {
+    final me = _lk?.localParticipant;
+    if (me == null || !videoOn) return;
+    VibeHaptics.selection();
+    for (final pub in me.videoTrackPublications) {
+      final t = pub.track;
+      if (pub.source == lk.TrackSource.camera && t is lk.LocalVideoTrack) {
+        frontCamera = !frontCamera;
+        try {
+          await t.setCameraPosition(
+            frontCamera ? lk.CameraPosition.front : lk.CameraPosition.back,
+          );
+        } catch (e) {
+          _log('flip camera: $e');
+        }
+      }
+    }
+    notifyListeners();
+  }
+
+  /// Share your screen (Android asks first, then shows "Vibe is sharing").
+  Future<void> toggleScreenShare() async {
+    final me = _lk?.localParticipant;
+    if (me == null || stage != VibeCallStage.inCall) {
+      _snack('Wait until the call has connected.');
+      return;
+    }
+    VibeHaptics.selection();
+    if (screenOn) {
+      screenOn = false;
+      notifyListeners();
+      try {
+        await me.setScreenShareEnabled(false);
+      } catch (e) {
+        _log('stop screen share: $e');
+      }
+      return;
+    }
+    if (PlatformInfos.isAndroid) {
+      final ok = await rtc.Helper.requestCapturePermission();
+      if (!ok) return;
+      // Android needs a "screen capture" service before capturing.
+      await _startService(screen: true);
+    }
+    try {
+      await me.setScreenShareEnabled(true, captureScreenAudio: false);
+      screenOn = true;
+      showStage = true;
+      _log('sharing screen');
+    } catch (e) {
+      _log('screen share failed: $e');
+      _snack('Couldn\'t share your screen.');
+    }
     notifyListeners();
   }
 
@@ -680,15 +808,25 @@ class VibeCall extends ChangeNotifier {
     if (!active) return;
     VibeHaptics.selection();
     soundOn = !soundOn;
-    _js('setSound', [soundOn]);
+    _applySound();
     if (!soundOn && micOn) {
       micOn = false;
-      _js('action', [
-        'io.element.device_mute',
-        {'audio_enabled': false, 'video_enabled': videoOn},
-      ]);
+      unawaited(
+        _lk?.localParticipant?.setMicrophoneEnabled(false) ?? Future.value(),
+      );
     }
     notifyListeners();
+  }
+
+  void _applySound() {
+    final r = _lk;
+    if (r == null) return;
+    for (final p in r.remoteParticipants.values) {
+      for (final pub in p.audioTrackPublications) {
+        final t = pub.track;
+        if (t != null) t.mediaStreamTrack.enabled = soundOn;
+      }
+    }
   }
 
   Future<void> setSpeaker(bool on) async {
@@ -698,92 +836,135 @@ class VibeCall extends ChangeNotifier {
   }
 
   Future<void> _applySpeaker() async {
-    if (!PlatformInfos.isAndroid) return;
     try {
-      // The WebView takes the audio route when the call starts; set ours
-      // after it.
-      await Future<void>.delayed(const Duration(milliseconds: 400));
-      await _system.invokeMethod('setSpeaker', {'on': speakerOn});
-    } catch (e) {
-      Logs().v('Vibe call: speaker switch failed $e');
-    }
-  }
-
-  /// Leave the call.
-  Future<void> hangup() async {
-    if (!active) return;
-    VibeHaptics.medium();
-    if (stage == VibeCallStage.inCall ||
-        stage == VibeCallStage.connecting) {
-      final wasIn = stage == VibeCallStage.inCall;
-      stage = VibeCallStage.leaving;
-      notifyListeners();
-      final left = _left = Completer<void>();
-      _js('action', ['im.vector.hangup', <String, Object?>{}]);
-      // Element Call answers once it has left; don't wait forever.
-      await left.future.timeout(
-        Duration(seconds: wasIn ? 4 : 1),
-        onTimeout: () {},
+      await lk.AudioManager.instance.setSpeakerOutputPreferred(
+        speakerOn,
+        force: speakerOn,
       );
+    } catch (e) {
+      _log('speaker switch failed: $e');
     }
-    await _teardown();
   }
 
-  Future<void> _teardown() async {
-    final w = web;
-    if (w == null) return;
-    _connectTimeout?.cancel();
-    _aloneTimer?.cancel();
-    _aloneTimer = null;
-    _sawOthers = false;
-    final driver = _driver;
-    _driver = null;
-    _config = null;
-    web = null;
-    stage = VibeCallStage.idle;
-    joinedAt = null;
-    expanded = true;
-    _reactionSub?.cancel();
-    _reactionSub = null;
-    _handEventId = null;
-    reactions.value = const [];
+  // ---------------------------------------------------------------------
+  // Reactions and raised hand (Element Call's format)
+  // ---------------------------------------------------------------------
+
+  /// Send an emoji reaction to everyone in the call.
+  Future<void> react(String emoji, String name) async {
+    final r = room;
+    final target = _session?.membershipEventId;
+    if (r == null || target == null || stage != VibeCallStage.inCall) {
+      _snack('Reactions work once the call has connected.');
+      return;
+    }
+    VibeHaptics.light();
+    reactions.value = [
+      ...reactions.value,
+      VibeCallReaction(emoji, r.client.userID!),
+    ];
+    try {
+      await r.sendEvent(
+        {
+          'm.relates_to': {'rel_type': 'm.reference', 'event_id': target},
+          'emoji': emoji,
+          'name': name,
+        },
+        type: VibeCallReaction.type,
+        displayPendingEvent: false,
+      );
+    } catch (e) {
+      _log('reaction failed: $e');
+    }
+  }
+
+  String? _handEventId;
+  bool get handRaised => _handEventId != null;
+
+  Future<void> toggleHand() async {
+    final r = room;
+    final target = _session?.membershipEventId;
+    if (r == null || target == null || stage != VibeCallStage.inCall) {
+      _snack('Wait until the call has connected.');
+      return;
+    }
+    VibeHaptics.selection();
+    final old = _handEventId;
+    if (old == '') return; // still sending
+    if (old != null) {
+      _handEventId = null;
+      notifyListeners();
+      try {
+        await r.redactEvent(old);
+      } catch (e) {
+        _log('lower hand failed: $e');
+      }
+      return;
+    }
+    _handEventId = '';
     notifyListeners();
     try {
-      // stops the microphone and camera right away
-      await w.loadRequest(Uri.parse('about:blank'));
-    } catch (_) {}
-    if (driver != null) {
-      // Make sure the server knows you left, so the chat doesn't keep
-      // showing a running call.
-      driver.dispose();
-      await driver.leave().timeout(
-        const Duration(seconds: 8),
-        onTimeout: () {},
+      _handEventId = await r.sendEvent(
+        {
+          'm.relates_to': {
+            'rel_type': 'm.annotation',
+            'event_id': target,
+            'key': '🖐️',
+          },
+        },
+        type: EventTypes.Reaction,
+        displayPendingEvent: false,
       );
+    } catch (e) {
+      _handEventId = null;
+      _log('raise hand failed: $e');
     }
-    if (PlatformInfos.isAndroid) {
-      try {
-        await _system.invokeMethod('resetAudio');
-      } catch (_) {}
-    }
-    await _stopService();
-    final r = room;
-    room = null;
-    if (r != null) {
-      // after the call's own last events have arrived
-      Future<void>.delayed(const Duration(seconds: 3), () => markCallRead(r));
-    }
+    notifyListeners();
+  }
+
+  /// Reactions to float up the call screen (yours and other people's).
+  final ValueNotifier<List<VibeCallReaction>> reactions = ValueNotifier(
+    const [],
+  );
+  StreamSubscription? _reactionSub;
+
+  void _listenReactions() {
+    final room = this.room;
+    if (room == null) return;
+    _reactionSub?.cancel();
+    _reactionSub = room.client.onTimelineEvent.stream
+        .where(
+          (e) =>
+              e.roomId == room.id &&
+              e.type == VibeCallReaction.type &&
+              e.senderId != room.client.userID,
+        )
+        .listen((e) {
+          final emoji = e.content['emoji'];
+          if (emoji is! String || emoji.isEmpty) return;
+          if (DateTime.now().difference(e.originServerTs).inSeconds > 20) {
+            return;
+          }
+          reactions.value = [
+            ...reactions.value,
+            VibeCallReaction(emoji, e.senderId),
+          ];
+        });
   }
 
   // ---------------------------------------------------------------------
   // Keep the call alive with the screen off
   // ---------------------------------------------------------------------
 
-  Future<void> _startService() async {
+  Future<void> _startService({bool screen = false}) async {
     if (!PlatformInfos.isAndroid) return;
     try {
-      _hadService = await FlutterForegroundTask.isRunningService;
-      if (_hadService) await FlutterForegroundTask.stopService();
+      final running = await FlutterForegroundTask.isRunningService;
+      if (running && !_hadServiceChecked) {
+        _hadService = true;
+      }
+      _hadServiceChecked = true;
+      if (running) await FlutterForegroundTask.stopService();
       FlutterForegroundTask.init(
         androidNotificationOptions: AndroidNotificationOptions(
           channelId: 'vibe_call',
@@ -810,15 +991,20 @@ class VibeCall extends ChangeNotifier {
         serviceTypes: [
           ForegroundServiceTypes.microphone,
           if (camera) ForegroundServiceTypes.camera,
+          if (screen || screenOn) ForegroundServiceTypes.mediaProjection,
         ],
         notificationTitle: 'Vibe call',
-        notificationText: 'In a call · $roomName',
+        notificationText: screen
+            ? 'Sharing your screen · $roomName'
+            : 'In a call · $roomName',
         notificationIcon: NotificationIcon(metaDataName: 'ic_launcher'),
       );
     } catch (e, s) {
       Logs().w('Vibe call: foreground service failed', e, s);
     }
   }
+
+  bool _hadServiceChecked = false;
 
   Future<void> _stopService() async {
     if (!PlatformInfos.isAndroid) return;
@@ -831,7 +1017,13 @@ class VibeCall extends ChangeNotifier {
       Logs().w('Vibe call: could not restore service', e);
     }
     _hadService = false;
+    _hadServiceChecked = false;
   }
+}
+
+class _CallProblem implements Exception {
+  final String message;
+  const _CallProblem(this.message);
 }
 
 /// An emoji someone sent during the call.
@@ -947,6 +1139,9 @@ abstract class VibeCallPower {
 /// join calls other people start (they bring their own), but you can't
 /// start one.
 abstract class VibeCallSupport {
+  /// What the last check found (shown in the call log).
+  static String? lastServiceUrl;
+
   static final Map<String, (DateTime, String?)> _cache = {};
 
   /// The call service URL for [client]'s server, or null if it has none.
@@ -993,7 +1188,7 @@ abstract class VibeCallSupport {
 
   static Future<bool> ensure(BuildContext context, Room room) async {
     final url = await serviceUrl(room.client);
-    VibeCallServer.livekitServiceUrl = url;
+    lastServiceUrl = url;
     if (url != null) return true;
     // Someone else's call brings its own call service: joining works.
     if (VibeCallMembers.active(room)) return true;

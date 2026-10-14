@@ -11,6 +11,17 @@ import 'package:package_info_plus/package_info_plus.dart';
 /// number is added automatically by the release workflow).
 const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
+    version: '3.1',
+    items: [
+      ('⚡', 'Calls are now built into Vibe itself instead of running a web page inside the app: they connect faster, use less battery, and the audio is cleaner'),
+      ('🖥', 'Share your screen in a call: tap Share. Android asks once, then everyone in the call sees your screen (Element and Element X too)'),
+      ('🔁', 'Video calls: tap your small video to swap it with theirs, like WhatsApp. Flip between front and back camera with the camera button at the top'),
+      ('👥', 'Group video calls show everyone in a grid, with a green ring around whoever is talking'),
+      ('🔒', 'Calls stay end-to-end encrypted and still work with Element, Element X and Sable'),
+      ('📵', 'An unanswered or declined call ends by itself'),
+    ],
+  ),
+  (
     version: '3.0',
     items: [
       ('📞', 'Voice and video calls! Open a chat\'s pane and tap # | audio-call or # | video-call. End-to-end encrypted, and they work with people on Sable, Element and Element X'),

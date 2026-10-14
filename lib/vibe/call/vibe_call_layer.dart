@@ -14,7 +14,7 @@ import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:fluffychat/vibe/call/vibe_call_stage.dart';
 
 const _green = Color(0xFF23A55A);
 const _red = Color(0xFFDA373C);
@@ -83,10 +83,10 @@ class _VibeCallHostState extends State<VibeCallHost>
       listenable: Listenable.merge([_call, _ring.ringing]),
       builder: (context, _) {
         final mq = MediaQuery.of(context);
-        final web = _call.web;
-        final showBar = web != null && !_call.expanded;
+        final live = _call.active;
+        final showBar = live && !_call.expanded;
         final barHeight = mq.padding.top + 44;
-        final stage = web != null && _call.expanded && _call.showStage;
+        final stage = live && _call.expanded && _call.showStage;
         final ring = _ring.ringing.value;
         return Stack(
           children: [
@@ -119,7 +119,7 @@ class _VibeCallHostState extends State<VibeCallHost>
             ),
             // 1) Vibe's call screen background (avatar, name, status) —
             //    hidden behind the video when Element Call's view is shown.
-            if (web != null)
+            if (live)
               Positioned.fill(
                 key: const ValueKey('backdrop'),
                 child: IgnorePointer(
@@ -131,26 +131,14 @@ class _VibeCallHostState extends State<VibeCallHost>
                   ),
                 ),
               ),
-            // 2) Element Call itself. Same widget in every mode so the call
-            //    never restarts: full screen for video, 1×1 out of sight
-            //    for voice or when minimized.
-            if (web != null)
-              Positioned(
-                key: const ValueKey('web'),
-                left: 0,
-                top: 0,
-                width: stage ? mq.size.width : 1,
-                height: stage ? mq.size.height : 1,
-                child: IgnorePointer(
-                  ignoring: !stage,
-                  child: Opacity(
-                    opacity: stage ? 1 : 0.01,
-                    child: WebViewWidget(controller: web),
-                  ),
-                ),
+            // 2) The video view (native, LiveKit).
+            if (stage)
+              Positioned.fill(
+                key: const ValueKey('stage'),
+                child: VibeCallStageView(call: _call),
               ),
             // 3) Vibe's controls on top: minimize, status, buttons.
-            if (web != null)
+            if (live)
               Positioned.fill(
                 key: const ValueKey('controls'),
                 child: IgnorePointer(
@@ -167,7 +155,7 @@ class _VibeCallHostState extends State<VibeCallHost>
                   ),
                 ),
               ),
-            if (web != null && _call.expanded && _call.problem != null)
+            if (live && _call.expanded && _call.problem != null)
               Positioned(
                 key: const ValueKey('problem'),
                 left: 16,
@@ -609,6 +597,11 @@ class _CallControls extends StatelessWidget {
                     color: call.soundOn ? Colors.white : _red,
                     onTap: call.toggleSound,
                   ),
+                if (call.videoOn)
+                  _TopButton(
+                    icon: Icons.flip_camera_android,
+                    onTap: call.flipCamera,
+                  ),
                 _TopButton(
                   icon: Icons.add_reaction_outlined,
                   onTap: () => _pickReaction(context, call),
@@ -634,7 +627,7 @@ class _CallControls extends StatelessWidget {
           right: 0,
           bottom: 0,
           child: Container(
-            padding: EdgeInsets.fromLTRB(12, 28, 12, pad.bottom + 26),
+            padding: EdgeInsets.fromLTRB(8, 28, 8, pad.bottom + 26),
             decoration: stage
                 ? const BoxDecoration(
                     gradient: LinearGradient(
@@ -658,6 +651,14 @@ class _CallControls extends StatelessWidget {
                   label: 'Camera',
                   on: call.videoOn,
                   onTap: call.toggleVideo,
+                ),
+                _CallButton(
+                  icon: call.screenOn
+                      ? Icons.stop_screen_share
+                      : Icons.screen_share,
+                  label: call.screenOn ? 'Stop' : 'Share',
+                  on: call.screenOn,
+                  onTap: call.toggleScreenShare,
                 ),
                 _CallButton(
                   icon: call.micOn ? Icons.mic : Icons.mic_off,
@@ -825,8 +826,8 @@ class _CallButton extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
-              width: 62,
-              height: 62,
+              width: 58,
+              height: 58,
               decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 180),

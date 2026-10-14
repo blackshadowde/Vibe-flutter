@@ -54,6 +54,41 @@ abstract class VibeCallMembers {
 
   static bool active(Room room) => userIds(room).isNotEmpty;
 
+  /// Everyone's current call membership (one per device), oldest first —
+  /// the order MatrixRTC uses to pick the call server ("oldest_membership").
+  static List<VibeRtcMember> sessions(Room room) {
+    final states = room.states[memberType];
+    if (states == null || states.isEmpty) return const [];
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final out = <VibeRtcMember>[];
+    for (final entry in states.entries) {
+      final s = entry.value;
+      final c = s.content;
+      if (c.isEmpty || c['application'] != 'm.call') continue;
+      if ((c['call_id'] ?? '') != '') continue;
+      final device = c['device_id'];
+      if (device is! String || device.isEmpty) continue;
+      final sent = s is Event ? s.originServerTs.millisecondsSinceEpoch : now;
+      final created = c['created_ts'] is int ? c['created_ts'] as int : sent;
+      final exp = c['expires'] is int
+          ? c['expires'] as int
+          : _defaultExpiry.inMilliseconds;
+      if (created + exp <= now) continue;
+      out.add(
+        VibeRtcMember(
+          userId: s.senderId,
+          deviceId: device,
+          createdTs: created,
+          eventId: s is Event ? s.eventId : null,
+          stateKey: entry.key,
+          content: c,
+        ),
+      );
+    }
+    out.sort((a, b) => a.createdTs.compareTo(b.createdTs));
+    return out;
+  }
+
   /// Ring notifications Element Call sends when starting a DM call.
   static const ringTypes = {
     'org.matrix.msc4075.rtc.notification',
@@ -89,4 +124,43 @@ abstract class VibeCallMembers {
     final intent = e.content['m.call.intent'] ?? e.content['call_intent'];
     return intent == 'video';
   }
+}
+
+/// One device's MatrixRTC call membership.
+class VibeRtcMember {
+  final String userId;
+  final String deviceId;
+  final int createdTs;
+  final String? eventId;
+  final String stateKey;
+  final Map<String, Object?> content;
+
+  const VibeRtcMember({
+    required this.userId,
+    required this.deviceId,
+    required this.createdTs,
+    required this.eventId,
+    required this.stateKey,
+    required this.content,
+  });
+
+  /// The LiveKit participant identity (and encryption key owner).
+  String get participantId => '$userId:$deviceId';
+
+  /// The call server this member prefers (the first LiveKit focus).
+  ({String url, String alias})? get focus {
+    final list = content['foci_preferred'];
+    if (list is! List) return null;
+    for (final f in list) {
+      if (f is! Map || f['type'] != 'livekit') continue;
+      final url = f['livekit_service_url'];
+      final alias = f['livekit_alias'];
+      if (url is String && url.isNotEmpty) {
+        return (url: url, alias: alias is String ? alias : '');
+      }
+    }
+    return null;
+  }
+
+  String? get intent => content['m.call.intent'] as String?;
 }

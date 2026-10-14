@@ -30,6 +30,7 @@
          and ring on the lock screen -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <!-- Vibe in-app updater: open the downloaded update in the installer -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />

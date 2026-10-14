@@ -199,11 +199,5 @@ android/app/google-services.json
 ios/Runner.ipa
 ios/Runner/GoogleServices-Info.plist
 
-# Element Call, fetched at build time (scripts/fetch_element_call.sh)
-/assets/element-call/*
-!/assets/element-call/README.md
-!/assets/element-call/assets/
-/assets/element-call/assets/*
-!/assets/element-call/assets/.gitkeep
 /assets/vibe_call/matrix-widget-api.min.js
 /assets/vibe_call/matrix-widget-api.LICENSE

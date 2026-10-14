@@ -265,22 +265,22 @@ class VibeCreditsSheet extends StatelessWidget {
       'https://matrix.org',
     ],
     [
-      'Element Call',
-      'Voice and video calls',
-      'GNU AGPL v3 · New Vector Ltd (Element)',
-      'https://github.com/element-hq/element-call',
-    ],
-    [
-      'matrix-widget-api',
-      'Connects Vibe to Element Call',
-      'Apache License 2.0 · The Matrix.org Foundation',
-      'https://github.com/matrix-org/matrix-widget-api',
-    ],
-    [
-      'LiveKit',
-      'Call audio and video (inside Element Call)',
+      'LiveKit Flutter SDK',
+      'Call audio, video and screen sharing',
       'Apache License 2.0 · LiveKit, Inc.',
-      'https://github.com/livekit/client-sdk-js',
+      'https://github.com/livekit/client-sdk-flutter',
+    ],
+    [
+      'flutter-webrtc',
+      'WebRTC for calls',
+      'MIT License · flutter-webrtc contributors',
+      'https://github.com/flutter-webrtc/flutter-webrtc',
+    ],
+    [
+      'matrix-js-sdk (MatrixRTC)',
+      'How Vibe\'s calls talk to Element Call and Element X (call membership, keys)',
+      'Apache License 2.0 · The Matrix.org Foundation',
+      'https://github.com/matrix-org/matrix-js-sdk',
     ],
     [
       'Figtree',
