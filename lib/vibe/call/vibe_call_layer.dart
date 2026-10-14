@@ -517,12 +517,10 @@ class _CallControls extends StatelessWidget {
     const scrim = [Color(0xAA000000), Color(0x00000000)];
     return Stack(
       children: [
-        // reactions float up the screen (Element Call shows its own over
-        // the video, so only on Vibe's voice screen)
-        if (!stage)
-          Positioned.fill(
-            child: IgnorePointer(child: _FloatingReactions(call: call)),
-          ),
+        // reactions float up the screen (yours and everyone else's)
+        Positioned.fill(
+          child: IgnorePointer(child: _FloatingReactions(call: call)),
+        ),
         // top bar
         Positioned(
           left: 0,

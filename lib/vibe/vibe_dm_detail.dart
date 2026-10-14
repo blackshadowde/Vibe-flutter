@@ -174,9 +174,8 @@ class VibeDmDetail extends StatelessWidget {
             else ...[
               VibeHashRow(
                 label: 'chat',
-                subtitle: room.encrypted
-                    ? '🔒 End-to-end encrypted'
-                    : null,
+                subtitle: room.encrypted ? 'End-to-end encrypted' : null,
+                subtitleIcon: Icons.lock_rounded,
                 onTap: onOpenChat,
               ),
               VibeCallWatch(
@@ -269,8 +268,11 @@ class VibeDmDetail extends StatelessWidget {
                 VibeHashRow(
                   label: 'privacy',
                   subtitle: VibeGroups.isPublic(room)
-                      ? '🌐 Public · anyone can join'
-                      : '🔒 Private · invite only',
+                      ? 'Public · anyone can join'
+                      : 'Private · invite only',
+                  subtitleIcon: VibeGroups.isPublic(room)
+                      ? Icons.public_rounded
+                      : Icons.lock_rounded,
                   onTap: () => VibeGroupEdit.privacy(context, room),
                 ),
                 VibeHashRow(
@@ -343,6 +345,9 @@ class VibePaneHeader extends StatelessWidget {
 class VibeHashRow extends StatelessWidget {
   final String label;
   final String? subtitle;
+
+  /// Small icon in front of the line under the label (a lock, a globe).
+  final IconData? subtitleIcon;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
 
@@ -359,6 +364,7 @@ class VibeHashRow extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.subtitle,
+    this.subtitleIcon,
     this.onLongPress,
     this.bold = false,
     this.trailing,
@@ -415,11 +421,21 @@ class VibeHashRow extends StatelessWidget {
                     if (subtitle != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 1),
-                        child: Text(
-                          subtitle!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 13, color: muted),
+                        child: Row(
+                          children: [
+                            if (subtitleIcon != null) ...[
+                              Icon(subtitleIcon, size: 12.5, color: muted),
+                              const SizedBox(width: 4),
+                            ],
+                            Flexible(
+                              child: Text(
+                                subtitle!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 13, color: muted),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                   ],

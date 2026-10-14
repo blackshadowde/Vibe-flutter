@@ -373,6 +373,9 @@ class VibeCall extends ChangeNotifier {
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: true,
+            // cuts low hum and handling noise
+            highPassFilter: true,
+            voiceIsolation: true,
           ),
           defaultCameraCaptureOptions: const lk.CameraCaptureOptions(
             params: lk.VideoParametersPresets.h720_169,
@@ -416,7 +419,25 @@ class VibeCall extends ChangeNotifier {
         })
         ..on<lk.TrackE2EEStateEvent>(
           (e) => _log('e2ee ${e.participant.identity}: ${e.state.name}'),
-        );
+        )
+        ..on<lk.TrackPublishedEvent>(
+          (e) => _log(
+            '${e.participant.identity} published ${e.publication.source.name}',
+          ),
+        )
+        ..on<lk.TrackMutedEvent>(
+          (e) => _log(
+            '${e.participant.identity} muted ${e.publication.source.name}',
+          ),
+        )
+        ..on<lk.TrackUnmutedEvent>(
+          (e) => _log(
+            '${e.participant.identity} unmuted ${e.publication.source.name}',
+          ),
+        )
+        // Cameras turned on later, mutes, new tracks: redraw on any change
+        // (the room itself only reports some of them).
+        ..listen((_) => _onLiveKitChange());
       await lkRoom.connect(sfuUrl, jwt);
       _log('connected to the call server');
       if (this.room?.id != room.id) {
@@ -855,9 +876,21 @@ class VibeCall extends ChangeNotifier {
   // ---------------------------------------------------------------------
 
   /// Send an emoji reaction to everyone in the call.
+  /// Your current membership event (what Element Call matches reactions
+  /// and raised hands against).
+  String? get _ownMembershipEventId {
+    final r = room;
+    if (r == null) return null;
+    final me = '${r.client.userID}:${r.client.deviceID}';
+    for (final m in VibeCallMembers.sessions(r)) {
+      if (m.participantId == me && m.eventId != null) return m.eventId;
+    }
+    return _session?.membershipEventId;
+  }
+
   Future<void> react(String emoji, String name) async {
     final r = room;
-    final target = _session?.membershipEventId;
+    final target = _ownMembershipEventId;
     if (r == null || target == null || stage != VibeCallStage.inCall) {
       _snack('Reactions work once the call has connected.');
       return;
@@ -868,7 +901,7 @@ class VibeCall extends ChangeNotifier {
       VibeCallReaction(emoji, r.client.userID!),
     ];
     try {
-      await r.sendEvent(
+      final id = await r.sendEvent(
         {
           'm.relates_to': {'rel_type': 'm.reference', 'event_id': target},
           'emoji': emoji,
@@ -877,6 +910,7 @@ class VibeCall extends ChangeNotifier {
         type: VibeCallReaction.type,
         displayPendingEvent: false,
       );
+      _log('reaction $name sent $id (to $target)');
     } catch (e) {
       _log('reaction failed: $e');
     }
@@ -887,7 +921,7 @@ class VibeCall extends ChangeNotifier {
 
   Future<void> toggleHand() async {
     final r = room;
-    final target = _session?.membershipEventId;
+    final target = _ownMembershipEventId;
     if (r == null || target == null || stage != VibeCallStage.inCall) {
       _snack('Wait until the call has connected.');
       return;

@@ -70,9 +70,13 @@ abstract class VibeChatActions {
           );
           if (ok != true) return;
           if (VibeCall.instance.isIn(room)) await VibeCall.instance.hangup();
-          await VibeDmFinder.delete(room);
+          final name = room.getLocalizedDisplayname();
+          final problem = await VibeDmFinder.delete(room);
+          if (problem != null) {
+            Logs().w('Vibe: delete chat: server said $problem');
+          }
           messenger.showSnackBar(
-            SnackBar(content: Text('Deleted ${room.getLocalizedDisplayname()}')),
+            SnackBar(content: Text('Deleted $name')),
           );
         case 'read':
           final last = room.lastEvent;

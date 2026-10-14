@@ -35,6 +35,34 @@ final Map<String, DateTime> lastReceivedPushNotification = {};
 /// both deliver the same message): each is shown once.
 final Set<String> _shownEventIds = {};
 
+/// Messages can reach Vibe twice: through its own always-on connection and
+/// through Firebase, which may run in a separate background isolate (so the
+/// in-memory set above doesn't see it). Shown event IDs are also kept in
+/// shared preferences, which both see.
+const _shownKey = 'vibe_shown_notification_events';
+
+Future<bool> _shownElsewhere(String eventId) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    return (prefs.getStringList(_shownKey) ?? const []).contains(eventId);
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<void> _markShown(String eventId) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final list = [...?prefs.getStringList(_shownKey)];
+    if (list.contains(eventId)) return;
+    list.add(eventId);
+    if (list.length > 200) list.removeRange(0, list.length - 200);
+    await prefs.setStringList(_shownKey, list);
+  } catch (_) {}
+}
+
 Future<void> pushHelper(
   PushNotification notification, {
   List<Client>? clients,
@@ -112,6 +140,10 @@ Future<void> _tryPushHelper(
       return;
     }
     if (_shownEventIds.length > 300) _shownEventIds.remove(_shownEventIds.first);
+    if (await _shownElsewhere(shownId)) {
+      Logs().v('Push helper: already shown elsewhere $shownId');
+      return;
+    }
   }
 
   final isBackgroundMessage = clients == null;
@@ -294,6 +326,18 @@ Future<void> _tryPushHelper(
   }
 
   final matrixLocals = MatrixLocals(l10n);
+
+  // Couldn't open the message here (a Firebase wake-up in the background):
+  // give Vibe's own connection a moment to show it with the real text, and
+  // don't add a second "New message" line if it did.
+  if (event.type == EventTypes.Encrypted) {
+    await Future<void>.delayed(const Duration(seconds: 4));
+    if (await _shownElsewhere(event.eventId)) {
+      Logs().v('Push helper: shown by the direct connection already');
+      return;
+    }
+  }
+  await _markShown(event.eventId);
 
   // Calculate the body
   final body = event.type == EventTypes.Encrypted

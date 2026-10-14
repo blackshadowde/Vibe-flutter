@@ -69,20 +69,73 @@ abstract class VibeDmFinder {
 
   /// Leave and forget a chat ("Delete chat"). The other person keeps their
   /// copy; Matrix can't delete a chat for both sides.
-  static Future<void> delete(Room room) async {
+  ///
+  /// Even when the server refuses (a chat it no longer knows you're in,
+  /// left over from an older Vibe), the chat is removed from this phone.
+  /// Returns the server's complaint, if any, for the log.
+  static Future<String?> delete(Room room) async {
+    final client = room.client;
+    final id = room.id;
+    String? problem;
+    // not in the archive and not a direct chat any more
+    try {
+      if (room.tags.isNotEmpty) {
+        for (final t in room.tags.keys.toList()) {
+          await room.removeTag(t);
+        }
+      }
+    } catch (_) {}
     if (room.membership != Membership.leave) {
       try {
-        await room.leave();
+        await client.leaveRoom(id);
       } on MatrixException catch (e) {
-        // already gone on the server: just forget it
-        if (e.errcode != 'M_FORBIDDEN' && e.errcode != 'M_NOT_FOUND') rethrow;
+        problem = '${e.errcode}: ${e.errorMessage}';
+      } catch (e) {
+        problem = '$e';
       }
     }
     try {
-      await room.forget();
+      await removeFromDirect(client, id);
+    } catch (_) {}
+    // Make this phone drop it, whatever the server said.
+    try {
+      await client.database.transaction(() async {
+        await client.handleSync(
+          SyncUpdate(
+            nextBatch: '',
+            rooms: RoomsUpdate(leave: {id: LeftRoomUpdate()}),
+          ),
+        );
+      });
     } catch (e) {
-      Logs().v('Vibe: forget failed $e');
+      Logs().v('Vibe: local leave failed $e');
     }
+    try {
+      await client.database.forgetRoom(id);
+    } catch (_) {}
+    try {
+      await client.forgetRoom(id);
+    } catch (_) {}
+    client.archivedRooms.removeWhere((r) => r.room.id == id);
+    return problem;
+  }
+
+  /// Take [roomId] out of your account's direct chat list (m.direct).
+  static Future<void> removeFromDirect(Client client, String roomId) async {
+    final direct = client.accountData['m.direct']?.content;
+    if (direct == null) return;
+    var changed = false;
+    final next = <String, Object?>{};
+    direct.forEach((user, rooms) {
+      if (rooms is List && rooms.contains(roomId)) {
+        changed = true;
+        next[user] = rooms.where((r) => r != roomId).toList();
+      } else {
+        next[user] = rooms;
+      }
+    });
+    if (!changed) return;
+    await client.setAccountData(client.userID!, 'm.direct', next);
   }
 
   /// Older Vibe versions sometimes made a second, unencrypted chat with

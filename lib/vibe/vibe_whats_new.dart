@@ -19,6 +19,10 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
       ('👥', 'Group video calls show everyone in a grid, with a green ring around whoever is talking'),
       ('🔒', 'Calls stay end-to-end encrypted and still work with Element, Element X and Sable'),
       ('📵', 'An unanswered or declined call ends by itself'),
+      ('🔔', 'No more double notifications (one with the message and one saying only "New message")'),
+      ('🗑', 'Delete chat now always removes the chat from your phone, even ones the server no longer knows about'),
+      ('📹', 'Their camera now shows up when they turn it on during a call'),
+      ('😀', 'Call reactions float up the screen in video calls too'),
     ],
   ),
   (

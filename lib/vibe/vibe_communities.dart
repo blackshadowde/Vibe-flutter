@@ -679,8 +679,9 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
               VibeHashRow(
                 label: 'privacy',
                 subtitle: isPublic
-                    ? '🌐 Public · anyone can join'
-                    : '🔒 Private · invite only',
+                    ? 'Public · anyone can join'
+                    : 'Private · invite only',
+                subtitleIcon: isPublic ? Icons.public_rounded : Icons.lock_rounded,
                 onTap: () => VibeGroupEdit.privacy(context, space),
               ),
               VibeHashRow(label: 'leave-community', onTap: _leave),

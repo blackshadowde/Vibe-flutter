@@ -1180,7 +1180,7 @@ class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
                       subtitle: Text(
                         _community
                             ? 'Only people you invite can join'
-                            : '🔒 End-to-end encrypted, invite only',
+                            : 'End-to-end encrypted, invite only',
                         style: TextStyle(color: t2),
                       ),
                     ),
