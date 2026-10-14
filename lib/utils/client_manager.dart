@@ -127,6 +127,8 @@ abstract class ClientManager {
         // Vibe custom status + time zone
         'chat.vibe.status',
         'chat.vibe.disappearing',
+        // Who is in a call (MatrixRTC), for the call buttons and badges
+        'org.matrix.msc3401.call.member',
       },
       customImageResizer: PlatformInfos.supportsCustomImageResizer
           ? customImageResizer

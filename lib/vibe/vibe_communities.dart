@@ -4,6 +4,9 @@ import 'dart:async';
 
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/call/vibe_call.dart';
+import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
+import 'package:fluffychat/vibe/call/vibe_call_members.dart';
 import 'package:fluffychat/vibe/vibe_dm_detail.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
@@ -107,10 +110,14 @@ abstract class VibeCommunities {
     Room space,
     String name, {
     List<String> invite = const [],
+    bool voice = false,
   }) async {
     final isPublic = space.joinRules == JoinRules.public;
     final id = await client.createRoom(
       name: name,
+      // voice channels are call rooms, the same kind Sable and Element use
+      creationContent: voice ? {'type': VibeCallMembers.voiceRoomType} : null,
+      powerLevelContentOverride: VibeCallPower.createOverride,
       preset: isPublic
           ? CreateRoomPreset.publicChat
           : CreateRoomPreset.privateChat,
@@ -139,38 +146,72 @@ abstract class VibeCommunities {
 
   static Future<void> newChannel(BuildContext context, Room space) async {
     final ctrl = TextEditingController();
+    var voice = false;
     final name = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('New channel'),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          decoration: const InputDecoration(
-            prefixText: '# ',
-            hintText: 'channel-name',
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: const Text('New channel'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ChoiceChip(
+                      avatar: const Icon(Icons.tag, size: 18),
+                      label: const Text('Text'),
+                      selected: !voice,
+                      showCheckmark: false,
+                      onSelected: (_) => setLocal(() => voice = false),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ChoiceChip(
+                      avatar: const Icon(Icons.volume_up, size: 18),
+                      label: const Text('Voice'),
+                      selected: voice,
+                      showCheckmark: false,
+                      onSelected: (_) => setLocal(() => voice = true),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: ctrl,
+                autofocus: true,
+                decoration: InputDecoration(
+                  prefixText: voice ? '🔊 ' : '# ',
+                  hintText: voice ? 'voice-chat' : 'channel-name',
+                ),
+                onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
+              ),
+            ],
           ),
-          onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+              child: const Text('Create'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-            child: const Text('Create'),
-          ),
-        ],
       ),
     );
     ctrl.dispose();
     if (name == null || name.isEmpty || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     try {
-      await createChannel(space.client, space, name);
+      await createChannel(space.client, space, name, voice: voice);
       VibeHaptics.light();
-      messenger.showSnackBar(SnackBar(content: Text('Created #$name')));
+      messenger.showSnackBar(
+        SnackBar(content: Text(voice ? 'Created voice channel $name' : 'Created #$name')),
+      );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('$e')));
     }
@@ -258,12 +299,14 @@ class _Channel {
   final String? topic;
   final int members;
   final List<String> via;
+  final bool voice;
   const _Channel({
     required this.id,
     required this.name,
     this.topic,
     this.members = 0,
     this.via = const [],
+    this.voice = false,
   });
 }
 
@@ -333,6 +376,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
               topic: r.topic,
               members: r.numJoinedMembers,
               via: via[r.roomId] ?? const [],
+              voice: r.roomType == VibeCallMembers.voiceRoomType,
             ),
       ];
       if (mounted) setState(() => _remote = list);
@@ -357,6 +401,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
           name: VibeGroups.nameOf(context, r),
           members: VibeGroups.memberCount(r),
           via: c.via,
+          voice: VibeCallMembers.isVoiceRoom(r),
         ),
       );
     }
@@ -367,7 +412,11 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
     final client = space.client;
     final local = client.getRoomById(c.id);
     if (local != null && local.membership == Membership.join) {
-      widget.onOpenRoom(local);
+      if (c.voice) {
+        await VibeCall.join(context, local);
+      } else {
+        widget.onOpenRoom(local);
+      }
       return;
     }
     setState(() => _joining = c.id);
@@ -376,7 +425,13 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
       await VibeCommunities._waitFor(client, c.id);
       VibeHaptics.light();
       final r = client.getRoomById(c.id);
-      if (r != null && mounted) widget.onOpenRoom(r);
+      if (r != null && mounted) {
+        if (c.voice) {
+          await VibeCall.join(context, r);
+        } else {
+          widget.onOpenRoom(r);
+        }
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -702,10 +757,42 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
         ),
       );
     }
+    if (c.voice && local != null) {
+      // Voice channel you're in: show who's talking in it, Discord style.
+      return VibeCallWatch(
+        key: ValueKey(c.id),
+        room: local,
+        builder: (context, inCall) {
+          final mine = VibeCall.instance.isIn(local);
+          final live = mine || inCall.isNotEmpty;
+          return VibeHashRow(
+            label: label.isEmpty ? 'voice' : label,
+            icon: Icons.volume_up,
+            iconColor: live ? const Color(0xFF23A55A) : null,
+            bold: live,
+            subtitle: mine
+                ? 'You\'re here · tap to open'
+                : inCall.isNotEmpty
+                ? '${inCall.length} talking · tap to join'
+                : 'Tap to join voice',
+            trailing: _joining == c.id
+                ? trailing
+                : inCall.isEmpty
+                ? null
+                : VibeCallFaces(room: local, userIds: inCall),
+            onTap: () => _open(c),
+            onLongPress: () => _channelMenu(c),
+          );
+        },
+      );
+    }
     return VibeHashRow(
       key: ValueKey(c.id),
       label: label.isEmpty ? 'channel' : label,
-      subtitle: subtitle,
+      icon: c.voice ? Icons.volume_up : null,
+      subtitle: c.voice && local == null
+          ? (c.members > 0 ? '${c.members} members · voice' : 'Voice channel')
+          : subtitle,
       bold: local?.isUnread ?? false,
       trailing: trailing,
       onTap: () => _open(c),

@@ -11,6 +11,18 @@ import 'package:package_info_plus/package_info_plus.dart';
 /// number is added automatically by the release workflow).
 const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
+    version: '3.0',
+    items: [
+      ('📞', 'Voice and video calls! Tap the phone (or camera) at the top of any chat. Calls are end-to-end encrypted and work with people on Sable, Element and Element X'),
+      ('🔊', 'Voice chats for groups: tap # | voice in the group pane, or the green "Join" when one is live. You see who\'s in it before you join'),
+      ('🎧', 'Voice channels in communities: + → Voice. Hop in and out like Discord; the rail shows a green speaker where people are talking'),
+      ('⬇', 'Keep using Vibe during a call: tap the arrow and the call shrinks to a green bar at the top. Mute, hang up or jump back in from there'),
+      ('🔔', 'Incoming calls ring full screen, even from the lock screen. Answer or decline in one tap'),
+      ('🎙', 'Deafen (hear nobody), earpiece or loudspeaker, camera on or off, all during the call'),
+      ('ℹ', 'Calls need your server to support Matrix calls (matrix.org and most bigger servers do). Old groups may ask an admin to turn calls on once'),
+    ],
+  ),
+  (
     version: '2.2',
     items: [
       ('🏘', 'Communities: tap + in the rail → Create community. Several channels (# | general, …) in one place, like a server. Communities sit at the bottom of the rail with an unread badge; add channels with + or add groups you already have'),

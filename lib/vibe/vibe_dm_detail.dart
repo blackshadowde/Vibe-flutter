@@ -8,6 +8,8 @@ import 'package:fluffychat/pages/chat/events/audio_player.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/call/vibe_call.dart';
+import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_media_viewer.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -177,6 +179,32 @@ class VibeDmDetail extends StatelessWidget {
                     : null,
                 onTap: onOpenChat,
               ),
+              VibeCallWatch(
+                room: room,
+                builder: (context, inCall) {
+                  final mine = VibeCall.instance.isIn(room);
+                  final live = mine || inCall.isNotEmpty;
+                  return VibeHashRow(
+                    label: group ? 'voice' : 'call',
+                    icon: Icons.volume_up,
+                    iconColor: live ? const Color(0xFF23A55A) : null,
+                    bold: live,
+                    subtitle: mine
+                        ? 'You\'re in the call · tap to open'
+                        : inCall.isNotEmpty
+                        ? 'Live · ${inCall.length} in the call · tap to join'
+                        : group
+                        ? 'Start a voice chat for the group'
+                        : 'Voice call · long-press for video',
+                    trailing: inCall.isEmpty
+                        ? null
+                        : VibeCallFaces(room: room, userIds: inCall),
+                    onTap: () => VibeCall.join(context, room),
+                    onLongPress: () =>
+                        VibeCall.join(context, room, video: true),
+                  );
+                },
+              ),
               const VibePaneHeader('INFO'),
               VibeHashRow(
                 label: 'media',
@@ -301,6 +329,10 @@ class VibeHashRow extends StatelessWidget {
 
   /// Shown at the end of the row (unread badge, "Join").
   final Widget? trailing;
+
+  /// "#" for text, "🔊"-style icon for voice.
+  final IconData? icon;
+  final Color? iconColor;
   const VibeHashRow({
     required this.label,
     required this.onTap,
@@ -308,6 +340,8 @@ class VibeHashRow extends StatelessWidget {
     this.onLongPress,
     this.bold = false,
     this.trailing,
+    this.icon,
+    this.iconColor,
     super.key,
   });
 
@@ -327,11 +361,13 @@ class VibeHashRow extends StatelessWidget {
             children: [
               SizedBox(
                 width: 28,
-                child: Text(
-                  '#',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 21, color: muted),
-                ),
+                child: icon != null
+                    ? Icon(icon, size: 21, color: iconColor ?? muted)
+                    : Text(
+                        '#',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 21, color: muted),
+                      ),
               ),
               const SizedBox(width: 14),
               Expanded(

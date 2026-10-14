@@ -26,6 +26,11 @@
     <!-- Vibe built-in notifications (ntfy) keep a connection open -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- Vibe calls: keep the microphone / camera on with the screen off,
+         and ring on the lock screen -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <!-- Vibe in-app updater: open the downloaded update in the installer -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
@@ -42,6 +47,7 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:localeConfig="@xml/locale_config"
+        android:networkSecurityConfig="@xml/network_security_config"
     >
         <activity
             android:name=".MainActivity"

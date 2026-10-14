@@ -5,6 +5,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/file_selector.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_communities.dart';
 import 'package:fluffychat/vibe/vibe_public_rooms.dart';
@@ -1067,6 +1068,7 @@ class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
           roomAliasName: slug,
           invite: _picked.toList(),
           initialState: avatarState,
+          powerLevelContentOverride: VibeCallPower.createOverride,
         );
         await client.waitForRoomInSync(id, join: true);
       } else {
@@ -1076,6 +1078,7 @@ class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
           enableEncryption: true,
           preset: CreateRoomPreset.privateChat,
           initialState: avatarState,
+          powerLevelContentOverride: VibeCallPower.createOverride,
         );
       }
       VibeHaptics.medium();

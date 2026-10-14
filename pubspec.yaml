@@ -9,7 +9,7 @@ publish_to: none
 # On version bump please also increase:
 # 1. The build number (for F-Droid)
 # 2. The version in /snap/snapcraft.yaml
-version: 2.2.0+1
+version: 3.0.0+1
 
 environment:
   sdk: ">=3.11.1 <4.0.0"
@@ -67,6 +67,7 @@ dependencies:
   path: ^1.9.0
   path_provider: ^2.1.6
   path_provider_foundation: ^2.6.0
+  permission_handler: ^12.0.1
   pretty_qr_code: ^3.6.0
   provider: ^6.0.2
   punycode: ^1.0.0
@@ -87,6 +88,8 @@ dependencies:
   video_compress: ^3.1.4
   video_player: ^2.13.0
   wakelock_plus: ^1.7.0
+  webview_flutter: ^4.14.1
+  webview_flutter_android: ^4.14.1
   webrtc_interface: ^1.5.1
 
 dev_dependencies:
@@ -107,6 +110,9 @@ flutter:
     - assets/logo/mini/
     - assets/sounds/
     - assets/vodozemac/
+    - assets/vibe_call/
+    - assets/element-call/
+    - assets/element-call/assets/
   fonts:
     - family: GGSans
       fonts:

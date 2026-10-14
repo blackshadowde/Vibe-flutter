@@ -6,6 +6,8 @@
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
+import 'package:fluffychat/vibe/call/vibe_call_members.dart';
 import 'package:fluffychat/vibe/vibe_communities.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -199,6 +201,18 @@ class VibeDmRail extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            if (_hasCall(room))
+                              Positioned(
+                                bottom: 0,
+                                right: 6,
+                                child: IgnorePointer(
+                                  child: VibeCallBadge(
+                                    ring: theme
+                                        .colorScheme
+                                        .surfaceContainerLowest,
+                                  ),
+                                ),
+                              ),
                             if (room.isFavourite)
                               Positioned(
                                 bottom: 0,
@@ -286,5 +300,15 @@ class VibeDmRail extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// A live call here (or, for a community, in one of its channels).
+  static bool _hasCall(Room room) {
+    if (!room.isSpace) return VibeCallMembers.active(room);
+    for (final id in VibeCommunities.childIds(room)) {
+      final r = room.client.getRoomById(id);
+      if (r != null && VibeCallMembers.active(r)) return true;
+    }
+    return false;
   }
 }

@@ -32,6 +32,18 @@ abstract class ForegroundServices {
     FlutterForegroundTask.stopService();
   }
 
+  /// Start the connection service again after something else (a call)
+  /// used the foreground slot.
+  static Future<void> resume() async {
+    if (runningServices.isEmpty || kIsWeb) return;
+    final names = List<String>.of(runningServices);
+    runningServices.clear();
+    await startService(names.first);
+    runningServices
+      ..clear()
+      ..addAll(names);
+  }
+
   static Future<void> startService(String name) async {
     try {
       runningServices.add(name);

@@ -17,6 +17,7 @@ import 'package:fluffychat/pages/chat/pinned_events.dart';
 import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
+import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/chat_settings_popup_menu.dart';
@@ -246,13 +247,8 @@ class ChatView extends StatelessWidget {
                         ],
                       ),
                   ] else if (!controller.room.isArchived) ...[
-                    if ((AppSettings.experimentalVoip.value &&
-                        controller.room.isDirectChat))
-                      IconButton(
-                        onPressed: controller.onPhoneButtonTap,
-                        icon: const Icon(Icons.call_outlined),
-                        tooltip: L10n.of(context).placeCall,
-                      ),
+                    // Vibe calls (Element Call / MatrixRTC, like Sable)
+                    VibeCallActions(room: controller.room),
                     if (controller.room.encrypted)
                       IconButton(
                         icon: const Icon(Icons.lock_outline),

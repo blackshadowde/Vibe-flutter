@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'package:fluffychat/pages/chat_list/chat_list.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
+import 'package:fluffychat/vibe/call/vibe_call_members.dart';
 import 'package:fluffychat/vibe/vibe_archive.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
 import 'package:fluffychat/vibe/vibe_communities.dart';
@@ -330,6 +331,7 @@ class _RoomListBuilderState extends State<_RoomListBuilder> {
         r.isUnreadOrInvited,
         r.joinRules,
         r.isSpace ? r.spaceChildren.length : 0,
+        VibeCallMembers.userIds(r).length,
       );
     }
     return h;
