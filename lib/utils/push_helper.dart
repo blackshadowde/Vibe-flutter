@@ -20,6 +20,7 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/start_push_foreground_service.dart';
 import 'package:fluffychat/vibe/call/vibe_call_members.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
+import 'package:fluffychat/vibe/vibe_peek.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -322,6 +323,17 @@ Future<void> _tryPushHelper(
         ),
       ),
     );
+    return;
+  }
+
+  // You're in another chat right now: their picture peeks in above the
+  // typing bar instead of a notification popping up.
+  if (clients != null &&
+      activeRoomId != null &&
+      activeRoomId != notification.roomId &&
+      WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+    VibePeek.instance.message(event);
+    await _markShown(event.eventId);
     return;
   }
 

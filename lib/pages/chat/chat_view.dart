@@ -17,6 +17,7 @@ import 'package:fluffychat/pages/chat/pinned_events.dart';
 import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
+import 'package:fluffychat/vibe/vibe_peek.dart';
 import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
 import 'package:fluffychat/vibe/vibe_lock_button.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
@@ -380,7 +381,13 @@ class ChatView extends StatelessWidget {
                           bottom: 0,
                           left: 0,
                           right: 0,
-                          child: SizeChangedLayoutNotifier(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // others typing / writing to you peek in here
+                              VibePeekBar(room: controller.room),
+                              SizeChangedLayoutNotifier(
                             child: Container(
                               key: controller.inputBarKey,
                               decoration: BoxDecoration(
@@ -482,6 +489,8 @@ class ChatView extends StatelessWidget {
                                     : SizedBox.shrink(),
                               ),
                             ),
+                          ),
+                            ],
                           ),
                         ),
                         if (controller.dragging)

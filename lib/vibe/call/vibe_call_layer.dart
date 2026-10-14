@@ -9,6 +9,7 @@ import 'package:fluffychat/vibe/call/vibe_call_members.dart';
 import 'package:fluffychat/vibe/call/vibe_call_ring.dart';
 import 'package:fluffychat/vibe/vibe_crash_report.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_peek.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -55,6 +56,7 @@ class _VibeCallHostState extends State<VibeCallHost>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _ring.attach(Matrix.of(context).client);
+    VibePeek.instance.attach(Matrix.of(context).client);
   }
 
   @override
