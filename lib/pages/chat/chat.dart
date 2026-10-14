@@ -409,9 +409,17 @@ class ChatController extends State<ChatPageWithRoom>
     }
   }
 
+  /// False while the chat is still sliding in. Work that isn't needed for
+  /// the first screenful (pre-building messages beyond the edge, the status
+  /// bubble) waits until the slide is done, so opening a chat stays smooth.
+  bool routeSettled = false;
+
   @override
   void initState() {
     inputFocus = FocusNode(onKeyEvent: _customEnterKeyHandling);
+    Future<void>.delayed(const Duration(milliseconds: 380), () {
+      if (mounted) setState(() => routeSettled = true);
+    });
 
     scrollController.addListener(_updateScrollController);
     inputFocus.addListener(_inputFocusListener);

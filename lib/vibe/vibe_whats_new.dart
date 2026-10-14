@@ -13,6 +13,8 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
+      ('📌', 'Long-press a picture in the left rail: Pin, Mute or Archive the chat with one tap'),
+      ('🗄️', 'Archived chats are hidden; long-press your own picture at the top of the rail to open them. A chat comes back while it has new messages (unless muted)'),
       ('✨', 'Motion like Apple\'s fluid interfaces: panes and pages move on springs, a flick keeps its speed when you close a chat, and you can grab a page while it\'s still sliding in'),
       ('🔠', 'Text size like Telegram: Settings → Style, 12 to 30 (16 is normal). Only message text changes; names and times stay the same. The preview now looks exactly like your chats'),
       ('🖼️', 'Tap a photo or video in a chat for a Google Messages style slideshow of the whole chat; long-press one to jump to it. The download button saves straight to your gallery'),

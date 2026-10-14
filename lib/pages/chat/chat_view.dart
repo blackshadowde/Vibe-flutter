@@ -386,6 +386,7 @@ class ChatView extends StatelessWidget {
                           child: ChatEventList(controller: controller),
                         ),
                         if (controller.room.isDirectChat &&
+                            controller.routeSettled &&
                             AppSettings.vibeStatusBubble.value &&
                             controller.selectedEvents.isEmpty)
                           Positioned(

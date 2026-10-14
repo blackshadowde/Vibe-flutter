@@ -296,21 +296,20 @@ class ChatInputRow extends StatelessWidget {
                               icon: const Icon(Icons.graphic_eq, size: 28),
                             ),
                           )
-                        : GestureDetector(
-                            // Long-press: send with effect / send later
+                        // Long-press: send with effect / send later. No
+                        // tooltip: a tooltip takes the long-press for itself,
+                        // which is why the effects never opened.
+                        : IconButton(
+                            key: Key('send_button'),
+                            onPressed: controller.send,
                             onLongPress: () =>
                                 VibeEffects.showSendOptions(context, controller),
-                            child: IconButton(
-                              key: Key('send_button'),
-                              tooltip: L10n.of(context).send,
-                              onPressed: controller.send,
-                              style: IconButton.styleFrom(
-                                backgroundColor: const Color(0xFFDCE4FF),
-                                foregroundColor: const Color(0xFF226DFD),
-                                fixedSize: const Size(56, 56),
-                              ),
-                              icon: const Icon(Icons.send_rounded, size: 24),
+                            style: IconButton.styleFrom(
+                              backgroundColor: const Color(0xFFDCE4FF),
+                              foregroundColor: const Color(0xFF226DFD),
+                              fixedSize: const Size(56, 56),
                             ),
+                            icon: const Icon(Icons.send_rounded, size: 24),
                           ),
                   ),
                   const SizedBox(width: 10),

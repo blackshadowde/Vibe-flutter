@@ -25,6 +25,9 @@ class VibeDmRail extends StatelessWidget {
   final VoidCallback onHome;
   final void Function(Room room)? onLongPress;
 
+  /// Long-press your own picture: the hidden archive.
+  final VoidCallback? onOwnLongPress;
+
   const VibeDmRail({
     required this.rooms,
     required this.selectedId,
@@ -32,6 +35,7 @@ class VibeDmRail extends StatelessWidget {
     required this.onSelect,
     required this.onHome,
     this.onLongPress,
+    this.onOwnLongPress,
     super.key,
   });
 
@@ -50,7 +54,9 @@ class VibeDmRail extends StatelessWidget {
               const SizedBox(height: 10),
               VibeOwnProfileBuilder(
                 client: client,
-                builder: (context, profile) => Avatar(
+                builder: (context, profile) => GestureDetector(
+                  onLongPress: onOwnLongPress,
+                  child: Avatar(
                   mxContent: profile?.avatarUrl,
                   name: profile?.displayName ?? client.userID?.localpart,
                   size: 48,
@@ -59,6 +65,7 @@ class VibeDmRail extends StatelessWidget {
                   presenceBackgroundColor:
                       theme.colorScheme.surfaceContainerLowest,
                   onTap: onHome,
+                ),
                 ),
               ),
               Padding(

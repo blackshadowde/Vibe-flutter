@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'package:fluffychat/pages/chat_list/chat_list.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
+import 'package:fluffychat/vibe/vibe_archive.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_dm_detail.dart';
@@ -162,6 +163,7 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                   (r) =>
                       !r.isSpace &&
                       !VibeLock.isLocked(r.id) &&
+                      !VibeArchive.hidden(r) &&
                       (r.membership == Membership.join ||
                           r.membership == Membership.invite),
                 )
@@ -190,6 +192,14 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                       activeRoomId: controller.activeChat,
                       onSelect: (room) => setState(() => selectedId = room.id),
                       onHome: () => setState(() => selectedId = null),
+                      onOwnLongPress: () => VibeArchive.open(
+                        context,
+                        client,
+                        onOpen: (room) {
+                          _lastOpenedId = room.id;
+                          controller.onChatTap(room);
+                        },
+                      ),
                       onLongPress: (room) => VibeChatActions.show(
                         context,
                         room,
@@ -274,6 +284,7 @@ class _RoomListBuilderState extends State<_RoomListBuilder> {
         r.notificationCount,
         r.highlightCount,
         r.isFavourite,
+        VibeArchive.isArchived(r),
         r.lastEvent?.eventId,
         r.lastEvent?.status,
         r.lastEvent?.body,
