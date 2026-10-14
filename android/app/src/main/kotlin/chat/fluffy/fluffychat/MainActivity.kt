@@ -53,7 +53,18 @@ class MainActivity : FlutterFragmentActivity() {
         var engine: FlutterEngine? = null
         fun provideEngine(context: Context): FlutterEngine {
             engine?.let { return it }
-            val eng = FlutterEngine(context, emptyArray(), true, false)
+            // The engine outlives any one screen (Android rebuilds the
+            // screen on theme / colour changes), so it must not hold on to
+            // the first Activity: use the app context.
+            val app = context.applicationContext
+            VibeSystemNative.installCrashRecorder(app)
+            val eng = FlutterEngine(app, emptyArray(), true, false)
+            eng.addEngineLifecycleListener(object : FlutterEngine.EngineLifecycleListener {
+                override fun onPreEngineRestart() {}
+                override fun onEngineWillDestroy() {
+                    if (engine === eng) engine = null
+                }
+            })
             VibeUpdater.register(context, eng)
             VibeBackupNative.register(context, eng)
             VibeSystemNative.register(context, eng)

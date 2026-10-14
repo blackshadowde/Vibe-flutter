@@ -15,10 +15,15 @@ class VibeCallDriver {
   /// Sends a JS call into the host page (`vibe.<fn>(...)`).
   final void Function(String fn, List<Object?> args) toWidget;
 
+  /// Our own call membership was written: true = in the call, false = left.
+  /// The surest sign the call really connected on the Matrix side.
+  final void Function(bool inCall)? onMembership;
+
   VibeCallDriver({
     required this.client,
     required this.roomId,
     required this.toWidget,
+    this.onMembership,
   });
 
   final List<StreamSubscription> _subs = [];
@@ -156,6 +161,10 @@ class VibeCallDriver {
     String? eventId;
     if (stateKey != null) {
       eventId = await client.setRoomStateWithKey(rid, type, stateKey, content);
+      if (type == 'org.matrix.msc3401.call.member' &&
+          stateKey.contains(client.deviceID ?? '\u0000')) {
+        onMembership?.call(content.isNotEmpty);
+      }
     } else {
       final r = client.getRoomById(rid);
       if (r == null) throw StateError('Not in that room');

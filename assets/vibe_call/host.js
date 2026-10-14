@@ -50,6 +50,47 @@
     post({ kind: kind, data: data || {} });
   }
 
+  // Anything that goes wrong ends up in Vibe's call log.
+  function report(where, err) {
+    const msg = err && (err.stack || err.message) ? (err.stack || err.message) : String(err);
+    notify('error', { where: where, message: msg.slice(0, 2000) });
+  }
+  window.addEventListener('error', function (e) {
+    report('host', e.error || e.message);
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    report('host promise', e.reason);
+  });
+  if (!mx) report('host', 'matrix-widget-api did not load');
+
+  // Vibe draws its own call controls, so Element Call's header and footer
+  // (mute, camera, hang up, settings) are hidden inside the call view.
+  const HIDE_CSS =
+    '[class*="_footer_"], [class*="_header_"], [data-testid="incall_leave"],' +
+    '[class*="_toggleLayout_"], [class*="_layoutToggle_"] {' +
+    ' display: none !important; }';
+
+  function styleCall() {
+    try {
+      const doc = iframe && (iframe.contentDocument || iframe.contentWindow.document);
+      if (!doc || !doc.head || doc.getElementById('vibe-style')) return;
+      const st = doc.createElement('style');
+      st.id = 'vibe-style';
+      st.textContent = HIDE_CSS;
+      doc.head.appendChild(st);
+      // forward Element Call's own errors too
+      const w = iframe.contentWindow;
+      w.addEventListener('error', function (e) {
+        report('call', e.error || e.message);
+      });
+      w.addEventListener('unhandledrejection', function (e) {
+        report('call promise', e.reason);
+      });
+    } catch (e) {
+      report('style', e);
+    }
+  }
+
   class VibeDriver extends mx.WidgetDriver {
     // Vibe ships this Element Call build itself, so it gets what it asks for
     // (it only asks for its own room and call events).
@@ -214,6 +255,14 @@
     },
 
     start: function (cfg) {
+      try {
+        this._start(cfg);
+      } catch (e) {
+        report('start', e);
+      }
+    },
+
+    _start: function (cfg) {
       knownRooms = cfg.knownRooms || [cfg.roomId];
       const widget = new mx.Widget({
         id: cfg.widgetId,
@@ -228,12 +277,20 @@
       iframe.title = 'Call';
       iframe.allow = 'microphone; camera; display-capture; autoplay; clipboard-write;';
       iframe.src = widget.getCompleteUrl({ currentUserId: cfg.userId });
+      iframe.addEventListener('load', function () {
+        notify('frame_loaded');
+        styleCall();
+      });
       document.body.appendChild(iframe);
 
       api = new mx.ClientWidgetApi(widget, iframe, new VibeDriver());
       api.setViewedRoomId(cfg.roomId);
       api.on('ready', function () {
         notify('ready');
+        styleCall();
+      });
+      api.on('preparing', function () {
+        notify('preparing');
       });
       handled.forEach(function (action) {
         api.on('action:' + action, function (ev) {

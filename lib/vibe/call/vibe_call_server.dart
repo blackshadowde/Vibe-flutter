@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -81,6 +82,10 @@ abstract class VibeCallServer {
         return;
       }
       if (path.endsWith('/')) path = '${path}index.html';
+      if (path == '/config.json' || path == '/element-call/config.json') {
+        await _config(res);
+        return;
+      }
       final allowed =
           path.startsWith('/element-call/') || path.startsWith('/vibe_call/');
       if (!allowed) {
@@ -106,6 +111,30 @@ abstract class VibeCallServer {
         await res.close();
       } catch (_) {}
     }
+  }
+
+  /// Call service (LiveKit JWT service) found for your server, if Element
+  /// Call might not find it itself (newer servers announce it through
+  /// /rtc/transports instead of .well-known).
+  static String? livekitServiceUrl;
+
+  /// Element Call's own config, plus the call service as a fallback.
+  static Future<void> _config(HttpResponse res) async {
+    Map<String, Object?> config = {};
+    try {
+      final raw = await rootBundle.loadString('assets/element-call/config.json');
+      config = Map<String, Object?>.from(jsonDecode(raw) as Map);
+    } catch (_) {}
+    final url = livekitServiceUrl;
+    if (url != null) {
+      config['livekit'] = {'livekit_service_url': url};
+    }
+    final bytes = utf8.encode(jsonEncode(config));
+    res.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+    res.headers.set(HttpHeaders.cacheControlHeader, 'no-cache');
+    res.contentLength = bytes.length;
+    res.add(bytes);
+    await res.close();
   }
 
   static Future<Uint8List> _load(String key) async {

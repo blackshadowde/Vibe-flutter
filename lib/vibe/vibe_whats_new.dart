@@ -13,14 +13,17 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '3.0',
     items: [
-      ('📞', 'Voice and video calls! Tap the phone (or camera) at the top of any chat. Calls are end-to-end encrypted and work with people on Sable, Element and Element X'),
+      ('📞', 'Voice and video calls! Open a chat\'s pane and tap # | audio-call or # | video-call. End-to-end encrypted, and they work with people on Sable, Element and Element X'),
+      ('📱', 'A proper call screen: big picture, timer, and Speaker · Camera · Mute · End buttons. Tap the grid button to see video'),
       ('🔊', 'Voice chats for groups: tap # | voice in the group pane, or the green "Join" when one is live. You see who\'s in it before you join'),
       ('🎧', 'Voice channels in communities: + → Voice. Hop in and out like Discord; the rail shows a green speaker where people are talking'),
+      ('🔒', 'The chat\'s lock is now top right and shows how safe the chat is: green = verified, amber = a device isn\'t verified, red = not encrypted. Search moved into the ⋮ menu'),
+      ('🩹', 'If Vibe ever closes unexpectedly, it tells you next time and lets you copy a report'),
       ('⬇', 'Keep using Vibe during a call: tap the arrow and the call shrinks to a green bar at the top. Mute, hang up or jump back in from there'),
       ('🔔', 'Incoming calls ring full screen, even from the lock screen. Answer or decline in one tap'),
       ('🎙', 'Deafen (hear nobody), earpiece or loudspeaker, camera on or off, all during the call'),
       ('✨', 'Send with effects plays after your message has slid in, and fills the whole chat above the keyboard'),
-      ('ℹ', 'Calls need your server to support Matrix calls (matrix.org and most bigger servers do). Old groups may ask an admin to turn calls on once'),
+      ('ℹ', 'Starting a call needs a server with Matrix calls (matrix.org has them); Vibe tells you if yours doesn\'t. You can always join calls others start. FluffyChat uses an older call system that doesn\'t work with these calls'),
     ],
   ),
   (

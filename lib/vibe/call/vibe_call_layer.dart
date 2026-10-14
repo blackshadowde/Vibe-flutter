@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' show FontFeature;
 
 import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/call/vibe_call_members.dart';
 import 'package:fluffychat/vibe/call/vibe_call_ring.dart';
+import 'package:fluffychat/vibe/vibe_crash_report.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:matrix/matrix.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 const _green = Color(0xFF23A55A);
@@ -39,6 +42,13 @@ class _VibeCallHostState extends State<VibeCallHost>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Did Vibe crash last time? Offer the report once.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => Future<void>.delayed(
+        const Duration(seconds: 3),
+        VibeCrashReport.check,
+      ),
+    );
   }
 
   @override
@@ -76,7 +86,7 @@ class _VibeCallHostState extends State<VibeCallHost>
         final web = _call.web;
         final showBar = web != null && !_call.expanded;
         final barHeight = mq.padding.top + 44;
-        final chromeTop = mq.padding.top + 60;
+        final stage = web != null && _call.expanded && _call.showStage;
         final ring = _ring.ringing.value;
         return Stack(
           children: [
@@ -107,32 +117,48 @@ class _VibeCallHostState extends State<VibeCallHost>
                 ),
               ],
             ),
+            // 1) Vibe's call screen background (avatar, name, status) —
+            //    hidden behind the video when Element Call's view is shown.
             if (web != null)
               Positioned.fill(
-                key: const ValueKey('chrome'),
+                key: const ValueKey('backdrop'),
                 child: IgnorePointer(
                   ignoring: !_call.expanded,
                   child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 220),
                     opacity: _call.expanded ? 1 : 0,
-                    child: _CallChrome(call: _call, top: chromeTop),
+                    child: _CallBackdrop(call: _call),
                   ),
                 ),
               ),
+            // 2) Element Call itself. Same widget in every mode so the call
+            //    never restarts: full screen for video, 1×1 out of sight
+            //    for voice or when minimized.
             if (web != null)
-              // Same widget in both modes, so the WebView is never rebuilt:
-              // full size under the top bar, or 1×1 out of sight.
               Positioned(
                 key: const ValueKey('web'),
                 left: 0,
-                top: _call.expanded ? chromeTop : 0,
-                width: _call.expanded ? mq.size.width : 1,
-                height: _call.expanded ? mq.size.height - chromeTop : 1,
+                top: 0,
+                width: stage ? mq.size.width : 1,
+                height: stage ? mq.size.height : 1,
+                child: IgnorePointer(
+                  ignoring: !stage,
+                  child: Opacity(
+                    opacity: stage ? 1 : 0.01,
+                    child: WebViewWidget(controller: web),
+                  ),
+                ),
+              ),
+            // 3) Vibe's controls on top: minimize, status, buttons.
+            if (web != null)
+              Positioned.fill(
+                key: const ValueKey('controls'),
                 child: IgnorePointer(
                   ignoring: !_call.expanded,
-                  child: Opacity(
-                    opacity: _call.expanded ? 1 : 0.01,
-                    child: WebViewWidget(controller: web),
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 220),
+                    opacity: _call.expanded ? 1 : 0,
+                    child: _CallControls(call: _call, stage: stage),
                   ),
                 ),
               ),
@@ -141,7 +167,7 @@ class _VibeCallHostState extends State<VibeCallHost>
                 key: const ValueKey('problem'),
                 left: 16,
                 right: 16,
-                bottom: mq.padding.bottom + 24,
+                top: mq.padding.top + 70,
                 child: _Problem(call: _call),
               ),
             if (ring != null)
@@ -267,147 +293,16 @@ class _Clock extends StatelessWidget {
   }
 }
 
-/// The top of the full-screen call: shrink, who/where, timer, speaker.
-class _CallChrome extends StatelessWidget {
-  final VibeCall call;
-  final double top;
-  const _CallChrome({required this.call, required this.top});
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final bg = dark ? const Color(0xFF1A191E) : const Color(0xFFF2F3F5);
-    final fg = dark ? Colors.white : const Color(0xFF060607);
-    final muted = dark ? const Color(0xFFB5BAC1) : const Color(0xFF5C5E66);
-    final room = call.room;
-    final people = room == null ? 0 : VibeCallMembers.userIds(room).length;
-    final status = switch (call.stage) {
-      VibeCallStage.connecting => 'Connecting…',
-      VibeCallStage.leaving => 'Leaving…',
-      _ => people > 1 ? '$people in the call' : 'Waiting for others',
-    };
-    return Material(
-      color: bg,
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          height: top,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              6,
-              MediaQuery.paddingOf(context).top + 6,
-              10,
-              6,
-            ),
-            child: Row(
-              children: [
-                _RoundButton(
-                  icon: Icons.keyboard_arrow_down,
-                  color: fg,
-                  onTap: call.minimize,
-                ),
-                const SizedBox(width: 4),
-                if (room != null)
-                  Avatar(
-                    mxContent: room.avatar,
-                    name: call.roomName,
-                    size: 34,
-                    client: room.client,
-                  ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        call.roomName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: fg,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              status,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: muted, fontSize: 12.5),
-                            ),
-                          ),
-                          if (call.joinedAt != null) ...[
-                            Text(
-                              '  ·  ',
-                              style: TextStyle(color: muted, fontSize: 12.5),
-                            ),
-                            _Clock(
-                              since: call.joinedAt,
-                              style: TextStyle(color: muted, fontSize: 12.5),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                _RoundButton(
-                  icon: call.soundOn ? Icons.headset : Icons.headset_off,
-                  color: call.soundOn ? fg : _red,
-                  onTap: call.toggleSound,
-                ),
-                _RoundButton(
-                  icon: call.speakerOn ? Icons.volume_up : Icons.phone_in_talk,
-                  color: fg,
-                  onTap: () => call.setSpeaker(!call.speakerOn),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RoundButton extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-  const _RoundButton({
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) => VibePressable(
-    child: GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: SizedBox(
-        width: 44,
-        height: 44,
-        child: Icon(icon, color: color, size: 24),
-      ),
-    ),
-  );
-}
-
 class _Problem extends StatelessWidget {
   final VibeCall call;
   const _Problem({required this.call});
 
   @override
   Widget build(BuildContext context) => Material(
-    color: const Color(0xFF2B2D31),
+    color: const Color(0xEE2B2D31),
     borderRadius: BorderRadius.circular(18),
     child: Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 8, 8),
+      padding: const EdgeInsets.fromLTRB(16, 14, 8, 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -416,17 +311,431 @@ class _Problem extends StatelessWidget {
             call.problem ?? '',
             style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: call.hangup,
-              child: const Text('Close'),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: call.copyLog,
+                child: const Text('Copy call log'),
+              ),
+              TextButton(
+                onPressed: call.hangup,
+                child: const Text('Close'),
+              ),
+            ],
           ),
         ],
       ),
     ),
   );
+}
+
+// ---------------------------------------------------------------------------
+// The call screen (Vibgram / Telegram style)
+// ---------------------------------------------------------------------------
+
+/// Slowly moving Vibe-coloured gradient, then the person (or group) in the
+/// middle with the call status.
+class _CallBackdrop extends StatefulWidget {
+  final VibeCall call;
+  const _CallBackdrop({required this.call});
+
+  @override
+  State<_CallBackdrop> createState() => _CallBackdropState();
+}
+
+class _CallBackdropState extends State<_CallBackdrop>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 14),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final call = widget.call;
+    final room = call.room;
+    final pad = MediaQuery.paddingOf(context);
+    return Material(
+      color: const Color(0xFF111214),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: _c,
+                builder: (context, _) {
+                  final a = _c.value * 2 * math.pi;
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment(math.cos(a), math.sin(a)),
+                        end: Alignment(-math.cos(a), -math.sin(a)),
+                        colors: const [
+                          Color(0xFF3C45A5),
+                          Color(0xFF1E1F22),
+                          Color(0xFF1B4D3E),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          if (room != null)
+            Positioned(
+              left: 24,
+              right: 24,
+              top: pad.top + 110,
+              child: _Who(call: call, room: room),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Avatar (pulsing while it rings or someone talks), name, status.
+class _Who extends StatelessWidget {
+  final VibeCall call;
+  final Room room;
+  const _Who({required this.call, required this.room});
+
+  @override
+  Widget build(BuildContext context) {
+    final others = call.others;
+    final dm = room.isDirectChat;
+    final otherId = dm ? room.directChatMatrixID : null;
+    final other = otherId == null
+        ? null
+        : room.unsafeGetUserFromMemoryOrFallback(otherId);
+    final name = other?.calcDisplayname() ?? call.roomName;
+    final waiting = call.stage == VibeCallStage.inCall && others.isEmpty;
+    final String status = switch (call.stage) {
+      VibeCallStage.connecting => 'Connecting…',
+      VibeCallStage.leaving => 'Ending call…',
+      VibeCallStage.idle => '',
+      VibeCallStage.inCall =>
+        waiting ? (dm ? 'Ringing…' : 'Waiting for others to join') : '',
+    };
+    final avatar = Avatar(
+      mxContent: other?.avatarUrl ?? room.avatar,
+      name: name,
+      size: 128,
+      client: room.client,
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (call.stage != VibeCallStage.inCall || waiting)
+          _Pulse(child: avatar)
+        else
+          SizedBox(width: 200, height: 200, child: Center(child: avatar)),
+        const SizedBox(height: 18),
+        Text(
+          name,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 6),
+        if (status.isNotEmpty)
+          Text(
+            status,
+            style: const TextStyle(color: Color(0xFFDBDEE1), fontSize: 15),
+          )
+        else
+          _Clock(
+            since: call.joinedAt,
+            style: const TextStyle(
+              color: Color(0xFFDBDEE1),
+              fontSize: 15,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+        if (!dm && others.isNotEmpty) ...[
+          const SizedBox(height: 22),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 14,
+            runSpacing: 12,
+            children: [
+              for (final id in others.take(8))
+                SizedBox(
+                  width: 64,
+                  child: Builder(
+                    builder: (context) {
+                      final u = room.unsafeGetUserFromMemoryOrFallback(id);
+                      return Column(
+                        children: [
+                          Avatar(
+                            mxContent: u.avatarUrl,
+                            name: u.calcDisplayname(),
+                            size: 48,
+                            client: room.client,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            u.calcDisplayname(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Top: shrink + encryption + (video) layout. Bottom: Speaker, Camera,
+/// Mute, End — round buttons with labels, like Telegram.
+class _CallControls extends StatelessWidget {
+  final VibeCall call;
+  final bool stage;
+  const _CallControls({required this.call, required this.stage});
+
+  @override
+  Widget build(BuildContext context) {
+    final pad = MediaQuery.paddingOf(context);
+    final room = call.room;
+    final dm = room?.isDirectChat ?? true;
+    const scrim = [Color(0xAA000000), Color(0x00000000)];
+    return Stack(
+      children: [
+        // top bar
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          child: Container(
+            padding: EdgeInsets.fromLTRB(6, pad.top + 4, 8, 12),
+            decoration: stage
+                ? const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: scrim,
+                    ),
+                  )
+                : null,
+            child: Row(
+              children: [
+                _TopButton(
+                  icon: Icons.keyboard_arrow_down,
+                  onTap: call.minimize,
+                ),
+                Expanded(
+                  child: Center(
+                    child: stage && room != null
+                        ? Text(
+                            call.roomName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          )
+                        : (room?.encrypted ?? false)
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withAlpha(0x1F),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.lock,
+                                  size: 13,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  'End-to-end encrypted',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                ),
+                if (!dm)
+                  _TopButton(
+                    icon: call.soundOn ? Icons.headset : Icons.headset_off,
+                    color: call.soundOn ? Colors.white : _red,
+                    onTap: call.toggleSound,
+                  ),
+                _TopButton(
+                  icon: stage ? Icons.person : Icons.grid_view_rounded,
+                  onTap: call.toggleStage,
+                ),
+              ],
+            ),
+          ),
+        ),
+        // bottom buttons
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Container(
+            padding: EdgeInsets.fromLTRB(12, 28, 12, pad.bottom + 26),
+            decoration: stage
+                ? const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: scrim,
+                    ),
+                  )
+                : null,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _CallButton(
+                  icon: call.speakerOn ? Icons.volume_up : Icons.phone_in_talk,
+                  label: call.speakerOn ? 'Speaker' : 'Earpiece',
+                  on: call.speakerOn,
+                  onTap: () => call.setSpeaker(!call.speakerOn),
+                ),
+                _CallButton(
+                  icon: call.videoOn ? Icons.videocam : Icons.videocam_off,
+                  label: 'Camera',
+                  on: call.videoOn,
+                  onTap: call.toggleVideo,
+                ),
+                _CallButton(
+                  icon: call.micOn ? Icons.mic : Icons.mic_off,
+                  label: call.micOn ? 'Mute' : 'Unmute',
+                  on: !call.micOn,
+                  onTap: call.toggleMic,
+                ),
+                _CallButton(
+                  icon: Icons.call_end,
+                  label: 'End',
+                  background: _red,
+                  onTap: call.hangup,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TopButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color color;
+  const _TopButton({
+    required this.icon,
+    required this.onTap,
+    this.color = Colors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) => VibePressable(
+    child: GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: SizedBox(
+        width: 46,
+        height: 46,
+        child: Icon(icon, color: color, size: 26),
+      ),
+    ),
+  );
+}
+
+/// Round call button: translucent white, or solid white when switched on
+/// (icon turns dark), red for End.
+class _CallButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool on;
+  final Color? background;
+  const _CallButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.on = false,
+    this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = background ?? (on ? Colors.white : Colors.white.withAlpha(0x2E));
+    final fg = background != null
+        ? Colors.white
+        : (on ? const Color(0xFF111214) : Colors.white);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        VibePressable(
+          scale: 0.9,
+          child: GestureDetector(
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              width: 62,
+              height: 62,
+              decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                child: Icon(icon, key: ValueKey(icon), color: fg, size: 28),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Someone is calling you.

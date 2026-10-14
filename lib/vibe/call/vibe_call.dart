@@ -49,8 +49,42 @@ class VibeCall extends ChangeNotifier {
 
   DateTime? joinedAt;
 
+  /// Show Element Call's video view (video calls, or "show video" in a
+  /// voice call). Otherwise Vibe's own call screen is shown.
+  bool showStage = false;
+
   /// Something went wrong before the call connected.
   String? problem;
+
+  /// What happened during the call, for "Copy call log".
+  final List<String> log = [];
+
+  void _log(String line) {
+    final t = DateTime.now().toIso8601String().substring(11, 23);
+    log.add('$t $line');
+    if (log.length > 400) log.removeRange(0, log.length - 400);
+    Logs().v('[Vibe call] $line');
+  }
+
+  Future<void> copyLog() async {
+    final head = [
+      'Vibe call log',
+      'room: ${room?.id}',
+      'server: ${room?.client.homeserver}',
+      'stage: ${stage.name}',
+      'call service: ${VibeCallServer.livekitServiceUrl ?? 'none found'}',
+    ];
+    await Clipboard.setData(ClipboardData(text: [...head, ...log].join('\n')));
+    _snack('Call log copied');
+  }
+
+  /// People in the call other than you.
+  List<String> get others {
+    final r = room;
+    if (r == null) return const [];
+    final me = r.client.userID;
+    return VibeCallMembers.userIds(r).where((u) => u != me).toList();
+  }
 
   Timer? _connectTimeout;
   Completer<void>? _left;
@@ -111,6 +145,8 @@ class VibeCall extends ChangeNotifier {
       return;
     }
     if (!context.mounted) return;
+    if (!await VibeCallSupport.ensure(context, room)) return;
+    if (!context.mounted) return;
     if (!await VibeCallPower.ensureAllowed(context, room)) return;
     if (PlatformInfos.isMobile) {
       final mic = await Permission.microphone.request();
@@ -146,10 +182,14 @@ class VibeCall extends ChangeNotifier {
     videoOn = video;
     _wantVideo = video;
     soundOn = true;
-    speakerOn = video || !room.isDirectChat;
+    // Loudspeaker by default (switch to the earpiece with the button).
+    speakerOn = true;
+    showStage = video;
     _firstMedia = true;
     joinedAt = null;
     problem = null;
+    log.clear();
+    _log('start ${room.id} video=$video encrypted=${room.encrypted}');
     notifyListeners();
     VibeHaptics.medium();
 
@@ -171,6 +211,7 @@ class VibeCall extends ChangeNotifier {
               ? (video ? 'join_existing_dm' : 'join_existing_dm_voice')
               : (video ? 'start_call_dm' : 'start_call_dm_voice'))
         : (ongoing ? 'join_existing' : 'start_call');
+    _log('intent $intent, already in call: ${VibeCallMembers.userIds(room)}');
     const widgetId = 'vibe-call';
     final params = <String, String>{
       'widgetId': widgetId,
@@ -189,6 +230,9 @@ class VibeCall extends ChangeNotifier {
       'perParticipantE2EE': room.encrypted.toString(),
       'lang': 'en',
       'theme': dark ? 'dark' : 'light',
+      // Vibe has its own header and controls
+      'header': 'none',
+      'hideHeader': 'true',
     };
     final url = origin
         .replace(path: '/element-call/index.html', queryParameters: params)
@@ -205,6 +249,10 @@ class VibeCall extends ChangeNotifier {
       client: client,
       roomId: room.id,
       toWidget: _js,
+      onMembership: (inCall) {
+        _log('own membership: ${inCall ? 'joined' : 'left'}');
+        if (inCall) _markJoined();
+      },
     );
     _driver = driver;
 
@@ -218,6 +266,12 @@ class VibeCall extends ChangeNotifier {
       onPermissionRequest: (request) => request.grant(),
     );
     await c.setJavaScriptMode(JavaScriptMode.unrestricted);
+    await c.setOnConsoleMessage((m) {
+      if (m.level == JavaScriptLogLevel.error ||
+          m.level == JavaScriptLogLevel.warning) {
+        _log('js ${m.level.name}: ${m.message}');
+      }
+    });
     await c.setBackgroundColor(
       dark ? const Color(0xFF1A191E) : const Color(0xFFF2F3F5),
     );
@@ -241,9 +295,10 @@ class VibeCall extends ChangeNotifier {
           return NavigationDecision.prevent;
         },
         onWebResourceError: (e) {
-          if (e.isForMainFrame == true) {
-            Logs().w('Vibe call page error: ${e.description}');
-          }
+          _log(
+            'load error ${e.errorCode} ${e.description} '
+            '${e.url ?? ''} main=${e.isForMainFrame}',
+          );
         },
       ),
     );
@@ -258,11 +313,12 @@ class VibeCall extends ChangeNotifier {
     driver.startFeeding();
     unawaited(_startService());
     _connectTimeout?.cancel();
-    _connectTimeout = Timer(const Duration(seconds: 45), () {
+    _connectTimeout = Timer(const Duration(seconds: 30), () {
       if (stage == VibeCallStage.connecting) {
+        _log('timed out connecting');
         problem =
-            'Couldn\'t connect the call. Your server may not support '
-            'Matrix calls yet (it needs a MatrixRTC / LiveKit service).';
+            'The call didn\'t connect. Copy the call log and send it to '
+            'support so we can see what went wrong.';
         notifyListeners();
       }
     });
@@ -297,13 +353,14 @@ class VibeCall extends ChangeNotifier {
       case 'rpc':
         await _rpc(m);
       case 'joined':
-        _connectTimeout?.cancel();
-        stage = VibeCallStage.inCall;
-        joinedAt = DateTime.now();
-        problem = null;
-        VibeHaptics.light();
-        notifyListeners();
-        unawaited(_applySpeaker());
+        _log('element call joined');
+        _markJoined();
+      case 'error':
+        _log('error ${data['where']}: ${data['message']}');
+      case 'ready':
+      case 'preparing':
+      case 'frame_loaded':
+        _log(m['kind'] as String);
       case 'media':
         final a = data['audio_enabled'];
         final v = data['video_enabled'];
@@ -321,9 +378,23 @@ class VibeCall extends ChangeNotifier {
         }
       case 'hangup':
       case 'close':
-        _left?.complete();
+        _log('element call ${m['kind']}');
+        if (_left?.isCompleted == false) _left?.complete();
         await _teardown();
     }
+  }
+
+  void _markJoined() {
+    if (stage == VibeCallStage.inCall || stage == VibeCallStage.leaving) {
+      return;
+    }
+    _connectTimeout?.cancel();
+    stage = VibeCallStage.inCall;
+    joinedAt = DateTime.now();
+    problem = null;
+    VibeHaptics.light();
+    notifyListeners();
+    unawaited(_applySpeaker());
   }
 
   Future<void> _rpc(Map<String, Object?> m) async {
@@ -336,9 +407,12 @@ class VibeCall extends ChangeNotifier {
     if (driver == null) return;
     try {
       final result = await driver.handle(method, args);
+      if (method != 'readRoomState' && method != 'readRoomTimeline') {
+        _log('$method ${args['type'] ?? ''} ok');
+      }
       _js('reply', [id, true, result]);
     } catch (e) {
-      Logs().w('Vibe call request $method failed', e);
+      _log('$method ${args['type'] ?? ''} FAILED: $e');
       _js('reply', [id, false, VibeCallDriver.errorJson(e)]);
     }
   }
@@ -356,6 +430,12 @@ class VibeCall extends ChangeNotifier {
   void minimize() {
     if (!active) return;
     expanded = false;
+    notifyListeners();
+  }
+
+  void toggleStage() {
+    if (!active) return;
+    showStage = !showStage;
     notifyListeners();
   }
 
@@ -385,6 +465,7 @@ class VibeCall extends ChangeNotifier {
       }
     }
     videoOn = !videoOn;
+    if (videoOn) showStage = true;
     _js('action', [
       'io.element.device_mute',
       {'audio_enabled': micOn, 'video_enabled': videoOn},
@@ -606,4 +687,85 @@ abstract class VibeCallPower {
   }
 
   static void _snack(String text) => VibeCall._snack(text);
+}
+
+/// Does your server offer Matrix calls? Element Call needs a call service
+/// (a LiveKit "focus") announced by the server. Without one you can still
+/// join calls other people start (they bring their own), but you can't
+/// start one.
+abstract class VibeCallSupport {
+  static final Map<String, (DateTime, String?)> _cache = {};
+
+  /// The call service URL for [client]'s server, or null if it has none.
+  static Future<String?> serviceUrl(Client client) async {
+    final key = client.homeserver.toString();
+    final hit = _cache[key];
+    if (hit != null &&
+        DateTime.now().difference(hit.$1) < const Duration(minutes: 10)) {
+      return hit.$2;
+    }
+    String? url;
+    String? pick(Object? list) {
+      if (list is! List) return null;
+      for (final f in list) {
+        if (f is Map && f['type'] == 'livekit') {
+          final u = f['livekit_service_url'];
+          if (u is String && u.isNotEmpty) return u;
+        }
+      }
+      return null;
+    }
+
+    try {
+      final wk = await client.getWellknown();
+      url = pick(wk.additionalProperties['org.matrix.msc4143.rtc_foci']);
+    } catch (e) {
+      Logs().v('Vibe call: no well-known foci ($e)');
+    }
+    if (url == null) {
+      for (final path in const [
+        '/client/v1/rtc/transports',
+        '/client/unstable/org.matrix.msc4143/rtc/transports',
+      ]) {
+        try {
+          final r = await client.request(RequestType.GET, path);
+          url = pick(r['rtc_transports']);
+          if (url != null) break;
+        } catch (_) {}
+      }
+    }
+    _cache[key] = (DateTime.now(), url);
+    return url;
+  }
+
+  static Future<bool> ensure(BuildContext context, Room room) async {
+    final url = await serviceUrl(room.client);
+    VibeCallServer.livekitServiceUrl = url;
+    if (url != null) return true;
+    // Someone else's call brings its own call service: joining works.
+    if (VibeCallMembers.active(room)) return true;
+    if (!context.mounted) return false;
+    final server = room.client.userID?.domain ?? 'your server';
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Calls aren\'t set up on your server'),
+        content: Text(
+          '$server doesn\'t offer Matrix calls yet, so Vibe can\'t start '
+          'one from this account.\n\n'
+          'You can still join calls that others start (from servers like '
+          'matrix.org). To start calls yourself, use an account on a '
+          'server with calls, or ask your server\'s admin to add a '
+          'MatrixRTC (LiveKit) call service.',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    return false;
+  }
 }

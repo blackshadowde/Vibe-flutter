@@ -1,7 +1,12 @@
 package chat.fluffy.fluffychat
 
+import android.app.ActivityManager
+import android.app.ApplicationExitInfo
 import android.content.Context
 import android.content.Intent
+import android.util.Log
+import java.io.File
+import java.util.Date
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
@@ -51,6 +56,7 @@ object VibeSystemNative {
                         result.success(setSpeaker(app, on))
                     }
                     "isSpeaker" -> result.success(isSpeaker(app))
+                    "lastExit" -> result.success(lastExit(app))
                     "resetAudio" -> {
                         try {
                             val am = audio(app)
@@ -109,5 +115,101 @@ object VibeSystemNative {
         } catch (e: Throwable) {
             false
         }
+    }
+
+    // ---- crash reports ----
+
+    private const val CRASH_FILE = "vibe_last_crash.txt"
+    private var crashRecorderInstalled = false
+
+    /** Writes any uncaught Kotlin/Java crash to a file before the app dies. */
+    fun installCrashRecorder(app: Context) {
+        if (crashRecorderInstalled) return
+        crashRecorderInstalled = true
+        val previous = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, error ->
+            try {
+                File(app.filesDir, CRASH_FILE).writeText(
+                    "${Date()}\nthread: ${thread.name}\n${Log.getStackTraceString(error)}"
+                )
+            } catch (_: Throwable) {
+            }
+            previous?.uncaughtException(thread, error)
+        }
+    }
+
+    /**
+     * Why Vibe last stopped, if it crashed or froze: Android keeps this
+     * (Android 11+), including native crashes we can't catch ourselves.
+     */
+    private fun lastExit(context: Context): Map<String, Any?>? {
+        val java = try {
+            File(context.filesDir, CRASH_FILE).takeIf { it.exists() }?.readText()
+        } catch (_: Throwable) {
+            null
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            return if (java == null) null else mapOf(
+                "time" to File(context.filesDir, CRASH_FILE).lastModified(),
+                "reason" to "crash",
+                "description" to "",
+                "trace" to java,
+            )
+        }
+        return try {
+            val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val info = am.getHistoricalProcessExitReasons(context.packageName, 0, 8)
+                .firstOrNull {
+                    it.reason == ApplicationExitInfo.REASON_CRASH ||
+                        it.reason == ApplicationExitInfo.REASON_CRASH_NATIVE ||
+                        it.reason == ApplicationExitInfo.REASON_ANR
+                } ?: return null
+            val reason = when (info.reason) {
+                ApplicationExitInfo.REASON_CRASH -> "crash"
+                ApplicationExitInfo.REASON_CRASH_NATIVE -> "native crash"
+                else -> "not responding"
+            }
+            var trace: String? = null
+            try {
+                info.traceInputStream?.use { stream ->
+                    val bytes = stream.readBytes()
+                    trace = if (info.reason == ApplicationExitInfo.REASON_ANR) {
+                        String(bytes).take(30000)
+                    } else {
+                        readable(bytes)
+                    }
+                }
+            } catch (_: Throwable) {
+            }
+            if (info.reason == ApplicationExitInfo.REASON_CRASH && java != null) {
+                trace = java
+            }
+            mapOf(
+                "time" to info.timestamp,
+                "reason" to reason,
+                "description" to (info.description ?: ""),
+                "trace" to (trace ?: ""),
+            )
+        } catch (e: Throwable) {
+            null
+        }
+    }
+
+    /** Native crash reports are binary; keep the readable lines. */
+    private fun readable(bytes: ByteArray): String {
+        val out = StringBuilder()
+        val run = StringBuilder()
+        for (b in bytes) {
+            val c = b.toInt() and 0xff
+            if (c in 32..126) {
+                run.append(c.toChar())
+            } else {
+                if (run.length >= 6) out.append(run).append('\n')
+                run.setLength(0)
+            }
+            if (out.length > 30000) break
+        }
+        if (run.length >= 6) out.append(run)
+        return out.toString()
     }
 }

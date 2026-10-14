@@ -184,24 +184,46 @@ class VibeDmDetail extends StatelessWidget {
                 builder: (context, inCall) {
                   final mine = VibeCall.instance.isIn(room);
                   final live = mine || inCall.isNotEmpty;
-                  return VibeHashRow(
-                    label: group ? 'voice' : 'call',
-                    icon: Icons.volume_up,
-                    iconColor: live ? const Color(0xFF23A55A) : null,
-                    bold: live,
-                    subtitle: mine
-                        ? 'You\'re in the call · tap to open'
-                        : inCall.isNotEmpty
-                        ? 'Live · ${inCall.length} in the call · tap to join'
-                        : group
-                        ? 'Start a voice chat for the group'
-                        : 'Voice call · long-press for video',
-                    trailing: inCall.isEmpty
-                        ? null
-                        : VibeCallFaces(room: room, userIds: inCall),
-                    onTap: () => VibeCall.join(context, room),
-                    onLongPress: () =>
-                        VibeCall.join(context, room, video: true),
+                  const green = Color(0xFF23A55A);
+                  final liveText = mine
+                      ? 'You\'re in the call · tap to open'
+                      : 'Live · ${inCall.length} in the call · tap to join';
+                  final faces = inCall.isEmpty
+                      ? null
+                      : VibeCallFaces(room: room, userIds: inCall);
+                  if (group) {
+                    return VibeHashRow(
+                      label: 'voice',
+                      icon: Icons.volume_up,
+                      iconColor: live ? green : null,
+                      bold: live,
+                      subtitle: live
+                          ? liveText
+                          : 'Start a voice chat for the group',
+                      trailing: faces,
+                      onTap: () => VibeCall.join(context, room),
+                    );
+                  }
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      VibeHashRow(
+                        label: 'audio-call',
+                        icon: Icons.call,
+                        iconColor: live ? green : null,
+                        bold: live,
+                        subtitle: live ? liveText : null,
+                        trailing: faces,
+                        onTap: () => VibeCall.join(context, room),
+                      ),
+                      VibeHashRow(
+                        label: 'video-call',
+                        icon: Icons.videocam,
+                        iconColor: live ? green : null,
+                        onTap: () =>
+                            VibeCall.join(context, room, video: true),
+                      ),
+                    ],
                   );
                 },
               ),

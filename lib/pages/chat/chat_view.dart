@@ -18,6 +18,7 @@ import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
+import 'package:fluffychat/vibe/vibe_lock_button.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/chat_settings_popup_menu.dart';
@@ -247,32 +248,10 @@ class ChatView extends StatelessWidget {
                         ],
                       ),
                   ] else if (!controller.room.isArchived) ...[
-                    // Vibe calls (Element Call / MatrixRTC, like Sable)
+                    // Live call here: a small green "Join" pill (the call
+                    // buttons themselves live in the chat pane).
                     VibeCallActions(room: controller.room),
-                    if (controller.room.encrypted)
-                      IconButton(
-                        icon: const Icon(Icons.lock_outline),
-                        color: const Color(0xFF22C55E),
-                        tooltip: 'End-to-end encrypted',
-                        onPressed: () => context.go(
-                          '/rooms/${controller.room.id}/encryption',
-                        ),
-                      )
-                    else
-                      IconButton(
-                        icon: const Icon(Icons.lock_open),
-                        color: Colors.redAccent,
-                        tooltip: 'Not encrypted',
-                        onPressed: () => context.go(
-                          '/rooms/${controller.room.id}/encryption',
-                        ),
-                      ),
-                    IconButton(
-                      icon: const Icon(Icons.search),
-                      tooltip: L10n.of(context).search,
-                      onPressed: () =>
-                          context.go('/rooms/${controller.room.id}/search'),
-                    ),
+                    VibeLockButton(room: controller.room),
                     ChatSettingsPopupMenu(controller.room, true),
                   ],
                 ],

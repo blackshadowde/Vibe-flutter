@@ -69,9 +69,9 @@ class _VibeCallWatchState extends State<VibeCallWatch> {
       widget.builder(context, VibeCallMembers.userIds(widget.room));
 }
 
-/// Call buttons for the chat's top bar. DMs get voice and video; groups get
-/// one "join voice" button. While a call is live it turns into a green
-/// "Join · 2" pill (or "In call" if it's yours).
+/// In the chat's top bar only while a call is live: a green "Join · 2"
+/// pill (or "In call" if it's yours). Calls are started from the chat pane
+/// (# | audio-call, # | video-call).
 class VibeCallActions extends StatelessWidget {
   final Room room;
   const VibeCallActions({required this.room, super.key});
@@ -94,22 +94,8 @@ class VibeCallActions extends StatelessWidget {
             ),
           );
         }
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.call),
-              tooltip: room.isDirectChat ? 'Voice call' : 'Start a voice call',
-              onPressed: () => VibeCall.join(context, room),
-            ),
-            if (room.isDirectChat)
-              IconButton(
-                icon: const Icon(Icons.videocam),
-                tooltip: 'Video call',
-                onPressed: () => VibeCall.join(context, room, video: true),
-              ),
-          ],
-        );
+        // No call: nothing here. Start calls from the chat pane.
+        return const SizedBox.shrink();
       },
     );
   }
