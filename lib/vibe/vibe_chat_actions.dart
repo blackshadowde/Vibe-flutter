@@ -2,7 +2,9 @@
 
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_archive.dart';
+import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
@@ -40,6 +42,38 @@ abstract class VibeChatActions {
           onOpen();
         case 'lock':
           await VibeLock.toggle(context, room);
+        case 'delete':
+          final ok = await showDialog<bool>(
+            context: context,
+            useRootNavigator: true,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Delete chat?'),
+              content: Text(
+                'You\'ll leave ${room.getLocalizedDisplayname()} and it '
+                'disappears from Vibe. The other person keeps their copy.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cancel'),
+                ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFDA373C),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          );
+          if (ok != true) return;
+          if (VibeCall.instance.isIn(room)) await VibeCall.instance.hangup();
+          await VibeDmFinder.delete(room);
+          messenger.showSnackBar(
+            SnackBar(content: Text('Deleted ${room.getLocalizedDisplayname()}')),
+          );
         case 'read':
           final last = room.lastEvent;
           if (room.markedUnread) await room.markUnread(false);
@@ -212,6 +246,17 @@ class _SheetState extends State<_Sheet> {
                             style: TextStyle(color: t2),
                           ),
                     onTap: () => Navigator.pop(context, 'lock'),
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.delete,
+                      color: Color(0xFFDA373C),
+                    ),
+                    title: Text(
+                      room.isDirectChat ? 'Delete chat' : 'Leave',
+                      style: const TextStyle(color: Color(0xFFDA373C)),
+                    ),
+                    onTap: () => Navigator.pop(context, 'delete'),
                   ),
                   if (room.isUnread)
                     ListTile(

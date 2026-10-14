@@ -66,4 +66,68 @@ abstract class VibeDmFinder {
     }
     return client.startDirectChat(userId, enableEncryption: true);
   }
+
+  /// Leave and forget a chat ("Delete chat"). The other person keeps their
+  /// copy; Matrix can't delete a chat for both sides.
+  static Future<void> delete(Room room) async {
+    if (room.membership != Membership.leave) {
+      try {
+        await room.leave();
+      } on MatrixException catch (e) {
+        // already gone on the server: just forget it
+        if (e.errcode != 'M_FORBIDDEN' && e.errcode != 'M_NOT_FOUND') rethrow;
+      }
+    }
+    try {
+      await room.forget();
+    } catch (e) {
+      Logs().v('Vibe: forget failed $e');
+    }
+  }
+
+  /// Older Vibe versions sometimes made a second, unencrypted chat with
+  /// someone you already had an encrypted chat with (after a call). Those
+  /// are removed again, but only when Vibe made it and nobody wrote in it.
+  static Future<void> cleanupDuplicates(Client client) async {
+    final me = client.userID;
+    if (me == null) return;
+    final byUser = <String, List<Room>>{};
+    for (final r in client.rooms) {
+      if (r.membership != Membership.join || r.isSpace) continue;
+      final count =
+          (r.summary.mJoinedMemberCount ?? 0) +
+          (r.summary.mInvitedMemberCount ?? 0);
+      if (count > 2) continue;
+      final other =
+          r.directChatMatrixID ??
+          r.summary.mHeroes?.firstWhere((u) => u != me, orElse: () => '');
+      if (other == null || other.isEmpty) continue;
+      byUser.putIfAbsent(other, () => []).add(r);
+    }
+    for (final rooms in byUser.values) {
+      if (rooms.length < 2 || !rooms.any((r) => r.encrypted)) continue;
+      for (final r in rooms.where((r) => !r.encrypted)) {
+        final named =
+            (r.getState(EventTypes.RoomName)?.content['name'] as String?)
+                ?.isNotEmpty ??
+            false;
+        if (named) continue;
+        if (r.getState(EventTypes.RoomCreate)?.senderId != me) continue;
+        try {
+          final res = await client.getRoomEvents(r.id, Direction.b, limit: 50);
+          final written = res.chunk.any(
+            (e) =>
+                e.type == EventTypes.Message ||
+                e.type == EventTypes.Encrypted ||
+                e.type == EventTypes.Sticker,
+          );
+          if (written) continue;
+          Logs().i('Vibe: removing empty duplicate chat ${r.id}');
+          await delete(r);
+        } catch (e) {
+          Logs().v('Vibe: duplicate check failed for ${r.id} $e');
+        }
+      }
+    }
+  }
 }

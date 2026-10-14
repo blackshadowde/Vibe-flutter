@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/call/vibe_call_members.dart';
+import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
@@ -49,6 +50,7 @@ class VibeCallRing {
         }
         await Future<void>.delayed(const Duration(seconds: 5));
         if (_client == client) await VibeCall.cleanupStale(client);
+        if (_client == client) await VibeDmFinder.cleanupDuplicates(client);
       } catch (e) {
         Logs().v('Vibe call: cleanup skipped $e');
       }
