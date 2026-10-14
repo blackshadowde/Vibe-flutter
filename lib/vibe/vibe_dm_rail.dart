@@ -6,7 +6,7 @@
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/vibe/vibe_add_contact.dart';
+import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
@@ -43,6 +43,12 @@ class VibeDmRail extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final client = Matrix.of(context).client;
+    // DMs first, then groups below a line (like Discord's servers).
+    final dms = rooms.where((r) => !VibeGroups.isGroup(r)).toList();
+    final groups = rooms.where(VibeGroups.isGroup).toList();
+    final list = [...dms, ...groups];
+    final firstGroup = dms.length;
+    final pinnedCount = dms.takeWhile((r) => r.isFavourite).length;
     return Material(
       color: theme.colorScheme.surfaceContainerLowest,
       child: SafeArea(
@@ -75,9 +81,9 @@ class VibeDmRail extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(bottom: 8),
-                  itemCount: rooms.length + 1,
+                  itemCount: list.length + 1,
                   itemBuilder: (context, i) {
-                    if (i == rooms.length) {
+                    if (i == list.length) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Center(
@@ -89,17 +95,14 @@ class VibeDmRail extends StatelessWidget {
                                 Icons.add,
                                 color: theme.colorScheme.primary,
                               ),
-                              tooltip: L10n.of(context).newChat,
-                              onPressed: () => VibeAddContact.show(context),
+                              tooltip: 'New chat or group',
+                              onPressed: () => VibeGroups.showNew(context),
                             ),
                           ),
                         ),
                       );
                     }
-                    final room = rooms[i];
-                    final pinnedCount = rooms
-                        .takeWhile((r) => r.isFavourite)
-                        .length;
+                    final room = list[i];
                     final active = room.id == (selectedId ?? activeRoomId);
                     final invited = room.membership == Membership.invite;
                     final name = room.getLocalizedDisplayname(
@@ -243,7 +246,10 @@ class VibeDmRail extends StatelessWidget {
                       ),
                       ),
                     );
-                    if (i == pinnedCount && pinnedCount > 0) {
+                    final groupLine =
+                        i == firstGroup && dms.isNotEmpty && groups.isNotEmpty;
+                    if (groupLine ||
+                        (i == pinnedCount && pinnedCount > 0 && i < firstGroup)) {
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [

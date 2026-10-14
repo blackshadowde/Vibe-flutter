@@ -8,6 +8,7 @@ import 'package:fluffychat/pages/chat/events/audio_player.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_media_viewer.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
@@ -49,6 +50,7 @@ class VibeDmDetail extends StatelessWidget {
     final name = room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
     final invited = room.membership == Membership.invite;
     final other = room.directChatMatrixID;
+    final group = VibeGroups.isGroup(room);
 
     void open(_Kind kind) => _DmSheet.open(context, room, kind);
 
@@ -115,7 +117,15 @@ class VibeDmDetail extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 6, top: 2),
-              child: PresenceBuilder(
+              child: group
+                  ? Text(
+                      '${VibeGroups.memberCount(room)} members',
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        color: cs.onSurfaceVariant,
+                      ),
+                    )
+                  : PresenceBuilder(
                 client: room.client,
                 userId: other,
                 builder: (context, p) {
@@ -179,7 +189,29 @@ class VibeDmDetail extends StatelessWidget {
                 label: 'starred-messages',
                 onTap: () => open(_Kind.starred),
               ),
-              if (other != null)
+              if (group) ...[
+                const _Header('MEMBERS'),
+                _HashRow(
+                  label: 'members',
+                  subtitle: '${VibeGroups.memberCount(room)} people',
+                  onTap: () => VibeGroups.showMembers(context, room),
+                ),
+                if (room.canInvite)
+                  _HashRow(
+                    label: 'invite-people',
+                    onTap: () => VibeGroups.showInvite(context, room),
+                  ),
+                if (room.canChangeStateEvent(EventTypes.RoomName))
+                  _HashRow(
+                    label: 'rename-group',
+                    onTap: () => VibeGroups.rename(context, room),
+                  ),
+                _HashRow(
+                  label: 'leave-group',
+                  onTap: () => VibeGroups.leave(context, room),
+                ),
+              ],
+              if (other != null && !group)
                 _HashRow(
                   label: 'profile',
                   onTap: () => VibeUserSheet.show(
@@ -312,7 +344,11 @@ class _ApprovalBanner extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              Text('$name wants to start a chat with you.'),
+              Text(
+                VibeGroups.isGroup(room)
+                    ? 'You\'re invited to the group $name.'
+                    : '$name wants to start a chat with you.',
+              ),
               const SizedBox(height: 12),
               Row(
                 children: [

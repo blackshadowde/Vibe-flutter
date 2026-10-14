@@ -8,6 +8,7 @@ import 'package:fluffychat/vibe/vibe_activity_pill.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
+import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_shared_page.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
@@ -67,7 +68,12 @@ class _VibeDmPaneState extends State<VibeDmPane> {
         .where((r) => r.membership != Membership.invite)
         .toList();
     final pinned = joined.where((r) => r.isFavourite).toList();
-    final others = joined.where((r) => !r.isFavourite).toList();
+    final others = joined
+        .where((r) => !r.isFavourite && !VibeGroups.isGroup(r))
+        .toList();
+    final groups = joined
+        .where((r) => !r.isFavourite && VibeGroups.isGroup(r))
+        .toList();
 
     Widget dmTile(Room r, int index) => VibeStagger(
       key: ValueKey('dm_${r.id}'),
@@ -157,6 +163,15 @@ class _VibeDmPaneState extends State<VibeDmPane> {
                       () => dmTile(
                         others[i],
                         i + invites.length + pinned.length + 1,
+                      ),
+                    () => _SectionLabel(
+                      'GROUPS — ${groups.length}',
+                      onAdd: () => VibeCreateGroupPage.open(context),
+                    ),
+                    for (var i = 0; i < groups.length; i++)
+                      () => dmTile(
+                        groups[i],
+                        i + invites.length + pinned.length + others.length + 2,
                       ),
                   ];
                   return ListView.builder(
@@ -304,7 +319,9 @@ class _DmTile extends StatelessWidget {
                   room: room,
                   userId: room.directChatMatrixID,
                   showTime: false,
-                  fallback: room.encrypted
+                  fallback: VibeGroups.isGroup(room)
+                      ? '${VibeGroups.memberCount(room)} members'
+                      : room.encrypted
                       ? 'Encrypted Direct Message'
                       : 'Direct Message',
                   style: TextStyle(
