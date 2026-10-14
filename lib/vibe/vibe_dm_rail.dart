@@ -6,6 +6,7 @@
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/vibe/vibe_communities.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
@@ -44,10 +45,15 @@ class VibeDmRail extends StatelessWidget {
     final theme = Theme.of(context);
     final client = Matrix.of(context).client;
     // DMs first, then groups below a line (like Discord's servers).
-    final dms = rooms.where((r) => !VibeGroups.isGroup(r)).toList();
+    final dms = rooms
+        .where((r) => !VibeGroups.isGroup(r) && !r.isSpace)
+        .toList();
     final groups = rooms.where(VibeGroups.isGroup).toList();
-    final list = [...dms, ...groups];
+    // communities last, under their own line
+    final spaces = rooms.where((r) => r.isSpace).toList();
+    final list = [...dms, ...groups, ...spaces];
     final firstGroup = dms.length;
+    final firstSpace = dms.length + groups.length;
     final pinnedCount = dms.takeWhile((r) => r.isFavourite).length;
     return Material(
       color: theme.colorScheme.surfaceContainerLowest,
@@ -105,6 +111,9 @@ class VibeDmRail extends StatelessWidget {
                     final room = list[i];
                     final active = room.id == (selectedId ?? activeRoomId);
                     final invited = room.membership == Membership.invite;
+                    final unread = room.isSpace
+                        ? VibeCommunities.unread(room)
+                        : room.notificationCount;
                     final name = room.getLocalizedDisplayname(
                       MatrixLocals(L10n.of(context)),
                     );
@@ -130,7 +139,7 @@ class VibeDmRail extends StatelessWidget {
                                   width: 4,
                                   height: active
                                       ? 30
-                                      : (room.notificationCount > 0 ? 8 : 0),
+                                      : (unread > 0 ? 8 : 0),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.onSurface,
                                     borderRadius: const BorderRadius.only(
@@ -212,7 +221,7 @@ class VibeDmRail extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            if (room.notificationCount > 0)
+                            if (unread > 0)
                               Positioned(
                                 top: 0,
                                 right: 6,
@@ -231,7 +240,7 @@ class VibeDmRail extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(9),
                                     ),
                                     child: Text(
-                                      '${room.notificationCount}',
+                                      '$unread',
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
@@ -247,7 +256,8 @@ class VibeDmRail extends StatelessWidget {
                       ),
                     );
                     final groupLine =
-                        i == firstGroup && dms.isNotEmpty && groups.isNotEmpty;
+                        (i == firstGroup && dms.isNotEmpty && groups.isNotEmpty) ||
+                        (i == firstSpace && spaces.isNotEmpty && firstSpace > 0);
                     if (groupLine ||
                         (i == pinnedCount && pinnedCount > 0 && i < firstGroup)) {
                       return Column(

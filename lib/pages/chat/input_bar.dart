@@ -155,24 +155,46 @@ class InputBar extends StatelessWidget {
         }
       }
     }
-    final userMatch = RegExp(r'(?:\s|^)@([-\w]+)$').firstMatch(searchText);
-    if (userMatch != null) {
+    // Vibe: like Telegram, a bare "@" already lists the people here.
+    final userMatch = RegExp(r'(?:\s|^)@([-\w.]*)$').firstMatch(searchText);
+    if (userMatch != null && !room.isDirectChat) {
       final userSearch = userMatch[1]!.toLowerCase();
-      for (final user in room.getParticipants()) {
-        if ((user.displayName != null &&
-                (user.displayName!.toLowerCase().contains(userSearch) ||
-                    slugify(
-                      user.displayName!.toLowerCase(),
-                    ).contains(userSearch))) ||
-            user.id.localpart!.toLowerCase().contains(userSearch)) {
-          ret.add({
-            'type': 'user',
-            'mxid': user.id,
-            'mention': user.mention,
-            'displayname': user.displayName,
-            'avatar_url': user.avatarUrl?.toString(),
-          });
-        }
+      final me = room.client.userID;
+      final people = room
+          .getParticipants([Membership.join])
+          .where((u) => u.id != me)
+          .where(
+            (user) =>
+                userSearch.isEmpty ||
+                (user.displayName != null &&
+                    (user.displayName!.toLowerCase().contains(userSearch) ||
+                        slugify(
+                          user.displayName!.toLowerCase(),
+                        ).contains(userSearch))) ||
+                (user.id.localpart ?? '').toLowerCase().contains(userSearch),
+          )
+          .toList();
+      int rank(User u) {
+        final name = (u.displayName ?? u.id.localpart ?? '').toLowerCase();
+        return userSearch.isNotEmpty && name.startsWith(userSearch) ? 0 : 1;
+      }
+      people.sort((a, b) {
+        final r = rank(a).compareTo(rank(b));
+        if (r != 0) return r;
+        final p = b.powerLevel.level.compareTo(a.powerLevel.level);
+        if (p != 0) return p;
+        return a.calcDisplayname().toLowerCase().compareTo(
+          b.calcDisplayname().toLowerCase(),
+        );
+      });
+      for (final user in people) {
+        ret.add({
+          'type': 'user',
+          'mxid': user.id,
+          'mention': user.mention,
+          'displayname': user.calcDisplayname(),
+          'avatar_url': user.avatarUrl?.toString(),
+        });
         if (ret.length > maxResults) {
           break;
         }
@@ -303,17 +325,50 @@ class InputBar extends StatelessWidget {
     }
     if (suggestion['type'] == 'user' || suggestion['type'] == 'room') {
       final url = Uri.parse(suggestion['avatar_url'] ?? '');
-      return ListTile(
+      final name =
+          suggestion.tryGet<String>('displayname') ??
+          suggestion.tryGet<String>('mxid') ??
+          '';
+      final id = suggestion['mxid'] ?? '';
+      return InkWell(
         onTap: () => onSelected(suggestion),
-        leading: Avatar(
-          mxContent: url,
-          name:
-              suggestion.tryGet<String>('displayname') ??
-              suggestion.tryGet<String>('mxid'),
-          size: size,
-          client: client,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          child: Row(
+            children: [
+              Avatar(mxContent: url, name: name, size: 34, client: client),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    if (id != name)
+                      Text(
+                        id,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        title: Text(suggestion['displayname'] ?? suggestion['mxid']!),
       );
     }
     return const SizedBox.shrink();
@@ -371,7 +426,7 @@ class InputBar extends StatelessWidget {
     if (suggestion['type'] == 'user') {
       insertText = '${suggestion['mention']!} ';
       startText = replaceText.replaceAllMapped(
-        RegExp(r'(\s|^)(@[-\w]+)$'),
+        RegExp(r'(\s|^)(@[-\w.]*)$'),
         (Match m) => '${m[1]}$insertText',
       );
     }
@@ -450,19 +505,34 @@ class InputBar extends StatelessWidget {
       ),
       optionsViewBuilder: (c, onSelected, s) {
         final suggestions = s.toList();
-        return Material(
-          elevation: theme.appBarTheme.scrolledUnderElevation ?? 4,
-          shadowColor: theme.appBarTheme.shadowColor,
-          borderRadius: BorderRadius.circular(AppConfig.borderRadius),
-          clipBehavior: Clip.hardEdge,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: suggestions.length,
-            itemBuilder: (context, i) => buildSuggestion(
-              c,
-              suggestions[i],
-              onSelected,
-              Matrix.of(context).client,
+        final dark = theme.brightness == Brightness.dark;
+        // Vibe: a soft rounded card above the input, at most ~5 rows tall.
+        return Align(
+          alignment: Alignment.bottomLeft,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Material(
+              color: dark ? const Color(0xFF2B2A30) : Colors.white,
+              elevation: 6,
+              shadowColor: Colors.black.withAlpha(60),
+              borderRadius: BorderRadius.circular(18),
+              clipBehavior: Clip.antiAlias,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 248),
+                child: RepaintBoundary(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    itemCount: suggestions.length,
+                    itemBuilder: (context, i) => buildSuggestion(
+                      c,
+                      suggestions[i],
+                      onSelected,
+                      Matrix.of(context).client,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         );

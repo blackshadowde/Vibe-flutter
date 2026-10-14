@@ -13,6 +13,11 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
+      ('🏘', 'Communities: tap + in the rail → Create community. Several channels (# | general, …) in one place, like a server. Communities sit at the bottom of the rail with an unread badge; add channels with + or add groups you already have'),
+      ('🌐', 'Public groups: make a group or community public with its own #link, or find and join public ones: + → Find public groups'),
+      ('🖼', 'Group pictures: # | group-picture in the group pane, or long-press the group\'s picture'),
+      ('🛡', 'Admins: open members and long-press someone to make them an admin or moderator, demote them, or remove them'),
+      ('@', '@mentions: type @ in a group and pick someone from the list'),
       ('🔕', 'Hide the permanent "Connected for notifications" notification: Settings → Notifications → Hide the permanent notification. Vibe stays connected and messages still arrive'),
       ('👥', 'Groups: tap + in the left rail → Create group. Groups sit under your DMs in the rail; their pane has # | chat, media, files, links, members, invite-people (by ID or link), rename and leave. End-to-end encrypted'),
       ('📌', 'Long-press a picture in the left rail: Pin, Mute or Archive the chat with one tap'),

@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:file_picker/file_picker.dart';
 import 'package:fluffychat/l10n/l10n.dart';
+import 'package:fluffychat/utils/file_selector.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/vibe/vibe_add_contact.dart';
+import 'package:fluffychat/vibe/vibe_communities.dart';
+import 'package:fluffychat/vibe/vibe_public_rooms.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
@@ -11,7 +16,9 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:matrix/matrix.dart';
+import 'package:matrix/matrix.dart' as sdk show Visibility;
 import 'package:share_plus/share_plus.dart';
 
 /// Group chats: Matrix rooms that aren't direct chats. They show as
@@ -39,6 +46,32 @@ abstract class VibeGroups {
 
   static int memberCount(Room r) =>
       r.summary.mJoinedMemberCount ?? r.getParticipants().length;
+
+  /// Public: anyone can find it and join without an invite.
+  static bool isPublic(Room r) => r.joinRules == JoinRules.public;
+
+  /// "Weekend Plans!" -> "weekend-plans" (for #weekend-plans:server).
+  static String slug(String name) => name
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9._-]+'), '-')
+      .replaceAll(RegExp(r'-{2,}'), '-')
+      .replaceAll(RegExp(r'^-|-$'), '');
+
+  static void _snack(BuildContext context, String text) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  static String _nice(Object e) {
+    if (e is MatrixException) {
+      if (e.errcode == 'M_ROOM_IN_USE') {
+        return 'That link name is taken, try another one';
+      }
+      return e.errorMessage;
+    }
+    return '$e';
+  }
 
   static String _matrixId(String raw) {
     var v = raw.trim();
@@ -96,6 +129,36 @@ abstract class VibeGroups {
                     onTap: () {
                       Navigator.pop(ctx);
                       VibeCreateGroupPage.open(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.workspaces, color: t1),
+                    title: Text(
+                      'Create community',
+                      style: TextStyle(color: t1),
+                    ),
+                    subtitle: Text(
+                      'Several group chats (channels) in one place',
+                      style: TextStyle(color: t2),
+                    ),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      VibeCreateGroupPage.open(context, community: true);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.travel_explore, color: t1),
+                    title: Text(
+                      'Find public groups',
+                      style: TextStyle(color: t1),
+                    ),
+                    subtitle: Text(
+                      'Browse and join groups and communities',
+                      style: TextStyle(color: t2),
+                    ),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      VibePublicRooms.show(context);
                     },
                   ),
                 ],
@@ -226,17 +289,648 @@ abstract class VibeGroups {
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// Group picture, privacy, roles (shared by groups and communities)
+// ---------------------------------------------------------------------------
+
+abstract class VibeGroupEdit {
+  /// Pick a new picture (camera / gallery) or remove the current one.
+  static Future<void> changePicture(BuildContext context, Room room) async {
+    final t1 = VibeSettingsStyle.text(context);
+    final action = await showVibeSheet<String>(
+      context: context,
+      useRootNavigator: true,
+      showDragHandle: true,
+      backgroundColor: VibeSettingsStyle.page(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: Row(
+                children: [
+                  Avatar(
+                    mxContent: room.avatar,
+                    name: VibeGroups.nameOf(ctx, room),
+                    size: 44,
+                    client: room.client,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    room.isSpace ? 'Community picture' : 'Group picture',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: t1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            _Card(
+              children: [
+                if (PlatformInfos.isMobile)
+                  ListTile(
+                    leading: Icon(Icons.photo_camera, color: t1),
+                    title: Text('Take a photo', style: TextStyle(color: t1)),
+                    onTap: () => Navigator.pop(ctx, 'camera'),
+                  ),
+                ListTile(
+                  leading: Icon(Icons.photo_library, color: t1),
+                  title: Text(
+                    'Choose from gallery',
+                    style: TextStyle(color: t1),
+                  ),
+                  onTap: () => Navigator.pop(ctx, 'gallery'),
+                ),
+                if (room.avatar != null)
+                  ListTile(
+                    leading: Icon(
+                      Icons.delete,
+                      color: Theme.of(ctx).colorScheme.error,
+                    ),
+                    title: Text(
+                      'Remove picture',
+                      style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+                    ),
+                    onTap: () => Navigator.pop(ctx, 'remove'),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+    if (action == null || !context.mounted) return;
+    try {
+      if (action == 'remove') {
+        await room.setAvatar(null);
+        VibeGroups._snack(context, 'Picture removed');
+        return;
+      }
+      MatrixFile? file;
+      if (PlatformInfos.isMobile) {
+        final picked = await ImagePicker().pickImage(
+          source: action == 'camera' ? ImageSource.camera : ImageSource.gallery,
+          maxWidth: 1024,
+          maxHeight: 1024,
+          imageQuality: 82,
+        );
+        if (picked == null) return;
+        file = MatrixImageFile(
+          bytes: await picked.readAsBytes(),
+          name: picked.name,
+        );
+      } else {
+        if (!context.mounted) return;
+        final picked = await selectFiles(context, type: FileType.image);
+        if (picked.isEmpty) return;
+        file = MatrixImageFile(
+          bytes: await picked.first.readAsBytes(),
+          name: picked.first.name,
+        );
+      }
+      if (context.mounted) VibeGroups._snack(context, 'Uploading picture…');
+      await room.setAvatar(file);
+      VibeHaptics.light();
+      if (context.mounted) VibeGroups._snack(context, 'Picture updated');
+    } catch (e) {
+      if (context.mounted) VibeGroups._snack(context, VibeGroups._nice(e));
+    }
+  }
+
+  /// Private (invite / link only) or Public (anyone can find and join).
+  static Future<void> privacy(BuildContext context, Room room) =>
+      showVibeSheet<void>(
+        context: context,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        showDragHandle: true,
+        backgroundColor: VibeSettingsStyle.page(context),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        builder: (ctx) => _Privacy(room: room),
+      );
+
+  /// Promote / demote / remove someone. Only offered when you outrank them.
+  static Future<bool> manageMember(
+    BuildContext context,
+    Room room,
+    User u,
+  ) async {
+    final me = room.ownPowerLevel.level;
+    final them = u.powerLevel.level;
+    final canRole = room.canChangePowerLevel && me > them;
+    final canKick = room.canKick && me > them;
+    if (!canRole && !canKick) return false;
+    final t1 = VibeSettingsStyle.text(context);
+    final t2 = VibeSettingsStyle.text2(context);
+    final role = u.powerLevel.role;
+    final action = await showVibeSheet<String>(
+      context: context,
+      useRootNavigator: true,
+      showDragHandle: true,
+      backgroundColor: VibeSettingsStyle.page(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: Row(
+                children: [
+                  Avatar(
+                    mxContent: u.avatarUrl,
+                    name: u.calcDisplayname(),
+                    size: 44,
+                    client: room.client,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          u.calcDisplayname(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: t1,
+                          ),
+                        ),
+                        Text(
+                          switch (role) {
+                            PowerLevelRole.owner => 'Owner',
+                            PowerLevelRole.admin => 'Admin',
+                            PowerLevelRole.moderator => 'Moderator',
+                            PowerLevelRole.user => 'Member',
+                          },
+                          style: TextStyle(color: t2, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            _Card(
+              children: [
+                if (canRole && role != PowerLevelRole.admin && me >= 100)
+                  ListTile(
+                    leading: Icon(Icons.shield, color: t1),
+                    title: Text('Make admin', style: TextStyle(color: t1)),
+                    subtitle: Text(
+                      'Can change everything, add admins and remove people',
+                      style: TextStyle(color: t2),
+                    ),
+                    onTap: () => Navigator.pop(ctx, 'admin'),
+                  ),
+                if (canRole && role != PowerLevelRole.moderator && me >= 50)
+                  ListTile(
+                    leading: Icon(Icons.verified_user, color: t1),
+                    title: Text('Make moderator', style: TextStyle(color: t1)),
+                    subtitle: Text(
+                      'Can remove people and delete messages',
+                      style: TextStyle(color: t2),
+                    ),
+                    onTap: () => Navigator.pop(ctx, 'mod'),
+                  ),
+                if (canRole && role != PowerLevelRole.user)
+                  ListTile(
+                    leading: Icon(Icons.person, color: t1),
+                    title: Text(
+                      role == PowerLevelRole.admin
+                          ? 'Remove admin'
+                          : 'Remove moderator',
+                      style: TextStyle(color: t1),
+                    ),
+                    onTap: () => Navigator.pop(ctx, 'user'),
+                  ),
+                if (canKick && u.membership != Membership.leave)
+                  ListTile(
+                    leading: Icon(
+                      Icons.person_remove,
+                      color: Theme.of(ctx).colorScheme.error,
+                    ),
+                    title: Text(
+                      u.membership == Membership.invite
+                          ? 'Cancel invite'
+                          : room.isSpace
+                          ? 'Remove from community'
+                          : 'Remove from group',
+                      style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+                    ),
+                    onTap: () => Navigator.pop(ctx, 'kick'),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+    if (action == null || !context.mounted) return false;
+    final name = u.calcDisplayname();
+    if (action == 'admin') {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Make $name an admin?'),
+          content: const Text(
+            'Admins have the same powers as you. On Matrix an admin can\'t '
+            'be demoted by another admin, so only do this for people you '
+            'trust.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Make admin'),
+            ),
+          ],
+        ),
+      );
+      if (ok != true || !context.mounted) return false;
+    }
+    if (action == 'kick') {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Remove $name?'),
+          content: const Text('They can be invited again later.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(
+                'Remove',
+                style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+              ),
+            ),
+          ],
+        ),
+      );
+      if (ok != true || !context.mounted) return false;
+    }
+    try {
+      switch (action) {
+        case 'admin':
+          await room.setPower(u.id, PowerLevel.defaultAdminLevel);
+          VibeGroups._snack(context, '$name is now an admin');
+        case 'mod':
+          await room.setPower(u.id, PowerLevel.defaultModeratorLevel);
+          if (context.mounted) {
+            VibeGroups._snack(context, '$name is now a moderator');
+          }
+        case 'user':
+          await room.setPower(u.id, PowerLevel.defaultUserLevel);
+          if (context.mounted) VibeGroups._snack(context, '$name is a member');
+        case 'kick':
+          await room.kick(u.id);
+          if (context.mounted) VibeGroups._snack(context, 'Removed $name');
+      }
+      VibeHaptics.light();
+      return true;
+    } catch (e) {
+      if (context.mounted) VibeGroups._snack(context, VibeGroups._nice(e));
+      return false;
+    }
+  }
+}
+
+class _Privacy extends StatefulWidget {
+  final Room room;
+  const _Privacy({required this.room});
+
+  @override
+  State<_Privacy> createState() => _PrivacyState();
+}
+
+class _PrivacyState extends State<_Privacy> {
+  late bool _public = VibeGroups.isPublic(widget.room);
+  late final _link = TextEditingController(
+    text: widget.room.canonicalAlias.isNotEmpty
+        ? widget.room.canonicalAlias.localpart ?? ''
+        : VibeGroups.slug(VibeGroups.nameOf(context, widget.room)),
+  );
+  bool _busy = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _link.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final room = widget.room;
+    final client = room.client;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      if (_public) {
+        final slug = VibeGroups.slug(_link.text);
+        if (slug.isEmpty) throw 'Pick a link name';
+        final alias = '#$slug:${client.userID!.domain}';
+        if (room.canonicalAlias != alias) {
+          await client.setRoomAlias(alias, room.id);
+          await room.setCanonicalAlias(alias);
+        }
+        await room.setJoinRules(JoinRules.public);
+        if (room.canChangeHistoryVisibility) {
+          await room.setHistoryVisibility(HistoryVisibility.shared);
+        }
+        await client.setRoomVisibilityOnDirectory(
+          room.id,
+          visibility: sdk.Visibility.public,
+        );
+      } else {
+        await room.setJoinRules(JoinRules.invite);
+        await client.setRoomVisibilityOnDirectory(
+          room.id,
+          visibility: sdk.Visibility.private,
+        );
+      }
+      VibeHaptics.light();
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _error = VibeGroups._nice(e);
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final room = widget.room;
+    final t1 = VibeSettingsStyle.text(context);
+    final t2 = VibeSettingsStyle.text2(context);
+    final what = room.isSpace ? 'community' : 'group';
+    final server = room.client.userID?.domain ?? '';
+    final canEdit = room.canChangeJoinRules;
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 150),
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _SheetTitle(label: 'privacy'),
+            RadioGroup<bool>(
+              groupValue: _public,
+              onChanged: (v) {
+                if (canEdit && v != null) setState(() => _public = v);
+              },
+              child: _Card(
+                children: [
+                  RadioListTile<bool>(
+                    value: false,
+                    enabled: canEdit,
+                    secondary: Icon(Icons.lock, color: t1),
+                    title: Text('Private', style: TextStyle(color: t1)),
+                    subtitle: Text(
+                      'People join by invite or link',
+                      style: TextStyle(color: t2),
+                    ),
+                  ),
+                  RadioListTile<bool>(
+                    value: true,
+                    enabled: canEdit,
+                    secondary: Icon(Icons.public, color: t1),
+                    title: Text('Public', style: TextStyle(color: t1)),
+                    subtitle: Text(
+                      'Anyone can find this $what and join',
+                      style: TextStyle(color: t2),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 260),
+              curve: vibeSpring,
+              child: _public
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      child: _LinkField(
+                        controller: _link,
+                        server: server,
+                        enabled: canEdit,
+                      ),
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
+            if (_public && room.encrypted)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                child: Text(
+                  'Messages stay end-to-end encrypted, but anyone who joins '
+                  'can read new ones.',
+                  style: TextStyle(fontSize: 12.5, color: t2),
+                ),
+              ),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                child: Text(
+                  _error!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+            if (canEdit)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: _BlurpleButton(
+                    busy: _busy,
+                    label: 'Save',
+                    onPressed: _save,
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'Only admins can change this.',
+                  style: TextStyle(color: t2),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LinkField extends StatelessWidget {
+  final TextEditingController controller;
+  final String server;
+  final bool enabled;
+  const _LinkField({
+    required this.controller,
+    required this.server,
+    this.enabled = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final t1 = VibeSettingsStyle.text(context);
+    final t2 = VibeSettingsStyle.text2(context);
+    return TextField(
+      controller: controller,
+      enabled: enabled,
+      autocorrect: false,
+      style: TextStyle(color: t1),
+      decoration: InputDecoration(
+        labelText: 'Public link',
+        prefixText: '#',
+        suffixText: ':$server',
+        suffixStyle: TextStyle(color: t2),
+        helperText: 'People can join with this link',
+        helperStyle: TextStyle(color: t2),
+        filled: true,
+        fillColor: VibeSettingsStyle.card(context),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+}
+
+class _BlurpleButton extends StatelessWidget {
+  final bool busy;
+  final String label;
+  final VoidCallback onPressed;
+  const _BlurpleButton({
+    required this.busy,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) => FilledButton(
+    style: FilledButton.styleFrom(
+      backgroundColor: const Color(0xFF5865F2),
+      foregroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    ),
+    onPressed: busy ? null : onPressed,
+    child: busy
+        ? const SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.4,
+              color: Colors.white,
+            ),
+          )
+        : Text(
+            label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          ),
+  );
+}
+
+/// Rounded card that groups list tiles.
+class _Card extends StatelessWidget {
+  final List<Widget> children;
+  const _Card({required this.children});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16),
+    decoration: BoxDecoration(
+      color: VibeSettingsStyle.card(context),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    clipBehavior: Clip.antiAlias,
+    child: Material(
+      type: MaterialType.transparency,
+      child: Column(mainAxisSize: MainAxisSize.min, children: children),
+    ),
+  );
+}
+
+/// "# | label" title for small sheets that already have a drag handle.
+class _SheetTitle extends StatelessWidget {
+  final String label;
+  const _SheetTitle({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final muted = VibeSettingsStyle.text2(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+      child: Row(
+        children: [
+          Text('#', style: TextStyle(fontSize: 24, color: muted)),
+          const SizedBox(width: 12),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '|  ',
+                  style: TextStyle(color: muted.withAlpha(0x88)),
+                ),
+                TextSpan(text: label),
+              ],
+            ),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: VibeSettingsStyle.text(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Create group
 // ---------------------------------------------------------------------------
 
 class VibeCreateGroupPage extends StatefulWidget {
-  const VibeCreateGroupPage({super.key});
+  /// A community (Matrix space) instead of a single group chat.
+  final bool community;
+  const VibeCreateGroupPage({this.community = false, super.key});
 
-  static Future<void> open(BuildContext context) =>
+  static Future<void> open(BuildContext context, {bool community = false}) =>
       Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute(
-          builder: (_) => const VibeSettingsTheme(child: VibeCreateGroupPage()),
+          builder: (_) => VibeSettingsTheme(
+            child: VibeCreateGroupPage(community: community),
+          ),
         ),
       );
 
@@ -247,14 +941,30 @@ class VibeCreateGroupPage extends StatefulWidget {
 class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
   final _name = TextEditingController();
   final _id = TextEditingController();
+  final _link = TextEditingController();
   final Set<String> _picked = {};
+  bool _public = false;
+  bool _linkEdited = false;
+  MatrixImageFile? _picture;
   bool _busy = false;
   String? _error;
+
+  bool get _community => widget.community;
+  String get _what => _community ? 'community' : 'group';
+
+  @override
+  void initState() {
+    super.initState();
+    _name.addListener(() {
+      if (!_linkEdited) _link.text = VibeGroups.slug(_name.text);
+    });
+  }
 
   @override
   void dispose() {
     _name.dispose();
     _id.dispose();
+    _link.dispose();
     super.dispose();
   }
 
@@ -271,10 +981,44 @@ class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
     });
   }
 
+  Future<void> _pickPicture() async {
+    try {
+      if (PlatformInfos.isMobile) {
+        final picked = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 1024,
+          maxHeight: 1024,
+          imageQuality: 82,
+        );
+        if (picked == null) return;
+        final file = MatrixImageFile(
+          bytes: await picked.readAsBytes(),
+          name: picked.name,
+        );
+        if (mounted) setState(() => _picture = file);
+      } else {
+        final picked = await selectFiles(context, type: FileType.image);
+        if (picked.isEmpty) return;
+        final file = MatrixImageFile(
+          bytes: await picked.first.readAsBytes(),
+          name: picked.first.name,
+        );
+        if (mounted) setState(() => _picture = file);
+      }
+    } catch (e) {
+      if (mounted) setState(() => _error = '$e');
+    }
+  }
+
   Future<void> _create() async {
     final name = _name.text.trim();
     if (name.isEmpty) {
-      setState(() => _error = 'Give the group a name');
+      setState(() => _error = 'Give the $_what a name');
+      return;
+    }
+    final slug = VibeGroups.slug(_link.text);
+    if (_public && slug.isEmpty) {
+      setState(() => _error = 'Pick a public link');
       return;
     }
     setState(() {
@@ -285,12 +1029,55 @@ class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
     final router = GoRouter.of(context);
     final nav = Navigator.of(context);
     try {
-      final id = await client.createGroupChat(
-        groupName: name,
-        invite: _picked.toList(),
-        enableEncryption: true,
-        preset: CreateRoomPreset.privateChat,
-      );
+      Uri? avatar;
+      if (_picture != null) {
+        avatar = await client.uploadContent(
+          _picture!.bytes,
+          filename: _picture!.name,
+          contentType: _picture!.mimeType,
+        );
+      }
+      final avatarState = [
+        if (avatar != null)
+          StateEvent(
+            type: EventTypes.RoomAvatar,
+            content: {'url': avatar.toString()},
+          ),
+      ];
+      if (_community) {
+        final id = await VibeCommunities.create(
+          client,
+          name: name,
+          isPublic: _public,
+          alias: _public ? slug : null,
+          invite: _picked.toList(),
+          initialState: avatarState,
+        );
+        VibeHaptics.medium();
+        nav.pop();
+        VibeCommunities.select.value = id;
+        return;
+      }
+      final String id;
+      if (_public) {
+        id = await client.createRoom(
+          name: name,
+          preset: CreateRoomPreset.publicChat,
+          visibility: sdk.Visibility.public,
+          roomAliasName: slug,
+          invite: _picked.toList(),
+          initialState: avatarState,
+        );
+        await client.waitForRoomInSync(id, join: true);
+      } else {
+        id = await client.createGroupChat(
+          groupName: name,
+          invite: _picked.toList(),
+          enableEncryption: true,
+          preset: CreateRoomPreset.privateChat,
+          initialState: avatarState,
+        );
+      }
       VibeHaptics.medium();
       nav.pop();
       router.go('/rooms/$id');
@@ -298,7 +1085,7 @@ class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
       if (mounted) {
         setState(() {
           _busy = false;
-          _error = '$e';
+          _error = VibeGroups._nice(e);
         });
       }
     }
@@ -324,23 +1111,117 @@ class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
         borderSide: BorderSide.none,
       ),
     );
+    final picture = _picture;
     return Scaffold(
-      appBar: AppBar(title: const Text('Create group')),
+      appBar: AppBar(
+        title: Text(_community ? 'Create community' : 'Create group'),
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
         children: [
-          TextField(
-            controller: _name,
-            autofocus: true,
-            textCapitalization: TextCapitalization.sentences,
-            style: TextStyle(color: t1, fontSize: 17),
-            decoration: deco('Group name', Icons.groups),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: _pickPicture,
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: card,
+                    borderRadius: BorderRadius.circular(_community ? 18 : 32),
+                    image: picture == null
+                        ? null
+                        : DecorationImage(
+                            image: MemoryImage(picture.bytes),
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                  child: picture == null
+                      ? Icon(Icons.add_a_photo, color: t2)
+                      : null,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _name,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.sentences,
+                  style: TextStyle(color: t1, fontSize: 17),
+                  decoration: deco(
+                    _community ? 'Community name' : 'Group name',
+                    _community ? Icons.workspaces : Icons.groups,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            '🔒 End-to-end encrypted. Only the people in it can read it.',
-            style: TextStyle(fontSize: 12.5, color: t2),
+          const SizedBox(height: 16),
+          RadioGroup<bool>(
+            groupValue: _public,
+            onChanged: (v) => setState(() => _public = v ?? false),
+            child: Container(
+              decoration: BoxDecoration(
+                color: card,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Material(
+                type: MaterialType.transparency,
+                child: Column(
+                  children: [
+                    RadioListTile<bool>(
+                      value: false,
+                      secondary: Icon(Icons.lock, color: t1),
+                      title: Text('Private', style: TextStyle(color: t1)),
+                      subtitle: Text(
+                        _community
+                            ? 'Only people you invite can join'
+                            : '🔒 End-to-end encrypted, invite only',
+                        style: TextStyle(color: t2),
+                      ),
+                    ),
+                    RadioListTile<bool>(
+                      value: true,
+                      secondary: Icon(Icons.public, color: t1),
+                      title: Text('Public', style: TextStyle(color: t1)),
+                      subtitle: Text(
+                        'Anyone can find it in Find public groups and join',
+                        style: TextStyle(color: t2),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 260),
+            curve: vibeSpring,
+            child: _public
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Focus(
+                      onFocusChange: (f) {
+                        if (f) _linkEdited = true;
+                      },
+                      child: _LinkField(
+                        controller: _link,
+                        server: client.userID?.domain ?? '',
+                      ),
+                    ),
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
+          if (_community)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                'A #general channel is created for you. Add more channels '
+                'from the community pane.',
+                style: TextStyle(fontSize: 12.5, color: t2),
+              ),
+            ),
           const SizedBox(height: 20),
           Text(
             'ADD PEOPLE${_picked.isEmpty ? '' : ' — ${_picked.length}'}',
@@ -433,33 +1314,12 @@ class _VibeCreateGroupPageState extends State<VibeCreateGroupPage> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
           child: SizedBox(
             height: 54,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF5865F2),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              onPressed: _busy ? null : _create,
-              child: _busy
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.4,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(
-                      _picked.isEmpty
-                          ? 'Create group'
-                          : 'Create group with ${_picked.length}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+            child: _BlurpleButton(
+              busy: _busy,
+              onPressed: _create,
+              label: _picked.isEmpty
+                  ? 'Create $_what'
+                  : 'Create $_what with ${_picked.length}',
             ),
           ),
         ),
@@ -509,37 +1369,6 @@ class _MembersState extends State<_Members> {
     }
   }
 
-  Future<void> _remove(User u) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Remove ${u.calcDisplayname()}?'),
-        content: const Text('They can be invited again later.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove'),
-          ),
-        ],
-      ),
-    );
-    if (ok != true) return;
-    try {
-      await widget.room.kick(u.id);
-      await _load();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$e')));
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final t1 = VibeSettingsStyle.text(context);
@@ -555,6 +1384,16 @@ class _MembersState extends State<_Members> {
             trailing: users == null ? null : '${users.length}',
           ),
         ),
+        if (widget.room.canChangePowerLevel || widget.room.canKick)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
+              child: Text(
+                'Long-press someone to make them an admin or remove them.',
+                style: TextStyle(fontSize: 12.5, color: t2),
+              ),
+            ),
+          ),
         if (users == null)
           const SliverFillRemaining(
             hasScrollBody: false,
@@ -617,9 +1456,22 @@ class _MembersState extends State<_Members> {
                         avatarUrl: u.avatarUrl,
                         currentRoomId: widget.room.id,
                       ),
-                onLongPress: u.id != me && widget.room.canKick
-                    ? () => _remove(u)
-                    : null,
+                onLongPress: u.id == me
+                    ? null
+                    : () async {
+                        final changed = await VibeGroupEdit.manageMember(
+                          context,
+                          widget.room,
+                          u,
+                        );
+                        if (changed) {
+                          // wait for the new power levels to sync back
+                          await Future<void>.delayed(
+                            const Duration(milliseconds: 700),
+                          );
+                          await _load();
+                        }
+                      },
               );
             },
           ),

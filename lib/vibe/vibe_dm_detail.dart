@@ -93,6 +93,10 @@ class VibeDmDetail extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: GestureDetector(
                   onTap: invited ? null : onOpenChat,
+                  onLongPress:
+                      group && room.canChangeStateEvent(EventTypes.RoomAvatar)
+                      ? () => VibeGroupEdit.changePicture(context, room)
+                      : null,
                   child: Avatar(
                     mxContent: room.avatar,
                     name: name,
@@ -166,53 +170,66 @@ class VibeDmDetail extends StatelessWidget {
             if (invited)
               _ApprovalBanner(room: room, name: name)
             else ...[
-              _HashRow(
+              VibeHashRow(
                 label: 'chat',
                 subtitle: room.encrypted
                     ? '🔒 End-to-end encrypted'
                     : null,
                 onTap: onOpenChat,
               ),
-              const _Header('INFO'),
-              _HashRow(
+              const VibePaneHeader('INFO'),
+              VibeHashRow(
                 label: 'media',
                 subtitle: 'Photos and videos',
                 onTap: () => open(_Kind.media),
               ),
-              _HashRow(label: 'files', onTap: () => open(_Kind.files)),
-              _HashRow(label: 'links', onTap: () => open(_Kind.links)),
-              _HashRow(
+              VibeHashRow(label: 'files', onTap: () => open(_Kind.files)),
+              VibeHashRow(label: 'links', onTap: () => open(_Kind.links)),
+              VibeHashRow(
                 label: 'voice-messages',
                 onTap: () => open(_Kind.voice),
               ),
-              _HashRow(
+              VibeHashRow(
                 label: 'starred-messages',
                 onTap: () => open(_Kind.starred),
               ),
               if (group) ...[
-                const _Header('MEMBERS'),
-                _HashRow(
+                const VibePaneHeader('MEMBERS'),
+                VibeHashRow(
                   label: 'members',
                   subtitle: '${VibeGroups.memberCount(room)} people',
                   onTap: () => VibeGroups.showMembers(context, room),
                 ),
                 if (room.canInvite)
-                  _HashRow(
+                  VibeHashRow(
                     label: 'invite-people',
                     onTap: () => VibeGroups.showInvite(context, room),
                   ),
+                const VibePaneHeader('GROUP'),
+                if (room.canChangeStateEvent(EventTypes.RoomAvatar))
+                  VibeHashRow(
+                    label: 'group-picture',
+                    onTap: () => VibeGroupEdit.changePicture(context, room),
+                  ),
                 if (room.canChangeStateEvent(EventTypes.RoomName))
-                  _HashRow(
+                  VibeHashRow(
                     label: 'rename-group',
                     onTap: () => VibeGroups.rename(context, room),
                   ),
-                _HashRow(
+                VibeHashRow(
+                  label: 'privacy',
+                  subtitle: VibeGroups.isPublic(room)
+                      ? '🌐 Public · anyone can join'
+                      : '🔒 Private · invite only',
+                  onTap: () => VibeGroupEdit.privacy(context, room),
+                ),
+                VibeHashRow(
                   label: 'leave-group',
                   onTap: () => VibeGroups.leave(context, room),
                 ),
               ],
               if (other != null && !group)
-                _HashRow(
+                VibeHashRow(
                   label: 'profile',
                   onTap: () => VibeUserSheet.show(
                     context,
@@ -231,31 +248,68 @@ class VibeDmDetail extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
+class VibePaneHeader extends StatelessWidget {
   final String text;
-  const _Header(this.text);
+
+  /// Optional "+" at the end of the header (add a channel, ...).
+  final VoidCallback? onAdd;
+  const VibePaneHeader(this.text, {this.onAdd, super.key});
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(6, 16, 6, 4),
-    child: Text(
+  Widget build(BuildContext context) {
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final label = Text(
       text,
       style: TextStyle(
         fontSize: 12.5,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.4,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        color: muted,
       ),
-    ),
-  );
+    );
+    return Padding(
+      padding: EdgeInsets.fromLTRB(6, 16, onAdd == null ? 6 : 0, onAdd == null ? 4 : 0),
+      child: onAdd == null
+          ? label
+          : Row(
+              children: [
+                Expanded(child: label),
+                SizedBox(
+                  width: 36,
+                  height: 32,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(Icons.add, size: 20, color: muted),
+                    onPressed: onAdd,
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
 }
 
 /// "#   | label" with an optional line under it, Vibgram style.
-class _HashRow extends StatelessWidget {
+class VibeHashRow extends StatelessWidget {
   final String label;
   final String? subtitle;
   final VoidCallback onTap;
-  const _HashRow({required this.label, required this.onTap, this.subtitle});
+  final VoidCallback? onLongPress;
+
+  /// Brighter label (an unread channel).
+  final bool bold;
+
+  /// Shown at the end of the row (unread badge, "Join").
+  final Widget? trailing;
+  const VibeHashRow({
+    required this.label,
+    required this.onTap,
+    this.subtitle,
+    this.onLongPress,
+    this.bold = false,
+    this.trailing,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -266,6 +320,7 @@ class _HashRow extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
           child: Row(
@@ -293,7 +348,11 @@ class _HashRow extends StatelessWidget {
                           TextSpan(text: label),
                         ],
                       ),
-                      style: TextStyle(fontSize: 16, color: muted),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: bold ? cs.onSurface : muted,
+                        fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+                      ),
                     ),
                     if (subtitle != null)
                       Padding(
@@ -308,6 +367,10 @@ class _HashRow extends StatelessWidget {
                   ],
                 ),
               ),
+              if (trailing != null) ...[
+                const SizedBox(width: 8),
+                trailing!,
+              ],
             ],
           ),
         ),

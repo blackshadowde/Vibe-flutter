@@ -9,10 +9,12 @@ import 'package:fluffychat/pages/chat_list/chat_list.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
 import 'package:fluffychat/vibe/vibe_archive.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
+import 'package:fluffychat/vibe/vibe_communities.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_dm_detail.dart';
 import 'package:fluffychat/vibe/vibe_dm_pane.dart';
 import 'package:fluffychat/vibe/vibe_dm_rail.dart';
+import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:fluffychat/vibe/vibe_user_bar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -46,15 +48,25 @@ class _VibeHomeViewState extends State<VibeHomeView> {
     if (mounted) setState(() {});
   }
 
+  /// A community was just created or joined: open its pane.
+  void _onSelectCommunity() {
+    final id = VibeCommunities.select.value;
+    if (id == null || !mounted) return;
+    VibeCommunities.select.value = null;
+    setState(() => selectedId = id);
+  }
+
   @override
   void initState() {
     super.initState();
     VibeLock.changes.addListener(_onLockChange);
+    VibeCommunities.select.addListener(_onSelectCommunity);
   }
 
   @override
   void dispose() {
     VibeLock.changes.removeListener(_onLockChange);
+    VibeCommunities.select.removeListener(_onSelectCommunity);
     VibeSwipe.reset();
     super.dispose();
   }
@@ -170,8 +182,21 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                 .toList(),
           );
           _rooms = rooms;
+          // Communities sit in the rail; their channels live inside them.
+          final spaces = VibeCommunities.joined(client);
+          final channels = VibeCommunities.channelIds(client);
+          final railRooms = [
+            ...rooms.where(
+              (r) =>
+                  !VibeGroups.isGroup(r) ||
+                  r.isFavourite ||
+                  r.membership == Membership.invite ||
+                  !channels.contains(r.id),
+            ),
+            ...spaces,
+          ];
           Room? selected;
-          for (final r in rooms) {
+          for (final r in [...rooms, ...spaces]) {
             if (r.id == selectedId) selected = r;
           }
           final theme = Theme.of(context);
@@ -187,7 +212,7 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                 Row(
                   children: [
                     VibeDmRail(
-                      rooms: rooms,
+                      rooms: railRooms,
                       selectedId: selected?.id,
                       activeRoomId: controller.activeChat,
                       onSelect: (room) => setState(() => selectedId = room.id),
@@ -200,7 +225,9 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                           controller.onChatTap(room);
                         },
                       ),
-                      onLongPress: (room) => VibeChatActions.show(
+                      onLongPress: (room) => room.isSpace
+                          ? setState(() => selectedId = room.id)
+                          : VibeChatActions.show(
                         context,
                         room,
                         onOpen: () {
@@ -221,6 +248,16 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                                 onTap: (room) =>
                                     setState(() => selectedId = room.id),
                                 onOpen: (room) {
+                                  _lastOpenedId = room.id;
+                                  controller.onChatTap(room);
+                                },
+                              )
+                            : selected.isSpace
+                            ? VibeCommunityPane(
+                                key: ValueKey(selected.id),
+                                space: selected,
+                                onBack: () => setState(() => selectedId = null),
+                                onOpenRoom: (room) {
                                   _lastOpenedId = room.id;
                                   controller.onChatTap(room);
                                 },
@@ -291,6 +328,8 @@ class _RoomListBuilderState extends State<_RoomListBuilder> {
         r.avatar,
         r.getLocalizedDisplayname(),
         r.isUnreadOrInvited,
+        r.joinRules,
+        r.isSpace ? r.spaceChildren.length : 0,
       );
     }
     return h;
