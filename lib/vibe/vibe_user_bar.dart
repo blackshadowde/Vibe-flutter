@@ -97,12 +97,6 @@ class VibeUserBar extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.notifications),
-                              color: theme.colorScheme.onSurfaceVariant,
-                              onPressed: () =>
-                                  context.go('/rooms/settings/notifications'),
-                            ),
-                            IconButton(
                               // Red dot while an update is waiting.
                               icon: const VibeUpdateDot(
                                 child: Icon(Icons.settings),
