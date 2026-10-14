@@ -10,13 +10,60 @@ abstract class VibeSettingsStyle {
       Theme.of(context).brightness == Brightness.dark;
 
   static Color page(BuildContext context) =>
-      _dark(context) ? const Color(0xFF252429) : const Color(0xFFF2F3F5);
+      _dark(context) ? const Color(0xFF1C1B20) : const Color(0xFFFFFFFF);
 
   static Color card(BuildContext context) =>
-      _dark(context) ? const Color(0xFF2E2D32) : const Color(0xFFFFFFFF);
+      _dark(context) ? const Color(0xFF26252B) : const Color(0xFFF2F3F5);
 
   static Color line(BuildContext context) =>
-      _dark(context) ? const Color(0xFF3A393F) : const Color(0xFFE3E5E8);
+      _dark(context) ? const Color(0xFF33323A) : const Color(0xFFE1E2E6);
+
+  static const Color accent = Color(0xFF5865F2);
+
+  /// Row text inside settings cards.
+  static TextStyle rowTitle(BuildContext context) => TextStyle(
+    fontSize: 15.5,
+    fontWeight: FontWeight.w500,
+    color: text(context),
+    height: 1.25,
+  );
+
+  static TextStyle rowSubtitle(BuildContext context) =>
+      TextStyle(fontSize: 13, color: text2(context), height: 1.3);
+
+  /// Compact list rows for every settings card.
+  static ListTileThemeData listTiles(BuildContext context) =>
+      ListTileThemeData(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        minVerticalPadding: 11,
+        minTileHeight: 52,
+        horizontalTitleGap: 14,
+        iconColor: text(context),
+        titleTextStyle: rowTitle(context),
+        subtitleTextStyle: rowSubtitle(context),
+        visualDensity: const VisualDensity(vertical: -1),
+      );
+
+  /// Slim Discord-style switch colours for any Material [Switch] left over.
+  static SwitchThemeData switches(BuildContext context) {
+    final dark = _dark(context);
+    return SwitchThemeData(
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      thumbIcon: const WidgetStatePropertyAll(null),
+      thumbColor: WidgetStateProperty.resolveWith(
+        (s) => s.contains(WidgetState.selected)
+            ? Colors.white
+            : (dark ? const Color(0xFFDBDEE1) : const Color(0xFF80848E)),
+      ),
+      trackColor: WidgetStateProperty.resolveWith(
+        (s) => s.contains(WidgetState.selected)
+            ? accent
+            : (dark ? const Color(0xFF4E5058) : const Color(0xFFE3E5E8)),
+      ),
+      trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
+      trackOutlineWidth: const WidgetStatePropertyAll(0),
+    );
+  }
 
   static Color text(BuildContext context) =>
       _dark(context) ? const Color(0xFFF2F3F5) : const Color(0xFF060607);
@@ -52,10 +99,8 @@ class VibeSettingsTheme extends StatelessWidget {
         dividerTheme: theme.dividerTheme.copyWith(
           color: VibeSettingsStyle.line(context),
         ),
-        listTileTheme: theme.listTileTheme.copyWith(
-          iconColor: VibeSettingsStyle.text(context),
-          tileColor: Colors.transparent,
-        ),
+        listTileTheme: VibeSettingsStyle.listTiles(context),
+        switchTheme: VibeSettingsStyle.switches(context),
       ),
       child: child,
     );
@@ -63,48 +108,212 @@ class VibeSettingsTheme extends StatelessWidget {
 }
 
 /// Drop-in for a settings Column: every run of rows between two [Divider]s
-/// becomes one rounded card (Vibgram style). The dividers themselves go away.
+/// becomes one rounded card (Discord style), with a thin line between rows.
+/// A bold header row at the start of a run (FluffyChat's section titles)
+/// becomes a plain grey label above its card.
 class VibeGroups extends StatelessWidget {
   final List<Widget> children;
   const VibeGroups({required this.children, super.key});
 
+  /// FluffyChat's section title: a ListTile with only a bold title.
+  static String? _headerText(Widget w) {
+    if (w is! ListTile) return null;
+    if (w.onTap != null ||
+        w.subtitle != null ||
+        w.leading != null ||
+        w.trailing != null) {
+      return null;
+    }
+    final t = w.title;
+    if (t is Text && t.style?.fontWeight == FontWeight.bold) return t.data;
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final groups = <List<Widget>>[[]];
+    final groups = <({String? title, List<Widget> rows})>[];
+    String? title;
+    var rows = <Widget>[];
+    void flush() {
+      if (rows.isNotEmpty || title != null) {
+        groups.add((title: title, rows: rows));
+      }
+      title = null;
+      rows = [];
+    }
+
     for (final c in children) {
       if (c is Divider) {
-        if (groups.last.isNotEmpty) groups.add([]);
-      } else {
-        groups.last.add(c);
+        flush();
+        continue;
       }
+      final h = _headerText(c);
+      if (h != null && rows.isEmpty) {
+        title = h;
+        continue;
+      }
+      rows.add(c);
     }
-    if (groups.last.isEmpty) groups.removeLast();
-    return Column(
-      children: [
-        const SizedBox(height: 6),
-        for (final g in groups)
-          Container(
-            margin: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+    flush();
+    return ListTileTheme.merge(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      minVerticalPadding: 11,
+      minTileHeight: 52,
+      titleTextStyle: VibeSettingsStyle.rowTitle(context),
+      subtitleTextStyle: VibeSettingsStyle.rowSubtitle(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 4),
+          for (final g in groups) ...[
+            if (g.title != null) VibeSectionLabel(g.title!),
+            if (g.rows.isNotEmpty) VibeCard(children: g.rows),
+          ],
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+}
+
+/// Plain grey section title above a card ("Theme", "Account Information").
+class VibeSectionLabel extends StatelessWidget {
+  final String text;
+  const VibeSectionLabel(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+    child: Text(
+      text,
+      style: TextStyle(
+        fontSize: 14.5,
+        fontWeight: FontWeight.w500,
+        color: VibeSettingsStyle.text2(context),
+      ),
+    ),
+  );
+}
+
+/// Rounded grey card holding rows, with a thin inset line between them.
+class VibeCard extends StatelessWidget {
+  final List<Widget> children;
+  final EdgeInsetsGeometry margin;
+  const VibeCard({
+    required this.children,
+    this.margin = const EdgeInsets.fromLTRB(16, 0, 16, 6),
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final line = VibeSettingsStyle.line(context);
+    return Container(
+      margin: margin,
+      decoration: BoxDecoration(
+        color: VibeSettingsStyle.card(context),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < children.length; i++) ...[
+              if (i > 0)
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Container(height: 0.6, color: line),
+                ),
+              children[i],
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Slim Discord-style toggle: blurple pill with a white knob when on.
+class VibeSwitch extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+  const VibeSwitch({required this.value, this.onChanged, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final enabled = onChanged != null;
+    final track = value
+        ? VibeSettingsStyle.accent
+        : (dark ? const Color(0xFF4E5058) : const Color(0xFFDADCE0));
+    final knob = value || dark ? Colors.white : const Color(0xFF80848E);
+    return Semantics(
+      toggled: value,
+      enabled: enabled,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: enabled ? () => onChanged!(!value) : null,
+        child: Opacity(
+          opacity: enabled ? 1 : 0.45,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            width: 44,
+            height: 26,
+            padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
-              color: VibeSettingsStyle.card(context),
-              borderRadius: BorderRadius.circular(20),
+              color: track,
+              borderRadius: BorderRadius.circular(13),
             ),
-            clipBehavior: Clip.antiAlias,
-            child: Material(
-              type: MaterialType.transparency,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: g,
+            child: AnimatedAlign(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: knob,
+                  shape: BoxShape.circle,
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x33000000), blurRadius: 2),
+                  ],
                 ),
               ),
             ),
           ),
-        const SizedBox(height: 12),
-      ],
+        ),
+      ),
     );
   }
+}
+
+/// A settings row with a [VibeSwitch]; tap anywhere on the row to toggle.
+class VibeSwitchRow extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+  final IconData? icon;
+  const VibeSwitchRow({
+    required this.title,
+    required this.value,
+    required this.onChanged,
+    this.subtitle,
+    this.icon,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    leading: icon == null ? null : Icon(icon, size: 22),
+    title: Text(title),
+    subtitle: subtitle == null ? null : Text(subtitle!),
+    trailing: VibeSwitch(value: value, onChanged: onChanged),
+    onTap: onChanged == null ? null : () => onChanged!(!value),
+  );
 }
 
 /// One row in a Vibgram-style settings card: filled icon, title, optional
@@ -135,7 +344,7 @@ class VibeSettingsRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: SizedBox(
-        height: 54,
+        height: 52,
         child: Stack(
           children: [
             // Fill the row so icon, title and chevron sit in the middle,
@@ -145,14 +354,18 @@ class VibeSettingsRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(width: 16),
-                Icon(icon, size: 24, color: text),
-                const SizedBox(width: 18),
+                Icon(icon, size: 22, color: text),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Text(
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 16, color: text),
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w500,
+                      color: text,
+                    ),
                   ),
                 ),
                 if (value != null)
@@ -178,11 +391,11 @@ class VibeSettingsRow extends StatelessWidget {
             ),
             if (!last)
               Positioned(
-                left: 58,
+                left: 54,
                 right: 0,
                 bottom: 0,
                 child: Container(
-                  height: 0.7,
+                  height: 0.6,
                   color: VibeSettingsStyle.line(context),
                 ),
               ),
@@ -204,21 +417,12 @@ class VibeSettingsGroup extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 22, 20, 10),
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              color: VibeSettingsStyle.text2(context),
-            ),
-          ),
-        ),
+        VibeSectionLabel(title),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: VibeSettingsStyle.card(context),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           clipBehavior: Clip.antiAlias,
           child: Material(

@@ -8,6 +8,7 @@ import 'package:fluffychat/pages/intro/flows/restore_backup_flow.dart';
 import 'package:fluffychat/pages/sign_in/view_model/model/public_homeserver_data.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/sign_in_flows/check_homeserver.dart';
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_sign_up.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -157,8 +158,13 @@ class _IntroPageState extends State<IntroPage>
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
+      backgroundColor: VibeSettingsStyle.page(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) {
-        final cs = Theme.of(ctx).colorScheme;
+        final t1 = VibeSettingsStyle.text(ctx);
+        final t2 = VibeSettingsStyle.text2(ctx);
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(ctx).viewInsets.bottom,
@@ -167,67 +173,83 @@ class _IntroPageState extends State<IntroPage>
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 20, 4),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
                     child: Text(
                       'Choose a server',
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 19,
+                        fontWeight: FontWeight.w700,
+                        color: t1,
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                     child: Text(
                       'Your account lives on this server. People on any '
                       'server can chat with each other.',
-                      style: TextStyle(color: cs.onSurfaceVariant),
+                      style: TextStyle(fontSize: 13.5, color: t2),
                     ),
                   ),
-                  for (final s in _quickServers)
-                    ListTile(
-                      leading: Icon(
-                        s.name == current
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_unchecked,
-                        color: s.name == current ? cs.primary : null,
-                      ),
-                      title: Text(
-                        s.title,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      subtitle: Text(s.note),
-                      onTap: () => Navigator.pop(ctx, s.name),
-                    ),
-                  ListTile(
-                    leading: const Icon(Icons.public),
-                    title: const Text(
-                      'Browse all public servers',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: const Text('Full list with details'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.pop(ctx, 'vibe:browse'),
+                  VibeCard(
+                    children: [
+                      for (final s in _quickServers)
+                        ListTile(
+                          title: Text(s.title),
+                          subtitle: Text(s.note),
+                          trailing: s.name == current
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  size: 22,
+                                  color: VibeSettingsStyle.accent,
+                                )
+                              : Icon(
+                                  Icons.circle_outlined,
+                                  size: 22,
+                                  color: VibeSettingsStyle.line(ctx),
+                                ),
+                          onTap: () => Navigator.pop(ctx, s.name),
+                        ),
+                    ],
                   ),
-                  const Divider(),
+                  VibeCard(
+                    margin: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+                    children: [
+                      ListTile(
+                        title: const Text('Browse all public servers'),
+                        trailing: Icon(Icons.chevron_right, color: t2),
+                        onTap: () => Navigator.pop(ctx, 'vibe:browse'),
+                      ),
+                    ],
+                  ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                     child: TextField(
                       controller: ctrl,
                       keyboardType: TextInputType.url,
                       autocorrect: false,
                       textInputAction: TextInputAction.go,
                       onSubmitted: (v) => Navigator.pop(ctx, v.trim()),
+                      style: TextStyle(fontSize: 15, color: t1),
                       decoration: InputDecoration(
-                        labelText: 'Other / self-hosted server',
-                        hintText: 'example.com',
-                        prefixIcon: const Icon(Icons.dns_outlined),
-                        border: const OutlineInputBorder(),
+                        isDense: true,
+                        hintText: 'Other server, e.g. example.com',
+                        hintStyle: TextStyle(color: t2),
+                        filled: true,
+                        fillColor: VibeSettingsStyle.card(ctx),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 13,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                         suffixIcon: IconButton(
-                          icon: const Icon(Icons.arrow_forward),
+                          icon: Icon(Icons.arrow_forward, size: 20, color: t1),
                           onPressed: () =>
                               Navigator.pop(ctx, ctrl.text.trim()),
                         ),
@@ -257,15 +279,12 @@ class _IntroPageState extends State<IntroPage>
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final bg = dark ? const Color(0xFF313338) : const Color(0xFFF2F3F5);
-    final card = dark ? const Color(0xFF2B2D31) : Colors.white;
-    final border = dark ? const Color(0xFF3F4147) : const Color(0xFFD4D7DC);
-    final field = dark ? const Color(0xFF1E1F22) : const Color(0xFFE3E5E8);
-    final text = dark ? const Color(0xFFF2F3F5) : const Color(0xFF1E1F22);
-    final muted = dark ? const Color(0xFFB5BAC1) : const Color(0xFF5C5E66);
-    const blurple = Color(0xFF5865F2);
-    const link = Color(0xFF8C96F6);
+    final bg = VibeSettingsStyle.page(context);
+    final field = VibeSettingsStyle.card(context);
+    final text = VibeSettingsStyle.text(context);
+    final muted = VibeSettingsStyle.text2(context);
+    const blurple = VibeSettingsStyle.accent;
+    const danger = Color(0xFFDA373C);
 
     if (widget.isLoading) {
       return Scaffold(
@@ -288,442 +307,359 @@ class _IntroPageState extends State<IntroPage>
       );
     }
 
-    InputDecoration deco(String hint, IconData icon, {Widget? suffix}) =>
-        InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: muted.withValues(alpha: 0.8)),
-          prefixIcon: Icon(icon, color: muted, size: 22),
-          suffixIcon: suffix,
-          filled: true,
-          fillColor: field,
-          contentPadding: const EdgeInsets.symmetric(vertical: 18),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(22),
-            borderSide: BorderSide(color: border),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(22),
-            borderSide: BorderSide(color: border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(22),
-            borderSide: const BorderSide(color: blurple, width: 1.5),
-          ),
-        );
+    // Plain filled field, no outline until focused.
+    InputDecoration deco(String hint, {Widget? suffix}) => InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(fontSize: 15, color: muted),
+      suffixIcon: suffix,
+      isDense: true,
+      filled: true,
+      fillColor: field,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: blurple, width: 1.4),
+      ),
+    );
 
-    Widget label(String t, {Widget? trailing, bool optional = false}) =>
-        Padding(
-      padding: const EdgeInsets.only(bottom: 8, top: 4),
+    Widget label(String t, {Widget? trailing}) => Padding(
+      padding: const EdgeInsets.only(bottom: 6, top: 14),
       child: Row(
         children: [
           Text(
             t,
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.6,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w600,
               color: muted,
             ),
           ),
-          if (optional)
-            Text(
-              '  OPTIONAL',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: muted.withValues(alpha: 0.7),
-              ),
-            )
-          else
-            const Text(
-              ' *',
-              style: TextStyle(
-                color: Color(0xFFF23F42),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
           const Spacer(),
           ?trailing,
         ],
       ),
     );
 
+    Widget field0(
+      TextEditingController c,
+      String hint, {
+      bool obscure = false,
+      bool enabled = true,
+      TextInputType? keyboard,
+      TextInputAction action = TextInputAction.next,
+      ValueChanged<String>? onSubmitted,
+      Widget? suffix,
+    }) => TextField(
+      controller: c,
+      enabled: enabled,
+      obscureText: obscure,
+      autocorrect: false,
+      keyboardType: keyboard,
+      textInputAction: action,
+      onSubmitted: onSubmitted,
+      style: TextStyle(color: text, fontSize: 15.5),
+      decoration: deco(hint, suffix: suffix),
+    );
+
+    Widget eye(bool shown, VoidCallback toggle) => IconButton(
+      icon: Icon(
+        shown ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+        size: 20,
+        color: muted,
+      ),
+      onPressed: toggle,
+    );
+
+    Widget primary(String title, VoidCallback? onTap, {String? busy}) =>
+        SizedBox(
+          height: 48,
+          child: FilledButton(
+            onPressed: onTap,
+            style: FilledButton.styleFrom(
+              backgroundColor: blurple,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: blurple.withValues(alpha: 0.5),
+              disabledForegroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            child: busy != null
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: Text(busy, overflow: TextOverflow.ellipsis),
+                      ),
+                    ],
+                  )
+                : Text(title),
+          ),
+        );
+
+    final error = _creating ? suError : _error;
+    final busy = _creating ? suBusy : _busy;
+
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 460),
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 22),
-                decoration: BoxDecoration(
-                  color: card,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: border),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+              children: [
+                // Server, small and tappable, top right.
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Material(
+                    color: field,
+                    borderRadius: BorderRadius.circular(18),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: busy ? null : _editHomeserver,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 7, 8, 7),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.dns_rounded, size: 15, color: muted),
+                            const SizedBox(width: 6),
+                            Text(
+                              VibeSignUpMixin.prettyServer(_homeserver),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: text,
+                              ),
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 18,
+                              color: muted,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 84,
-                        height: 84,
-                        decoration: BoxDecoration(
-                          color: blurple.withValues(alpha: 0.18),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: blurple.withValues(alpha: 0.45),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.sensors,
-                          size: 42,
-                          color: Color(0xFF8C96F6),
-                        ),
-                      ),
+                const SizedBox(height: 28),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      'assets/logo/mini/logo_mini.png',
+                      width: 56,
+                      height: 56,
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      _creating ? 'Create your account' : 'Welcome back!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: text,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _creating
-                          ? 'Free and end-to-end encrypted. No phone number needed.'
-                          : "We're so excited to see you again!",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: muted),
-                    ),
-                    const SizedBox(height: 26),
-                    if (_creating) ...[
-                      label('USERNAME'),
-                      TextField(
-                        controller: suUser,
-                        enabled: !suBusy,
-                        autocorrect: false,
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(color: text, fontSize: 16),
-                        decoration: deco(
-                          'Pick a username',
-                          Icons.alternate_email,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      label('PASSWORD'),
-                      TextField(
-                        controller: suPass,
-                        enabled: !suBusy,
-                        obscureText: !suShowPass,
-                        autocorrect: false,
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(color: text, fontSize: 16),
-                        decoration: deco(
-                          'At least 8 characters',
-                          Icons.lock_outline,
-                          suffix: IconButton(
-                            icon: Icon(
-                              suShowPass
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              color: muted,
-                            ),
-                            onPressed: () =>
-                                setState(() => suShowPass = !suShowPass),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      label('REPEAT PASSWORD'),
-                      TextField(
-                        controller: suPass2,
-                        enabled: !suBusy,
-                        obscureText: !suShowPass,
-                        autocorrect: false,
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(color: text, fontSize: 16),
-                        decoration: deco('Type it again', Icons.lock_outline),
-                      ),
-                      const SizedBox(height: 14),
-                      label('EMAIL'),
-                      TextField(
-                        controller: suEmail,
-                        enabled: !suBusy,
-                        autocorrect: false,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => suBusy ? null : suSubmit(),
-                        style: TextStyle(color: text, fontSize: 16),
-                        decoration: deco(
-                          'We\'ll send a link to confirm your account',
-                          Icons.mail_outline,
-                        ),
-                      ),
-                      if (suError != null) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          suError!,
-                          style: const TextStyle(
-                            color: Color(0xFFF23F42),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        height: 54,
-                        child: FilledButton(
-                          onPressed: suBusy ? null : suSubmit,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: blurple,
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: blurple.withValues(
-                              alpha: 0.55,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            textStyle: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          child: suBusy
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.4,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(suStatus ?? 'Please wait…'),
-                                  ],
-                                )
-                              : const Text('Create account'),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Column(
+                    key: ValueKey(_creating),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        'Your account lives on ${VibeSignUpMixin.prettyServer(_homeserver)}. '
-                        'Open the confirmation email, tap the link, then come '
-                        'back to Vibe to finish.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12.5, color: muted),
-                      ),
-                    ] else ...[
-                      label('ACCOUNT / USERNAME'),
-                      TextField(
-                        controller: _user,
-                        enabled: !_busy,
-                        autocorrect: false,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(color: text, fontSize: 16),
-                        decoration: deco(
-                          'username or @you:server',
-                          Icons.person_outline,
+                        _creating ? 'Create your account' : 'Welcome back',
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w700,
+                          color: text,
+                          height: 1.15,
                         ),
                       ),
-                      const SizedBox(height: 14),
-                      label(
-                        'PASSWORD',
-                        trailing: GestureDetector(
-                          onTap: () => launchUrlString(
-                            'https://app.element.io/#/forgot_password',
-                            mode: LaunchMode.externalApplication,
-                          ),
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: link,
-                            ),
-                          ),
-                        ),
-                      ),
-                      TextField(
-                        controller: _pass,
-                        enabled: !_busy,
-                        obscureText: !_showPass,
-                        autocorrect: false,
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => _signIn(),
-                        style: TextStyle(color: text, fontSize: 16),
-                        decoration: deco(
-                          'Enter your password',
-                          Icons.lock_outline,
-                          suffix: IconButton(
-                            icon: Icon(
-                              _showPass
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              color: muted,
-                            ),
-                            onPressed: () =>
-                                setState(() => _showPass = !_showPass),
-                          ),
-                        ),
-                      ),
-                      if (_error != null) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          _error!,
-                          style: const TextStyle(
-                            color: Color(0xFFF23F42),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        height: 54,
-                        child: FilledButton(
-                          onPressed: _busy ? null : _signIn,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: blurple,
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: blurple.withValues(
-                              alpha: 0.55,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            textStyle: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          child: _busy
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.4,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('Sign In'),
-                                    SizedBox(width: 8),
-                                    Icon(Icons.arrow_forward, size: 20),
-                                  ],
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Center(
-                        child: TextButton(
-                          onPressed: _busy ? null : () => _web(signUp: false),
-                          child: Text(
-                            'Use the server\'s own login page',
-                            style: TextStyle(fontSize: 14, color: muted),
-                          ),
-                        ),
+                      const SizedBox(height: 6),
+                      Text(
+                        _creating
+                            ? 'Free and end-to-end encrypted. No phone number needed.'
+                            : 'Log in with your Matrix account.',
+                        style: TextStyle(fontSize: 14.5, color: muted),
                       ),
                     ],
-                    const SizedBox(height: 12),
-                    Center(
-                      child: TextButton(
-                        onPressed: suBusy || _busy
-                            ? null
-                            : () => setState(() {
-                                _creating = !_creating;
-                                _error = null;
-                                suError = null;
-                              }),
-                        child: Text.rich(
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (_creating) ...[
+                  label('Username'),
+                  field0(suUser, 'Pick a username', enabled: !suBusy),
+                  label('Password'),
+                  field0(
+                    suPass,
+                    'At least 8 characters',
+                    obscure: !suShowPass,
+                    enabled: !suBusy,
+                    suffix: eye(
+                      suShowPass,
+                      () => setState(() => suShowPass = !suShowPass),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  field0(
+                    suPass2,
+                    'Repeat password',
+                    obscure: !suShowPass,
+                    enabled: !suBusy,
+                  ),
+                  label('Email'),
+                  field0(
+                    suEmail,
+                    'you@example.com',
+                    enabled: !suBusy,
+                    keyboard: TextInputType.emailAddress,
+                    action: TextInputAction.done,
+                    onSubmitted: (_) => suBusy ? null : suSubmit(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      'We\'ll send a link to confirm your account.',
+                      style: TextStyle(fontSize: 12.5, color: muted),
+                    ),
+                  ),
+                ] else ...[
+                  label('Username or email'),
+                  field0(
+                    _user,
+                    'username or @you:server',
+                    enabled: !_busy,
+                    keyboard: TextInputType.emailAddress,
+                  ),
+                  label(
+                    'Password',
+                    trailing: GestureDetector(
+                      onTap: () => launchUrlString(
+                        'https://app.element.io/#/forgot_password',
+                        mode: LaunchMode.externalApplication,
+                      ),
+                      child: const Text(
+                        'Forgot?',
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          color: blurple,
+                        ),
+                      ),
+                    ),
+                  ),
+                  field0(
+                    _pass,
+                    'Your password',
+                    obscure: !_showPass,
+                    enabled: !_busy,
+                    action: TextInputAction.done,
+                    onSubmitted: (_) => _signIn(),
+                    suffix: eye(
+                      _showPass,
+                      () => setState(() => _showPass = !_showPass),
+                    ),
+                  ),
+                ],
+                if (error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      error,
+                      style: const TextStyle(color: danger, fontSize: 13),
+                    ),
+                  ),
+                const SizedBox(height: 22),
+                if (_creating)
+                  primary(
+                    'Create account',
+                    suBusy ? null : suSubmit,
+                    busy: suBusy ? (suStatus ?? 'Please wait…') : null,
+                  )
+                else
+                  primary(
+                    'Log in',
+                    _busy ? null : _signIn,
+                    busy: _busy ? 'Logging in…' : null,
+                  ),
+                if (!_creating)
+                  Center(
+                    child: TextButton(
+                      onPressed: _busy ? null : () => _web(signUp: false),
+                      child: Text(
+                        'Use the server\'s login page',
+                        style: TextStyle(fontSize: 13.5, color: muted),
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                Center(
+                  child: TextButton(
+                    onPressed: busy
+                        ? null
+                        : () => setState(() {
+                            _creating = !_creating;
+                            _error = null;
+                            suError = null;
+                          }),
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
                           TextSpan(
-                            children: [
-                              TextSpan(
-                                text: _creating
-                                    ? 'Already have an account? '
-                                    : 'New to Vibe? ',
-                                style: TextStyle(color: muted),
-                              ),
-                              TextSpan(
-                                text: _creating ? 'Log in' : 'Create an account',
-                                style: const TextStyle(
-                                  color: link,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
+                            text: _creating
+                                ? 'Already have an account? '
+                                : 'New to Vibe? ',
+                            style: TextStyle(color: muted),
                           ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
+                          TextSpan(
+                            text: _creating ? 'Log in' : 'Create an account',
+                            style: const TextStyle(
+                              color: blurple,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      style: const TextStyle(fontSize: 14.5),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () => PlatformInfos.showDialog(context),
+                      child: Text(
+                        'About',
+                        style: TextStyle(fontSize: 13, color: muted),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Center(
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: _busy ? null : _editHomeserver,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 6,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.circle, size: 9, color: blurple),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  'Server: ${VibeSignUpMixin.prettyServer(_homeserver)} · Change',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: link,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                    Text('·', style: TextStyle(color: muted)),
+                    TextButton(
+                      onPressed: _busy ? null : () => restoreBackupFlow(context),
+                      child: Text(
+                        'Restore backup',
+                        style: TextStyle(fontSize: 13, color: muted),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: () => PlatformInfos.showDialog(context),
-                          child: const Text(
-                            'About Vibe',
-                            style: TextStyle(fontSize: 15, color: link),
-                          ),
-                        ),
-                        Text('•', style: TextStyle(color: muted)),
-                        TextButton(
-                          onPressed: _busy
-                              ? null
-                              : () => restoreBackupFlow(context),
-                          child: Text(
-                            'Restore backup',
-                            style: TextStyle(fontSize: 15, color: muted),
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
         ),

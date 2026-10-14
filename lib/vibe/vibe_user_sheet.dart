@@ -3,7 +3,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
@@ -12,7 +14,8 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
-/// Big "about this user" sheet: photo banner, name, Matrix ID, Message button.
+/// "About this user" sheet (Discord style): photo banner, name, username,
+/// Message / call buttons, status and member since.
 abstract class VibeUserSheet {
   static Future<void> show(
     BuildContext context, {
@@ -31,7 +34,7 @@ abstract class VibeUserSheet {
       backgroundColor: Theme.of(context).colorScheme.surface,
       clipBehavior: Clip.antiAlias,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (sheetContext) => VibeSheetDragClose(
         child: _Sheet(
@@ -47,7 +50,7 @@ abstract class VibeUserSheet {
   }
 }
 
-class _Sheet extends StatelessWidget {
+class _Sheet extends StatefulWidget {
   final Client client;
   final String userId;
   final String displayName;
@@ -64,44 +67,114 @@ class _Sheet extends StatelessWidget {
     required this.router,
   });
 
-  Future<void> _message(BuildContext context) async {
-    final existing = client.getDirectChatFromUserId(userId);
-    if (existing != null) {
-      Navigator.of(context).pop();
-      if (existing != currentRoomId) router.go('/rooms/$existing');
+  @override
+  State<_Sheet> createState() => _SheetState();
+}
+
+class _SheetState extends State<_Sheet> {
+  DateTime? _since;
+
+  Client get client => widget.client;
+  String get userId => widget.userId;
+
+  /// The chat this profile was opened from, or your DM with them.
+  Room? get _room {
+    final id = widget.currentRoomId ?? client.getDirectChatFromUserId(userId);
+    return id == null ? null : client.getRoomById(id);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSince();
+  }
+
+  /// "Member since": when they joined this chat (Matrix has no public
+  /// account creation date). Read from their membership event.
+  Future<void> _loadSince() async {
+    final room = _room;
+    if (room == null) return;
+    final known = room.getState(EventTypes.RoomMember, userId);
+    if (known is Event) {
+      if (mounted) setState(() => _since = known.originServerTs);
       return;
     }
+    try {
+      final json = await client.request(
+        RequestType.GET,
+        '/client/v3/rooms/${Uri.encodeComponent(room.id)}/state/'
+        'm.room.member/${Uri.encodeComponent(userId)}',
+        query: {'format': 'event'},
+      );
+      final ts = json['origin_server_ts'];
+      if (ts is int && mounted) {
+        setState(() => _since = DateTime.fromMillisecondsSinceEpoch(ts));
+      }
+    } catch (_) {}
+  }
+
+  /// Groups you're both in.
+  int get _mutual => client.rooms
+      .where(
+        (r) =>
+            !r.isDirectChat &&
+            !r.isSpace &&
+            r.membership == Membership.join &&
+            r.getState(EventTypes.RoomMember, userId)?.content['membership'] ==
+                'join',
+      )
+      .length;
+
+  Future<String?> _dm(BuildContext context) async {
+    final existing = client.getDirectChatFromUserId(userId);
+    if (existing != null) return existing;
     final result = await showFutureLoadingDialog(
       context: context,
       future: () => client.startDirectChat(userId),
     );
-    final roomId = result.result;
-    if (roomId == null) return;
-    if (context.mounted) Navigator.of(context).pop();
-    router.go('/rooms/$roomId');
+    return result.result;
+  }
+
+  Future<void> _message(BuildContext context) async {
+    final roomId = await _dm(context);
+    if (roomId == null || !context.mounted) return;
+    Navigator.of(context).pop();
+    if (roomId != widget.currentRoomId) widget.router.go('/rooms/$roomId');
+  }
+
+  Future<void> _call(BuildContext context, {bool video = false}) async {
+    final roomId = await _dm(context);
+    if (roomId == null || !context.mounted) return;
+    final room = client.getRoomById(roomId);
+    if (room == null) return;
+    Navigator.of(context).pop();
+    await VibeCall.join(context, room, video: video);
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final isMe = userId == client.userID;
-    final box = BoxDecoration(
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: theme.dividerColor),
-    );
-    final labelStyle = TextStyle(
-      fontWeight: FontWeight.bold,
-      letterSpacing: 0.8,
-      color: cs.onSurfaceVariant,
+    final displayName = widget.displayName;
+    final avatarUrl = widget.avatarUrl;
+    final muted = cs.onSurfaceVariant;
+    final soft = dark ? const Color(0xFF2B2D31) : const Color(0xFFEBEDEF);
+    final room = _room;
+    final mutual = isMe ? 0 : _mutual;
+    final label = TextStyle(
+      fontSize: 13.5,
+      fontWeight: FontWeight.w600,
+      color: muted,
     );
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Photo banner that fades into the sheet.
           SizedBox(
-            height: 340,
+            height: 280,
             width: double.infinity,
             child: Stack(
               fit: StackFit.expand,
@@ -113,7 +186,7 @@ class _Sheet extends StatelessWidget {
                     cacheKey: 'vibe_banner_$avatarUrl',
                     fit: BoxFit.cover,
                     width: double.infinity,
-                    height: 340,
+                    height: 280,
                     isThumbnail: false,
                   )
                 else
@@ -125,7 +198,7 @@ class _Sheet extends StatelessWidget {
                           ? '@'
                           : displayName.substring(0, 1).toUpperCase(),
                       style: TextStyle(
-                        fontSize: 120,
+                        fontSize: 96,
                         fontWeight: FontWeight.bold,
                         color: cs.onPrimaryContainer,
                       ),
@@ -139,132 +212,173 @@ class _Sheet extends StatelessWidget {
                       colors: [
                         Colors.transparent,
                         Colors.transparent,
-                        cs.surface.withAlpha(235),
+                        cs.surface,
                       ],
-                      stops: const [0, 0.45, 1],
+                      stops: const [0, 0.55, 1],
                     ),
                   ),
                 ),
                 Positioned(
-                  left: 14,
-                  top: 18,
+                  left: 12,
+                  top: 14,
                   child: Material(
-                    color: Colors.black45,
+                    color: Colors.black38,
                     shape: const CircleBorder(),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.of(context).pop(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => Navigator.of(context).pop(),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.arrow_back,
+                          size: 22,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Positioned(
-                  left: 20,
-                  right: 20,
-                  bottom: 14,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        displayName,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          color: cs.onSurface,
-                        ),
-                      ),
-                      Text(
-                        userId,
-                        style: TextStyle(
-                          fontFamily: 'RobotoMono',
-                          fontSize: 16,
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('DISPLAY NAME', style: labelStyle),
-                const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 16,
+                Text(
+                  displayName,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: cs.onSurface,
+                    height: 1.15,
                   ),
-                  decoration: box,
-                  child: Text(displayName, style: const TextStyle(fontSize: 17)),
                 ),
-                const SizedBox(height: 20),
-                Text('MATRIX USER ID', style: labelStyle),
-                const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(
-                    left: 18,
-                    right: 6,
-                    top: 4,
-                    bottom: 4,
-                  ),
-                  decoration: box,
+                const SizedBox(height: 2),
+                // Username, tap to copy.
+                GestureDetector(
+                  onTap: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    await Clipboard.setData(ClipboardData(text: userId));
+                    messenger.showSnackBar(
+                      const SnackBar(content: Text('Copied')),
+                    );
+                  },
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
+                      Flexible(
                         child: Text(
                           userId,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 17,
-                            color: cs.onSurfaceVariant,
-                          ),
+                          style: TextStyle(fontSize: 14.5, color: muted),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.copy_outlined),
-                        tooltip: 'Copy',
-                        onPressed: () async {
-                          final messenger = ScaffoldMessenger.of(context);
-                          await Clipboard.setData(ClipboardData(text: userId));
-                          messenger.showSnackBar(
-                            const SnackBar(content: Text('Copied')),
-                          );
-                        },
-                      ),
+                      const SizedBox(width: 6),
+                      Icon(Icons.copy_rounded, size: 14, color: muted),
                     ],
                   ),
                 ),
-                if (!isMe) ...[
-                  const SizedBox(height: 22),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 58,
-                    child: FilledButton.icon(
-                      onPressed: () => _message(context),
-                      icon: const Icon(Icons.chat_bubble_outline),
-                      label: const Text('Message'),
-                      style: FilledButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                if (mutual > 0) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(Icons.groups_rounded, size: 17, color: muted),
+                      const SizedBox(width: 6),
+                      Text(
+                        mutual == 1 ? '1 mutual group' : '$mutual mutual groups',
+                        style: TextStyle(fontSize: 13.5, color: muted),
                       ),
-                    ),
+                    ],
                   ),
                 ],
-                SafeArea(top: false, child: const SizedBox(height: 12)),
+                if (!isMe) ...[
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 42,
+                          child: FilledButton.icon(
+                            onPressed: () => _message(context),
+                            icon: const Icon(Icons.chat_bubble, size: 18),
+                            label: const Text('Message'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFF5865F2),
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              textStyle: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _SquareButton(
+                        icon: Icons.call,
+                        background: soft,
+                        color: cs.onSurface,
+                        onTap: () => _call(context),
+                      ),
+                      const SizedBox(width: 8),
+                      _SquareButton(
+                        icon: Icons.videocam,
+                        background: soft,
+                        color: cs.onSurface,
+                        onTap: () => _call(context, video: true),
+                      ),
+                    ],
+                  ),
+                ],
+                if (room != null && !isMe) ...[
+                  const SizedBox(height: 22),
+                  Text('Status', style: label),
+                  const SizedBox(height: 4),
+                  VibeStatusLine(
+                    room: room,
+                    userId: userId,
+                    alwaysTime: true,
+                    maxLines: 3,
+                    fallback: 'No status',
+                    style: TextStyle(fontSize: 15, color: cs.onSurface),
+                  ),
+                ],
+                if (_since != null) ...[
+                  const SizedBox(height: 18),
+                  Text('Member since', style: label),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.forum_rounded, size: 17, color: muted),
+                      const SizedBox(width: 8),
+                      Text(
+                        _date(_since!),
+                        style: TextStyle(fontSize: 15, color: cs.onSurface),
+                      ),
+                      if (room != null && !room.isDirectChat) ...[
+                        Text('  ·  ', style: TextStyle(color: muted)),
+                        Flexible(
+                          child: Text(
+                            room.getLocalizedDisplayname(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 14, color: muted),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+                const SafeArea(top: false, child: SizedBox(height: 24)),
               ],
             ),
           ),
@@ -272,4 +386,39 @@ class _Sheet extends StatelessWidget {
       ),
     );
   }
+
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  static String _date(DateTime d) => '${_months[d.month - 1]} ${d.day}, ${d.year}';
+}
+
+class _SquareButton extends StatelessWidget {
+  final IconData icon;
+  final Color background;
+  final Color color;
+  final VoidCallback onTap;
+  const _SquareButton({
+    required this.icon,
+    required this.background,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: background,
+    borderRadius: BorderRadius.circular(12),
+    child: InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: SizedBox(
+        width: 42,
+        height: 42,
+        child: Icon(icon, size: 20, color: color),
+      ),
+    ),
+  );
 }

@@ -177,20 +177,31 @@ class _OwnSheetState extends State<_OwnSheet> {
     ),
   );
 
+  Widget _squareButton(BuildContext context, IconData icon, VoidCallback onTap) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Material(
+      color: dark ? const Color(0xFF2B2D31) : const Color(0xFFEBEDEF),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: SizedBox(
+          width: 42,
+          height: 42,
+          child: Icon(
+            icon,
+            size: 20,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final userId = client.userID ?? '';
-    final box = BoxDecoration(
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: cs.outlineVariant),
-    );
-    final labelStyle = TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.bold,
-      letterSpacing: 0.8,
-      color: cs.onSurfaceVariant,
-    );
     return FutureBuilder<Profile>(
       future: _profile,
       builder: (context, snap) {
@@ -292,23 +303,82 @@ class _OwnSheetState extends State<_OwnSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: cs.onSurface,
+                    // Name: tap the pencil to edit it right here.
+                    if (_editing)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _name,
+                              focusNode: _nameFocus,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: cs.onSurface,
+                              ),
+                              decoration: const InputDecoration(
+                                isDense: true,
+                                filled: false,
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
+                              ),
+                              onSubmitted: (_) => _saveName(),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.check, size: 22),
+                            onPressed: _saveName,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 22),
+                            onPressed: () => setState(() => _editing = false),
+                          ),
+                        ],
+                      )
+                    else
+                      Text(
+                        name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: cs.onSurface,
+                          height: 1.15,
+                        ),
                       ),
-                    ),
-                    Text(
-                      userId,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: cs.onSurfaceVariant,
+                    const SizedBox(height: 2),
+                    GestureDetector(
+                      onTap: () async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        await Clipboard.setData(ClipboardData(text: userId));
+                        messenger.showSnackBar(
+                          const SnackBar(content: Text('Copied')),
+                        );
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              userId,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 14.5,
+                                color: cs.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.copy_rounded,
+                            size: 14,
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -316,142 +386,49 @@ class _OwnSheetState extends State<_OwnSheet> {
               ),
               VibeStagger(
                 index: 3,
-                dy: 28,
+                dy: 20,
                 child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('DISPLAY NAME', style: labelStyle),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.only(
-                        left: 18,
-                        right: _editing ? 6 : 18,
-                        top: _editing ? 2 : 16,
-                        bottom: _editing ? 2 : 16,
-                      ),
-                      decoration: box,
-                      child: _editing
-                          ? Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: _name,
-                                    focusNode: _nameFocus,
-                                    style: const TextStyle(fontSize: 16),
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      filled: false,
-                                    ),
-                                    onSubmitted: (_) => _saveName(),
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.check),
-                                  onPressed: _saveName,
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close),
-                                  onPressed: () =>
-                                      setState(() => _editing = false),
-                                ),
-                              ],
-                            )
-                          : Text(name, style: const TextStyle(fontSize: 16)),
-                    ),
-                    const SizedBox(height: 20),
-                    Text('MATRIX USER ID', style: labelStyle),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.only(
-                        left: 18,
-                        right: 6,
-                        top: 4,
-                        bottom: 4,
-                      ),
-                      decoration: box,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              userId,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: cs.onSurfaceVariant,
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 42,
+                          child: FilledButton.icon(
+                            onPressed: () => _startEdit(name),
+                            icon: const Icon(Icons.edit, size: 18),
+                            label: const Text('Edit profile'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFF5865F2),
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              textStyle: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.copy_outlined),
-                            tooltip: 'Copy',
-                            onPressed: () async {
-                              final messenger = ScaffoldMessenger.of(context);
-                              await Clipboard.setData(
-                                ClipboardData(text: userId),
-                              );
-                              messenger.showSnackBar(
-                                const SnackBar(content: Text('Copied')),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Divider(height: 1, color: cs.outlineVariant),
-                    const SizedBox(height: 18),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: FilledButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          widget.router.go('/rooms/settings');
-                        },
-                        icon: const Icon(Icons.settings_outlined),
-                        label: const Text('Open settings'),
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: OutlinedButton.icon(
-                        onPressed: () => FluffyShare.share(userId, context),
-                        icon: const Icon(Icons.qr_code_2),
-                        label: const Text('Share my ID'),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: cs.outlineVariant),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                      const SizedBox(width: 8),
+                      _squareButton(
+                        context,
+                        Icons.qr_code_2,
+                        () => FluffyShare.share(userId, context),
                       ),
-                    ),
-                    SafeArea(top: false, child: const SizedBox(height: 14)),
-                  ],
-                ),
+                      const SizedBox(width: 8),
+                      _squareButton(context, Icons.settings, () {
+                        Navigator.of(context).pop();
+                        widget.router.go('/rooms/settings');
+                      }),
+                    ],
+                  ),
                 ),
               ),
+              const SafeArea(top: false, child: SizedBox(height: 16)),
             ],
           ),
         );

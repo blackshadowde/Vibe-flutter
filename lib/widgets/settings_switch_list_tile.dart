@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/config/setting_keys.dart';
+import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:flutter/material.dart';
 
 class SettingsSwitchListTile extends StatefulWidget {
@@ -28,10 +29,11 @@ class SettingsSwitchListTileState extends State<SettingsSwitchListTile> {
   @override
   Widget build(BuildContext context) {
     final subtitle = widget.subtitle;
-    return SwitchListTile.adaptive(
+    // Vibe: slim Discord-style switch, whole row tappable.
+    return VibeSwitchRow(
       value: widget.setting.value,
-      title: Text(widget.title),
-      subtitle: subtitle == null ? null : Text(subtitle),
+      title: widget.title,
+      subtitle: subtitle,
       onChanged: (bool newValue) async {
         widget.onChanged?.call(newValue);
         await widget.setting.setItem(newValue);

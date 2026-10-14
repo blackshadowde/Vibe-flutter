@@ -18,6 +18,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
       ('🔊', 'Voice chats for groups: tap # | voice in the group pane, or the green "Join" when one is live. You see who\'s in it before you join'),
       ('🎧', 'Voice channels in communities: + → Voice. Hop in and out like Discord; the rail shows a green speaker where people are talking'),
       ('🔒', 'The chat\'s lock is now top right and shows how safe the chat is: green = verified, amber = a device isn\'t verified, red = not encrypted. Search moved into the ⋮ menu'),
+      ('🪶', 'Lighter, cleaner screens: profiles (with Member since and quick call buttons), sign-in, choosing a server, the encryption page and every settings page'),
       ('🔤', 'New look for text: Figtree, a friendly rounded typeface, and the new Vibe icon everywhere'),
       ('🕑', 'Their time shows just the time now'),
       ('🩹', 'If Vibe ever closes unexpectedly, it tells you next time and lets you copy a report'),
