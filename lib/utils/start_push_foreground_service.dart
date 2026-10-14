@@ -40,18 +40,19 @@ abstract class ForegroundServices {
         return;
       }
       if (PlatformInfos.isMobile) {
-        final l10n = await L10n.delegate.load(
-          PlatformDispatcher.instance.locale,
-        );
         FlutterForegroundTask.init(
+          // Same quiet category as Vibe's connection: no sound, no status
+          // bar icon, and one switch hides it (see VibeHideService).
           androidNotificationOptions: AndroidNotificationOptions(
-            channelId: 'fluffychat_sync',
-            channelName: l10n.loadingMessages,
-            channelDescription: l10n.loadingMessages,
+            channelId: 'vibe_connection',
+            channelName: 'Vibe connection',
+            channelDescription: 'Keeps Vibe connected for notifications',
             onlyAlertOnce: true,
             playSound: false,
             enableVibration: false,
-            priority: NotificationPriority.LOW,
+            showWhen: false,
+            priority: NotificationPriority.MIN,
+            channelImportance: NotificationChannelImportance.MIN,
           ),
           iosNotificationOptions: const IOSNotificationOptions(
             showNotification: false,
@@ -69,7 +70,7 @@ abstract class ForegroundServices {
         final result = await FlutterForegroundTask.startService(
           serviceTypes: [ForegroundServiceTypes.shortService],
           notificationTitle: 'Vibe',
-          notificationText: l10n.loadingMessages,
+          notificationText: 'Connected for notifications',
           notificationIcon: NotificationIcon(metaDataName: 'ic_launcher'),
         );
         final started = result is ServiceRequestSuccess;

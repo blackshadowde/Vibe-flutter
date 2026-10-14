@@ -4,6 +4,7 @@ import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/vibe/vibe_direct.dart';
 import 'package:fluffychat/vibe/vibe_ntfy.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:fluffychat/vibe/vibe_hide_service.dart';
 import 'package:flutter/material.dart';
 
 /// Settings > Notifications: Direct connection (like Vibgram, default),
@@ -92,7 +93,7 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
           'Direct connection (recommended)',
           'Like Vibgram: Vibe stays connected to your server and shows '
               'messages the moment they arrive, with nothing in between. '
-              'Shows a small permanent notification.',
+              'Shows a small permanent notification (you can hide it below).',
           Icons.bolt,
         ),
         _tile(
@@ -110,6 +111,17 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
               'little more battery.',
           Icons.cell_tower,
         ),
+        if (AppSettings.vibePushMode.value != 'standard')
+          ListTile(
+            leading: const Icon(Icons.notifications_paused),
+            title: const Text('Hide the permanent notification'),
+            subtitle: const Text(
+              'Keeps the connection, removes the "Connected for '
+              'notifications" notification',
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => VibeHideService.open(context),
+          ),
       ],
     );
   }

@@ -13,6 +13,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
   (
     version: '2.2',
     items: [
+      ('🔕', 'Hide the permanent "Connected for notifications" notification: Settings → Notifications → Hide the permanent notification. Vibe stays connected and messages still arrive'),
       ('👥', 'Groups: tap + in the left rail → Create group. Groups sit under your DMs in the rail; their pane has # | chat, media, files, links, members, invite-people (by ID or link), rename and leave. End-to-end encrypted'),
       ('📌', 'Long-press a picture in the left rail: Pin, Mute or Archive the chat with one tap'),
       ('🗄️', 'Archived chats are hidden; long-press your own picture at the top of the rail to open them. A chat comes back while it has new messages (unless muted)'),
