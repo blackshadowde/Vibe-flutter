@@ -31,5 +31,7 @@ find ec/package/dist/assets -maxdepth 1 -type f ! -name '*.map' -exec cp {} "$DE
 cp ec/package/LICENSE-AGPL-3.0 "$DEST/LICENSE-AGPL-3.0"
 
 cp mwa/package/dist/api.min.js "$ROOT/assets/vibe_call/matrix-widget-api.min.js"
+# Apache-2.0: ship its licence with it
+cp mwa/package/LICENSE "$ROOT/assets/vibe_call/matrix-widget-api.LICENSE" 2>/dev/null || true
 
 echo "Element Call ${EC_VERSION}: $(ls "$DEST/assets" | wc -l) files, $(du -sh "$DEST" | cut -f1)"

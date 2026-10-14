@@ -110,7 +110,7 @@ class VibeTextSizePreview extends StatelessWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          'Good morning! 👋',
+                          'Hey! Still on for tonight? 🍕',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -123,9 +123,9 @@ class VibeTextSizePreview extends StatelessWidget {
                   ),
                 ),
                 _Row(
-                  avatar: const Avatar(name: 'Bob Harris', size: 40),
-                  header: header('Bob Harris', otherName, t1),
-                  child: Text('Do you know what time it is?', style: body),
+                  avatar: const Avatar(name: 'Maya', size: 40),
+                  header: header('Maya', otherName, t1),
+                  child: Text('Yes! I\'ll bring the board games', style: body),
                 ),
                 const SizedBox(height: 14),
                 _Row(
@@ -141,7 +141,7 @@ class VibeTextSizePreview extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Flexible(
-                        child: Text('It\'s morning in Tokyo 😎', style: body),
+                        child: Text('Perfect, see you at 8 🎲', style: body),
                       ),
                       const Padding(
                         padding: EdgeInsets.only(left: 6, bottom: 3),

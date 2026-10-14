@@ -125,7 +125,7 @@ abstract class FluffyThemes {
     final base = ThemeData(
       visualDensity: VisualDensity.standard,
       useMaterial3: true,
-      fontFamily: 'GGSans',
+      fontFamily: 'Figtree',
       brightness: brightness,
       colorScheme: colorScheme,
       dividerColor: dividerColor,
@@ -209,8 +209,7 @@ abstract class FluffyThemes {
         ),
       ),
     );
-    // Vibe: Discord's mobile app renders message and body text in gg sans
-    // Medium; Regular looked thin next to it.
+    // Vibe: body and message text in Figtree Medium; Regular looked thin.
     TextStyle? w5(TextStyle? t) => t?.copyWith(fontWeight: FontWeight.w500);
     final tt = base.textTheme;
     return base.copyWith(

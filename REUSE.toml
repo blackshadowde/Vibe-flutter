@@ -46,10 +46,19 @@ path = [
 SPDX-FileCopyrightText = "Matrix Foundation"
 SPDX-License-Identifier = "Apache-2.0"
 
-# App Logo
+[[annotations]]
+path = [
+    "assets/fonts/Figtree-*.ttf",
+    "assets/fonts/Figtree-OFL.txt"
+]
+SPDX-FileCopyrightText = "2022 The Figtree Project Authors"
+SPDX-License-Identifier = "OFL-1.1"
+
+# App Logo (Vibe)
 [[annotations]]
 path = [
     "assets/logo/**",
+    "vibe-icon.png",
     "android/app/src/main/res/mipmap**/**",
     "ios/Runner/Assets.xcassets/AppIcon.appiconset/**",
     "macos/Runner/Assets.xcassets/AppIcon.appiconset/**",
@@ -59,5 +68,5 @@ path = [
     "windows/runner/resources/app_icon.ico"
 ]
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2017-Present Fabiyamada"
-SPDX-License-Identifier = "CC-BY-4.0"
+SPDX-FileCopyrightText = "Vibe (blackshadowde)"
+SPDX-License-Identifier = "AGPL-3.0-or-later"

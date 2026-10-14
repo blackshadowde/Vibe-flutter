@@ -264,7 +264,36 @@ class VibeCreditsSheet extends StatelessWidget {
       'Apache License 2.0 · The Matrix.org Foundation',
       'https://matrix.org',
     ],
-    ['GG Sans', 'Typeface', '© Discord Inc.', null],
+    [
+      'Element Call',
+      'Voice and video calls',
+      'GNU AGPL v3 · New Vector Ltd (Element)',
+      'https://github.com/element-hq/element-call',
+    ],
+    [
+      'matrix-widget-api',
+      'Connects Vibe to Element Call',
+      'Apache License 2.0 · The Matrix.org Foundation',
+      'https://github.com/matrix-org/matrix-widget-api',
+    ],
+    [
+      'LiveKit',
+      'Call audio and video (inside Element Call)',
+      'Apache License 2.0 · LiveKit, Inc.',
+      'https://github.com/livekit/client-sdk-js',
+    ],
+    [
+      'Figtree',
+      'Typeface',
+      'SIL Open Font License 1.1 · The Figtree Project Authors',
+      'https://github.com/erikdkennedy/figtree',
+    ],
+    [
+      'Ringtone and sounds',
+      'Call and notification sounds',
+      'Pixabay',
+      'https://pixabay.com',
+    ],
     [
       'Noto Animated Emoji',
       'Animated reactions in the message menu',

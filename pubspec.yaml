@@ -114,15 +114,19 @@ flutter:
     - assets/element-call/
     - assets/element-call/assets/
   fonts:
-    - family: GGSans
+    # Figtree (SIL Open Font License, assets/fonts/Figtree-OFL.txt)
+    - family: Figtree
       fonts:
-        - asset: assets/fonts/GGSans-Regular.ttf
+        - asset: assets/fonts/Figtree-Regular.ttf
           weight: 400
-        - asset: assets/fonts/GGSans-Medium.ttf
+        - asset: assets/fonts/Figtree-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Figtree-Medium.ttf
           weight: 500
-        - asset: assets/fonts/GGSans-Semibold.ttf
+        - asset: assets/fonts/Figtree-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/GGSans-Bold.ttf
+        - asset: assets/fonts/Figtree-Bold.ttf
           weight: 700
 
 hooks:

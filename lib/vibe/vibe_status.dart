@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
 /// Custom status ("⚓ On watch · until 4:00 PM") + the person's time zone
-/// ("🌙 2:14 AM for Ashish").
+/// ("2:14 AM for Ashish").
 ///
 /// Stored as a `chat.vibe.status` state event (state key = your user id) in
 /// each of your direct chats, so only people you chat with can see it.
@@ -326,7 +326,7 @@ String vibeUntil(BuildContext context, DateTime until) {
   return 'until ${until.day}/${until.month}';
 }
 
-/// "⚓ On watch · until 4:00 PM" and/or "🌙 2:14 AM there" for [userId] in
+/// "🎧 Busy · until 4:00 PM" and/or "2:14 AM there" for [userId] in
 /// [room]. Rebuilds on room updates and every minute (expiry, clock).
 class VibeStatusLine extends StatefulWidget {
   final Room room;
@@ -394,14 +394,13 @@ class _VibeStatusLineState extends State<VibeStatusLine> {
         theirZone != null &&
         (theirZone != myZone || widget.alwaysTime)) {
       final t = DateTime.now().toUtc().add(Duration(minutes: theirZone));
-      final night = t.hour < 6 || t.hour >= 21;
       final clock = MaterialLocalizations.of(
         context,
       ).formatTimeOfDay(TimeOfDay(hour: t.hour, minute: t.minute));
       parts.add(
         theirZone == myZone
-            ? '${night ? '🌙' : '☀️'} $clock · same time as you'
-            : '${night ? '🌙' : '☀️'} $clock there',
+            ? '$clock · same time as you'
+            : '$clock there',
       );
     }
     final text = parts.isEmpty ? widget.fallback : parts.join('  ·  ');
@@ -485,11 +484,10 @@ class _VibeStatusBubbleState extends State<VibeStatusBubble> {
     final zone = s?.tzOffsetMin;
     if (zone != null) {
       final t = DateTime.now().toUtc().add(Duration(minutes: zone));
-      final night = t.hour < 6 || t.hour >= 21;
       final clock = MaterialLocalizations.of(
         context,
       ).formatTimeOfDay(TimeOfDay(hour: t.hour, minute: t.minute));
-      timeText = '${night ? '🌙' : '☀️'} $clock there';
+      timeText = '$clock there';
     }
     if (statusText == null && timeText == null) {
       return const SizedBox.shrink();

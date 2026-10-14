@@ -206,3 +206,4 @@ ios/Runner/GoogleServices-Info.plist
 /assets/element-call/assets/*
 !/assets/element-call/assets/.gitkeep
 /assets/vibe_call/matrix-widget-api.min.js
+/assets/vibe_call/matrix-widget-api.LICENSE

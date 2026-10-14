@@ -46,7 +46,7 @@ It looks and feels like Discord: a rail of profile pictures on the left, your DM
 - 🌐 Pick any Matrix server, or create an account right in the app
 - 🔔 Notifications through Firebase, or **built-in without Google** (ntfy)
 - 💾 Keep media on your phone and save photos to your gallery
-- 🎨 Discord palette, GG Sans font, haptics and 120 Hz animations
+- 🎨 Discord-style palette, Figtree font, haptics and 120 Hz animations
 
 ## Download and install
 
