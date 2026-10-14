@@ -453,6 +453,11 @@ class VibeCall extends ChangeNotifier {
         return;
       }
       final local = lkRoom.localParticipant;
+      _log(
+        'my call identity ${local?.identity} '
+        '(keys for ${client.userID}:${client.deviceID}), '
+        'already there: ${lkRoom.remoteParticipants.keys.join(', ')}',
+      );
       await local?.setMicrophoneEnabled(true);
       if (video) {
         try {

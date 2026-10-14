@@ -65,7 +65,6 @@ class VibeCallKeys {
 
   Uint8List? _key;
   int _index = 0;
-  DateTime _keyTime = DateTime.now();
 
   /// Devices (participantId + membership time) that have the current key.
   final Map<String, int> _sharedWith = {};
@@ -166,7 +165,6 @@ class VibeCallKeys {
     if (_key == null) {
       _key = _randomKey();
       _index = 0;
-      _keyTime = DateTime.now();
       await keyProvider.setRawKey(_key!, participantId: ownId, keyIndex: 0);
     }
     final want = <String, int>{
@@ -179,16 +177,15 @@ class VibeCallKeys {
     final joined = want.keys.where((p) => !_sharedWith.containsKey(p)).toList();
     if (left.isEmpty && joined.isEmpty) return;
 
-    var rotate = left.isNotEmpty;
-    if (!rotate &&
-        DateTime.now().difference(_keyTime) > const Duration(seconds: 10)) {
-      rotate = true;
-    }
+    // New key only when someone leaves (so they can't listen in later).
+    // A joiner gets the current key: they can't have recorded anything
+    // before joining, and switching keys right as they join is when their
+    // client is most likely to miss the switch.
+    final rotate = left.isNotEmpty;
     List<String> targets;
     if (rotate) {
       _key = _randomKey();
       _index = (_index + 1) % 256;
-      _keyTime = DateTime.now();
       _sharedWith.clear();
       targets = want.keys.toList();
       log('new call key $_index');
