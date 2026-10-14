@@ -19,6 +19,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
       ('⬇', 'Keep using Vibe during a call: tap the arrow and the call shrinks to a green bar at the top. Mute, hang up or jump back in from there'),
       ('🔔', 'Incoming calls ring full screen, even from the lock screen. Answer or decline in one tap'),
       ('🎙', 'Deafen (hear nobody), earpiece or loudspeaker, camera on or off, all during the call'),
+      ('✨', 'Send with effects plays after your message has slid in, and fills the whole chat above the keyboard'),
       ('ℹ', 'Calls need your server to support Matrix calls (matrix.org and most bigger servers do). Old groups may ask an admin to turn calls on once'),
     ],
   ),

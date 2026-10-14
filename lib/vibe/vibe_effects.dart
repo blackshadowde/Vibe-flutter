@@ -258,40 +258,34 @@ abstract class VibeEffects {
         DateTime.now().difference(event.originServerTs).inSeconds.abs() < 90;
     if (!mine && !fresh) return;
     if (mine && event.status.isSynced && !fresh) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Let the message slide into the timeline first (its entrance takes
+    // ~460 ms), then play the effect, so the two never fight.
+    Future<void>.delayed(_settle, () {
       if (context.mounted) play(context, effect);
     });
   }
 
-  /// Plays [effect] over the whole screen, starting at the widget [context]
-  /// belongs to (the message).
+  static const _settle = Duration(milliseconds: 520);
+
+  /// Plays [effect] over the whole chat screen: everything between the top
+  /// bar and the message box, above the keyboard. A tapped emoji bursts
+  /// where it is; every other effect fills the screen from its middle.
   static void play(BuildContext context, VibeEffect effect) {
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
     if (overlay == null) return;
-    final media = MediaQuery.of(context);
-    final screen = media.size;
-    var origin = Offset(screen.width / 2, screen.height * 0.45);
-    final box = context.findRenderObject();
-    if (box is RenderBox && box.attached && box.hasSize) {
-      final c = box.localToGlobal(box.size.center(Offset.zero));
-      final top = media.padding.top + 140;
-      final bottom = screen.height - media.viewInsets.bottom - 200;
-      // Effects start in the middle of the screen at the message's height;
-      // a tapped emoji bursts right where it is.
-      final double x = effect.id == 'emoji'
-          ? c.dx.clamp(80.0, math.max(80.0, screen.width - 80)).toDouble()
-          : screen.width / 2;
-      final double y = bottom > top
-          ? c.dy.clamp(top, bottom).toDouble()
-          : c.dy;
-      origin = Offset(x, y);
+    Offset? anchor;
+    if (effect.id == 'emoji') {
+      final box = context.findRenderObject();
+      if (box is RenderBox && box.attached && box.hasSize) {
+        anchor = box.localToGlobal(box.size.center(Offset.zero));
+      }
     }
     VibeHaptics.medium();
     late OverlayEntry entry;
     entry = OverlayEntry(
       builder: (_) => _EffectPlayer(
         effect: effect,
-        origin: origin,
+        anchor: anchor,
         onDone: () => entry.remove(),
       ),
     );
@@ -467,11 +461,13 @@ class _Particle {
 
 class _EffectPlayer extends StatefulWidget {
   final VibeEffect effect;
-  final Offset origin;
+
+  /// Where a tapped emoji bursts from; null = middle of the chat screen.
+  final Offset? anchor;
   final VoidCallback onDone;
   const _EffectPlayer({
     required this.effect,
-    required this.origin,
+    required this.anchor,
     required this.onDone,
   });
 
@@ -486,6 +482,23 @@ class _EffectPlayerState extends State<_EffectPlayer>
     duration: const Duration(milliseconds: 2600),
   );
   List<_Particle>? _ps;
+  Rect? _area;
+  Offset? _origin;
+
+  /// The visible chat screen, measured from the app's own MediaQuery (the
+  /// chat page hides the keyboard height from its children, which is why
+  /// effects used to end up underneath the keyboard).
+  static Rect _chatArea(MediaQueryData mq) {
+    final size = mq.size;
+    final top = mq.padding.top + 64; // top bar
+    final keyboard = mq.viewInsets.bottom;
+    final bottom =
+        size.height - (keyboard > 0 ? keyboard : mq.padding.bottom) - 64;
+    if (bottom - top < 160) {
+      return Rect.fromLTRB(0, mq.padding.top, size.width, size.height - keyboard);
+    }
+    return Rect.fromLTRB(0, top, size.width, bottom);
+  }
 
   @override
   void initState() {
@@ -499,12 +512,11 @@ class _EffectPlayerState extends State<_EffectPlayer>
     super.dispose();
   }
 
-  List<_Particle> _make(Size screen) {
+  List<_Particle> _make(Rect area, Offset o) {
     final e = widget.effect;
     final r = math.Random();
     final tps = <String, TextPainter>{};
-    final o = widget.origin;
-    final w = screen.width, h = screen.height;
+    final w = area.width, h = area.height;
     return List.generate(VibeLowData.on ? e.count ~/ 2 : e.count, (i) {
       final kind = e.kinds[r.nextInt(e.kinds.length)];
       var size = 6.0 + r.nextDouble() * 8;
@@ -532,16 +544,19 @@ class _EffectPlayerState extends State<_EffectPlayer>
           v = Offset(math.cos(a), math.sin(a)) * speed;
           delay = 0.06 + r.nextDouble() * 0.12;
         case VibeEmit.rise:
-          start = Offset(r.nextDouble() * w, h + 30);
+          start = Offset(area.left + r.nextDouble() * w, area.bottom + 30);
           v = Offset((r.nextDouble() - 0.5) * 80, -(h * (0.55 + r.nextDouble() * 0.5)));
           delay = r.nextDouble() * 0.35;
         case VibeEmit.fall:
-          start = Offset(r.nextDouble() * w, -40);
+          start = Offset(area.left + r.nextDouble() * w, area.top - 40);
           v = Offset((r.nextDouble() - 0.5) * 60, h * (0.7 + r.nextDouble() * 0.5));
           delay = r.nextDouble() * 0.4;
         case VibeEmit.cannons:
           final left = i.isEven;
-          start = Offset(left ? -10 : w + 10, h * 0.85);
+          start = Offset(
+            left ? area.left - 10 : area.right + 10,
+            area.top + h * 0.85,
+          );
           final a = left
               ? -math.pi / 2 + 0.25 + r.nextDouble() * 0.6
               : -math.pi / 2 - 0.25 - r.nextDouble() * 0.6;
@@ -567,8 +582,19 @@ class _EffectPlayerState extends State<_EffectPlayer>
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.sizeOf(context);
-    final ps = _ps ??= _make(screen);
+    final area = _area ??= _chatArea(MediaQuery.of(context));
+    final a = widget.anchor;
+    final origin = _origin ??= a == null
+        ? area.center
+        : Offset(
+            a.dx
+                .clamp(area.left + 80, math.max(area.left + 80, area.right - 80))
+                .toDouble(),
+            a.dy
+                .clamp(area.top + 60, math.max(area.top + 60, area.bottom - 60))
+                .toDouble(),
+          );
+    final ps = _ps ??= _make(area, origin);
     const big = 150.0;
     return IgnorePointer(
       child: AnimatedBuilder(
@@ -601,14 +627,14 @@ class _EffectPlayerState extends State<_EffectPlayer>
                       VibeEmit.fall => 120,
                     },
                     glow: widget.effect.colors.first,
-                    origin: widget.origin,
+                    origin: origin,
                   ),
                 ),
               ),
               if (alpha > 0)
                 Positioned(
-                  left: widget.origin.dx - big / 2,
-                  top: widget.origin.dy - big / 2,
+                  left: origin.dx - big / 2,
+                  top: origin.dy - big / 2,
                   width: big,
                   height: big,
                   child: Opacity(
