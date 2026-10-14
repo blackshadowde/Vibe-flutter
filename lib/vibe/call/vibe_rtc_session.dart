@@ -215,12 +215,12 @@ class VibeRtcSession {
 
   /// Ring the other person (DMs) or notify the room (groups), like
   /// Element Call does when you're the first one in the call.
-  Future<String?> notify({required bool ring}) async {
+  Future<List<String>> notify({required bool ring}) async {
     final parent = membershipEventId;
-    if (parent == null) return null;
-    String? id;
+    if (parent == null) return const [];
+    final ids = <String>[];
     try {
-      id = await room.sendEvent(
+      final id = await room.sendEvent(
         {
           'm.mentions': {'user_ids': <String>[], 'room': true},
           'notification_type': ring ? 'ring' : 'notification',
@@ -232,8 +232,9 @@ class VibeRtcSession {
         type: 'org.matrix.msc4075.rtc.notification',
         displayPendingEvent: false,
       );
+      if (id != null) ids.add(id);
       // older clients still listen for this one
-      await room.sendEvent(
+      final legacy = await room.sendEvent(
         {
           'application': 'm.call',
           'm.mentions': {'user_ids': <String>[], 'room': true},
@@ -243,9 +244,10 @@ class VibeRtcSession {
         type: 'org.matrix.msc4075.call.notify',
         displayPendingEvent: false,
       );
+      if (legacy != null) ids.add(legacy);
     } catch (e) {
       log('ring failed: $e');
     }
-    return id;
+    return ids;
   }
 }

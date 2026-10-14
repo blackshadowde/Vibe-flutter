@@ -60,8 +60,12 @@ class VibeCall extends ChangeNotifier {
   VibeCallKeys? _keys;
   StreamSubscription? _stateSub;
   StreamSubscription? _declineSub;
-  String? _ringEventId;
+  final Set<String> _ringEventIds = {};
   Timer? _noAnswer;
+
+  /// Bumped on every start and hang-up, so a start that's still running
+  /// when you hang up notices and undoes itself.
+  int _gen = 0;
 
   /// Full screen (true) or the green bar (false).
   bool expanded = true;
@@ -263,6 +267,8 @@ class VibeCall extends ChangeNotifier {
 
   Future<void> _start(Room room, {required bool video}) async {
     final client = room.client;
+    final gen = ++_gen;
+    bool gone() => gen != _gen;
     this.room = room;
     stage = VibeCallStage.connecting;
     expanded = true;
@@ -349,7 +355,7 @@ class VibeCall extends ChangeNotifier {
         throw const _CallProblem('The call server sent an odd answer.');
       }
       _log('got call pass for $sfuUrl');
-      if (this.room?.id != room.id) return; // hung up meanwhile
+      if (gone()) return; // hung up meanwhile
 
       // 3) Encryption keys (Element Call compatible).
       VibeCallKeys? keys;
@@ -394,6 +400,8 @@ class VibeCall extends ChangeNotifier {
         ),
       );
       _lk = lkRoom;
+      keys?.onOwnKey = (index) async =>
+          lkRoom.e2eeManager?.setKeyIndex(index);
       lkRoom.addListener(_onLiveKitChange);
       final events = lkRoom.createListener();
       _lkEvents = events;
@@ -440,7 +448,7 @@ class VibeCall extends ChangeNotifier {
         ..listen((_) => _onLiveKitChange());
       await lkRoom.connect(sfuUrl, jwt);
       _log('connected to the call server');
-      if (this.room?.id != room.id) {
+      if (gone()) {
         await lkRoom.disconnect();
         return;
       }
@@ -465,6 +473,11 @@ class VibeCall extends ChangeNotifier {
       );
       _session = session;
       await session.join();
+      if (gone()) {
+        // hung up while joining: take the membership back
+        await session.leave();
+        return;
+      }
       _stateSub = client.onRoomState.stream
           .where(
             (u) =>
@@ -477,7 +490,10 @@ class VibeCall extends ChangeNotifier {
       // 6) Ring them if you're the first one in.
       if (existing.isEmpty && !VibeCallMembers.isVoiceRoom(room)) {
         final dm = room.isDirectChat;
-        _ringEventId = await session.notify(ring: dm);
+        _ringEventIds
+          ..clear()
+          ..addAll(await session.notify(ring: dm));
+        if (gone()) return;
         if (dm) _watchRing(room);
       }
 
@@ -524,9 +540,10 @@ class VibeCall extends ChangeNotifier {
               e.senderId != room.client.userID,
         )
         .listen((e) {
-          final rel = e.content.tryGetMap<String, Object?>('m.relates_to');
-          if (rel?['event_id'] != _ringEventId) return;
+          // While it's still ringing (they haven't joined), any decline
+          // from them ends it, whichever of our ring events it points at.
           if (others.isNotEmpty) return;
+          _log('declined by ${e.senderId}');
           _snack('Call declined');
           unawaited(hangup());
         });
@@ -633,6 +650,8 @@ class VibeCall extends ChangeNotifier {
   /// Leave the call.
   Future<void> hangup() async {
     if (!active || stage == VibeCallStage.leaving) return;
+    _gen++;
+    _ringEventIds.clear();
     VibeHaptics.medium();
     stage = VibeCallStage.leaving;
     notifyListeners();

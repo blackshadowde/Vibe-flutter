@@ -285,6 +285,7 @@ class BackgroundPush {
   Future<void> setupBuiltinPush() async {
     for (final client in clients) {
       if (!client.isLogged()) continue;
+      await removeFirebasePusher(client);
       await setupPusher(
         client: client,
         gatewayUrl: VibeNtfy.gateway,
@@ -316,14 +317,39 @@ class BackgroundPush {
         flutterLocalNotificationsPlugin: _flutterLocalNotificationsPlugin,
       ),
     );
-    if (firebaseEnabled) {
-      for (final client in clients) {
-        if (client.isLogged()) await setupFirebase(client);
+    // Firebase is no longer used on Android: Vibe's own connection shows
+    // everything, and a second Firebase copy made duplicate notifications.
+    for (final client in clients) {
+      if (client.isLogged()) await removeFirebasePusher(client);
+    }
+  }
+
+  /// Remove this device's Firebase pusher from the server, so the push
+  /// gateway stops sending copies of every message.
+  Future<void> removeFirebasePusher(Client client) async {
+    try {
+      final gateway = AppSettings.pushNotificationsGatewayUrl.value;
+      var thisAppId =
+          '${AppConfig.pushNotificationsAppId}.${client.deviceID}';
+      if (thisAppId.length > 64) thisAppId = thisAppId.substring(0, 64);
+      final pushers = await client.getPushers() ?? [];
+      for (final p in pushers) {
+        if (p.data.url.toString() != gateway) continue;
+        if (p.appId != thisAppId) continue;
+        await client.deletePusher(p);
+        Logs().i('[Push] Removed Firebase pusher for ${client.deviceID}');
       }
+    } catch (e) {
+      Logs().w('[Push] Could not remove Firebase pusher', e);
     }
   }
 
   Future<void> setupPush(BuildContext context) async {
+    // Firebase mode was removed on Android: move to the direct connection.
+    if (PlatformInfos.isAndroid &&
+        AppSettings.vibePushMode.value == 'standard') {
+      await AppSettings.vibePushMode.setItem('direct');
+    }
     if (!(PlatformInfos.isAndroid && VibeDirect.enabled)) {
       await VibeDirect.stop();
     }

@@ -27,6 +27,11 @@ class VibeCallKeys {
   final lk.BaseKeyProvider keyProvider;
   final void Function(String) log;
 
+  /// Called when your own key changes: tracks already being sent must be
+  /// switched to it, or the others (who only got the new key) can't
+  /// decrypt them. LiveKit keeps each sender on the index it started with.
+  Future<void> Function(int index)? onOwnKey;
+
   VibeCallKeys._(this.client, this.roomId, this.keyProvider, this.log);
 
   /// Same key settings as Element Call's MatrixKeyProvider.
@@ -204,6 +209,12 @@ class VibeCallKeys {
         participantId: ownId,
         keyIndex: _index,
       );
+      try {
+        await onOwnKey?.call(_index);
+      } catch (e) {
+        log('switching to key $_index failed: $e');
+      }
+      log('now sending with key $_index');
     }
   }
 

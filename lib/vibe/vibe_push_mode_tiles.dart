@@ -7,8 +7,8 @@ import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/vibe/vibe_hide_service.dart';
 import 'package:flutter/material.dart';
 
-/// Settings > Notifications: Direct connection (like Vibgram, default),
-/// Standard (Firebase) or Built-in (ntfy, no Google).
+/// Settings > Notifications: Direct connection (like Vibgram, default) or
+/// Built-in (ntfy). Firebase was removed: it duplicated notifications.
 class VibePushModeTiles extends StatefulWidget {
   const VibePushModeTiles({super.key});
 
@@ -38,8 +38,7 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
           content: Text(
             switch (mode) {
               'direct' => 'Direct connection on',
-              'builtin' => 'Built-in notifications on',
-              _ => 'Standard notifications on',
+              _ => 'Built-in notifications on',
             },
           ),
         ),
@@ -97,13 +96,6 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
           Icons.bolt,
         ),
         _tile(
-          'standard',
-          'Google Firebase',
-          'Through Google\'s push service. Uses the least battery, but '
-              'messages can arrive late.',
-          Icons.cloud_outlined,
-        ),
-        _tile(
           'builtin',
           'Built-in, no Google',
           'Vibe keeps its own connection (ntfy). Works without Google '
@@ -111,8 +103,7 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
               'little more battery.',
           Icons.cell_tower,
         ),
-        if (AppSettings.vibePushMode.value != 'standard')
-          ListTile(
+        ListTile(
             leading: const Icon(Icons.notifications_paused),
             title: const Text('Hide the permanent notification'),
             subtitle: const Text(
