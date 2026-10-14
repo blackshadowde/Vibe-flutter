@@ -381,7 +381,11 @@ class VibeCall extends ChangeNotifier {
             useiOSBroadcastExtension: false,
             params: lk.VideoParametersPresets.screenShareH1080FPS15,
           ),
-          encryption: keys == null
+          // Media encryption only, like Element Call (the newer
+          // `encryption` option also encrypts data messages, which Element
+          // Call doesn't expect).
+          // ignore: deprecated_member_use
+          e2eeOptions: keys == null
               ? null
               : lk.E2EEOptions(keyProvider: keys.keyProvider),
         ),
