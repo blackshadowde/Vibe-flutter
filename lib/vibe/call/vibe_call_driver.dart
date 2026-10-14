@@ -68,6 +68,63 @@ class VibeCallDriver {
     );
   }
 
+  /// Delayed "left the call" events Element Call scheduled, and the state
+  /// keys of your call membership, so leaving can be finished for sure.
+  final Set<String> _delayIds = {};
+  final Set<String> _ownKeys = {};
+
+  /// Event ID of your current call membership (reactions point at it).
+  String? ownMembershipEventId;
+
+  /// Make sure you're out of the call on the server: fire the delayed
+  /// leave events now and clear your membership state. Element Call does
+  /// this itself when it leaves cleanly; this covers the times it didn't
+  /// get the chance (closed early, killed, still connecting).
+  Future<void> leave() async {
+    for (final id in _delayIds.toList()) {
+      try {
+        await _updateDelayedEvent({'delayId': id, 'action': 'send'});
+      } catch (_) {}
+    }
+    _delayIds.clear();
+    await clearOwnMembership(client, roomId, extraKeys: _ownKeys);
+    _ownKeys.clear();
+    ownMembershipEventId = null;
+  }
+
+  /// Clear every call membership of this device in [roomId].
+  static Future<void> clearOwnMembership(
+    Client client,
+    String roomId, {
+    Iterable<String> extraKeys = const [],
+  }) async {
+    final me = client.userID;
+    final device = client.deviceID;
+    if (me == null || device == null) return;
+    final keys = <String>{...extraKeys};
+    final room = client.getRoomById(roomId);
+    final states = room?.states['org.matrix.msc3401.call.member'];
+    states?.forEach((key, s) {
+      if (s.senderId == me && s.content.isNotEmpty && key.contains(device)) {
+        keys.add(key);
+      }
+    });
+    for (final key in keys) {
+      final cur = states?[key];
+      if (cur != null && cur.content.isEmpty) continue;
+      try {
+        await client.setRoomStateWithKey(
+          roomId,
+          'org.matrix.msc3401.call.member',
+          key,
+          {},
+        );
+      } catch (e) {
+        Logs().v('Vibe call: could not clear membership $key $e');
+      }
+    }
+  }
+
   void dispose() {
     for (final s in _subs) {
       s.cancel();
@@ -195,6 +252,13 @@ class VibeCallDriver {
       eventId = await client.setRoomStateWithKey(rid, type, stateKey, content);
       if (type == 'org.matrix.msc3401.call.member' &&
           stateKey.contains(client.deviceID ?? '\u0000')) {
+        if (content.isNotEmpty) {
+          _ownKeys.add(stateKey);
+          ownMembershipEventId = eventId;
+        } else {
+          _ownKeys.remove(stateKey);
+          ownMembershipEventId = null;
+        }
         onMembership?.call(content.isNotEmpty);
       }
     } else {
@@ -237,7 +301,9 @@ class VibeCallDriver {
       data: _content(a),
       query: query,
     );
-    return {'roomId': rid, 'delayId': res['delay_id']};
+    final delayId = res['delay_id'];
+    if (delayId is String) _delayIds.add(delayId);
+    return {'roomId': rid, 'delayId': delayId};
   }
 
   Future<Map<String, Object?>> _updateDelayedEvent(
@@ -245,6 +311,7 @@ class VibeCallDriver {
   ) async {
     final id = a['delayId'] as String;
     final action = a['action'] as String;
+    if (action != 'restart') _delayIds.remove(id);
     try {
       await client.request(
         RequestType.POST,

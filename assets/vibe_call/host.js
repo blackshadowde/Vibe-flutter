@@ -44,6 +44,111 @@
     } catch (e) {}
   }
 
+  // WhatsApp style: tap your own small video to make it the big one (and
+  // theirs small). Element Call has no such switch, so the two video
+  // streams are swapped between the tiles.
+  let swapped = false;
+  let mine = null;
+  let theirs = null;
+  let swapTimer = null;
+
+  function callDoc() {
+    try {
+      return iframe && (iframe.contentDocument || iframe.contentWindow.document);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function tiles(doc) {
+    const local = doc.querySelector('[class*="_local_"]');
+    if (!local) return null;
+    const lv = local.querySelector('video');
+    let rv = null;
+    doc.querySelectorAll('video').forEach(function (v) {
+      if (!rv && !local.contains(v)) rv = v;
+    });
+    if (!lv || !rv || !lv.srcObject || !rv.srcObject) return null;
+    return { local: local, lv: lv, rv: rv };
+  }
+
+  function setFlip(v, on) {
+    v.style.setProperty('transform', on ? 'scaleX(-1)' : 'none', 'important');
+  }
+
+  function applySwap() {
+    const doc = callDoc();
+    if (!doc) return;
+    const t = tiles(doc);
+    if (!t) {
+      if (swapped) unswap();
+      return;
+    }
+    if (t.lv.srcObject === theirs && t.rv.srcObject === mine) return;
+    // first swap, or Element Call put the streams back: take them again
+    mine = t.lv.srcObject;
+    theirs = t.rv.srcObject;
+    t.lv.srcObject = theirs;
+    t.rv.srcObject = mine;
+    setFlip(t.lv, false);
+    setFlip(t.rv, true);
+    t.lv.play().catch(function () {});
+    t.rv.play().catch(function () {});
+  }
+
+  function unswap() {
+    swapped = false;
+    if (swapTimer) clearInterval(swapTimer);
+    swapTimer = null;
+    const doc = callDoc();
+    const t = doc && tiles(doc);
+    if (t && t.lv.srcObject === theirs && t.rv.srcObject === mine) {
+      t.lv.srcObject = mine;
+      t.rv.srcObject = theirs;
+      t.lv.play().catch(function () {});
+      t.rv.play().catch(function () {});
+    }
+    if (t) {
+      t.lv.style.removeProperty('transform');
+      t.rv.style.removeProperty('transform');
+    }
+    mine = null;
+    theirs = null;
+    notify('swapped', { on: false });
+  }
+
+  function toggleSwap() {
+    if (swapped) {
+      unswap();
+      return;
+    }
+    const doc = callDoc();
+    if (!doc || !tiles(doc)) return;
+    swapped = true;
+    applySwap();
+    swapTimer = setInterval(applySwap, 700);
+    notify('swapped', { on: true });
+  }
+
+  function watchTaps(doc) {
+    if (!doc || doc.__vibeTaps) return;
+    doc.__vibeTaps = true;
+    let downAt = null;
+    doc.addEventListener('pointerdown', function (e) {
+      downAt = { x: e.clientX, y: e.clientY };
+    }, true);
+    doc.addEventListener('click', function (e) {
+      const target = e.target;
+      if (!target || !target.closest) return;
+      if (target.closest('button')) return;
+      // a drag of the small tile isn't a tap
+      if (downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 12) return;
+      if (target.closest('[class*="_local_"]')) {
+        toggleSwap();
+      }
+    }, true);
+  }
+
   function applySound() {
     try {
       const doc = iframe && (iframe.contentDocument || iframe.contentWindow.document);
@@ -104,6 +209,7 @@
       st.id = 'vibe-style';
       st.textContent = HIDE_CSS;
       doc.head.appendChild(st);
+      watchTaps(doc);
       // forward Element Call's own errors too
       const w = iframe.contentWindow;
       w.addEventListener('error', function (e) {
@@ -368,6 +474,10 @@
       api.transport.send(name, data || {}).catch(function (e) {
         console.warn('Call action failed', name, e);
       });
+    },
+
+    swap: function () {
+      toggleSwap();
     },
 
     // Deafen: mute everyone else's audio (same origin, so we can reach in).

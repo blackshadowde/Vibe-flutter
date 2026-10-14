@@ -20,16 +20,25 @@ abstract class VibeSettingsStyle {
 
   static const Color accent = Color(0xFF5865F2);
 
-  /// Row text inside settings cards.
-  static TextStyle rowTitle(BuildContext context) => TextStyle(
-    fontSize: 15.5,
-    fontWeight: FontWeight.w500,
-    color: text(context),
-    height: 1.25,
-  );
+  /// Row text inside settings cards. Built on the app's text theme so it
+  /// uses the app font (a bare TextStyle here fell back to the system font,
+  /// because list tiles replace the inherited style instead of merging).
+  static TextStyle rowTitle(BuildContext context) =>
+      (Theme.of(context).textTheme.bodyLarge ?? const TextStyle()).copyWith(
+        fontSize: 15.5,
+        fontWeight: FontWeight.w500,
+        color: text(context),
+        height: 1.25,
+        letterSpacing: 0,
+      );
 
   static TextStyle rowSubtitle(BuildContext context) =>
-      TextStyle(fontSize: 13, color: text2(context), height: 1.3);
+      (Theme.of(context).textTheme.bodyMedium ?? const TextStyle()).copyWith(
+        fontSize: 13,
+        color: text2(context),
+        height: 1.3,
+        letterSpacing: 0,
+      );
 
   /// Compact list rows for every settings card.
   static ListTileThemeData listTiles(BuildContext context) =>

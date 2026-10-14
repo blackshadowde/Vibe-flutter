@@ -246,7 +246,7 @@ class _VerifyCard extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          textStyle: const TextStyle(
+                          textStyle: const TextStyle(fontFamily: 'Figtree', 
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600,
                           ),
@@ -415,7 +415,7 @@ class _Device extends StatelessWidget {
               foregroundColor: device.blocked
                   ? VibeSettingsStyle.text(context)
                   : _red,
-              textStyle: const TextStyle(
+              textStyle: const TextStyle(fontFamily: 'Figtree', 
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),

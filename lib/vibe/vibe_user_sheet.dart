@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/call/vibe_call.dart';
+import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
@@ -79,8 +80,9 @@ class _SheetState extends State<_Sheet> {
 
   /// The chat this profile was opened from, or your DM with them.
   Room? get _room {
-    final id = widget.currentRoomId ?? client.getDirectChatFromUserId(userId);
-    return id == null ? null : client.getRoomById(id);
+    final id = widget.currentRoomId;
+    if (id != null) return client.getRoomById(id);
+    return VibeDmFinder.find(client, userId);
   }
 
   @override
@@ -126,11 +128,15 @@ class _SheetState extends State<_Sheet> {
       .length;
 
   Future<String?> _dm(BuildContext context) async {
-    final existing = client.getDirectChatFromUserId(userId);
-    if (existing != null) return existing;
+    final existing = VibeDmFinder.find(
+      client,
+      userId,
+      currentRoomId: widget.currentRoomId,
+    );
+    if (existing != null) return existing.id;
     final result = await showFutureLoadingDialog(
       context: context,
-      future: () => client.startDirectChat(userId),
+      future: () => VibeDmFinder.open(client, userId),
     );
     return result.result;
   }
@@ -314,7 +320,7 @@ class _SheetState extends State<_Sheet> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              textStyle: const TextStyle(
+                              textStyle: const TextStyle(fontFamily: 'Figtree', 
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),

@@ -301,7 +301,7 @@ class _AttachSheetState extends State<_AttachSheet> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      textStyle: const TextStyle(
+                      textStyle: const TextStyle(fontFamily: 'Figtree', 
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),

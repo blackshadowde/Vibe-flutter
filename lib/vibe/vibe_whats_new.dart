@@ -14,6 +14,12 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
     version: '3.0',
     items: [
       ('📞', 'Voice and video calls! Open a chat\'s pane and tap # | audio-call or # | video-call. End-to-end encrypted, and they work with people on Sable, Element and Element X'),
+      ('😀', 'React during a call: tap the smiley at the top and pick an emoji. It floats up the screen for everyone (Element shows it too). The hand button raises your hand'),
+      ('🔁', 'Video calls: tap your own small video to make it big and theirs small, like WhatsApp. Tap again to switch back'),
+      ('📴', 'Calls end properly: hanging up (or the other person leaving a one-to-one call) no longer leaves a "call running" in the chat. Old stuck calls are cleared when Vibe starts'),
+      ('💬', 'Calling or messaging someone from their profile opens your existing chat with them instead of making a second, unencrypted one. New chats are always encrypted'),
+      ('📌', 'Long-press a picture in the left rail works again (Pin, Mute, Archive)'),
+      ('🔤', 'Settings pages and buttons now use the same font as the rest of Vibe'),
       ('📱', 'A proper call screen: big picture, timer, and Speaker · Camera · Mute · End buttons. Tap the grid button to see video'),
       ('🔊', 'Voice chats for groups: tap # | voice in the group pane, or the green "Join" when one is live. You see who\'s in it before you join'),
       ('🎧', 'Voice channels in communities: + → Voice. Hop in and out like Discord; the rail shows a green speaker where people are talking'),

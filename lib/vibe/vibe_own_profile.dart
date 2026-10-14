@@ -405,7 +405,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              textStyle: const TextStyle(
+                              textStyle: const TextStyle(fontFamily: 'Figtree', 
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),

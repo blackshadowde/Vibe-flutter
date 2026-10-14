@@ -132,7 +132,7 @@ class SignInPage extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              textStyle: const TextStyle(
+                              textStyle: const TextStyle(fontFamily: 'Figtree', 
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),

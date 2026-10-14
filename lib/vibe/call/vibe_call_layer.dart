@@ -529,6 +529,12 @@ class _CallControls extends StatelessWidget {
     const scrim = [Color(0xAA000000), Color(0x00000000)];
     return Stack(
       children: [
+        // reactions float up the screen (Element Call shows its own over
+        // the video, so only on Vibe's voice screen)
+        if (!stage)
+          Positioned.fill(
+            child: IgnorePointer(child: _FloatingReactions(call: call)),
+          ),
         // top bar
         Positioned(
           left: 0,
@@ -604,6 +610,17 @@ class _CallControls extends StatelessWidget {
                     onTap: call.toggleSound,
                   ),
                 _TopButton(
+                  icon: Icons.add_reaction_outlined,
+                  onTap: () => _pickReaction(context, call),
+                ),
+                _TopButton(
+                  icon: call.handRaised
+                      ? Icons.back_hand
+                      : Icons.back_hand_outlined,
+                  color: call.handRaised ? const Color(0xFFFFC542) : Colors.white,
+                  onTap: call.toggleHand,
+                ),
+                _TopButton(
                   icon: stage ? Icons.person : Icons.grid_view_rounded,
                   onTap: call.toggleStage,
                 ),
@@ -661,6 +678,95 @@ class _CallControls extends StatelessWidget {
       ],
     );
   }
+}
+
+Future<void> _pickReaction(BuildContext context, VibeCall call) async {
+  final picked = await showModalBottomSheet<(String, String)>(
+    context: context,
+    useRootNavigator: true,
+    backgroundColor: const Color(0xFF232428),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final r in VibeCallReaction.choices)
+              InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () => Navigator.of(ctx).pop(r),
+                child: SizedBox(
+                  width: 52,
+                  height: 52,
+                  child: Center(
+                    child: Text(r.$1, style: const TextStyle(fontSize: 28)),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    ),
+  );
+  if (picked != null) await call.react(picked.$1, picked.$2);
+}
+
+class _FloatingReactions extends StatefulWidget {
+  final VibeCall call;
+  const _FloatingReactions({required this.call});
+
+  @override
+  State<_FloatingReactions> createState() => _FloatingReactionsState();
+}
+
+class _FloatingReactionsState extends State<_FloatingReactions> {
+  final Set<int> _done = {};
+
+  @override
+  Widget build(BuildContext context) =>
+      ValueListenableBuilder<List<VibeCallReaction>>(
+        valueListenable: widget.call.reactions,
+        builder: (context, list, _) {
+          final size = MediaQuery.sizeOf(context);
+          final live = list.where((r) => !_done.contains(r.id)).toList();
+          return Stack(
+            children: [
+              for (final r in live)
+                TweenAnimationBuilder<double>(
+                  key: ValueKey(r.id),
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 2800),
+                  curve: Curves.easeOutCubic,
+                  onEnd: () => setState(() => _done.add(r.id)),
+                  builder: (context, t, child) {
+                    // each reaction gets its own lane and a gentle sway
+                    final lane = (r.id * 37 % 60) / 100 + 0.2;
+                    final x = size.width * lane +
+                        18 * math.sin(t * math.pi * 3 + r.id);
+                    final y = size.height * (0.78 - 0.55 * t);
+                    return Positioned(
+                      left: x - 22,
+                      top: y,
+                      child: Opacity(
+                        opacity: t < 0.75 ? 1 : (1 - t) * 4,
+                        child: Transform.scale(
+                          scale: 0.6 + 0.6 * (t * 4).clamp(0.0, 1.0).toDouble(),
+                          child: child,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(r.emoji, style: const TextStyle(fontSize: 40)),
+                ),
+            ],
+          );
+        },
+      );
 }
 
 class _TopButton extends StatelessWidget {

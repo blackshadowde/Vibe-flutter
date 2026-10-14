@@ -94,6 +94,159 @@ class VibeCall extends ChangeNotifier {
   Timer? _connectTimeout;
   Completer<void>? _left;
 
+  /// One-to-one calls end when the other person leaves (like a phone call).
+  Timer? _aloneTimer;
+  bool _sawOthers = false;
+  int _aloneTicks = 0;
+
+  void _watchAlone() {
+    _aloneTimer?.cancel();
+    _sawOthers = false;
+    _aloneTicks = 0;
+    _aloneTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      final r = room;
+      if (r == null || !active) return;
+      final n = others.length;
+      if (n > 0) {
+        _sawOthers = true;
+        _aloneTicks = 0;
+        return;
+      }
+      if (!_sawOthers || !r.isDirectChat || stage != VibeCallStage.inCall) {
+        return;
+      }
+      // a couple of checks in a row, so a quick reconnect doesn't end it
+      if (++_aloneTicks >= 2) {
+        _log('the other person left, ending the call');
+        _snack('Call ended');
+        unawaited(hangup());
+      }
+    });
+  }
+
+  /// Call memberships of this device left behind by an earlier run of the
+  /// app (killed mid-call, crashed) make chats show a call forever. Clear
+  /// them once at start.
+  static Future<void> cleanupStale(Client client) async {
+    final device = client.deviceID;
+    final me = client.userID;
+    if (device == null || me == null) return;
+    for (final r in client.rooms) {
+      if (instance.isIn(r)) continue;
+      final states = r.states[VibeCallMembers.memberType];
+      if (states == null) continue;
+      final mine = states.entries.any(
+        (e) =>
+            e.value.senderId == me &&
+            e.value.content.isNotEmpty &&
+            e.key.contains(device),
+      );
+      if (!mine) continue;
+      Logs().i('Vibe call: clearing old call membership in ${r.id}');
+      await VibeCallDriver.clearOwnMembership(client, r.id);
+    }
+  }
+
+  /// Send an emoji reaction to everyone in the call (Element Call shows
+  /// it on your tile, and so does Vibe).
+  Future<void> react(String emoji, String name) async {
+    final r = room;
+    final target = _driver?.ownMembershipEventId;
+    if (r == null || target == null || stage != VibeCallStage.inCall) {
+      _snack('Reactions work once the call has connected.');
+      return;
+    }
+    VibeHaptics.light();
+    reactions.value = [...reactions.value, VibeCallReaction(emoji, r.client.userID!)];
+    try {
+      await r.sendEvent(
+        {
+          'm.relates_to': {'rel_type': 'm.reference', 'event_id': target},
+          'emoji': emoji,
+          'name': name,
+        },
+        type: VibeCallReaction.type,
+        displayPendingEvent: false,
+      );
+    } catch (e) {
+      _log('reaction failed: $e');
+    }
+  }
+
+  /// Raise or lower your hand.
+  String? _handEventId;
+  bool get handRaised => _handEventId != null;
+
+  Future<void> toggleHand() async {
+    final r = room;
+    final target = _driver?.ownMembershipEventId;
+    if (r == null || target == null || stage != VibeCallStage.inCall) {
+      _snack('Wait until the call has connected.');
+      return;
+    }
+    VibeHaptics.selection();
+    final old = _handEventId;
+    if (old == '') return; // still sending
+    if (old != null) {
+      _handEventId = null;
+      notifyListeners();
+      try {
+        await r.redactEvent(old);
+      } catch (e) {
+        _log('lower hand failed: $e');
+      }
+      return;
+    }
+    _handEventId = '';
+    notifyListeners();
+    try {
+      final id = await r.sendEvent(
+        {
+          'm.relates_to': {
+            'rel_type': 'm.annotation',
+            'event_id': target,
+            'key': '🖐️',
+          },
+        },
+        type: EventTypes.Reaction,
+        displayPendingEvent: false,
+      );
+      _handEventId = id;
+    } catch (e) {
+      _handEventId = null;
+      _log('raise hand failed: $e');
+    }
+    notifyListeners();
+  }
+
+  /// Reactions to float up the call screen (yours and other people's).
+  final ValueNotifier<List<VibeCallReaction>> reactions = ValueNotifier(
+    const [],
+  );
+  StreamSubscription? _reactionSub;
+
+  void _listenReactions(Room room) {
+    _reactionSub?.cancel();
+    _reactionSub = room.client.onTimelineEvent.stream
+        .where(
+          (e) =>
+              e.roomId == room.id &&
+              e.type == VibeCallReaction.type &&
+              e.senderId != room.client.userID,
+        )
+        .listen((e) {
+          final emoji = e.content['emoji'];
+          if (emoji is! String || emoji.isEmpty) return;
+          if (DateTime.now().difference(e.originServerTs).inSeconds > 20) {
+            return;
+          }
+          reactions.value = [
+            ...reactions.value,
+            VibeCallReaction(emoji, e.senderId),
+          ];
+        });
+  }
+
   bool get active => web != null;
   bool isIn(Room r) => active && room?.id == r.id;
 
@@ -326,6 +479,10 @@ class VibeCall extends ChangeNotifier {
     await c.loadRequest(origin.replace(path: '/vibe_call/host.html'));
 
     driver.startFeeding();
+    _watchAlone();
+    _listenReactions(room);
+    _handEventId = null;
+    reactions.value = const [];
     unawaited(_startService());
     _connectTimeout?.cancel();
     _connectTimeout = Timer(const Duration(seconds: 30), () {
@@ -556,14 +713,16 @@ class VibeCall extends ChangeNotifier {
   Future<void> hangup() async {
     if (!active) return;
     VibeHaptics.medium();
-    if (stage == VibeCallStage.inCall) {
+    if (stage == VibeCallStage.inCall ||
+        stage == VibeCallStage.connecting) {
+      final wasIn = stage == VibeCallStage.inCall;
       stage = VibeCallStage.leaving;
       notifyListeners();
       final left = _left = Completer<void>();
       _js('action', ['im.vector.hangup', <String, Object?>{}]);
       // Element Call answers once it has left; don't wait forever.
       await left.future.timeout(
-        const Duration(seconds: 4),
+        Duration(seconds: wasIn ? 4 : 1),
         onTimeout: () {},
       );
     }
@@ -574,18 +733,34 @@ class VibeCall extends ChangeNotifier {
     final w = web;
     if (w == null) return;
     _connectTimeout?.cancel();
-    _driver?.dispose();
+    _aloneTimer?.cancel();
+    _aloneTimer = null;
+    _sawOthers = false;
+    final driver = _driver;
     _driver = null;
     _config = null;
     web = null;
     stage = VibeCallStage.idle;
     joinedAt = null;
     expanded = true;
+    _reactionSub?.cancel();
+    _reactionSub = null;
+    _handEventId = null;
+    reactions.value = const [];
     notifyListeners();
     try {
       // stops the microphone and camera right away
       await w.loadRequest(Uri.parse('about:blank'));
     } catch (_) {}
+    if (driver != null) {
+      // Make sure the server knows you left, so the chat doesn't keep
+      // showing a running call.
+      driver.dispose();
+      await driver.leave().timeout(
+        const Duration(seconds: 8),
+        onTimeout: () {},
+      );
+    }
     if (PlatformInfos.isAndroid) {
       try {
         await _system.invokeMethod('resetAudio');
@@ -657,6 +832,35 @@ class VibeCall extends ChangeNotifier {
     }
     _hadService = false;
   }
+}
+
+/// An emoji someone sent during the call.
+class VibeCallReaction {
+  static const type = 'io.element.call.reaction';
+
+  /// The same set Element Call offers, so both sides show the same thing.
+  static const choices = <(String, String)>[
+    ('👍', 'thumbsup'),
+    ('👎', 'thumbsdown'),
+    ('🥰', 'heart'),
+    ('😄', 'laugh'),
+    ('🎉', 'party'),
+    ('👏', 'clapping'),
+    ('👌', 'ok'),
+    ('🤘', 'rock'),
+    ('👋', 'wave'),
+    ('💡', 'lightbulb'),
+    ('😵‍💫', 'dizzy'),
+    ('🐶', 'dog'),
+    ('🐱', 'cat'),
+    ('🦗', 'crickets'),
+  ];
+
+  final String emoji;
+  final String sender;
+  final int id;
+  static int _seq = 0;
+  VibeCallReaction(this.emoji, this.sender) : id = ++_seq;
 }
 
 /// Calls need everyone to be allowed to post their "I'm in the call" state.

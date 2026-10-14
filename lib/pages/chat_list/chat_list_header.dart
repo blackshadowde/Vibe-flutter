@@ -124,7 +124,7 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(99),
                               ),
-                              textStyle: const TextStyle(fontSize: 12),
+                              textStyle: const TextStyle(fontFamily: 'Figtree', fontSize: 12),
                             ),
                             icon: const Icon(Icons.edit_outlined, size: 16),
                             label: Text(

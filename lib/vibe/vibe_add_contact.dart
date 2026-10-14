@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/pages/new_private_chat/qr_scanner_modal.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
@@ -84,7 +85,7 @@ class _AddContactSheetState extends State<_AddContactSheet> {
     final client = Matrix.of(context).client;
     final router = GoRouter.of(widget.parentContext);
     final id = _value;
-    final existing = client.getDirectChatFromUserId(id);
+    final existing = VibeDmFinder.find(client, id)?.id;
     if (existing != null) {
       Navigator.of(context).pop();
       router.go('/rooms/$existing');
@@ -92,7 +93,7 @@ class _AddContactSheetState extends State<_AddContactSheet> {
     }
     final result = await showFutureLoadingDialog(
       context: context,
-      future: () => client.startDirectChat(id),
+      future: () => VibeDmFinder.open(client, id),
     );
     final roomId = result.result;
     if (roomId == null) return;
@@ -259,7 +260,7 @@ class _AddContactSheetState extends State<_AddContactSheet> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      textStyle: const TextStyle(
+                      textStyle: const TextStyle(fontFamily: 'Figtree', 
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
                       ),

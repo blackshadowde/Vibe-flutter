@@ -205,7 +205,7 @@ abstract class FluffyThemes {
           foregroundColor: colorScheme.onSecondaryContainer,
           elevation: 0,
           padding: const EdgeInsets.all(16),
-          textStyle: const TextStyle(fontSize: 16),
+          textStyle: const TextStyle(fontFamily: 'Figtree', fontSize: 16),
         ),
       ),
     );

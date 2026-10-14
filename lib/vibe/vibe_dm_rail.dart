@@ -125,8 +125,9 @@ class VibeDmRail extends StatelessWidget {
                         onLongPress: onLongPress == null
                             ? null
                             : () => onLongPress!(room),
-                        child: Tooltip(
-                        message: name,
+                        // (no tooltip: it took the long press away from the
+                        // pin / mute / archive menu)
+                        behavior: HitTestBehavior.opaque,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
@@ -266,7 +267,6 @@ class VibeDmRail extends StatelessWidget {
                               ),
                           ],
                         ),
-                      ),
                       ),
                     );
                     final groupLine =

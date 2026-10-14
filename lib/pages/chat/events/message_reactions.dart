@@ -141,7 +141,7 @@ class _Reaction extends StatelessWidget {
     return Badge(
       isLabelVisible: count > 1,
       label: Text(count.toString()),
-      textStyle: TextStyle(fontSize: 10),
+      textStyle: TextStyle(fontFamily: 'Figtree', fontSize: 10),
       textColor: theme.colorScheme.onPrimary,
       backgroundColor: theme.colorScheme.primary.withAlpha(200),
       child: InkWell(

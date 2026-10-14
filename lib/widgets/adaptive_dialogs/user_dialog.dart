@@ -9,6 +9,7 @@ import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_text_input_dialog.dart';
+import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/presence_builder.dart';
 import 'package:flutter/material.dart';
@@ -251,7 +252,8 @@ class UserDialog extends StatelessWidget {
                         final router = GoRouter.of(context);
                         final roomIdResult = await showFutureLoadingDialog(
                           context: context,
-                          future: () => client.startDirectChat(profile.userId),
+                          future: () =>
+                              VibeDmFinder.open(client, profile.userId),
                         );
                         final roomId = roomIdResult.result;
                         if (roomId == null) return;

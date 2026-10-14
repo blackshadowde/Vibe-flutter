@@ -210,7 +210,7 @@ class _VibeWelcomeState extends State<VibeWelcome> {
                             onPressed: _isLast ? null : _finish,
                             style: TextButton.styleFrom(
                               foregroundColor: _lavender,
-                              textStyle: const TextStyle(
+                              textStyle: const TextStyle(fontFamily: 'Figtree', 
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -273,7 +273,7 @@ class _VibeWelcomeState extends State<VibeWelcome> {
                             horizontal: _isLast ? 28 : 24,
                           ),
                           shape: const StadiumBorder(),
-                          textStyle: const TextStyle(
+                          textStyle: const TextStyle(fontFamily: 'Figtree', 
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),

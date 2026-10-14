@@ -160,7 +160,7 @@ class VibeButton extends StatelessWidget {
           disabledBackgroundColor: cs.surfaceContainerHighest,
           disabledForegroundColor: cs.onSurfaceVariant.withAlpha(150),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(fontFamily: 'Figtree', fontSize: 16, fontWeight: FontWeight.w600),
         ),
         child: loading
             ? SizedBox.square(

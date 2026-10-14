@@ -40,6 +40,19 @@ class VibeCallRing {
     _client = client;
     _sub?.cancel();
     _sub = client.onTimelineEvent.stream.listen(_onEvent);
+    // Clear call memberships an earlier run left behind (app killed
+    // mid-call), once the first sync has brought the rooms' state.
+    unawaited(() async {
+      try {
+        if (client.prevBatch == null) {
+          await client.onSync.stream.first.timeout(const Duration(minutes: 1));
+        }
+        await Future<void>.delayed(const Duration(seconds: 5));
+        if (_client == client) await VibeCall.cleanupStale(client);
+      } catch (e) {
+        Logs().v('Vibe call: cleanup skipped $e');
+      }
+    }());
   }
 
   void _onEvent(Event e) {
