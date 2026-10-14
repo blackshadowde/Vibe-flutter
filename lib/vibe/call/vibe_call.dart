@@ -53,6 +53,11 @@ class VibeCall extends ChangeNotifier {
   /// voice call). Otherwise Vibe's own call screen is shown.
   bool showStage = false;
 
+  /// Playing video streams in the call (yours included), and whether you
+  /// closed the video view yourself (then it doesn't pop back up).
+  int _videoCount = 0;
+  bool _stageDismissed = false;
+
   /// Something went wrong before the call connected.
   String? problem;
 
@@ -182,8 +187,12 @@ class VibeCall extends ChangeNotifier {
     videoOn = video;
     _wantVideo = video;
     soundOn = true;
-    // Loudspeaker by default (switch to the earpiece with the button).
-    speakerOn = true;
+    // Earpiece for one-to-one voice calls (like a phone call, and no
+    // feedback between two phones in the same room); loudspeaker for
+    // video and group calls.
+    speakerOn = video || !room.isDirectChat;
+    _videoCount = 0;
+    _stageDismissed = false;
     showStage = video;
     _firstMedia = true;
     joinedAt = null;
@@ -233,6 +242,12 @@ class VibeCall extends ChangeNotifier {
       // Vibe has its own header and controls
       'header': 'none',
       'hideHeader': 'true',
+      'showControls': 'false',
+      // Vibe routes the audio itself (earpiece / speaker button); without
+      // this, Element Call waits for a native audio-device bridge that
+      // only Element X has.
+      'controlledAudioDevices': 'false',
+      'allowIceFallback': 'true',
     };
     final url = origin
         .replace(path: '/element-call/index.html', queryParameters: params)
@@ -357,6 +372,15 @@ class VibeCall extends ChangeNotifier {
         _markJoined();
       case 'error':
         _log('error ${data['where']}: ${data['message']}');
+      case 'videos':
+        _videoCount = (data['count'] as num?)?.toInt() ?? 0;
+        final remote = _videoCount - (videoOn ? 1 : 0);
+        _log('video streams: $_videoCount');
+        // Someone turned their camera on: show the video.
+        if (remote > 0 && !showStage && !_stageDismissed && expanded) {
+          showStage = true;
+          notifyListeners();
+        }
       case 'ready':
       case 'preparing':
       case 'frame_loaded':
@@ -395,6 +419,26 @@ class VibeCall extends ChangeNotifier {
     VibeHaptics.light();
     notifyListeners();
     unawaited(_applySpeaker());
+    final r = room;
+    if (r != null) unawaited(markCallRead(r));
+  }
+
+  /// Call events (the ring, "joined", "declined") count as unread on the
+  /// server but never show in the chat, which left a stuck "1" on the
+  /// picture. Mark the chat read up to its newest event.
+  static Future<void> markCallRead(Room room) async {
+    try {
+      final res = await room.client.getRoomEvents(
+        room.id,
+        Direction.b,
+        limit: 1,
+      );
+      final id = res.chunk.isEmpty ? null : res.chunk.first.eventId;
+      if (id == null) return;
+      await room.setReadMarker(id, mRead: id);
+    } catch (e) {
+      Logs().v('Vibe call: could not mark read $e');
+    }
   }
 
   Future<void> _rpc(Map<String, Object?> m) async {
@@ -435,6 +479,7 @@ class VibeCall extends ChangeNotifier {
   void toggleStage() {
     if (!active) return;
     showStage = !showStage;
+    if (!showStage) _stageDismissed = true;
     notifyListeners();
   }
 
@@ -547,7 +592,12 @@ class VibeCall extends ChangeNotifier {
       } catch (_) {}
     }
     await _stopService();
+    final r = room;
     room = null;
+    if (r != null) {
+      // after the call's own last events have arrived
+      Future<void>.delayed(const Duration(seconds: 3), () => markCallRead(r));
+    }
   }
 
   // ---------------------------------------------------------------------

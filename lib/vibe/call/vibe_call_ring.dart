@@ -125,6 +125,12 @@ class VibeCallRing {
     final ring = ringing.value;
     if (ring == null) return;
     stop();
+    unawaited(
+      Future<void>.delayed(
+        const Duration(seconds: 2),
+        () => VibeCall.markCallRead(ring.room),
+      ),
+    );
     try {
       await ring.room.sendEvent(
         {

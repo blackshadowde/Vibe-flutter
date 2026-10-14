@@ -17,6 +17,32 @@
   let knownRooms = [];
   let soundOn = true;
   let soundTimer = null;
+  // Events that arrive before Element Call is ready (e.g. the other
+  // person's encryption keys) are kept and delivered once it is.
+  let ready = false;
+  const early = [];
+  function whenReady(fn) {
+    if (ready) fn();
+    else if (early.length < 500) early.push(fn);
+  }
+  let lastVideos = -1;
+  function countVideos() {
+    try {
+      const doc = iframe && (iframe.contentDocument || iframe.contentWindow.document);
+      if (!doc) return;
+      let n = 0;
+      doc.querySelectorAll('video').forEach(function (v) {
+        const s = v.srcObject;
+        if (s && s.getVideoTracks && s.getVideoTracks().some(function (t) {
+          return t.readyState === 'live' && !t.muted;
+        })) n++;
+      });
+      if (n !== lastVideos) {
+        lastVideos = n;
+        notify('videos', { count: n });
+      }
+    } catch (e) {}
+  }
 
   function applySound() {
     try {
@@ -292,8 +318,13 @@
       api = new mx.ClientWidgetApi(widget, iframe, new VibeDriver());
       api.setViewedRoomId(cfg.roomId);
       api.on('ready', function () {
+        ready = true;
         notify('ready');
         styleCall();
+        early.splice(0).forEach(function (fn) {
+          try { fn(); } catch (e) { report('early', e); }
+        });
+        setInterval(countVideos, 1500);
       });
       api.on('preparing', function () {
         notify('preparing');
@@ -312,15 +343,23 @@
     },
 
     feedEvent: function (ev) {
-      if (api) api.feedEvent(ev).catch(function () {});
+      whenReady(function () {
+        api.feedEvent(ev).catch(function () {});
+      });
     },
 
     feedState: function (ev) {
-      if (api && api.feedStateUpdate) api.feedStateUpdate(ev).catch(function () {});
+      whenReady(function () {
+        if (api.feedStateUpdate) api.feedStateUpdate(ev).catch(function () {});
+      });
     },
 
     feedToDevice: function (ev, encrypted) {
-      if (api) api.feedToDevice(ev, encrypted).catch(function () {});
+      whenReady(function () {
+        api.feedToDevice(ev, encrypted).catch(function (e) {
+          report('to-device ' + ev.type, e);
+        });
+      });
     },
 
     // Vibe's own buttons drive the call through the widget API.
