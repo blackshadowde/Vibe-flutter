@@ -48,14 +48,12 @@ class VibeCallDriver {
           .where((e) => e.roomId == roomId)
           .listen((e) {
             if (e.type == EventTypes.Encrypted) return; // couldn't decrypt
-            toWidget('feedEvent', [eventJson(e)]);
+            toWidget('feedEvent', [eventJson(e, roomId: roomId)]);
           }),
     );
     _subs.add(
       client.onRoomState.stream.where((u) => u.roomId == roomId).listen((u) {
-        final s = u.state;
-        if (s is! Event) return;
-        toWidget('feedState', [eventJson(s)]);
+        toWidget('feedState', [eventJson(u.state, roomId: roomId)]);
       }),
     );
     _subs.add(
@@ -77,20 +75,54 @@ class VibeCallDriver {
     _subs.clear();
   }
 
-  static Map<String, Object?> eventJson(StrippedStateEvent e) {
+  /// A full Matrix event as the widget expects it. Element Call ignores
+  /// state without the right `room_id`, and the Matrix Dart SDK keeps room
+  /// members as stripped entries (no room or event ID), so those get filled
+  /// in here. Without this, Element Call thinks you're not in the room
+  /// ("Room not found").
+  static Map<String, Object?> eventJson(
+    StrippedStateEvent e, {
+    required String roomId,
+  }) {
     if (e is Event) {
       final json = Map<String, Object?>.from(e.toJson())
-        ..remove('original_source');
-      json['room_id'] ??= e.roomId;
+        ..remove('original_source')
+        ..remove('status');
+      json['room_id'] = e.roomId ?? roomId;
       return json;
     }
     return {
       'type': e.type,
-      'state_key': e.stateKey,
+      'state_key': e.stateKey ?? '',
       'sender': e.senderId,
       'content': e.content,
-      'event_id': '',
-      'origin_server_ts': 0,
+      'room_id': roomId,
+      // stable made-up ID, so the same entry is recognised again
+      'event_id': '\$vibe_${e.type}_${e.stateKey ?? ''}'.replaceAll(' ', '_'),
+      'origin_server_ts': DateTime.now().millisecondsSinceEpoch,
+      'unsigned': <String, Object?>{},
+    };
+  }
+
+  /// Your own membership, made up from what the SDK knows if the room's
+  /// member list doesn't have it (Element Call needs to see you joined).
+  Map<String, Object?>? _ownMember(Room r) {
+    final me = client.userID;
+    if (me == null || r.membership != Membership.join) return null;
+    final user = r.unsafeGetUserFromMemoryOrFallback(me);
+    return {
+      'type': EventTypes.RoomMember,
+      'state_key': me,
+      'sender': me,
+      'room_id': r.id,
+      'event_id': '\$vibe_own_member',
+      'origin_server_ts': DateTime.now().millisecondsSinceEpoch,
+      'content': {
+        'membership': 'join',
+        if (user.displayName != null) 'displayname': user.displayName,
+        if (user.avatarUrl != null) 'avatar_url': user.avatarUrl.toString(),
+      },
+      'unsigned': <String, Object?>{},
     };
   }
 
@@ -293,13 +325,18 @@ class VibeCallDriver {
   ) async {
     final r = client.getRoomById(_room(a));
     if (r == null) return const [];
-    final states = r.states[a['type'] as String];
-    if (states == null) return const [];
+    final type = a['type'] as String;
     final stateKey = a['stateKey'] as String?;
-    final list = stateKey == null
-        ? states.values
-        : [?states[stateKey]];
-    return [for (final s in list) eventJson(s)];
+    final states = r.states[type] ?? const <String, StrippedStateEvent>{};
+    final list = stateKey == null ? states.values : [?states[stateKey]];
+    final out = [for (final s in list) eventJson(s, roomId: r.id)];
+    if (type == EventTypes.RoomMember &&
+        (stateKey == null || stateKey == client.userID) &&
+        !out.any((e) => e['state_key'] == client.userID)) {
+      final own = _ownMember(r);
+      if (own != null) out.add(own);
+    }
+    return out;
   }
 
   Future<List<Map<String, Object?>>> _readRoomTimeline(
@@ -330,7 +367,7 @@ class VibeCallDriver {
           ev.content['msgtype'] != msgtype) {
         continue;
       }
-      out.add(eventJson(ev));
+      out.add(eventJson(ev, roomId: r.id));
       if (out.length >= max) break;
     }
     return out;

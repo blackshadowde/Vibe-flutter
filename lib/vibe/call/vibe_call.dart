@@ -407,9 +407,8 @@ class VibeCall extends ChangeNotifier {
     if (driver == null) return;
     try {
       final result = await driver.handle(method, args);
-      if (method != 'readRoomState' && method != 'readRoomTimeline') {
-        _log('$method ${args['type'] ?? ''} ok');
-      }
+      final n = result is List ? ' (${result.length})' : '';
+      _log('$method ${args['type'] ?? ''} ok$n');
       _js('reply', [id, true, result]);
     } catch (e) {
       _log('$method ${args['type'] ?? ''} FAILED: $e');
