@@ -91,7 +91,13 @@
     }
   }
 
-  class VibeDriver extends mx.WidgetDriver {
+  // Never let a missing piece of the widget API stop the page.
+  const DriverBase = (mx && mx.WidgetDriver) || class {};
+  if (!mx || !mx.ClientWidgetApi || !mx.Widget) {
+    report('host', 'matrix-widget-api is incomplete: ' + (mx ? Object.keys(mx).join(',') : 'missing'));
+  }
+
+  class VibeDriver extends DriverBase {
     // Vibe ships this Element Call build itself, so it gets what it asks for
     // (it only asks for its own room and call events).
     async validateCapabilities(requested) {

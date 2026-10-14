@@ -158,7 +158,12 @@ class _VibeCallHostState extends State<VibeCallHost>
                   child: AnimatedOpacity(
                     duration: const Duration(milliseconds: 220),
                     opacity: _call.expanded ? 1 : 0,
-                    child: _CallControls(call: _call, stage: stage),
+                    // Material gives the labels the app's text style (without
+                    // it Flutter shows yellow-underlined debug text).
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: _CallControls(call: _call, stage: stage),
+                    ),
                   ),
                 ),
               ),

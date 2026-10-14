@@ -30,7 +30,24 @@ fi
 find ec/package/dist/assets -maxdepth 1 -type f ! -name '*.map' -exec cp {} "$DEST/assets/" \;
 cp ec/package/LICENSE-AGPL-3.0 "$DEST/LICENSE-AGPL-3.0"
 
-cp mwa/package/dist/api.min.js "$ROOT/assets/vibe_call/matrix-widget-api.min.js"
+# Build the browser file from the library itself (all exports, incl.
+# ClientWidgetApi and WidgetDriver) as window.mxwidgets.
+(cd mwa/package && npm install --omit=dev --ignore-scripts --no-audit --no-fund --silent)
+npx --yes esbuild@0.25.0 mwa/package/lib/index.js --bundle --format=iife \
+  --global-name=mxwidgets --minify --platform=browser \
+  --outfile="$ROOT/assets/vibe_call/matrix-widget-api.min.js"
+node -e '
+  const vm = require("vm");
+  const ctx = { window: {}, console };
+  ctx.self = ctx.window; ctx.globalThis = ctx.window;
+  vm.createContext(ctx);
+  vm.runInContext(require("fs").readFileSync(process.argv[1], "utf8") + ";window.mxwidgets = mxwidgets;", ctx);
+  const m = ctx.window.mxwidgets || {};
+  const need = ["WidgetDriver", "ClientWidgetApi", "Widget", "OpenIDRequestState"];
+  const missing = need.filter((k) => !m[k]);
+  if (missing.length) { console.log("::error::matrix-widget-api build is missing " + missing.join(",")); process.exit(1); }
+  console.log("matrix-widget-api ok: " + need.join(", "));
+' "$ROOT/assets/vibe_call/matrix-widget-api.min.js"
 # Apache-2.0: ship its licence with it
 cp mwa/package/LICENSE "$ROOT/assets/vibe_call/matrix-widget-api.LICENSE" 2>/dev/null || true
 
