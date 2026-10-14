@@ -33,8 +33,9 @@ cp ec/package/LICENSE-AGPL-3.0 "$DEST/LICENSE-AGPL-3.0"
 
 # Build the browser file from the library itself (all exports, incl.
 # ClientWidgetApi and WidgetDriver) as window.mxwidgets.
-(cd mwa/package && npm install --omit=dev --ignore-scripts --no-audit --no-fund --no-package-lock 2>&1 | tail -5)
-npx --yes esbuild@0.25.0 mwa/package/lib/index.js --bundle --format=iife \
+mkdir bundle
+(cd bundle && npm init -y >/dev/null && npm install "matrix-widget-api@${MWA_VERSION}" esbuild@0.25.0 --no-audit --no-fund --silent)
+bundle/node_modules/.bin/esbuild bundle/node_modules/matrix-widget-api/lib/index.js --bundle --format=iife \
   --global-name=mxwidgets --minify --platform=browser \
   --outfile="$ROOT/assets/vibe_call/matrix-widget-api.min.js"
 node -e '
