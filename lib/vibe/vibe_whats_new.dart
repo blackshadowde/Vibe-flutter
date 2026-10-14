@@ -19,6 +19,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
       ('👥', 'Group video calls show everyone in a grid, with a green ring around whoever is talking'),
       ('🔒', 'Calls stay end-to-end encrypted and still work with Element, Element X and Sable'),
       ('📵', 'An unanswered or declined call ends by itself'),
+      ('🌙', 'The app icon follows your phone: white with the blue bubble in light mode, blue with a white bubble and padlock in dark mode. With themed icons (Material You) on, it takes your wallpaper colours'),
       ('👀', 'While you\'re in a chat, someone else typing or writing to you no longer pops up a notification: their picture peeks in from the side above the typing bar (dots while they type). Tap it to jump to their chat, swipe it right to dismiss'),
       ('🔔', 'No more double notifications (one with the message and one saying only "New message")'),
       ('🗑', 'Delete chat now always removes the chat from your phone, even ones the server no longer knows about'),

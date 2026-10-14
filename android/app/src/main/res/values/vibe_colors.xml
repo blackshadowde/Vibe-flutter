@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="vibe_notification_color">#5865F2</color>
+    <!-- dark-mode app icon background -->
+    <color name="vibe_icon_blue">#226DFD</color>
 </resources>

@@ -60,6 +60,7 @@ path = [
     "assets/logo/**",
     "vibe-icon.png",
     "android/app/src/main/res/mipmap**/**",
+    "android/app/src/main/res/drawable*/ic_launcher_*.png",
     "ios/Runner/Assets.xcassets/AppIcon.appiconset/**",
     "macos/Runner/Assets.xcassets/AppIcon.appiconset/**",
     "web/icons/**",

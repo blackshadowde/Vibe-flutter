@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark mode: white bubble and padlock on Vibe blue. Themed icons
+     (Material You) use the monochrome layer, as in light mode. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+  <background android:drawable="@color/vibe_icon_blue"/>
+  <foreground>
+      <inset
+          android:drawable="@drawable/ic_launcher_foreground_dark"
+          android:inset="16%" />
+  </foreground>
+  <monochrome>
+      <inset
+          android:drawable="@drawable/ic_launcher_monochrome"
+          android:inset="16%" />
+  </monochrome>
+</adaptive-icon>
