@@ -4,6 +4,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_archive.dart';
+import 'package:fluffychat/vibe/vibe_communities.dart';
 import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
@@ -195,9 +196,13 @@ class _SheetState extends State<_Sheet> {
                   label: _muted ? 'Unmute' : 'Mute',
                   onTap: () => _run(
                     () => _muted = !_muted,
-                    () => room.setPushRuleState(
-                      _muted ? PushRuleState.dontNotify : PushRuleState.notify,
-                    ),
+                    () => room.isSpace
+                        ? VibeCommunities.setMuted(room, _muted)
+                        : room.setPushRuleState(
+                            _muted
+                                ? PushRuleState.dontNotify
+                                : PushRuleState.notify,
+                          ),
                     _muted ? 'Muted $name' : 'Notifications on for $name',
                   ),
                 ),
@@ -231,9 +236,13 @@ class _SheetState extends State<_Sheet> {
                 children: [
                   ListTile(
                     leading: Icon(Icons.chat_bubble, color: t1),
-                    title: Text('Open chat', style: TextStyle(color: t1)),
+                    title: Text(
+                      room.isSpace ? 'Open community' : 'Open chat',
+                      style: TextStyle(color: t1),
+                    ),
                     onTap: () => Navigator.pop(context, 'open'),
                   ),
+                  if (!room.isSpace)
                   ListTile(
                     leading: Icon(
                       locked ? Icons.lock_open : Icons.lock,

@@ -22,6 +22,19 @@ import 'package:matrix/matrix.dart' as sdk show Visibility;
 /// ("channels"), like a Discord server. They sit in the rail under your
 /// groups; tapping one opens its channels in the middle pane.
 abstract class VibeCommunities {
+  /// Mute / unmute a community: every channel you're in, and the community.
+  static Future<void> setMuted(Room space, bool muted) async {
+    final state = muted ? PushRuleState.dontNotify : PushRuleState.notify;
+    for (final c in space.spaceChildren) {
+      final id = c.roomId;
+      if (id == null) continue;
+      final r = space.client.getRoomById(id);
+      if (r == null || r.isSpace || r.membership != Membership.join) continue;
+      if (r.pushRuleState != state) await r.setPushRuleState(state);
+    }
+    await space.setPushRuleState(state);
+  }
+
   /// Ask Home to open a community (after creating or joining one).
   static final ValueNotifier<String?> select = ValueNotifier(null);
 
@@ -555,45 +568,6 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
     }
   }
 
-  List<Room> get _joinedChannels => [
-    for (final c in space.spaceChildren)
-      if (c.roomId != null)
-        if (space.client.getRoomById(c.roomId!) case final r?)
-          if (r.membership == Membership.join && !r.isSpace) r,
-  ];
-
-  bool get _allMuted {
-    final list = _joinedChannels;
-    return list.isNotEmpty && list.every(VibeMuteRow.isMuted);
-  }
-
-  Future<void> _muteAll() async {
-    final list = _joinedChannels;
-    if (list.isEmpty) return;
-    final mute = !_allMuted;
-    VibeHaptics.light();
-    try {
-      for (final r in list) {
-        await VibeMuteRow.setMuted(r, mute);
-      }
-      await VibeMuteRow.setMuted(space, mute);
-      if (mounted) {
-        setState(() {});
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(mute ? 'Community muted' : 'Notifications on'),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$e')));
-      }
-    }
-  }
-
   Future<void> _accept(bool join) async {
     try {
       if (join) {
@@ -800,16 +774,6 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
                     : 'Private · invite only',
                 subtitleIcon: isPublic ? Icons.public_rounded : Icons.lock_rounded,
                 onTap: () => VibeGroupEdit.privacy(context, space),
-              ),
-              VibeHashRow(
-                label: _allMuted ? 'unmute-community' : 'mute-community',
-                subtitle: _allMuted
-                    ? 'All channels muted'
-                    : 'Mute every channel you\'re in',
-                subtitleIcon: _allMuted
-                    ? Icons.notifications_off_rounded
-                    : Icons.notifications_rounded,
-                onTap: _muteAll,
               ),
               VibeHashRow(label: 'leave-community', onTap: _leave),
             ],

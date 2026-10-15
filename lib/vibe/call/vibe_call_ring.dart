@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/call/vibe_call_members.dart';
+import 'package:fluffychat/vibe/call/vibe_missed_calls.dart';
 import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +42,7 @@ class VibeCallRing {
     _client = client;
     _sub?.cancel();
     _sub = client.onTimelineEvent.stream.listen(_onEvent);
+    unawaited(VibeMissedCalls.instance.load());
     // Clear call memberships an earlier run left behind (app killed
     // mid-call), once the first sync has brought the rooms' state.
     unawaited(() async {
@@ -65,6 +67,8 @@ class VibeCallRing {
       final rel = e.content.tryGetMap<String, Object?>('m.relates_to');
       if (e.senderId == client.userID &&
           rel?['event_id'] == ringing.value?.event.eventId) {
+        final r = ringing.value!;
+        unawaited(VibeMissedCalls.instance.handled(r.room.id, r.event.eventId));
         stop();
       }
       return;
@@ -85,6 +89,13 @@ class VibeCallRing {
 
   void _ring(VibeRing ring, Duration left) {
     ringing.value = ring;
+    unawaited(
+      VibeMissedCalls.ringing(
+        ring.room.id,
+        ring.event.eventId,
+        video: ring.video,
+      ),
+    );
     _end?.cancel();
     _end = Timer(left, stop);
     // Stop when the caller gives up, or you answered on another device.
@@ -94,6 +105,9 @@ class VibeCallRing {
       final members = VibeCallMembers.userIds(ring.room);
       final me = ring.room.client.userID;
       if (members.contains(me) && !VibeCall.instance.isIn(ring.room)) {
+        unawaited(
+          VibeMissedCalls.instance.handled(ring.room.id, ring.event.eventId),
+        );
         stop(); // picked up elsewhere
         return;
       }
@@ -133,6 +147,9 @@ class VibeCallRing {
     final ring = ringing.value;
     if (ring == null) return;
     stop();
+    unawaited(
+      VibeMissedCalls.instance.handled(ring.room.id, ring.event.eventId),
+    );
     await VibeCall.join(context, ring.room, video: ring.video);
   }
 
@@ -140,6 +157,9 @@ class VibeCallRing {
     final ring = ringing.value;
     if (ring == null) return;
     stop();
+    unawaited(
+      VibeMissedCalls.instance.handled(ring.room.id, ring.event.eventId),
+    );
     unawaited(
       Future<void>.delayed(
         const Duration(seconds: 2),

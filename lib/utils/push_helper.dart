@@ -19,6 +19,7 @@ import 'package:fluffychat/utils/notification_background_handler.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/start_push_foreground_service.dart';
 import 'package:fluffychat/vibe/call/vibe_call_members.dart';
+import 'package:fluffychat/vibe/call/vibe_missed_calls.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_peek.dart';
 import 'package:flutter/foundation.dart';
@@ -238,6 +239,11 @@ Future<void> _tryPushHelper(
       event,
     ).add(life).difference(DateTime.now());
     if (left <= Duration.zero) return;
+    await VibeMissedCalls.ringing(
+      event.room.id,
+      event.eventId,
+      video: VibeCallMembers.ringVideo(event),
+    );
     final caller = event.senderFromMemoryOrFallback.calcDisplayname();
     final locked = VibeLock.isLocked(event.room.id);
     await flutterLocalNotificationsPlugin.show(

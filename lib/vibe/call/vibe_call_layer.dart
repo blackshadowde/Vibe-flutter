@@ -6,6 +6,7 @@ import 'dart:ui' show FontFeature;
 
 import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/call/vibe_call_members.dart';
+import 'package:fluffychat/vibe/call/vibe_missed_calls.dart';
 import 'package:fluffychat/vibe/call/vibe_call_ring.dart';
 import 'package:fluffychat/vibe/vibe_crash_report.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -63,6 +64,14 @@ class _VibeCallHostState extends State<VibeCallHost>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // a ring may have come in while Vibe was closed
+    if (state == AppLifecycleState.resumed) {
+      unawaited(VibeMissedCalls.instance.load());
+    }
   }
 
   /// Android back: shrink the call instead of leaving the screen under it.

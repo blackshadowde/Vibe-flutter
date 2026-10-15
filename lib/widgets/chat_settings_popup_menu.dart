@@ -23,6 +23,7 @@ enum ChatPopupMenuActions {
   scheduled,
   leave,
   search,
+  mute,
 }
 
 class ChatSettingsPopupMenu extends StatefulWidget {
@@ -100,6 +101,25 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               case ChatPopupMenuActions.scheduled:
                 await VibeSendLater.showList(context, widget.room);
                 break;
+              case ChatPopupMenuActions.mute:
+                final muted =
+                    widget.room.pushRuleState != PushRuleState.notify;
+                final messenger = ScaffoldMessenger.of(context);
+                try {
+                  await widget.room.setPushRuleState(
+                    muted ? PushRuleState.notify : PushRuleState.dontNotify,
+                  );
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(muted ? 'Notifications on' : 'Muted'),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                } catch (e) {
+                  messenger.showSnackBar(SnackBar(content: Text('$e')));
+                }
+                if (mounted) setState(() {});
+                break;
             }
           },
           itemBuilder: (BuildContext context) => [
@@ -121,6 +141,24 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                   const Icon(Icons.search_outlined),
                   const SizedBox(width: 12),
                   Text(L10n.of(context).search),
+                ],
+              ),
+            ),
+            PopupMenuItem<ChatPopupMenuActions>(
+              value: ChatPopupMenuActions.mute,
+              child: Row(
+                children: [
+                  Icon(
+                    widget.room.pushRuleState == PushRuleState.notify
+                        ? Icons.notifications_off_outlined
+                        : Icons.notifications_outlined,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    widget.room.pushRuleState == PushRuleState.notify
+                        ? 'Mute notifications'
+                        : 'Unmute notifications',
+                  ),
                 ],
               ),
             ),

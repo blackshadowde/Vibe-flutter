@@ -9,6 +9,7 @@ import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/call/vibe_call.dart';
+import 'package:fluffychat/vibe/call/vibe_missed_calls.dart';
 import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_media_viewer.dart';
@@ -172,11 +173,17 @@ class VibeDmDetail extends StatelessWidget {
             if (invited)
               _ApprovalBanner(room: room, name: name)
             else ...[
-              VibeHashRow(
-                label: 'chat',
-                subtitle: room.encrypted ? 'End-to-end encrypted' : null,
-                subtitleIcon: Icons.lock_rounded,
-                onTap: onOpenChat,
+              StreamBuilder<Object?>(
+                stream: room.onUpdate.stream,
+                builder: (context, _) => VibeHashRow(
+                  label: 'chat',
+                  subtitle: room.encrypted ? 'End-to-end encrypted' : null,
+                  subtitleIcon: Icons.lock_rounded,
+                  unread: room.notificationCount > 0
+                      ? room.notificationCount
+                      : (room.markedUnread ? 1 : 0),
+                  onTap: onOpenChat,
+                ),
               ),
               VibeCallWatch(
                 room: room,
@@ -203,15 +210,31 @@ class VibeDmDetail extends StatelessWidget {
                       onTap: () => VibeCall.join(context, room),
                     );
                   }
-                  return Column(
+                  return ListenableBuilder(
+                    listenable: VibeMissedCalls.instance,
+                    builder: (context, _) => Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       VibeHashRow(
                         label: 'audio-call',
+                        unread: live
+                            ? 0
+                            : VibeMissedCalls.instance.count(
+                                room.id,
+                                video: false,
+                              ),
                         icon: Icons.call,
                         iconColor: live ? green : null,
                         bold: live,
-                        subtitle: live ? liveText : null,
+                        subtitle: live
+                            ? liveText
+                            : VibeMissedCalls.instance.count(
+                                    room.id,
+                                    video: false,
+                                  ) >
+                                  0
+                            ? 'Missed call'
+                            : null,
                         trailing: faces,
                         onTap: () => VibeCall.join(context, room),
                       ),
@@ -219,10 +242,25 @@ class VibeDmDetail extends StatelessWidget {
                         label: 'video-call',
                         icon: Icons.videocam,
                         iconColor: live ? green : null,
+                        unread: live
+                            ? 0
+                            : VibeMissedCalls.instance.count(
+                                room.id,
+                                video: true,
+                              ),
+                        subtitle: !live &&
+                                VibeMissedCalls.instance.count(
+                                      room.id,
+                                      video: true,
+                                    ) >
+                                    0
+                            ? 'Missed video call'
+                            : null,
                         onTap: () =>
                             VibeCall.join(context, room, video: true),
                       ),
                     ],
+                  ),
                   );
                 },
               ),
@@ -275,7 +313,6 @@ class VibeDmDetail extends StatelessWidget {
                       : Icons.lock_rounded,
                   onTap: () => VibeGroupEdit.privacy(context, room),
                 ),
-                VibeMuteRow(room: room),
                 VibeHashRow(
                   label: 'leave-group',
                   onTap: () => VibeGroups.leave(context, room),
@@ -358,6 +395,11 @@ class VibeHashRow extends StatelessWidget {
   /// Shown at the end of the row (unread badge, "Join").
   final Widget? trailing;
 
+  /// Unread messages / missed calls: the row lights up (white in dark
+  /// mode, black in light), with a counter and a small pill at the edge,
+  /// like Discord's unread channels.
+  final int unread;
+
   /// "#" for text, "🔊"-style icon for voice.
   final IconData? icon;
   final Color? iconColor;
@@ -371,14 +413,19 @@ class VibeHashRow extends StatelessWidget {
     this.trailing,
     this.icon,
     this.iconColor,
+    this.unread = 0,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final muted = cs.onSurfaceVariant;
-    return VibePressable(
+    final lit = unread > 0;
+    final muted = lit ? cs.onSurface : cs.onSurfaceVariant;
+    final bold = this.bold || lit;
+    final trailing =
+        this.trailing ?? (lit ? VibeUnreadBadge(count: unread) : null);
+    final row = VibePressable(
       scale: 0.97,
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -451,7 +498,57 @@ class VibeHashRow extends StatelessWidget {
         ),
       ),
     );
+    if (!lit) return row;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        row,
+        Positioned(
+          left: -10,
+          top: 0,
+          bottom: 0,
+          child: Center(
+            child: Container(
+              width: 4,
+              height: 8,
+              decoration: BoxDecoration(
+                color: cs.onSurface,
+                borderRadius: const BorderRadius.horizontal(
+                  right: Radius.circular(4),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
+}
+
+/// Red unread counter (99+ at most).
+class VibeUnreadBadge extends StatelessWidget {
+  final int count;
+  const VibeUnreadBadge({required this.count, super.key});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    constraints: const BoxConstraints(minWidth: 20),
+    height: 20,
+    padding: const EdgeInsets.symmetric(horizontal: 6),
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: const Color(0xFFF23F43),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Text(
+      count > 99 ? '99+' : '$count',
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+  );
 }
 
 /// "# | mute-notifications": silence a group or channel (stored on the

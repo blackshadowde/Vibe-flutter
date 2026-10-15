@@ -227,7 +227,12 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                         },
                       ),
                       onLongPress: (room) => room.isSpace
-                          ? setState(() => selectedId = room.id)
+                          ? VibeChatActions.show(
+                              context,
+                              room,
+                              onOpen: () =>
+                                  setState(() => selectedId = room.id),
+                            )
                           : VibeChatActions.show(
                         context,
                         room,

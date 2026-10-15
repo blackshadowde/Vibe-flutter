@@ -7,6 +7,7 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/start_push_foreground_service.dart';
 import 'package:fluffychat/vibe/call/vibe_call_keys.dart';
 import 'package:fluffychat/vibe/call/vibe_call_members.dart';
+import 'package:fluffychat/vibe/call/vibe_missed_calls.dart';
 import 'package:fluffychat/vibe/call/vibe_rtc_session.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
@@ -216,6 +217,7 @@ class VibeCall extends ChangeNotifier {
     bool video = false,
   }) async {
     final call = instance;
+    unawaited(VibeMissedCalls.instance.clear(room.id));
     if (call.isIn(room)) {
       call.expand();
       return;
