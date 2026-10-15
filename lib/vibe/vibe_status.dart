@@ -427,6 +427,69 @@ abstract class VibeStatusSheet {
 
 /// Discord-style thought bubble under the chat header: custom status (if
 /// any) and the other person's local time. Tap to fold it away.
+/// "6:42 PM there": the other person's local time, small, under their name
+/// in the chat's top bar (where "Connecting to server…" shows while
+/// connecting). Nothing if they don't share a time zone.
+class VibeTheirTime extends StatefulWidget {
+  final Room room;
+  final String userId;
+  final TextStyle? style;
+  const VibeTheirTime({
+    required this.room,
+    required this.userId,
+    this.style,
+    super.key,
+  });
+
+  @override
+  State<VibeTheirTime> createState() => _VibeTheirTimeState();
+}
+
+class _VibeTheirTimeState extends State<VibeTheirTime> {
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    // on the minute, so the clock never lags
+    final now = DateTime.now();
+    _tick = Timer(Duration(seconds: 60 - now.second), () {
+      if (mounted) setState(() {});
+      _tick = Timer.periodic(const Duration(minutes: 1), (_) {
+        if (mounted) setState(() {});
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final zone = VibeStatus.of(widget.room, widget.userId)?.tzOffsetMin;
+    if (zone == null) return const SizedBox.shrink();
+    final t = DateTime.now().toUtc().add(Duration(minutes: zone));
+    final clock = MaterialLocalizations.of(
+      context,
+    ).formatTimeOfDay(TimeOfDay(hour: t.hour, minute: t.minute));
+    final mine = DateTime.now().timeZoneOffset.inMinutes == zone;
+    return Text(
+      mine ? '$clock · same time as you' : '$clock there',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style:
+          widget.style ??
+          TextStyle(
+            fontSize: 12,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+    );
+  }
+}
+
 class VibeStatusBubble extends StatefulWidget {
   final Room room;
   final String? userId;
@@ -480,18 +543,9 @@ class _VibeStatusBubbleState extends State<VibeStatusBubble> {
           '${s.emoji.isEmpty ? '' : '${s.emoji} '}${s.text}'
           '${until == null ? '' : ' · ${vibeUntil(context, until)}'}';
     }
-    String? timeText;
-    final zone = s?.tzOffsetMin;
-    if (zone != null) {
-      final t = DateTime.now().toUtc().add(Duration(minutes: zone));
-      final clock = MaterialLocalizations.of(
-        context,
-      ).formatTimeOfDay(TimeOfDay(hour: t.hour, minute: t.minute));
-      timeText = '$clock there';
-    }
-    if (statusText == null && timeText == null) {
-      return const SizedBox.shrink();
-    }
+    // The bubble is only for a custom status; their time sits under the
+    // name in the top bar (VibeTheirTime).
+    if (statusText == null) return const SizedBox.shrink();
 
     final cs = Theme.of(context).colorScheme;
     final fill = cs.surfaceContainerHigh;
@@ -538,35 +592,16 @@ class _VibeStatusBubbleState extends State<VibeStatusBubble> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (statusText != null)
-                    Text(
-                      statusText,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontStyle: FontStyle.italic,
-                        color: cs.onSurface,
-                      ),
+                  Text(
+                    statusText,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontStyle: FontStyle.italic,
+                      color: cs.onSurface,
                     ),
-                  if (timeText != null)
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: statusText == null ? 0 : 2,
-                      ),
-                      child: Text(
-                        timeText,
-                        style: TextStyle(
-                          fontSize: statusText == null ? 15 : 12.5,
-                          fontStyle: statusText == null
-                              ? FontStyle.italic
-                              : FontStyle.normal,
-                          color: statusText == null
-                              ? cs.onSurface
-                              : cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
+                  ),
                 ],
               ),
       ),

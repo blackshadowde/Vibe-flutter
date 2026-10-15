@@ -21,6 +21,7 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
       ('📵', 'An unanswered or declined call ends by itself'),
       ('🛰', 'Calls connect on more networks: if the direct route to the call server is blocked, Vibe goes through your server\'s relay'),
       ('🔕', 'Mute any chat from its ⋮ menu (Mute notifications). Long-press a community in the rail to mute all its channels, or long-press a single channel'),
+      ('🕑', 'Their time now sits under their name at the top of the chat (where "Connecting" shows while Vibe connects). The thought bubble only appears when they\'ve set a status'),
       ('⚪', 'Unread in a chat\'s pane: # | chat lights up with a counter when there are new messages, and # | audio-call / video-call when you missed a call'),
       ('🌙', 'The app icon follows your phone: white with the blue bubble in light mode, blue with a white bubble and padlock in dark mode. With themed icons (Material You) on, it takes your wallpaper colours'),
       ('👀', 'While you\'re in a chat, someone else typing or writing to you no longer pops up a notification: their picture peeks in from the side above the typing bar (dots while they type). Tap it to jump to their chat, swipe it right to dismiss'),

@@ -98,7 +98,13 @@ class ChatAppBarTitle extends StatelessWidget {
                         !(room.client.onSync.value != null &&
                             status.status != SyncStatus.error &&
                             room.client.prevBatch != null);
-                    if (!syncing) return const SizedBox.shrink();
+                    if (!syncing) {
+                      // connected: their local time, in the same spot
+                      return dmUser != null &&
+                              AppSettings.vibeStatusBubble.value
+                          ? VibeTheirTime(room: room, userId: dmUser)
+                          : const SizedBox.shrink();
+                    }
                     return Row(
                       children: [
                         SizedBox.square(
