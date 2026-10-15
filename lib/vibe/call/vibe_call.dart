@@ -568,7 +568,7 @@ class VibeCall extends ChangeNotifier {
       if (t.uris.isEmpty) return const [];
       return [
         lk.RTCIceServer(
-          urls: t.uris,
+          urls: [for (final u in t.uris) u.toString()],
           username: t.username,
           credential: t.password,
         ),
