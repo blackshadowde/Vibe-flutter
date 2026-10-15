@@ -307,59 +307,48 @@ class VibeCall extends ChangeNotifier {
       }
 
       // 1) Which call server? The one the call already uses (the oldest
-      //    membership's), else your own server's.
+      //    membership's), else your own server's. In a one-to-one chat the
+      //    other person's server is tried too, in case yours can't be
+      //    reached from this network.
       final me = '${client.userID}:${client.deviceID}';
       final existing = VibeCallMembers.sessions(
         room,
       ).where((m) => m.participantId != me).toList();
       final first = existing.isEmpty ? null : existing.first.focus;
       final own = await VibeCallSupport.serviceUrl(client);
-      final url = first?.url ?? own;
-      if (url == null) {
+      final candidates = <({String url, String alias, String why})>[];
+      void add(String? url, String alias, String why) {
+        if (url == null || candidates.any((c) => c.url == url)) return;
+        candidates.add((url: url, alias: alias, why: why));
+      }
+
+      if (first != null) {
+        add(
+          first.url,
+          first.alias.isNotEmpty ? first.alias : room.id,
+          'from the call',
+        );
+      }
+      add(own, room.id, 'yours');
+      final peerDomain = room.directChatMatrixID?.domain;
+      if (first == null &&
+          room.isDirectChat &&
+          peerDomain != null &&
+          peerDomain != client.userID?.domain) {
+        add(
+          await VibeCallSupport.serviceUrlForDomain(client, peerDomain),
+          room.id,
+          '$peerDomain\'s',
+        );
+      }
+      if (candidates.isEmpty) {
         throw const _CallProblem(
           'Your server doesn\'t offer Matrix calls, and nobody else is in '
           'this call yet.',
         );
       }
-      final alias = (first?.alias.isNotEmpty ?? false) ? first!.alias : room.id;
-      _serviceUrl = url;
-      final foci = <Map<String, Object?>>[
-        {'type': 'livekit', 'livekit_service_url': url, 'livekit_alias': alias},
-        if (own != null && own != url)
-          {
-            'type': 'livekit',
-            'livekit_service_url': own,
-            'livekit_alias': room.id,
-          },
-      ];
-      _log('call server $url (${first != null ? 'from the call' : 'yours'})');
 
-      // 2) A LiveKit pass for that server, via your Matrix OpenID token.
-      final openId = await client.requestOpenIdToken(client.userID!, {});
-      final res = await client.httpClient.post(
-        Uri.parse('${url.replaceAll(RegExp(r'/+$'), '')}/sfu/get'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'room': alias,
-          'openid_token': openId.toJson(),
-          'device_id': client.deviceID,
-        }),
-      );
-      if (res.statusCode != 200) {
-        throw _CallProblem(
-          'The call server said no (${res.statusCode}). Try again in a bit.',
-        );
-      }
-      final sfu = jsonDecode(res.body) as Map<String, Object?>;
-      final sfuUrl = sfu['url'] as String?;
-      final jwt = sfu['jwt'] as String?;
-      if (sfuUrl == null || jwt == null) {
-        throw const _CallProblem('The call server sent an odd answer.');
-      }
-      _log('got call pass for $sfuUrl');
-      if (gone()) return; // hung up meanwhile
-
-      // 3) Encryption keys (Element Call compatible).
+      // 2) Encryption keys (Element Call compatible).
       VibeCallKeys? keys;
       if (room.encrypted) {
         keys = await VibeCallKeys.create(
@@ -371,126 +360,85 @@ class VibeCall extends ChangeNotifier {
         _keys = keys;
       }
 
-      // 4) Connect to the call server.
+      // 3) A LiveKit pass from each call server in turn (via your Matrix
+      //    OpenID token), until one connects.
       await lk.AudioManager.instance.setSpeakerOutputPreferred(speakerOn);
-      // Some networks block the call server's direct route. If the first
-      // try times out, go through your Matrix server's relay (TURN), then
-      // relay only.
-      List<lk.RTCIceServer>? turn;
+      final openId = await client.requestOpenIdToken(client.userID!, {});
       lk.Room? connected;
+      ({String url, String alias, String why})? used;
       Object? lastError;
-      for (var attempt = 0; attempt < 3 && connected == null; attempt++) {
+      for (var i = 0; i < candidates.length; i++) {
+        final c = candidates[i];
         if (gone()) return;
-        var rtcConfig = const lk.RTCConfiguration();
-        if (attempt > 0) {
-          turn ??= await _homeserverTurn(client);
-          if (turn.isEmpty) break;
-          rtcConfig = lk.RTCConfiguration(
-            iceServers: turn,
-            iceTransportPolicy: attempt == 2
-                ? lk.RTCIceTransportPolicy.relay
-                : lk.RTCIceTransportPolicy.all,
-          );
-          _log(
-            'retrying through your server\'s relay'
-            '${attempt == 2 ? ' only' : ''}',
-          );
-        }
-        final lkRoom = lk.Room(
-          roomOptions: lk.RoomOptions(
-            adaptiveStream: true,
-            dynacast: true,
-            defaultAudioCaptureOptions: const lk.AudioCaptureOptions(
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true,
-              // cuts low hum and handling noise
-              highPassFilter: true,
-              voiceIsolation: true,
-            ),
-            defaultCameraCaptureOptions: const lk.CameraCaptureOptions(
-              params: lk.VideoParametersPresets.h720_169,
-            ),
-            defaultScreenShareCaptureOptions: const lk.ScreenShareCaptureOptions(
-              useiOSBroadcastExtension: false,
-              params: lk.VideoParametersPresets.screenShareH1080FPS15,
-            ),
-            // Media encryption only, like Element Call (the newer
-            // `encryption` option also encrypts data messages, which Element
-            // Call doesn't expect).
-            // ignore: deprecated_member_use
-            e2eeOptions: keys == null
-                ? null
-                : lk.E2EEOptions(keyProvider: keys.keyProvider),
-          ),
-        );
-        _lk = lkRoom;
-        keys?.onOwnKey = (index) async =>
-            lkRoom.e2eeManager?.setKeyIndex(index);
-        lkRoom.addListener(_onLiveKitChange);
-        final events = lkRoom.createListener();
-        _lkEvents = events;
-        events
-          ..on<lk.RoomDisconnectedEvent>((e) {
-            _log('call server disconnected: ${e.reason}');
-            if (stage == VibeCallStage.inCall) {
-              _snack('Call ended: connection lost');
-              unawaited(hangup());
-            }
-          })
-          ..on<lk.RoomReconnectingEvent>((_) => _log('reconnecting'))
-          ..on<lk.RoomReconnectedEvent>((_) => _log('reconnected'))
-          ..on<lk.ParticipantConnectedEvent>(
-            (e) => _log('joined: ${e.participant.identity}'),
-          )
-          ..on<lk.ParticipantDisconnectedEvent>(
-            (e) => _log('left: ${e.participant.identity}'),
-          )
-          ..on<lk.TrackSubscribedEvent>((e) {
-            _log('${e.participant.identity}: ${e.publication.source.name}');
-            if (!soundOn) _applySound();
-          })
-          ..on<lk.TrackE2EEStateEvent>(
-            (e) => _log('e2ee ${e.participant.identity}: ${e.state.name}'),
-          )
-          ..on<lk.TrackPublishedEvent>(
-            (e) => _log(
-              '${e.participant.identity} published ${e.publication.source.name}',
-            ),
-          )
-          ..on<lk.TrackMutedEvent>(
-            (e) => _log(
-              '${e.participant.identity} muted ${e.publication.source.name}',
-            ),
-          )
-          ..on<lk.TrackUnmutedEvent>(
-            (e) => _log(
-              '${e.participant.identity} unmuted ${e.publication.source.name}',
-            ),
-          )
-          // Cameras turned on later, mutes, new tracks: redraw on any change
-          // (the room itself only reports some of them).
-          ..listen((_) => _onLiveKitChange());
+        _log('call server ${c.url} (${c.why})');
+        String? sfuUrl;
+        String? jwt;
         try {
-          await lkRoom.connect(
-            sfuUrl,
-            jwt,
-            connectOptions: lk.ConnectOptions(rtcConfiguration: rtcConfig),
+          final res = await client.httpClient.post(
+            Uri.parse('${c.url.replaceAll(RegExp(r'/+$'), '')}/sfu/get'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'room': c.alias,
+              'openid_token': openId.toJson(),
+              'device_id': client.deviceID,
+            }),
           );
-          connected = lkRoom;
+          if (res.statusCode != 200) {
+            _log('call server said no (${res.statusCode}): ${res.body}');
+            lastError = _CallProblem(
+              'The call server said no (${res.statusCode}). Try again in a '
+              'bit.',
+            );
+            continue;
+          }
+          final sfu = jsonDecode(res.body) as Map<String, Object?>;
+          sfuUrl = sfu['url'] as String?;
+          jwt = sfu['jwt'] as String?;
         } catch (e) {
+          _log('call pass failed: $e');
           lastError = e;
-          _log('connection try ${attempt + 1} failed: $e');
-          lkRoom.removeListener(_onLiveKitChange);
-          await events.dispose();
-          _lkEvents = null;
-          _lk = null;
-          try {
-            await lkRoom.dispose();
-          } catch (_) {}
+          continue;
+        }
+        if (sfuUrl == null || jwt == null) {
+          lastError = const _CallProblem('The call server sent an odd answer.');
+          continue;
+        }
+        _log('got call pass for $sfuUrl');
+        connected = await _connectLiveKit(
+          client,
+          sfuUrl,
+          jwt,
+          keys,
+          tries: i == candidates.length - 1 ? 3 : 2,
+          gone: gone,
+          onError: (e) => lastError = e,
+        );
+        if (connected != null) {
+          used = c;
+          break;
         }
       }
-      if (connected == null) throw lastError ?? const _CallProblem('No connection');
+      if (gone()) {
+        await connected?.disconnect();
+        return;
+      }
+      if (connected == null || used == null) {
+        throw lastError ?? const _CallProblem('No connection');
+      }
+      _serviceUrl = used.url;
+      final foci = <Map<String, Object?>>[
+        {
+          'type': 'livekit',
+          'livekit_service_url': used.url,
+          'livekit_alias': used.alias,
+        },
+        if (own != null && own != used.url)
+          {
+            'type': 'livekit',
+            'livekit_service_url': own,
+            'livekit_alias': room.id,
+          },
+      ];
       final lkRoom = connected;
       _log('connected to the call server');
       if (gone()) {
@@ -560,6 +508,135 @@ class VibeCall extends ChangeNotifier {
           'support so we can see what went wrong.';
       notifyListeners();
     }
+  }
+
+  /// Connect to LiveKit, retrying through your Matrix server's relay
+  /// (TURN) and then relay-only when the direct route times out.
+  Future<lk.Room?> _connectLiveKit(
+    Client client,
+    String sfuUrl,
+    String jwt,
+    VibeCallKeys? keys, {
+    required int tries,
+    required bool Function() gone,
+    required void Function(Object) onError,
+  }) async {
+    List<lk.RTCIceServer>? turn;
+    for (var attempt = 0; attempt < tries; attempt++) {
+      if (gone()) return null;
+      var rtcConfig = const lk.RTCConfiguration();
+      if (attempt > 0) {
+        turn ??= await _homeserverTurn(client);
+        if (turn.isEmpty) {
+          _log('your server has no relay (TURN) to try');
+          return null;
+        }
+        rtcConfig = lk.RTCConfiguration(
+          iceServers: turn,
+          iceTransportPolicy: attempt == 2
+              ? lk.RTCIceTransportPolicy.relay
+              : lk.RTCIceTransportPolicy.all,
+        );
+        _log(
+          'retrying through your server\'s relay'
+          '${attempt == 2 ? ' only' : ''}',
+        );
+      }
+    final lkRoom = lk.Room(
+      roomOptions: lk.RoomOptions(
+        adaptiveStream: true,
+        dynacast: true,
+        defaultAudioCaptureOptions: const lk.AudioCaptureOptions(
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          // cuts low hum and handling noise
+          highPassFilter: true,
+          voiceIsolation: true,
+        ),
+        defaultCameraCaptureOptions: const lk.CameraCaptureOptions(
+          params: lk.VideoParametersPresets.h720_169,
+        ),
+        defaultScreenShareCaptureOptions: const lk.ScreenShareCaptureOptions(
+          useiOSBroadcastExtension: false,
+          params: lk.VideoParametersPresets.screenShareH1080FPS15,
+        ),
+        // Media encryption only, like Element Call (the newer
+        // `encryption` option also encrypts data messages, which Element
+        // Call doesn't expect).
+        // ignore: deprecated_member_use
+        e2eeOptions: keys == null
+            ? null
+            : lk.E2EEOptions(keyProvider: keys.keyProvider),
+      ),
+    );
+    _lk = lkRoom;
+    keys?.onOwnKey = (index) async =>
+        lkRoom.e2eeManager?.setKeyIndex(index);
+    lkRoom.addListener(_onLiveKitChange);
+    final events = lkRoom.createListener();
+    _lkEvents = events;
+    events
+      ..on<lk.RoomDisconnectedEvent>((e) {
+        _log('call server disconnected: ${e.reason}');
+        if (stage == VibeCallStage.inCall) {
+          _snack('Call ended: connection lost');
+          unawaited(hangup());
+        }
+      })
+      ..on<lk.RoomReconnectingEvent>((_) => _log('reconnecting'))
+      ..on<lk.RoomReconnectedEvent>((_) => _log('reconnected'))
+      ..on<lk.ParticipantConnectedEvent>(
+        (e) => _log('joined: ${e.participant.identity}'),
+      )
+      ..on<lk.ParticipantDisconnectedEvent>(
+        (e) => _log('left: ${e.participant.identity}'),
+      )
+      ..on<lk.TrackSubscribedEvent>((e) {
+        _log('${e.participant.identity}: ${e.publication.source.name}');
+        if (!soundOn) _applySound();
+      })
+      ..on<lk.TrackE2EEStateEvent>(
+        (e) => _log('e2ee ${e.participant.identity}: ${e.state.name}'),
+      )
+      ..on<lk.TrackPublishedEvent>(
+        (e) => _log(
+          '${e.participant.identity} published ${e.publication.source.name}',
+        ),
+      )
+      ..on<lk.TrackMutedEvent>(
+        (e) => _log(
+          '${e.participant.identity} muted ${e.publication.source.name}',
+        ),
+      )
+      ..on<lk.TrackUnmutedEvent>(
+        (e) => _log(
+          '${e.participant.identity} unmuted ${e.publication.source.name}',
+        ),
+      )
+      // Cameras turned on later, mutes, new tracks: redraw on any change
+      // (the room itself only reports some of them).
+      ..listen((_) => _onLiveKitChange());
+      try {
+        await lkRoom.connect(
+          sfuUrl,
+          jwt,
+          connectOptions: lk.ConnectOptions(rtcConfiguration: rtcConfig),
+        );
+        return lkRoom;
+      } catch (e) {
+        onError(e);
+        _log('connection try ${attempt + 1} failed: $e');
+        lkRoom.removeListener(_onLiveKitChange);
+        await events.dispose();
+        _lkEvents = null;
+        _lk = null;
+        try {
+          await lkRoom.dispose();
+        } catch (_) {}
+      }
+    }
+    return null;
   }
 
   /// Your Matrix server's relay (TURN) servers, for networks that block
@@ -1310,6 +1387,32 @@ abstract class VibeCallSupport {
     }
     _cache[key] = (DateTime.now(), url);
     return url;
+  }
+
+  /// The call service another server announces (its public
+  /// .well-known), e.g. the other person's server in a one-to-one chat.
+  static Future<String?> serviceUrlForDomain(
+    Client client,
+    String domain,
+  ) async {
+    try {
+      final res = await client.httpClient
+          .get(Uri.https(domain, '/.well-known/matrix/client'))
+          .timeout(const Duration(seconds: 6));
+      if (res.statusCode != 200) return null;
+      final wk = jsonDecode(res.body);
+      final list = wk is Map ? wk['org.matrix.msc4143.rtc_foci'] : null;
+      if (list is! List) return null;
+      for (final f in list) {
+        if (f is Map && f['type'] == 'livekit') {
+          final u = f['livekit_service_url'];
+          if (u is String && u.isNotEmpty) return u;
+        }
+      }
+    } catch (e) {
+      Logs().v('Vibe call: no call service found for $domain ($e)');
+    }
+    return null;
   }
 
   static Future<bool> ensure(BuildContext context, Room room) async {
