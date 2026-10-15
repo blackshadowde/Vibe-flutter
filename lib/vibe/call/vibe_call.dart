@@ -371,82 +371,125 @@ class VibeCall extends ChangeNotifier {
 
       // 4) Connect to the call server.
       await lk.AudioManager.instance.setSpeakerOutputPreferred(speakerOn);
-      final lkRoom = lk.Room(
-        roomOptions: lk.RoomOptions(
-          adaptiveStream: true,
-          dynacast: true,
-          defaultAudioCaptureOptions: const lk.AudioCaptureOptions(
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-            // cuts low hum and handling noise
-            highPassFilter: true,
-            voiceIsolation: true,
+      // Some networks block the call server's direct route. If the first
+      // try times out, go through your Matrix server's relay (TURN), then
+      // relay only.
+      List<lk.RTCIceServer>? turn;
+      lk.Room? connected;
+      Object? lastError;
+      for (var attempt = 0; attempt < 3 && connected == null; attempt++) {
+        if (gone()) return;
+        var rtcConfig = const lk.RTCConfiguration();
+        if (attempt > 0) {
+          turn ??= await _homeserverTurn(client);
+          if (turn.isEmpty) break;
+          rtcConfig = lk.RTCConfiguration(
+            iceServers: turn,
+            iceTransportPolicy: attempt == 2
+                ? lk.RTCIceTransportPolicy.relay
+                : lk.RTCIceTransportPolicy.all,
+          );
+          _log(
+            'retrying through your server\'s relay'
+            '${attempt == 2 ? ' only' : ''}',
+          );
+        }
+        final lkRoom = lk.Room(
+          roomOptions: lk.RoomOptions(
+            adaptiveStream: true,
+            dynacast: true,
+            defaultAudioCaptureOptions: const lk.AudioCaptureOptions(
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+              // cuts low hum and handling noise
+              highPassFilter: true,
+              voiceIsolation: true,
+            ),
+            defaultCameraCaptureOptions: const lk.CameraCaptureOptions(
+              params: lk.VideoParametersPresets.h720_169,
+            ),
+            defaultScreenShareCaptureOptions: const lk.ScreenShareCaptureOptions(
+              useiOSBroadcastExtension: false,
+              params: lk.VideoParametersPresets.screenShareH1080FPS15,
+            ),
+            // Media encryption only, like Element Call (the newer
+            // `encryption` option also encrypts data messages, which Element
+            // Call doesn't expect).
+            // ignore: deprecated_member_use
+            e2eeOptions: keys == null
+                ? null
+                : lk.E2EEOptions(keyProvider: keys.keyProvider),
           ),
-          defaultCameraCaptureOptions: const lk.CameraCaptureOptions(
-            params: lk.VideoParametersPresets.h720_169,
-          ),
-          defaultScreenShareCaptureOptions: const lk.ScreenShareCaptureOptions(
-            useiOSBroadcastExtension: false,
-            params: lk.VideoParametersPresets.screenShareH1080FPS15,
-          ),
-          // Media encryption only, like Element Call (the newer
-          // `encryption` option also encrypts data messages, which Element
-          // Call doesn't expect).
-          // ignore: deprecated_member_use
-          e2eeOptions: keys == null
-              ? null
-              : lk.E2EEOptions(keyProvider: keys.keyProvider),
-        ),
-      );
-      _lk = lkRoom;
-      keys?.onOwnKey = (index) async =>
-          lkRoom.e2eeManager?.setKeyIndex(index);
-      lkRoom.addListener(_onLiveKitChange);
-      final events = lkRoom.createListener();
-      _lkEvents = events;
-      events
-        ..on<lk.RoomDisconnectedEvent>((e) {
-          _log('call server disconnected: ${e.reason}');
-          if (stage == VibeCallStage.inCall) {
-            _snack('Call ended: connection lost');
-            unawaited(hangup());
-          }
-        })
-        ..on<lk.RoomReconnectingEvent>((_) => _log('reconnecting'))
-        ..on<lk.RoomReconnectedEvent>((_) => _log('reconnected'))
-        ..on<lk.ParticipantConnectedEvent>(
-          (e) => _log('joined: ${e.participant.identity}'),
-        )
-        ..on<lk.ParticipantDisconnectedEvent>(
-          (e) => _log('left: ${e.participant.identity}'),
-        )
-        ..on<lk.TrackSubscribedEvent>((e) {
-          _log('${e.participant.identity}: ${e.publication.source.name}');
-          if (!soundOn) _applySound();
-        })
-        ..on<lk.TrackE2EEStateEvent>(
-          (e) => _log('e2ee ${e.participant.identity}: ${e.state.name}'),
-        )
-        ..on<lk.TrackPublishedEvent>(
-          (e) => _log(
-            '${e.participant.identity} published ${e.publication.source.name}',
-          ),
-        )
-        ..on<lk.TrackMutedEvent>(
-          (e) => _log(
-            '${e.participant.identity} muted ${e.publication.source.name}',
-          ),
-        )
-        ..on<lk.TrackUnmutedEvent>(
-          (e) => _log(
-            '${e.participant.identity} unmuted ${e.publication.source.name}',
-          ),
-        )
-        // Cameras turned on later, mutes, new tracks: redraw on any change
-        // (the room itself only reports some of them).
-        ..listen((_) => _onLiveKitChange());
-      await lkRoom.connect(sfuUrl, jwt);
+        );
+        _lk = lkRoom;
+        keys?.onOwnKey = (index) async =>
+            lkRoom.e2eeManager?.setKeyIndex(index);
+        lkRoom.addListener(_onLiveKitChange);
+        final events = lkRoom.createListener();
+        _lkEvents = events;
+        events
+          ..on<lk.RoomDisconnectedEvent>((e) {
+            _log('call server disconnected: ${e.reason}');
+            if (stage == VibeCallStage.inCall) {
+              _snack('Call ended: connection lost');
+              unawaited(hangup());
+            }
+          })
+          ..on<lk.RoomReconnectingEvent>((_) => _log('reconnecting'))
+          ..on<lk.RoomReconnectedEvent>((_) => _log('reconnected'))
+          ..on<lk.ParticipantConnectedEvent>(
+            (e) => _log('joined: ${e.participant.identity}'),
+          )
+          ..on<lk.ParticipantDisconnectedEvent>(
+            (e) => _log('left: ${e.participant.identity}'),
+          )
+          ..on<lk.TrackSubscribedEvent>((e) {
+            _log('${e.participant.identity}: ${e.publication.source.name}');
+            if (!soundOn) _applySound();
+          })
+          ..on<lk.TrackE2EEStateEvent>(
+            (e) => _log('e2ee ${e.participant.identity}: ${e.state.name}'),
+          )
+          ..on<lk.TrackPublishedEvent>(
+            (e) => _log(
+              '${e.participant.identity} published ${e.publication.source.name}',
+            ),
+          )
+          ..on<lk.TrackMutedEvent>(
+            (e) => _log(
+              '${e.participant.identity} muted ${e.publication.source.name}',
+            ),
+          )
+          ..on<lk.TrackUnmutedEvent>(
+            (e) => _log(
+              '${e.participant.identity} unmuted ${e.publication.source.name}',
+            ),
+          )
+          // Cameras turned on later, mutes, new tracks: redraw on any change
+          // (the room itself only reports some of them).
+          ..listen((_) => _onLiveKitChange());
+        try {
+          await lkRoom.connect(
+            sfuUrl,
+            jwt,
+            connectOptions: lk.ConnectOptions(rtcConfiguration: rtcConfig),
+          );
+          connected = lkRoom;
+        } catch (e) {
+          lastError = e;
+          _log('connection try ${attempt + 1} failed: $e');
+          lkRoom.removeListener(_onLiveKitChange);
+          await events.dispose();
+          _lkEvents = null;
+          _lk = null;
+          try {
+            await lkRoom.dispose();
+          } catch (_) {}
+        }
+      }
+      if (connected == null) throw lastError ?? const _CallProblem('No connection');
+      final lkRoom = connected;
       _log('connected to the call server');
       if (gone()) {
         await lkRoom.disconnect();
@@ -514,6 +557,25 @@ class VibeCall extends ChangeNotifier {
           'The call didn\'t connect. Copy the call log and send it to '
           'support so we can see what went wrong.';
       notifyListeners();
+    }
+  }
+
+  /// Your Matrix server's relay (TURN) servers, for networks that block
+  /// the call server's direct route.
+  static Future<List<lk.RTCIceServer>> _homeserverTurn(Client client) async {
+    try {
+      final t = await client.getTurnServer();
+      if (t.uris.isEmpty) return const [];
+      return [
+        lk.RTCIceServer(
+          urls: t.uris,
+          username: t.username,
+          credential: t.password,
+        ),
+      ];
+    } catch (e) {
+      Logs().v('Vibe call: no TURN from the server $e');
+      return const [];
     }
   }
 

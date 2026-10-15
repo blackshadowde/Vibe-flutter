@@ -275,6 +275,7 @@ class VibeDmDetail extends StatelessWidget {
                       : Icons.lock_rounded,
                   onTap: () => VibeGroupEdit.privacy(context, room),
                 ),
+                VibeMuteRow(room: room),
                 VibeHashRow(
                   label: 'leave-group',
                   onTap: () => VibeGroups.leave(context, room),
@@ -451,6 +452,62 @@ class VibeHashRow extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "# | mute-notifications": silence a group or channel (stored on the
+/// server, so it follows you to every device).
+class VibeMuteRow extends StatefulWidget {
+  final Room room;
+  final String what;
+  const VibeMuteRow({required this.room, this.what = 'notifications', super.key});
+
+  static bool isMuted(Room room) =>
+      room.pushRuleState != PushRuleState.notify;
+
+  static Future<void> setMuted(Room room, bool muted) => room.setPushRuleState(
+    muted ? PushRuleState.dontNotify : PushRuleState.notify,
+  );
+
+  @override
+  State<VibeMuteRow> createState() => _VibeMuteRowState();
+}
+
+class _VibeMuteRowState extends State<VibeMuteRow> {
+  late bool _muted = VibeMuteRow.isMuted(widget.room);
+  bool _busy = false;
+
+  Future<void> _toggle() async {
+    if (_busy) return;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() {
+      _busy = true;
+      _muted = !_muted;
+    });
+    try {
+      await VibeMuteRow.setMuted(widget.room, _muted);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(_muted ? 'Muted' : 'Notifications on'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (mounted) setState(() => _muted = !_muted);
+      messenger.showSnackBar(SnackBar(content: Text('$e')));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => VibeHashRow(
+    label: _muted ? 'unmute-${widget.what}' : 'mute-${widget.what}',
+    subtitle: _muted ? 'Muted · no notifications' : 'Notifications on',
+    subtitleIcon: _muted
+        ? Icons.notifications_off_rounded
+        : Icons.notifications_rounded,
+    onTap: _toggle,
+  );
 }
 
 class _ApprovalBanner extends StatelessWidget {

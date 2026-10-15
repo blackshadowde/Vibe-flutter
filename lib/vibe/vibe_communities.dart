@@ -443,8 +443,86 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
     }
   }
 
+  /// Long-press a channel: mute / unmute it, and (admins) remove it.
   Future<void> _channelMenu(_Channel c) async {
-    if (!space.canChangeStateEvent(EventTypes.SpaceChild)) return;
+    final local = space.client.getRoomById(c.id);
+    final joined = local != null && local.membership == Membership.join;
+    final canRemove = space.canChangeStateEvent(EventTypes.SpaceChild);
+    if (!joined && !canRemove) return;
+    VibeHaptics.medium();
+    final muted = joined && VibeMuteRow.isMuted(local);
+    final action = await showVibeSheet<String>(
+      context: context,
+      useRootNavigator: true,
+      showDragHandle: true,
+      backgroundColor: VibeSettingsStyle.page(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(
+                '#${c.name}',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: VibeSettingsStyle.text(ctx),
+                ),
+              ),
+            ),
+            if (joined)
+              ListTile(
+                leading: Icon(
+                  muted
+                      ? Icons.notifications_rounded
+                      : Icons.notifications_off_rounded,
+                ),
+                title: Text(muted ? 'Unmute channel' : 'Mute channel'),
+                onTap: () => Navigator.pop(ctx, 'mute'),
+              ),
+            if (canRemove)
+              ListTile(
+                leading: const Icon(
+                  Icons.remove_circle_outline,
+                  color: Color(0xFFDA373C),
+                ),
+                title: const Text(
+                  'Remove from community',
+                  style: TextStyle(color: Color(0xFFDA373C)),
+                ),
+                onTap: () => Navigator.pop(ctx, 'remove'),
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || action == null) return;
+    if (action == 'mute' && local != null) {
+      try {
+        await VibeMuteRow.setMuted(local, !muted);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(muted ? 'Notifications on' : 'Muted #${c.name}'),
+            ),
+          );
+          setState(() {});
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('$e')));
+        }
+      }
+      return;
+    }
+    if (action != 'remove') return;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -468,6 +546,45 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
     try {
       await space.removeSpaceChild(c.id);
       await _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$e')));
+      }
+    }
+  }
+
+  List<Room> get _joinedChannels => [
+    for (final c in space.spaceChildren)
+      if (c.roomId != null)
+        if (space.client.getRoomById(c.roomId!) case final r?)
+          if (r.membership == Membership.join && !r.isSpace) r,
+  ];
+
+  bool get _allMuted {
+    final list = _joinedChannels;
+    return list.isNotEmpty && list.every(VibeMuteRow.isMuted);
+  }
+
+  Future<void> _muteAll() async {
+    final list = _joinedChannels;
+    if (list.isEmpty) return;
+    final mute = !_allMuted;
+    VibeHaptics.light();
+    try {
+      for (final r in list) {
+        await VibeMuteRow.setMuted(r, mute);
+      }
+      await VibeMuteRow.setMuted(space, mute);
+      if (mounted) {
+        setState(() {});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(mute ? 'Community muted' : 'Notifications on'),
+          ),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -683,6 +800,16 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
                     : 'Private · invite only',
                 subtitleIcon: isPublic ? Icons.public_rounded : Icons.lock_rounded,
                 onTap: () => VibeGroupEdit.privacy(context, space),
+              ),
+              VibeHashRow(
+                label: _allMuted ? 'unmute-community' : 'mute-community',
+                subtitle: _allMuted
+                    ? 'All channels muted'
+                    : 'Mute every channel you\'re in',
+                subtitleIcon: _allMuted
+                    ? Icons.notifications_off_rounded
+                    : Icons.notifications_rounded,
+                onTap: _muteAll,
               ),
               VibeHashRow(label: 'leave-community', onTap: _leave),
             ],

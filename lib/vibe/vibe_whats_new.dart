@@ -19,6 +19,8 @@ const vibeReleaseNotes = <({String version, List<(String, String)> items})>[
       ('👥', 'Group video calls show everyone in a grid, with a green ring around whoever is talking'),
       ('🔒', 'Calls stay end-to-end encrypted and still work with Element, Element X and Sable'),
       ('📵', 'An unanswered or declined call ends by itself'),
+      ('🛰', 'Calls connect on more networks: if the direct route to the call server is blocked, Vibe goes through your server\'s relay'),
+      ('🔕', 'Mute groups and channels: # | mute-notifications in a group\'s pane, long-press a community channel → Mute channel, or # | mute-community to silence all its channels'),
       ('🌙', 'The app icon follows your phone: white with the blue bubble in light mode, blue with a white bubble and padlock in dark mode. With themed icons (Material You) on, it takes your wallpaper colours'),
       ('👀', 'While you\'re in a chat, someone else typing or writing to you no longer pops up a notification: their picture peeks in from the side above the typing bar (dots while they type). Tap it to jump to their chat, swipe it right to dismiss'),
       ('🔔', 'No more double notifications: Google Firebase is gone, Vibe\'s own connection delivers everything (Settings → Notifications)'),
