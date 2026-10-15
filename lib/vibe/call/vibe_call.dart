@@ -341,6 +341,16 @@ class VibeCall extends ChangeNotifier {
           '$peerDomain\'s',
         );
       }
+      // Last resort: the public call service Element runs for Element Call
+      // (accepts accounts from any server, as far as we know). Used only
+      // when nobody is in the call yet and the others didn't connect.
+      if (first == null) {
+        add(
+          'https://livekit-jwt.call.element.io',
+          room.id,
+          'Element\'s public call service',
+        );
+      }
       if (candidates.isEmpty) {
         throw const _CallProblem(
           'Your server doesn\'t offer Matrix calls, and nobody else is in '
