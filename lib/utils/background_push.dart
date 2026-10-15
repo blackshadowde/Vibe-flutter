@@ -311,6 +311,7 @@ class BackgroundPush {
       clients,
       (client, event) => pushHelper(
         VibeDirect.pushFor(client, event),
+        knownEvent: event,
         clients: clients,
         l10n: l10n,
         activeRoomId: matrix?.activeRoomId,

@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 jobs:
   analyze:
@@ -53,3 +54,34 @@ jobs:
           }
           echo "### Code check" >> "$GITHUB_STEP_SUMMARY"
           tail -1 analyze.txt >> "$GITHUB_STEP_SUMMARY"
+
+      # The full analyzer output (warnings and hints too) as a check on the
+      # commit, readable from the GitHub API and the commit's Checks tab.
+      - name: Analyzer report
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          test -f analyze.txt || exit 0
+          grep -E "^\s*(error|warning|info) " analyze.txt > issues.txt
+          COUNT=$(wc -l < issues.txt)
+          head -c 60000 issues.txt > report.txt
+          python3 - <<'PY'
+          import json, os
+          body = {
+            "name": "Analyzer report",
+            "head_sha": os.environ["GITHUB_SHA"],
+            "status": "completed",
+            "conclusion": "neutral",
+            "output": {
+              "title": "flutter analyze",
+              "summary": open("analyze.txt").read().strip().splitlines()[-1][:1000],
+              "text": open("report.txt").read(),
+            },
+          }
+          json.dump(body, open("check.json", "w"))
+          PY
+          gh api "repos/${GITHUB_REPOSITORY}/check-runs" --input check.json > /dev/null
+          echo "$COUNT issues reported"
+

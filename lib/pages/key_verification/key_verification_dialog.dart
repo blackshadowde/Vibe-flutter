@@ -145,7 +145,17 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
     switch (widget.request.state) {
       case KeyVerificationState.showQRSuccess:
       case KeyVerificationState.confirmQRScan:
-        throw 'Not implemented';
+        // Vibe verifies with emoji only; QR states never start from here.
+        hero = avatarHero(spinner: true);
+        subtitle = L10n.of(context).waitingPartnerEmoji;
+        buttons.add(
+          VibeButton(
+            label: L10n.of(context).cancel,
+            tonal: true,
+            onPressed: () => widget.request.cancel(),
+          ),
+        );
+        break;
       case KeyVerificationState.askSSSS:
         // prompt the user for their ssss passphrase / key
         textEditingController = TextEditingController();
@@ -201,6 +211,28 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
         );
         break;
       case KeyVerificationState.askChoice:
+        // Both sides are ready. The other app (Element, Cinny) may offer a
+        // QR code, which Vibe can't scan, so Vibe starts the emoji
+        // comparison itself instead of waiting for them to.
+        hero = avatarHero();
+        subtitle =
+            'Ready. Tap below and compare the emoji on both screens.';
+        buttons.add(
+          VibeButton(
+            label: L10n.of(context).compareEmojiMatch,
+            onPressed: () => widget.request.continueVerification(
+              EventTypes.Sas,
+            ),
+          ),
+        );
+        buttons.add(
+          VibeButton(
+            label: L10n.of(context).cancel,
+            tonal: true,
+            onPressed: () => widget.request.cancel(),
+          ),
+        );
+        break;
       case KeyVerificationState.waitingAccept:
         hero = avatarHero(spinner: true);
         subtitle = L10n.of(context).waitingPartnerAcceptRequest;

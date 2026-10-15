@@ -67,6 +67,7 @@ Future<void> _markShown(String eventId) async {
 
 Future<void> pushHelper(
   PushNotification notification, {
+  Event? knownEvent,
   List<Client>? clients,
   L10n? l10n,
   String? activeRoomId,
@@ -77,6 +78,7 @@ Future<void> pushHelper(
   try {
     await _tryPushHelper(
       notification,
+      knownEvent: knownEvent,
       clients: clients,
       l10n: l10n,
       activeRoomId: activeRoomId,
@@ -130,6 +132,7 @@ Future<void> pushHelper(
 
 Future<void> _tryPushHelper(
   PushNotification notification, {
+  Event? knownEvent,
   List<Client>? clients,
   L10n? l10n,
   String? activeRoomId,
@@ -180,10 +183,21 @@ Future<void> _tryPushHelper(
   l10n ??= await L10n.delegate.load(PlatformDispatcher.instance.locale);
 
   Logs().v('Load event...');
-  final event = await client.getEventByPushNotification(
-    notification,
-    storeInDatabase: false,
-  );
+  // Vibe's own connection already has the (decrypted) event; only a push
+  // wake-up needs to fetch it.
+  Event? event = knownEvent;
+  if (event == null) {
+    try {
+      event = await client.getEventByPushNotification(
+        notification,
+        storeInDatabase: false,
+      );
+    } catch (e) {
+      // gone, redacted or not visible to us: nothing to show, not a crash
+      Logs().w('Push helper: no event for this notification ($e)');
+      return;
+    }
+  }
 
   updateAppBadge(notification.counts?.unread ?? 0);
 
