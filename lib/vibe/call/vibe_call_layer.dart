@@ -2,10 +2,8 @@
 
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui' show FontFeature;
 
 import 'package:fluffychat/vibe/call/vibe_call.dart';
-import 'package:fluffychat/vibe/call/vibe_call_members.dart';
 import 'package:fluffychat/vibe/call/vibe_missed_calls.dart';
 import 'package:fluffychat/vibe/call/vibe_call_ring.dart';
 import 'package:fluffychat/vibe/vibe_crash_report.dart';
@@ -765,7 +763,7 @@ class _FloatingReactionsState extends State<_FloatingReactions> {
                       child: Opacity(
                         opacity: t < 0.75 ? 1 : (1 - t) * 4,
                         child: Transform.scale(
-                          scale: 0.6 + 0.6 * (t * 4).clamp(0.0, 1.0).toDouble(),
+                          scale: 0.6 + 0.6 * (t * 4).clamp(0.0, 1.0),
                           child: child,
                         ),
                       ),
@@ -879,7 +877,7 @@ class _Incoming extends StatelessWidget {
         duration: const Duration(milliseconds: 420),
         curve: vibeSpring,
         builder: (context, t, child) => Opacity(
-          opacity: t.clamp(0.0, 1.0).toDouble(),
+          opacity: t.clamp(0.0, 1.0),
           child: Transform.translate(
             offset: Offset(0, (1 - t) * 40),
             child: child,

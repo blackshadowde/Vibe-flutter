@@ -3,25 +3,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'dart:ui';
 
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat/events/state_message.dart';
 import 'package:fluffychat/utils/account_config.dart';
-import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/settings_switch_list_tile.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:fluffychat/vibe/vibe_text_size.dart';
 import 'package:fluffychat/vibe/vibe_text_size_preview.dart';
 import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart';
 
-import '../../config/app_config.dart';
 import 'settings_style.dart';
 
 class SettingsStyleView extends StatelessWidget {

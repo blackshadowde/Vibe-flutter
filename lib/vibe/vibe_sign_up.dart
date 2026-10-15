@@ -250,7 +250,7 @@ mixin VibeSignUpMixin<T extends StatefulWidget> on State<T> {
                 type: AuthenticationTypes.emailIdentity,
                 session: session,
                 threepidCreds: ThreepidCreds(
-                  sid: emailSid!,
+                  sid: emailSid,
                   clientSecret: clientSecret,
                 ),
               );

@@ -20,7 +20,6 @@ import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
-import '../../config/themes.dart';
 import 'chat.dart';
 import 'input_bar.dart';
 
@@ -34,10 +33,6 @@ class ChatInputRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textMessageOnly =
-        controller.sendController.text.isNotEmpty ||
-        controller.replyEvent != null ||
-        controller.editEvent != null;
 
     if (!controller.room.otherPartyCanReceiveMessages) {
       return Center(

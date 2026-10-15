@@ -16,7 +16,6 @@ import 'package:fluffychat/vibe/vibe_text_size.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
-import '../../../config/app_config.dart';
 import '../../../utils/event_checkbox_extension.dart';
 import '../../../utils/platform_infos.dart';
 import '../../../utils/url_launcher.dart';

@@ -7,7 +7,6 @@ import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
 
 /// Keep an animation point inside the part of the screen you can see:

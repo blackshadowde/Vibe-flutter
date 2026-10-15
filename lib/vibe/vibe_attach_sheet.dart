@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:fluffychat/vibe/vibe_contact_share.dart';
@@ -12,7 +11,6 @@ import 'package:cross_file/cross_file.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/pages/chat/send_file_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart' hide RequestType;
 import 'package:photo_manager/photo_manager.dart';
 
 /// "+" attachment sheet: gallery grid + Photos / Contacts / Files / Location.

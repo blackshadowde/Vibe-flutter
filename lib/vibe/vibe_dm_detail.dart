@@ -174,7 +174,11 @@ class VibeDmDetail extends StatelessWidget {
               _ApprovalBanner(room: room, name: name)
             else ...[
               StreamBuilder<Object?>(
-                stream: room.onUpdate.stream,
+                stream: room.client.onSync.stream.where(
+                  (u) =>
+                      (u.rooms?.join?.containsKey(room.id) ?? false) ||
+                      (u.accountData?.isNotEmpty ?? false),
+                ),
                 builder: (context, _) => VibeHashRow(
                   label: 'chat',
                   subtitle: room.encrypted ? 'End-to-end encrypted' : null,
@@ -491,7 +495,7 @@ class VibeHashRow extends StatelessWidget {
               ),
               if (trailing != null) ...[
                 const SizedBox(width: 8),
-                trailing!,
+                trailing,
               ],
             ],
           ),
@@ -631,7 +635,7 @@ class _ApprovalBanner extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.6,
-                  color: const Color(0xFFB5BAC1),
+                  color: Color(0xFFB5BAC1),
                 ),
               ),
               const SizedBox(height: 6),
@@ -813,7 +817,7 @@ class _DmSheetState extends State<_DmSheet> {
     setState(() => f.loading = true);
     try {
       final result = await widget.room.searchEvents(
-        searchFunc: widget.kind.filter!,
+        searchFunc: widget.kind.filter,
         nextBatch: f.nextBatch,
       );
       final known = f.events.map((e) => e.eventId).toSet();

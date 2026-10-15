@@ -9,7 +9,6 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:matrix/matrix_api_lite/utils/logs.dart';
 import 'package:universal_html/html.dart' as html;
 
-import '../l10n/l10n.dart';
 
 abstract class ForegroundServices {
   static final List<String> runningServices = [];

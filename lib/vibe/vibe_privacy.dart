@@ -89,6 +89,7 @@ class _VibePrivacyTilesState extends State<VibePrivacyTiles> {
       if (!ok || !mounted) return;
     }
     await AppSettings.vibeStatusAudience.setItem(choice);
+    if (!mounted) return;
     setState(() {});
     final messenger = ScaffoldMessenger.of(context);
     await VibeStatus.refresh(client);

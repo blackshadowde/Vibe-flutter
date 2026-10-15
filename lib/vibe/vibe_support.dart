@@ -77,6 +77,7 @@ abstract class VibeSupport {
       // Don't stack on top of another sheet or dialog (update, what's new).
       if (Navigator.of(ctx, rootNavigator: true).canPop()) return;
       await store.setInt(_lastAskKey, now);
+      if (!ctx.mounted) return;
       await showVibeSheet<void>(
         context: ctx,
         useRootNavigator: true,
@@ -202,7 +203,7 @@ class VibeSupportPage extends StatelessWidget {
                 children: [
                   PrettyQrView.data(
                     data: VibeSupport.upiLink,
-                    decoration: PrettyQrDecoration(
+                    decoration: const PrettyQrDecoration(
                       shape: PrettyQrSmoothSymbol(
                         roundFactor: 1,
                         color: Color(0xFF111214),

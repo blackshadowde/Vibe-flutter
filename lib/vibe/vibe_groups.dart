@@ -372,6 +372,7 @@ abstract class VibeGroupEdit {
     try {
       if (action == 'remove') {
         await room.setAvatar(null);
+        if (!context.mounted) return;
         VibeGroups._snack(context, 'Picture removed');
         return;
       }
@@ -595,7 +596,9 @@ abstract class VibeGroupEdit {
       switch (action) {
         case 'admin':
           await room.setPower(u.id, PowerLevel.defaultAdminLevel);
-          VibeGroups._snack(context, '$name is now an admin');
+          if (context.mounted) {
+            VibeGroups._snack(context, '$name is now an admin');
+          }
         case 'mod':
           await room.setPower(u.id, PowerLevel.defaultModeratorLevel);
           if (context.mounted) {
