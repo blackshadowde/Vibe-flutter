@@ -3,6 +3,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 /// Opening the app: the blue 💬 sits still and its three dots hop once,
 /// like someone typing, then it fades away. The app loads underneath the
@@ -11,24 +12,69 @@ class VibeLaunch extends StatefulWidget {
   final Widget child;
   const VibeLaunch({required this.child, super.key});
 
-  static bool _shown = false;
 
   @override
   State<VibeLaunch> createState() => _VibeLaunchState();
 }
 
-class _VibeLaunchState extends State<VibeLaunch> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  late bool _show = !VibeLaunch._shown;
+/// The opening's clock is kept here, outside the widget, so the widget being
+/// rebuilt or remounted while the app starts can't cut it short or skip it.
+abstract class _Launch {
+  static const ms = 1150;
+  static DateTime? start; // when the hop began (null = not yet)
+  static bool over = false;
+  static bool scheduled = false;
+
+  static double get t {
+    final s = start;
+    if (s == null) return 0;
+    return (DateTime.now().difference(s).inMilliseconds / ms).clamp(0.0, 1.0);
+  }
+
+  /// Starts the hop once the heavy first frames are drawn, so it isn't
+  /// played while frames are dropped (you'd only see a still icon).
+  static void schedule() {
+    if (scheduled || over) return;
+    scheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      for (var i = 0; i < 3; i++) {
+        await WidgetsBinding.instance.endOfFrame;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      start = DateTime.now();
+    });
+  }
+
+  static void replay() {
+    start = null;
+    over = false;
+    scheduled = false;
+    schedule();
+  }
+}
+
+class _VibeLaunchState extends State<VibeLaunch>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  late final Ticker _ticker = createTicker(_tick);
   bool _closed = false;
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1150));
-  bool _done = false;
 
   @override
   void initState() {
     super.initState();
-    VibeLaunch._shown = true;
     WidgetsBinding.instance.addObserver(this);
-    if (_show) _play();
+    if (!_Launch.over) {
+      _Launch.schedule();
+      _ticker.start();
+    }
+  }
+
+  void _tick(Duration _) {
+    if (!mounted) return;
+    if (_Launch.t >= 1) {
+      _Launch.over = true;
+      _ticker.stop();
+    }
+    setState(() {});
   }
 
   // Vibe keeps running in the background after you leave it (the engine
@@ -41,66 +87,51 @@ class _VibeLaunchState extends State<VibeLaunch> with SingleTickerProviderStateM
     } else if (state == AppLifecycleState.resumed && _closed) {
       _closed = false;
       if (!mounted) return;
-      _c.reset();
-      setState(() {
-        _show = true;
-        _done = false;
-      });
-      _play();
-    }
-  }
-
-  void _play() {
-    {
-      // The first frames after start are heavy (the chat list builds), so
-      // wait until they're drawn, or the hop plays while frames are dropped
-      // and you'd only see a still icon.
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await WidgetsBinding.instance.endOfFrame;
-        await Future<void>.delayed(const Duration(milliseconds: 250));
-        if (!mounted) return;
-        _c.forward().whenComplete(() {
-          if (mounted) setState(() => _done = true);
-        });
-      });
+      _Launch.replay();
+      if (!_ticker.isActive) _ticker.start();
+      setState(() {});
     }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _c.dispose();
+    _ticker.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_show || _done) return widget.child;
-    final bg = Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1A191E) : Colors.white;
+    final bg = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF1A191E)
+        : Colors.white;
+    final t = _Launch.t;
+    final out = ((t - 0.72) / 0.28).clamp(0.0, 1.0);
+    // The same Stack the whole time: the app underneath is never rebuilt
+    // from scratch when the opening ends.
     return Stack(
       children: [
         widget.child,
-        IgnorePointer(
-          child: AnimatedBuilder(
-            animation: _c,
-            builder: (context, _) {
-              final t = _c.value;
-              final out = ((t - 0.72) / 0.28).clamp(0.0, 1.0);
-              return Opacity(
+        if (!_Launch.over)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Opacity(
                 opacity: 1 - out,
                 child: ColoredBox(
                   color: bg,
                   child: Center(
                     child: Transform.scale(
                       scale: 1 + 0.12 * out,
-                      child: SizedBox.square(dimension: 150, child: CustomPaint(painter: _BubblePainter(t))),
+                      child: SizedBox.square(
+                        dimension: 150,
+                        child: CustomPaint(painter: _BubblePainter(t)),
+                      ),
                     ),
                   ),
                 ),
-              );
-            },
+              ),
+            ),
           ),
-        ),
       ],
     );
   }
