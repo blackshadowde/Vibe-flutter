@@ -16,12 +16,16 @@ const vibeReleaseNotes = <({String version, List<String> items})>[
     version: '3.1',
     items: [
       'Sending shows a pulsing dot (a line runs between two dots while it encrypts), then 1 dot sent, 2 dots delivered, 3 blue dots read',
+      'Questions, menus and settings pages slide up from the bottom and close with a swipe down',
       'Full-screen effects for words like love, miss you, good morning, good night, hug, kiss, congrats, bye, sweet dreams, hi and welcome',
       'Back up chats to Google Drive automatically: Settings, Backups, Back up to Google Drive',
+      'Your profile pane looks like Vibe X: your picture blurred behind it, a floating bar and a smaller thought bubble',
+      'Connecting shows three dots in the chat bar that turn green once you\'re connected',
       'Continue with Google, and your password manager fills in your login',
-      'New messages glide into the chat, and chats open and close with a light tap',
+      'New messages glide into the chat, and chats slide open and closed more smoothly',
       'Bold names in the chat list, unread in white, and a red "read up to here" line',
       'Long messages keep their dots right after the text',
+      'The media pane shows all the photos and videos in the chat',
     ],
   ),
   (
@@ -238,4 +242,50 @@ class _PopInState extends State<_PopIn> with SingleTickerProviderStateMixin {
       );
     },
   );
+}
+
+/// One change in Vibe X's style: a blue dot and the text (any emoji at the
+/// start is dropped), popping in [index] lines after the first.
+class VibeNoteLine extends StatelessWidget {
+  final int index;
+  final String text;
+  const VibeNoteLine({required this.index, required this.text, super.key});
+
+  static final _lead = RegExp(r'^[^\p{L}\p{N}"(]+', unicode: true);
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return _PopIn(
+      index: index,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 7),
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                color: _blurple,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                text.replaceFirst(_lead, ''),
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 20 / 15,
+                  color: cs.onSurface,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

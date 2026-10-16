@@ -258,14 +258,8 @@ class _VibeUpdatesPageState extends State<VibeUpdatesPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (final line in notes)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Text(
-                            line,
-                            style: const TextStyle(fontSize: 15, height: 1.35),
-                          ),
-                        ),
+                      for (final (i, line) in notes.indexed)
+                        VibeNoteLine(index: i, text: line),
                     ],
                   ),
                 ),

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_whats_new.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -574,14 +575,8 @@ class _UpdateSheetState extends State<_UpdateSheet> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                for (final line in r.notes)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Text(
-                      line,
-                      style: const TextStyle(fontSize: 15, height: 1.35),
-                    ),
-                  ),
+                for (final (i, line) in r.notes.indexed)
+                  VibeNoteLine(index: i, text: line),
               ],
               const SizedBox(height: 20),
               action,

@@ -1,11 +1,11 @@
-- 🔔 **Built-in notifications fixed:** "Built-in, no Google" mode now actually delivers notifications (the notification channel had the wrong name format). If you use it, open Vibe once after updating
-- 🚀 **In-app updates:** Vibe now tells you when a new version is out and installs it for you. A red dot on the ⚙ gear means an update is waiting; Settings → Updates shows your version, what's new and a refresh button
-- ❤️ **Support Vibe:** Settings → Support Vibe shows a UPI QR code and UPI ID, with a button to pay from GPay, PhonePe, Paytm or BHIM
-- 💭 **New status look:** your profile shows a round picture with a thought bubble. Tap the bubble to set your status, with a live preview and "Clear at"
-- 🔗 **Link previews:** links show a card with the title, description and picture. Turn it off in Settings → Security & sign-in
-- 💬 **Chat looks more like Discord:** smaller profile pictures, tighter spacing, today's messages show just the time
-- ☀️ **Light mode:** names are dark with a soft shadow, easy to read on white
-- 👇 **Swipe down to close** your profile and other people's profiles
-- ↩️ **Smoother replies:** no more stutter when you send a reply
-- 💭 **Status bubble** sits closer to the profile picture
-- 🧹 Removed the chat wallpaper option from Appearance
+- Sending shows a pulsing dot (a line runs between two dots while it encrypts), then 1 dot sent, 2 dots delivered, 3 blue dots read
+- Questions, menus and settings pages slide up from the bottom and close with a swipe down
+- Full-screen effects for words like love, miss you, good morning, good night, hug, kiss, congrats, bye, sweet dreams, hi and welcome
+- Back up chats to Google Drive automatically: Settings, Backups, Back up to Google Drive
+- Your profile pane looks like Vibe X: your picture blurred behind it, a floating bar and a smaller thought bubble
+- Connecting shows three dots in the chat bar that turn green once you're connected
+- Continue with Google, and your password manager fills in your login
+- New messages glide into the chat, and chats slide open and closed more smoothly
+- Bold names in the chat list, unread in white, and a red "read up to here" line
+- Long messages keep their dots right after the text
+- The media pane shows all the photos and videos in the chat
