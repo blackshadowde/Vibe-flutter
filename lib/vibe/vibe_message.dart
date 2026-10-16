@@ -315,11 +315,11 @@ class _StatusBits extends StatelessWidget {
       ),
       builder: (context, _) {
         final read = _readByOther(event, timeline);
-        return Icon(
-          read ? Icons.done_all : Icons.done,
-          size: 18,
-          color: read ? _readTickColor : dim,
-        );
+        // dots instead of ticks: 1 grey sent, 2 grey delivered (back from
+        // the server), 3 blue read. Grey turns black in light mode.
+        final ink = theme.brightness == Brightness.dark ? dim : const Color(0xFF111214);
+        final count = read ? 3 : (status.isSynced ? 2 : 1);
+        return VibeStatusDots(count: count, color: read ? _readTickColor : ink);
       },
     );
   }
@@ -982,4 +982,36 @@ class _ReplyCurve extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _ReplyCurve old) => old.color != color;
+}
+
+
+/// Message status as small dots; a new dot pops in with a spring.
+class VibeStatusDots extends StatelessWidget {
+  final int count;
+  final Color color;
+  const VibeStatusDots({required this.count, required this.color, super.key});
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 16,
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < 3; i++)
+          AnimatedScale(
+            scale: i < count ? 1 : 0,
+            duration: const Duration(milliseconds: 380),
+            curve: Curves.elasticOut,
+            child: i < count
+                ? Container(
+                    margin: EdgeInsets.only(left: i == 0 ? 0 : 2.5),
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                  )
+                : const SizedBox.shrink(),
+          ),
+      ],
+    ),
+  );
 }
