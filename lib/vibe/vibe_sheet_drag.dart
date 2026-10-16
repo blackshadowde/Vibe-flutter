@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 
 /// Lets a scrollable bottom sheet close with a swipe down. The scroll view
@@ -27,6 +28,7 @@ class _VibeSheetDragCloseState extends State<VibeSheetDragClose> {
       _pull -= n.overscroll;
       if (_pull > 24) {
         _closing = true;
+        VibeHaptics.light();
         Navigator.of(context).maybePop();
       }
     }

@@ -291,7 +291,10 @@ Future<T?> showVibeSheet<T>({
   bool? showDragHandle,
   bool useRootNavigator = false,
   bool useSafeArea = false,
-}) => showModalBottomSheet<T>(
+}) {
+  // a pane rising gets a light tap, as in Vibe X
+  VibeHaptics.light();
+  return showModalBottomSheet<T>(
   context: context,
   builder: (ctx) => RepaintBoundary(child: builder(ctx)),
   backgroundColor: backgroundColor,
@@ -305,3 +308,4 @@ Future<T?> showVibeSheet<T>({
   useRootNavigator: useRootNavigator,
   useSafeArea: useSafeArea,
 );
+}

@@ -385,7 +385,7 @@ class VibeHashRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         color: bold ? cs.onSurface : muted,
-                        fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: bold ? FontWeight.w800 : FontWeight.w700,
                       ),
                     ),
                     if (subtitle != null)

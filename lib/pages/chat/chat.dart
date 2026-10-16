@@ -6,6 +6,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:collection/collection.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -738,6 +739,7 @@ class ChatController extends State<ChatPageWithRoom>
     final proceed = await showTrustUserInRoomDialog(context, room);
     if (!mounted || !proceed) return;
     if (sendController.text.trim().isEmpty) return;
+    VibeHaptics.light();
     _storeInputTimeoutTimer?.cancel();
     final prefs = Matrix.of(context).store;
     prefs.remove('draft_$roomId');

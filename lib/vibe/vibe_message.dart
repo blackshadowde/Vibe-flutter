@@ -281,8 +281,11 @@ class _StatusBits extends StatelessWidget {
         FileSendingStatus.uploading => L10n.of(context).uploading,
       };
       if (event.fileSendingStatus == null) {
-        // Inline, just the word: no spinner, nothing that jumps around.
-        return Text(label, style: TextStyle(fontSize: 12, color: dim));
+        if (offline) return Text(label, style: TextStyle(fontSize: 12, color: dim));
+        // Encrypting: a line runs between two dots; then it folds into one
+        // dot that pulses while the message goes out.
+        final ink = theme.brightness == Brightness.dark ? dim : const Color(0xFF111214);
+        return VibeSendingDots(encrypting: event.room.encrypted, color: ink);
       }
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -630,7 +633,10 @@ class VibeMessage extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Builder(
             builder: (context) {
-              final content = VibeChunks.info(displayEvent) != null
+              // Vibe X's soft shadow under the text in light mode
+              final Widget content = DefaultTextStyle.merge(
+                style: TextStyle(shadows: _nameShadows(theme)),
+                child: VibeChunks.info(displayEvent) != null
                   ? VibeChunkCard(displayEvent)
                   : MessageContent(
                       displayEvent,
@@ -641,7 +647,8 @@ class VibeMessage extends StatelessWidget {
                       timeline: timeline,
                       selected: selected,
                       bigEmojis: bigEmojis,
-                    );
+                    ),
+              );
               // Sent with an effect: play it once as it arrives, and keep a
               // small badge to play it again.
               final effect = VibeEffects.of(event);
@@ -915,8 +922,14 @@ class VibeMessage extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Divider(
-                        color: theme.colorScheme.surfaceContainerHighest,
+                      child: Container(
+                        height: 1.2,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF23F43),
+                          boxShadow: theme.brightness == Brightness.light
+                              ? const [BoxShadow(color: Color(0x40000000), blurRadius: 4, offset: Offset(0, 1))]
+                              : null,
+                        ),
                       ),
                     ),
                     Container(
@@ -936,12 +949,23 @@ class VibeMessage extends StatelessWidget {
                       ),
                       child: Text(
                         L10n.of(context).readUpToHere,
-                        style: TextStyle(fontSize: 11),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFFF23F43),
+                          shadows: _nameShadows(theme),
+                        ),
                       ),
                     ),
                     Expanded(
-                      child: Divider(
-                        color: theme.colorScheme.surfaceContainerHighest,
+                      child: Container(
+                        height: 1.2,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF23F43),
+                          boxShadow: theme.brightness == Brightness.light
+                              ? const [BoxShadow(color: Color(0x40000000), blurRadius: 4, offset: Offset(0, 1))]
+                              : null,
+                        ),
                       ),
                     ),
                   ],
@@ -1014,4 +1038,89 @@ class VibeStatusDots extends StatelessWidget {
       ],
     ),
   );
+}
+
+
+/// While a message goes out: (encrypted rooms) two dots with a line running
+/// between them, which folds into one dot; that dot pulses until it's sent.
+class VibeSendingDots extends StatefulWidget {
+  final bool encrypting;
+  final Color color;
+  const VibeSendingDots({required this.encrypting, required this.color, super.key});
+
+  @override
+  State<VibeSendingDots> createState() => _VibeSendingDotsState();
+}
+
+class _VibeSendingDotsState extends State<VibeSendingDots> with TickerProviderStateMixin {
+  late final AnimationController _run = AnimationController(vsync: this, duration: const Duration(milliseconds: 600))..repeat(reverse: true);
+  // 0 = encrypting (two dots + line), 1 = folded into one pulsing dot
+  late final AnimationController _fold = AnimationController(vsync: this, duration: const Duration(milliseconds: 280), value: widget.encrypting ? 0 : 1);
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.encrypting) {
+      Future<void>.delayed(const Duration(milliseconds: 900), () {
+        if (mounted) _fold.forward();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _run.dispose();
+    _fold.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 22,
+    height: 16,
+    child: AnimatedBuilder(
+      animation: Listenable.merge([_run, _fold]),
+      builder: (context, _) => CustomPaint(painter: _SendingPainter(_run.value, _fold.value, widget.color)),
+    ),
+  );
+}
+
+class _SendingPainter extends CustomPainter {
+  final double t, fold;
+  final Color color;
+  _SendingPainter(this.t, this.fold, this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final y = size.height / 2;
+    const r = 2.5;
+    final left = Offset(r, y);
+    final right = Offset(size.width - r, y);
+    if (fold < 1) {
+      final a = 1 - fold;
+      final p = Paint()..color = color.withValues(alpha: color.a * a);
+      // the second dot slides into the first as it folds
+      canvas.drawCircle(left, r, p);
+      canvas.drawCircle(Offset.lerp(right, left, fold)!, r, p);
+      // a short line running back and forth between them
+      final from = left.dx + r + 1, to = right.dx - r - 1;
+      final head = from + (to - from) * Curves.easeInOut.transform(t);
+      final len = (to - from) * 0.35;
+      canvas.drawLine(
+        Offset((head - len).clamp(from, to), y),
+        Offset(head, y),
+        Paint()
+          ..color = color.withValues(alpha: color.a * a * 0.8)
+          ..strokeWidth = 1.6
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+    if (fold > 0) {
+      final pulse = 0.3 + 0.55 * t;
+      canvas.drawCircle(left, r, Paint()..color = color.withValues(alpha: color.a * pulse * fold));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SendingPainter old) => old.t != t || old.fold != fold || old.color != color;
 }

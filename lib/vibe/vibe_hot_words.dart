@@ -354,6 +354,8 @@ class _ScenePainter extends CustomPainter {
     final ring = _seg(t, 0.34, 0.7);
     if (ring > 0 && ring < 1) {
       c.drawCircle(center, 40 + 160 * ring, _stroke(_a(const Color(0xFFFF4F8B), 0.55 * (1 - ring)), 10 * (1 - ring) + 1));
+      final gr = 180 * ring + 1;
+      c.drawCircle(center, gr, Paint()..shader = RadialGradient(colors: [const Color(0x55FF4F8B), Colors.transparent]).createShader(Rect.fromCircle(center: center, radius: gr)));
     }
     _glyph(c, '💋', 88, pos, alpha: 1 - _seg(t, 0.8, 1), scale: fly < 1 ? 0.6 + 0.5 * fly : 1.6 - 0.6 * _smooth(stamp), deg: fly < 1 ? (1 - fly) * -40 : 0);
     for (var i = 0; i < 12; i++) {
@@ -389,6 +391,8 @@ class _ScenePainter extends CustomPainter {
       c.saveLayer(null, Paint()..color = Color.fromRGBO(0, 0, 0, arms));
       c.drawArc(rect, math.pi, -sweep, false, arm(22, 1));
       c.drawArc(rect, 0, sweep, false, arm(22, 1));
+      c.drawArc(rect, math.pi, sweep * 0.9, false, arm(12, 0.5));
+      c.drawArc(rect, 0, -sweep * 0.9, false, arm(12, 0.5));
       c.restore();
     }
     final face = _seg(t, 0.05, 0.9);
@@ -475,6 +479,7 @@ class _ScenePainter extends CustomPainter {
       c.drawPath(s, _stroke(_a(Colors.white, 0.7), 1.5));
       c.drawOval(Rect.fromLTWH(x - bw / 2, y - bw * 0.62, bw, bw * 1.22), _fill(col));
       c.drawOval(Rect.fromLTWH(x - bw * 0.3, y - bw * 0.48, bw * 0.22, bw * 0.36), _fill(_a(Colors.white, 0.35)));
+      c.drawPath(Path()..moveTo(x - 5, y + bw * 0.66)..lineTo(x + 5, y + bw * 0.66)..lineTo(x, y + bw * 0.56)..close(), _fill(col));
     }
   }
 
@@ -499,6 +504,7 @@ class _ScenePainter extends CustomPainter {
     const mr = 48.0;
     final moon = Path.combine(PathOperation.difference, Path()..addOval(Rect.fromCircle(center: mc, radius: mr)),
         Path()..addOval(Rect.fromCircle(center: Offset(mc.dx + mr * 0.45, mc.dy - mr * 0.25), radius: mr * 0.9)));
+    c.drawCircle(mc, mr * 2.4, Paint()..shader = RadialGradient(colors: [_a(const Color(0x55FFF3B0), night), Colors.transparent]).createShader(Rect.fromCircle(center: mc, radius: mr * 2.4)));
     c.drawPath(moon, _fill(_a(const Color(0xFFFFF3B0), night)));
     for (var i = 0; i < 4; i++) {
       final u = _seg(t, 0.25 + i * 0.12, 0.7 + i * 0.12);
@@ -513,7 +519,9 @@ class _ScenePainter extends CustomPainter {
     final pulse = beat(0.16, 0.12) + beat(0.24, 0.2) + beat(0.42, 0.12) + beat(0.50, 0.22);
     final size = 150 * _backOut(_seg(t, 0, 0.14)) * (1 + pulse) * (1 - _seg(t, 0.62, 0.72));
     if (size > 1) {
+      c.drawCircle(center, size * 1.6, Paint()..shader = RadialGradient(colors: [const Color(0x66FF3B5C), Colors.transparent]).createShader(Rect.fromCircle(center: center, radius: size * 1.6)));
       c.drawPath(_heart(center, size), Paint()..shader = const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFF6B8B), Color(0xFFE91E63)]).createShader(Rect.fromCircle(center: center, radius: size * 0.6)));
+      c.drawPath(_heart(Offset(center.dx - size * 0.16, center.dy - size * 0.12), size * 0.26), _fill(_a(Colors.white, 0.25)));
     }
     for (final at in [0.24, 0.50]) {
       final u = _seg(t, at, at + 0.35);
@@ -532,6 +540,9 @@ class _ScenePainter extends CustomPainter {
 
   void _missYou(Canvas c, double t, math.Random r, double w, double h) {
     final tint = _fadeInOut(t, 0.2, 0.8);
+    c.drawRect(Offset.zero & Size(w, h), Paint()
+      ..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_a(const Color(0x335C7CFA), tint), _a(const Color(0x22A0B4FF), tint), Colors.transparent])
+          .createShader(Offset.zero & Size(w, h)));
     Offset planeAt(double u) {
       final loop = _seg(u, 0.38, 0.62);
       final a = loop * 2 * math.pi;
@@ -554,6 +565,7 @@ class _ScenePainter extends CustomPainter {
       c.rotate(math.atan2(ahead.dy - pos.dy, ahead.dx - pos.dx));
       const s = 22.0;
       c.drawPath(Path()..moveTo(s, 0)..lineTo(-s, -s * 0.7)..lineTo(-s * 0.45, 0)..lineTo(-s, s * 0.7)..close(), _fill(Colors.white));
+      c.drawLine(const Offset(-s * 0.45, 0), const Offset(s, 0), _stroke(const Color(0xFFB0BEC5), 1.5));
       c.restore();
     }
     final drop = _seg(t, 0.55, 0.85);
@@ -561,6 +573,7 @@ class _ScenePainter extends CustomPainter {
     final center = Offset(w / 2, h * 0.48);
     final hp = drop <= 0 ? hang : Offset(hang.dx + (center.dx - hang.dx) * _smooth(drop) + math.sin(drop * 9) * 16 * (1 - drop), hang.dy + (center.dy - hang.dy) * _smooth(drop));
     final beat = 1 + 0.12 * math.sin(_seg(t, 0.85, 0.95) * math.pi);
+    if (drop > 0.9) c.drawCircle(hp, 90, Paint()..shader = RadialGradient(colors: [_a(const Color(0x55FF6B8B), 1 - _seg(t, 0.9, 1)), Colors.transparent]).createShader(Rect.fromCircle(center: hp, radius: 90)));
     if (t > 0.04) c.drawPath(_heart(hp, (drop > 0 ? 30 + 40 * _smooth(drop) : 30) * beat), _fill(_a(const Color(0xFFFF6B8B), 1 - _seg(t, 0.9, 1))));
     final face = _seg(t, 0.82, 1);
     if (face > 0 && face < 1) _glyph(c, '🥺', 46, Offset(center.dx, center.dy + 70), alpha: 1 - _seg(face, 0.7, 1), scale: _backOut(_seg(face, 0, 0.4)));
@@ -574,6 +587,7 @@ class _ScenePainter extends CustomPainter {
     final sun = Offset(w / 2, h * 0.78 - _smooth(_seg(t, 0.02, 0.5)) * h * 0.36);
     const sr = 56.0;
     if (warm > 0) {
+      c.drawCircle(sun, sr * 3.2, Paint()..shader = RadialGradient(colors: [_a(const Color(0x88FFD54F), warm), Colors.transparent]).createShader(Rect.fromCircle(center: sun, radius: sr * 3.2)));
       for (var k = 0; k < 12; k++) {
         final a = k / 12 * 2 * math.pi + t * 70 * math.pi / 180;
         final outer = sr * (1.9 + 0.25 * math.sin(t * 20 + k));

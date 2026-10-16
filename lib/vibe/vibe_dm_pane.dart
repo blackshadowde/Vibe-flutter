@@ -289,10 +289,14 @@ class _DmTile extends StatelessWidget {
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  // bold like Discord's list: brightest and heaviest when unread
                   style: TextStyle(
                     fontWeight: room.isUnread
-                        ? FontWeight.bold
-                        : FontWeight.w600,
+                        ? FontWeight.w800
+                        : FontWeight.w700,
+                    color: room.isUnread
+                        ? Theme.of(context).colorScheme.onSurface
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),

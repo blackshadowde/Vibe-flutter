@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/pages/chat/events/video_player.dart';
 import 'package:fluffychat/pages/image_viewer/image_viewer.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
@@ -196,6 +197,7 @@ class _VibeMediaViewerState extends State<VibeMediaViewer> {
                     controller: _pages,
                     itemCount: widget.events.length,
                     onPageChanged: (i) {
+                      VibeHaptics.selection();
                       setState(() => _index = i);
                       _centerStrip();
                     },
