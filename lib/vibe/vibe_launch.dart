@@ -17,8 +17,9 @@ class VibeLaunch extends StatefulWidget {
   State<VibeLaunch> createState() => _VibeLaunchState();
 }
 
-class _VibeLaunchState extends State<VibeLaunch> with SingleTickerProviderStateMixin {
-  late final bool _show = !VibeLaunch._shown;
+class _VibeLaunchState extends State<VibeLaunch> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  late bool _show = !VibeLaunch._shown;
+  bool _closed = false;
   late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1150));
   bool _done = false;
 
@@ -26,7 +27,31 @@ class _VibeLaunchState extends State<VibeLaunch> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     VibeLaunch._shown = true;
-    if (_show) {
+    WidgetsBinding.instance.addObserver(this);
+    if (_show) _play();
+  }
+
+  // Vibe keeps running in the background after you leave it (the engine
+  // stays), so opening it again only showed Android's still splash: play
+  // the opening again whenever the app's screen was closed and reopened.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      _closed = true;
+    } else if (state == AppLifecycleState.resumed && _closed) {
+      _closed = false;
+      if (!mounted) return;
+      _c.reset();
+      setState(() {
+        _show = true;
+        _done = false;
+      });
+      _play();
+    }
+  }
+
+  void _play() {
+    {
       // The first frames after start are heavy (the chat list builds), so
       // wait until they're drawn, or the hop plays while frames are dropped
       // and you'd only see a still icon.
@@ -43,6 +68,7 @@ class _VibeLaunchState extends State<VibeLaunch> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _c.dispose();
     super.dispose();
   }
