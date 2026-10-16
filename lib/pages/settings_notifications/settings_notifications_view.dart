@@ -118,14 +118,6 @@ class SettingsNotificationsView extends StatelessWidget {
                       Divider(color: theme.dividerColor),
                     ],
 
-                  if (pushService?.firebaseEnabled != true)
-                    ListTile(
-                      title: Text(L10n.of(context).buildDoesNotSupportFirebase),
-                      leading: Icon(
-                        Icons.close,
-                        color: theme.colorScheme.error,
-                      ),
-                    ),
                   if (PlatformInfos.isAndroid)
                     FutureBuilder(
                       future: UnifiedPush.getDistributors(),

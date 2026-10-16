@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:fluffychat/vibe/vibe_backup.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
@@ -266,7 +267,7 @@ class SettingsView extends StatelessWidget {
                         : 'Auto',
                     last: true,
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
+                      VibeSheetPageRoute(
                         builder: (_) =>
                             const VibeSettingsTheme(child: VibeBackupPage()),
                       ),

@@ -12,7 +12,8 @@ import 'package:matrix/matrix.dart';
 /// Vibe privacy: hide online / last seen, and who sees your status and
 /// local time.
 abstract class VibePrivacy {
-  static bool get hidePresence => AppSettings.vibeHidePresence.value;
+  // (the switch is gone: Matrix apps don't show online / last seen reliably)
+  static bool get hidePresence => false;
 
   /// Presence to send with every sync. Hidden = always "offline", so the
   /// server never updates your online dot or last-seen time.
@@ -178,17 +179,6 @@ class _VibePrivacyTilesState extends State<VibePrivacyTiles> {
           ),
           trailing: const Icon(Icons.chevron_right_outlined),
           onTap: _pickAudience,
-        ),
-        SwitchListTile.adaptive(
-          value: VibePrivacy.hidePresence,
-          title: const Text('Hide online and last seen'),
-          subtitle: const Text(
-            'Nobody sees when you\'re online or when you were last active.',
-          ),
-          onChanged: (hide) async {
-            await VibePrivacy.setHidePresence(Matrix.of(context).widget.clients, hide);
-            if (mounted) setState(() {});
-          },
         ),
       ],
     );

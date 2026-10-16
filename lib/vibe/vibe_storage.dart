@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:io';
 
@@ -126,7 +127,7 @@ class VibeStoragePage extends StatefulWidget {
   const VibeStoragePage({super.key});
 
   static Future<void> open(BuildContext context) => Navigator.of(context).push(
-    MaterialPageRoute(
+    VibeSheetPageRoute(
       builder: (_) => const VibeSettingsTheme(child: VibeStoragePage()),
     ),
   );

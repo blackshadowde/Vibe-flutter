@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -28,7 +29,7 @@ abstract class VibeSupport {
   static Future<void> open(BuildContext context) => Navigator.of(
     context,
     rootNavigator: true,
-  ).push(MaterialPageRoute(builder: (_) => const VibeSupportPage()));
+  ).push(VibeSheetPageRoute(builder: (_) => const VibeSupportPage()));
 
   static Future<void> payWithApp(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);

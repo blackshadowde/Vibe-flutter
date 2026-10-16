@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:fluffychat/vibe/vibe_updater.dart';
 import 'package:fluffychat/vibe/vibe_whats_new.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class VibeUpdatesPage extends StatefulWidget {
   static Future<void> open(BuildContext context) => Navigator.of(
     context,
     rootNavigator: true,
-  ).push(MaterialPageRoute(builder: (_) => const VibeUpdatesPage()));
+  ).push(VibeSheetPageRoute(builder: (_) => const VibeUpdatesPage()));
 
   @override
   State<VibeUpdatesPage> createState() => _VibeUpdatesPageState();

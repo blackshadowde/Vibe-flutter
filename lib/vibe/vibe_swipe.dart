@@ -301,31 +301,111 @@ class VibePage<T> extends Page<T> {
   });
 
   @override
-  Route<T> createRoute(BuildContext context) => _VibePageRoute<T>(this);
+  Route<T> createRoute(BuildContext context) => sheet
+      ? _VibeSheetPageRoute<T>(settings: this, builder: (_) => child)
+      : _VibePageRoute<T>(this);
 }
 
 class _VibePageRoute<T> extends PageRoute<T>
     with MaterialRouteTransitionMixin<T> {
   _VibePageRoute(VibePage<T> page) : super(settings: page);
 
-  VibePage<T> get _page => settings as VibePage<T>;
-
   @override
-  Widget buildContent(BuildContext context) =>
-      _page.sheet ? VibeSheetDragClose(child: _page.child) : _page.child;
+  Widget buildContent(BuildContext context) => (settings as VibePage<T>).child;
 
   @override
   bool get maintainState => true;
 
   @override
-  Duration get transitionDuration => _page.sheet
-      ? const Duration(milliseconds: 420)
-      : const Duration(milliseconds: 440);
+  Duration get transitionDuration => const Duration(milliseconds: 440);
 
   @override
-  Duration get reverseTransitionDuration => _page.sheet
-      ? const Duration(milliseconds: 320)
-      : const Duration(milliseconds: 380);
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 380);
+}
+
+/// A settings page as a pane: it rises to half the screen, then on up to
+/// the full page; no back button, a swipe down (following the finger)
+/// closes it. The page underneath stays still.
+class VibeSheetPageRoute<T> extends _VibeSheetPageRoute<T> {
+  VibeSheetPageRoute({required super.builder, super.settings});
+}
+
+class _VibeSheetPageRoute<T> extends PageRoute<T> {
+  final WidgetBuilder builder;
+  _VibeSheetPageRoute({required this.builder, super.settings});
+
+  @override
+  bool get opaque => false;
+
+  @override
+  Color? get barrierColor => const Color(0x66000000);
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  bool get impliesAppBarDismissal => false;
+
+  // the page underneath doesn't move (it used to wiggle)
+  @override
+  bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 620);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 320);
+
+  static final _rise = TweenSequence<double>([
+    TweenSequenceItem(
+      tween: Tween(begin: 1.0, end: 0.5).chain(CurveTween(curve: Curves.easeOutCubic)),
+      weight: 42,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: 0.5, end: 0.0).chain(CurveTween(curve: Curves.easeInOutCubic)),
+      weight: 58,
+    ),
+  ]);
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    final cs = Theme.of(context).colorScheme;
+    return VibeSheetDragClose(
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: Stack(
+          children: [
+            Positioned.fill(child: builder(context)),
+            // the grab handle (it closes by sliding down, no back button)
+            Positioned(
+              top: MediaQuery.paddingOf(context).top + 6,
+              left: 0,
+              right: 0,
+              child: IgnorePointer(
+                child: Center(
+                  child: Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: cs.onSurfaceVariant.withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget buildTransitions(
@@ -333,24 +413,22 @@ class _VibePageRoute<T> extends PageRoute<T>
     Animation<double> animation,
     Animation<double> secondaryAnimation,
     Widget child,
-  ) {
-    if (!_page.sheet) {
-      return super.buildTransitions(
-        context,
-        animation,
-        secondaryAnimation,
-        child,
-      );
-    }
-    return SlideTransition(
-      position: Tween(begin: const Offset(0, 1), end: Offset.zero).animate(
-        CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutQuint,
-          reverseCurve: Curves.easeInCubic,
-        ),
-      ),
-      child: child,
-    );
-  }
+  ) => AnimatedBuilder(
+    animation: animation,
+    child: child,
+    builder: (context, child) {
+      final v = animation.value.clamp(0.0, 1.0);
+      // following a finger: 1:1; opening: half way, then all the way;
+      // closing: straight down
+      final double y;
+      if (navigator?.userGestureInProgress == true) {
+        y = 1 - v;
+      } else if (animation.status == AnimationStatus.reverse) {
+        y = 1 - Curves.easeOutCubic.transform(v);
+      } else {
+        y = _rise.transform(v);
+      }
+      return FractionalTranslation(translation: Offset(0, y), child: child);
+    },
+  );
 }

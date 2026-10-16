@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'dart:async';
 
 import 'package:fluffychat/vibe/vibe_haptics.dart';
@@ -296,7 +297,8 @@ Future<T?> showVibeSheet<T>({
   VibeHaptics.light();
   return showModalBottomSheet<T>(
   context: context,
-  builder: (ctx) => RepaintBoundary(child: builder(ctx)),
+  // every pane closes with a swipe down that follows the finger
+  builder: (ctx) => VibeSheetDragClose(child: RepaintBoundary(child: builder(ctx))),
   backgroundColor: backgroundColor,
   clipBehavior: clipBehavior,
   constraints: constraints,

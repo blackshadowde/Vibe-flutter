@@ -388,12 +388,6 @@ class VibeSettingsRow extends StatelessWidget {
                       ),
                     ),
                   ),
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.chevron_right,
-                  size: 22,
-                  color: VibeSettingsStyle.text2(context),
-                ),
                 const SizedBox(width: 12),
               ],
               ),
