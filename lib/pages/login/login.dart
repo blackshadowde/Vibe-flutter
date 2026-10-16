@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_auto_keys.dart';
 import 'dart:async';
 
 import 'package:fluffychat/l10n/l10n.dart';
@@ -75,6 +76,7 @@ class LoginController extends State<Login> {
         identifier = AuthenticationUserIdentifier(user: username);
       }
       final client = await matrix.getLoginClient();
+      VibeAutoKeys.remember(passwordController.text);
       await client.login(
         LoginType.mLoginPassword,
         identifier: identifier,

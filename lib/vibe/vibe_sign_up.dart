@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:flutter/material.dart';
+import 'package:fluffychat/vibe/vibe_auto_keys.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -159,6 +160,7 @@ mixin VibeSignUpMixin<T extends StatefulWidget> on State<T> {
 
       while (true) {
         _say('Creating account…');
+        VibeAutoKeys.remember(password);
         try {
           await client.register(
             username: username,

@@ -10,9 +10,11 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/sign_in_flows/check_homeserver.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_sign_up.dart';
+import 'package:fluffychat/vibe/vibe_auto_keys.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -100,6 +102,7 @@ class _IntroPageState extends State<IntroPage>
       }
       final client = await Matrix.of(context).getLoginClient();
       await client.checkHomeserver(Uri.parse(_homeserver));
+      VibeAutoKeys.remember(password);
       final AuthenticationIdentifier identifier =
           RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(username)
           ? AuthenticationThirdPartyIdentifier(
@@ -113,14 +116,35 @@ class _IntroPageState extends State<IntroPage>
         password: password,
         initialDeviceDisplayName: PlatformInfos.appDisplayName,
       );
+      TextInput.finishAutofillContext(); // offer to save it in the password manager
       if (mounted) context.go('/backup');
     } on MatrixException catch (e) {
-      if (mounted) setState(() => _error = e.errorMessage);
+      if (mounted) setState(() => _error = _friendly(e));
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (mounted) {
+        setState(
+          () => _error = e.toString().contains('SocketException') ||
+                  e.toString().contains('ClientException')
+              ? 'Can\'t reach the server. Check your internet and try again.'
+              : e.toString(),
+        );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  String _friendly(MatrixException e) => switch (e.errcode) {
+    'M_FORBIDDEN' => 'Wrong username or password',
+    'M_USER_DEACTIVATED' => 'This account was closed',
+    'M_LIMIT_EXCEEDED' => 'Too many tries. Wait a minute, then try again.',
+    _ => e.errorMessage,
+  };
+
+  /// Google (also Apple, GitHub) sign-in through matrix.org's account page.
+  Future<void> _google() async {
+    setState(() => _homeserver = 'https://matrix.org');
+    await _web(signUp: _creating);
   }
 
   Future<void> _web({required bool signUp}) => connectToHomeserverFlow(
@@ -353,8 +377,10 @@ class _IntroPageState extends State<IntroPage>
       TextInputAction action = TextInputAction.next,
       ValueChanged<String>? onSubmitted,
       Widget? suffix,
+      Iterable<String>? hints,
     }) => TextField(
       controller: c,
+      autofillHints: hints,
       enabled: enabled,
       obscureText: obscure,
       autocorrect: false,
@@ -417,7 +443,8 @@ class _IntroPageState extends State<IntroPage>
     final error = _creating ? suError : _error;
     final busy = _creating ? suBusy : _busy;
 
-    return Scaffold(
+    return AutofillGroup(
+      child: Scaffold(
       backgroundColor: bg,
       body: SafeArea(
         child: Center(
@@ -502,11 +529,12 @@ class _IntroPageState extends State<IntroPage>
                 const SizedBox(height: 10),
                 if (_creating) ...[
                   label('Username'),
-                  field0(suUser, 'Pick a username', enabled: !suBusy),
+                  field0(suUser, 'Pick a username', enabled: !suBusy, hints: const [AutofillHints.newUsername]),
                   label('Password'),
                   field0(
                     suPass,
                     'At least 8 characters',
+                    hints: const [AutofillHints.newPassword],
                     obscure: !suShowPass,
                     enabled: !suBusy,
                     suffix: eye(
@@ -525,6 +553,7 @@ class _IntroPageState extends State<IntroPage>
                   field0(
                     suEmail,
                     'you@example.com',
+                    hints: const [AutofillHints.email],
                     enabled: !suBusy,
                     keyboard: TextInputType.emailAddress,
                     action: TextInputAction.done,
@@ -542,6 +571,7 @@ class _IntroPageState extends State<IntroPage>
                   field0(
                     _user,
                     'username or @you:server',
+                    hints: const [AutofillHints.username],
                     enabled: !_busy,
                     keyboard: TextInputType.emailAddress,
                   ),
@@ -565,6 +595,7 @@ class _IntroPageState extends State<IntroPage>
                   field0(
                     _pass,
                     'Your password',
+                    hints: const [AutofillHints.password],
                     obscure: !_showPass,
                     enabled: !_busy,
                     action: TextInputAction.done,
@@ -596,6 +627,35 @@ class _IntroPageState extends State<IntroPage>
                     _busy ? null : _signIn,
                     busy: _busy ? 'Logging in…' : null,
                   ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 50,
+                  child: OutlinedButton.icon(
+                    onPressed: busy ? null : _google,
+                    icon: const Text(
+                      'G',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF4285F4),
+                      ),
+                    ),
+                    label: Text(
+                      'Continue with Google',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: text,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: muted.withValues(alpha: 0.4)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
                 if (!_creating)
                   Center(
                     child: TextButton(
@@ -664,6 +724,7 @@ class _IntroPageState extends State<IntroPage>
           ),
         ),
       ),
+    ),
     );
   }
 }
