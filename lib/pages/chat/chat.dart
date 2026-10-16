@@ -416,6 +416,8 @@ class ChatController extends State<ChatPageWithRoom>
 
   @override
   void initState() {
+    // the chat sliding in gets a light tap (and sliding out, in dispose)
+    VibeHaptics.light();
     inputFocus = FocusNode(onKeyEvent: _customEnterKeyHandling);
     Future<void>.delayed(const Duration(milliseconds: 380), () {
       if (mounted) setState(() => routeSettled = true);
@@ -690,6 +692,7 @@ class ChatController extends State<ChatPageWithRoom>
 
   @override
   void dispose() {
+    VibeHaptics.light();
     timeline?.cancelSubscriptions();
     timeline = null;
     _storeInputTimeoutTimer?.cancel();

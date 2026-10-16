@@ -15,8 +15,6 @@ import 'package:go_router/go_router.dart';
 import 'package:matrix/encryption.dart';
 import 'package:matrix/matrix.dart';
 
-import 'package:fluffychat/vibe/vibe_auto_keys.dart';
-
 import 'bootstrap_state.dart';
 
 class BootstrapViewModel extends ValueNotifier<BootstrapViewModelState> {
@@ -69,8 +67,6 @@ class BootstrapViewModel extends ValueNotifier<BootstrapViewModelState> {
   }
 
   Future<void> _init() async {
-    // Vibe: just logged in or signed up: the backup sets itself up / unlocks with the password
-    if (!reset) await VibeAutoKeys.run(client);
     final state = value.cryptoIdentityState = await client
         .getCryptoIdentityState();
     newPassphraseController.addListener(_checkCanCreatePassphrase);

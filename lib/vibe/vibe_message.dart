@@ -636,6 +636,8 @@ class VibeMessage extends StatelessWidget {
               // Vibe X's soft shadow under the text in light mode
               final Widget content = DefaultTextStyle.merge(
                 style: TextStyle(shadows: _nameShadows(theme)),
+                // a long message is only as wide as its longest line, so the dots sit right after it
+                textWidthBasis: TextWidthBasis.longestLine,
                 child: VibeChunks.info(displayEvent) != null
                   ? VibeChunkCard(displayEvent)
                   : MessageContent(

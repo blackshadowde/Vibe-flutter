@@ -36,14 +36,15 @@ class _VibeEntranceState extends State<VibeEntrance>
     if (!widget.animate) return;
     final c = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 460),
+      duration: const Duration(milliseconds: 420),
     );
     _c = c;
     _size = CurvedAnimation(
       parent: c,
-      curve: const Interval(0.0, 0.8, curve: Curves.easeOutCubic),
+      curve: const Interval(0.0, 0.85, curve: Curves.easeOutCubic),
     );
-    _pop = CurvedAnimation(parent: c, curve: Curves.easeOutBack);
+    // glides up out of the typing box and settles, no bounce (like Vibe X)
+    _pop = CurvedAnimation(parent: c, curve: Curves.easeOutCubic);
     _fade = CurvedAnimation(
       parent: c,
       curve: const Interval(0.0, 0.55, curve: Curves.easeOut),
@@ -98,9 +99,9 @@ class _Pop extends AnimatedWidget {
   Widget build(BuildContext context) {
     final p = (listenable as Animation<double>).value;
     return Transform.translate(
-      offset: Offset(0, (1 - p) * 38),
+      offset: Offset(0, (1 - p) * 26),
       child: Transform.scale(
-        scale: 0.86 + 0.14 * p,
+        scale: 0.96 + 0.04 * p,
         alignment: alignment,
         child: child,
       ),

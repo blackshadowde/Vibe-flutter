@@ -14,6 +14,7 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun onResume() {
         super.onResume()
+        current = this
         requestHighRefreshRate()
     }
 
@@ -41,6 +42,34 @@ class MainActivity : FlutterFragmentActivity() {
         }
     }
 
+    override fun onDestroy() {
+        if (current === this) current = null
+        super.onDestroy()
+    }
+
+    /** Android's "save to" picker (Google Drive, OneDrive, phone) for the backup file. */
+    fun pickBackupPlace(name: String) {
+        try {
+            val i = android.content.Intent(android.content.Intent.ACTION_CREATE_DOCUMENT)
+                .addCategory(android.content.Intent.CATEGORY_OPENABLE)
+                .setType("application/octet-stream")
+                .putExtra(android.content.Intent.EXTRA_TITLE, name)
+            @Suppress("DEPRECATION")
+            startActivityForResult(i, PICK_BACKUP)
+        } catch (_: Throwable) {
+            VibeBackupNative.picked(this, null)
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_BACKUP) {
+            VibeBackupNative.picked(this, if (resultCode == RESULT_OK) data?.data else null)
+        }
+    }
+
     override fun provideFlutterEngine(context: Context): FlutterEngine? {
         return provideEngine(this)
     }
@@ -50,6 +79,8 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     companion object {
+        private const val PICK_BACKUP = 4711
+        var current: MainActivity? = null
         var engine: FlutterEngine? = null
         fun provideEngine(context: Context): FlutterEngine {
             engine?.let { return it }

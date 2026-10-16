@@ -40,6 +40,18 @@ object VibeBackupNative {
         val main = Handler(Looper.getMainLooper())
         MethodChannel(engine.dartExecutor.binaryMessenger, CHANNEL)
             .setMethodCallHandler { call, result ->
+                // Google Drive (or any app's) backup file, picked once with Android's "save to" picker
+                if (call.method == "pickCloud") {
+                    val act = MainActivity.current
+                    if (act == null) {
+                        result.error("failed", "Open Vibe first", null)
+                    } else {
+                        pending?.success(null)
+                        pending = result
+                        act.pickBackupPlace(call.argument<String>("name") ?: "vibe-backup.vibebackup")
+                    }
+                    return@setMethodCallHandler
+                }
                 // PBKDF2 and file work take a moment: never on the UI thread.
                 Thread {
                     try {
@@ -59,6 +71,18 @@ object VibeBackupNative {
                                 call.argument<String>("keepPrefix"),
                                 call.argument<Int>("keep") ?: 0,
                             )
+                            "saveCloud" -> {
+                                val u = android.net.Uri.parse(call.argument<String>("uri")!!)
+                                val data = call.argument<ByteArray>("data")!!
+                                val cr = app.contentResolver
+                                // "wt" empties the old backup first; some providers only know "w"
+                                val out = runCatching { cr.openOutputStream(u, "wt") }.getOrNull()
+                                    ?: cr.openOutputStream(u, "w")
+                                    ?: throw IllegalStateException("The backup file can't be opened. Choose where to keep it again.")
+                                out.use { it.write(data) }
+                                cloudName(app, u) ?: "Google Drive"
+                            }
+                            "cloudName" -> cloudName(app, android.net.Uri.parse(call.argument<String>("uri")!!))
                             else -> {
                                 main.post { result.notImplemented() }
                                 return@Thread
@@ -74,6 +98,38 @@ object VibeBackupNative {
                     }
                 }.start()
             }
+    }
+
+    var pending: MethodChannel.Result? = null
+
+    /** The picked place (kept across restarts), or null if cancelled. */
+    fun picked(context: Context, uri: android.net.Uri?) {
+        val r = pending ?: return
+        pending = null
+        if (uri == null) return r.success(null)
+        try {
+            context.contentResolver.takePersistableUriPermission(
+                uri,
+                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+            )
+        } catch (_: Throwable) {
+        }
+        r.success(uri.toString())
+    }
+
+    /** "Google Drive · vibe-backup.vibebackup", or null if the file is gone. */
+    private fun cloudName(context: Context, u: android.net.Uri): String? {
+        val name = context.contentResolver.query(u, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+            if (c.moveToFirst()) c.getString(0) else null
+        } ?: return null
+        val a = u.authority ?: ""
+        val where = when {
+            a.contains("com.google.android.apps.docs") -> "Google Drive"
+            a.contains("onedrive") || a.contains("skydrive") -> "OneDrive"
+            a.contains("dropbox") -> "Dropbox"
+            else -> "This phone"
+        }
+        return "$where · $name"
     }
 
     private class WrongPassword : Exception()

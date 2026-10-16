@@ -21,7 +21,11 @@ enum VibeScene {
   goodMorning(3.4), // good morning: the sun rises, birds fly by
   thanks(3.0), // thank you: a flower blooms around 🙏, petals drift down
   sorry(3.4), // sorry: a cloud rains a little, then a rainbow
-  wow(2.4); // wow / omg: a comic burst with speed lines behind "WOW!"
+  wow(2.4), // wow / omg: a comic burst with speed lines behind "WOW!"
+  sweetDreams(3.6), // sweet dreams: a soft dusk, a moon on a cloud, hearts and stars float up
+  welcome(3.2), // welcome: golden rays, a ribbon with "WELCOME", stars fall
+  bye(2.8), // bye: a big hand waves goodbye and floats away
+  hi(2.6); // hi / hello / namaste: a hand waves in, ripples and a "Hi!" bubble
 
   const VibeScene(this.seconds);
   final double seconds;
@@ -34,6 +38,7 @@ abstract class VibeHotWords {
     (VibeScene.birthday, _r(r'happy\s*b(irth)?day|\bhbd\b|🎂|janmadin|जन्मदिन|పుట్టినరోజు')),
     (VibeScene.congrats, _r(r'congrat|\bcongo\b|badhai|बधाई|అభినందన')),
     (VibeScene.goodMorning, _r(r'good\s*m(o|or)ning|\bgud\s*m(o|or)?n(i|n)?ng\b|\bgm\b|suprabhat|सुप्रभात|శుభోదయం|🌅')),
+    (VibeScene.sweetDreams, _r(r'sweet\s*dreams?|\bswt\s*drms?\b|मीठे\s*सपने')),
     (VibeScene.goodNight, _r(r'good\s*night|\bgud\s*n(i|y)te?\b|\bgn8\b|shubh\s*ratri|शुभ\s*रात्रि|శుభ\s*రాత్రి|😴|🌙')),
     (VibeScene.missYou, _r(r'\bmiss(ed|ing)?\s*(you|u|ya)\b|🥺')),
     (VibeScene.love, _r(r'\bi\s*love\s*(you|u)\b|\blove\s*(you|u)\b|\bily\b|\bluv\s*(you|u)\b|❤️❤️|💖|💗')),
@@ -43,6 +48,9 @@ abstract class VibeHotWords {
     (VibeScene.thanks, _r(r'\bthank(s|\s*you|\s*u|q)\b|\bthanx\b|\bthx\b|\bty\b|dhanyavaa?d|धन्यवाद|ధన్యవాదాలు|🙏')),
     (VibeScene.sorry, _r(r'\bsorry\b|\bsry\b|\bmy\s*bad\b|\bmaaf\b|माफ़|క్షమించు')),
     (VibeScene.wow, _r(r'\bwo+w+\b|\bomg\b|\bwh?oa+h?\b|😮|🤯|😱')),
+    (VibeScene.welcome, _r(r"(?<!you'?re\s)(?<!your\s)(?<!ur\s)\bwelcome\b|\bswagat|स्वागत|స్వాగతం")),
+    (VibeScene.bye, _r(r'\b(good\s*)?by+e+\b|\bbye\s*bye\b|\bta\s*ta\b|\bcya\b|\bsee\s*(you|ya|u)\b|अलविदा')),
+    (VibeScene.hi, _r(r'^\s*(hi+|hel+o+|hey+|hai+|namaste|namaskar|नमस्ते|నమస్తే|👋)(\s|[!.,]|$)')),
     (VibeScene.laugh, _r(r'\b(ha){3,}h?\b|\b(he){3,}\b|\blo+l+\b|\blmf?a+o+\b|\brofl\b|😂|🤣')),
   ];
 
@@ -161,6 +169,18 @@ class _ScenePlayerState extends State<_ScenePlayer> with SingleTickerProviderSta
       case VibeScene.missYou:
         await wait(1700);
         VibeHaptics.medium();
+      case VibeScene.bye:
+      case VibeScene.hi:
+        for (var i = 0; i < 3; i++) {
+          await wait(i == 0 ? 300 : 260);
+          VibeHaptics.light();
+        }
+      case VibeScene.sweetDreams:
+        await wait(500);
+        VibeHaptics.light();
+      case VibeScene.welcome:
+        await wait(350);
+        VibeHaptics.medium();
       default:
         VibeHaptics.medium();
     }
@@ -272,6 +292,14 @@ class _ScenePainter extends CustomPainter {
         _sorry(canvas, t, r, w, h);
       case VibeScene.wow:
         _wow(canvas, t, r, w, h);
+      case VibeScene.sweetDreams:
+        _sweetDreams(canvas, t, r, w, h);
+      case VibeScene.welcome:
+        _welcome(canvas, t, r, w, h);
+      case VibeScene.bye:
+        _wave(canvas, t, r, w, h, bye: true);
+      case VibeScene.hi:
+        _wave(canvas, t, r, w, h, bye: false);
     }
   }
 
@@ -510,6 +538,142 @@ class _ScenePainter extends CustomPainter {
       final u = _seg(t, 0.25 + i * 0.12, 0.7 + i * 0.12);
       if (u <= 0 || u >= 1) continue;
       _glyph(c, i.isEven ? 'Z' : 'z', 26.0 + i * 6, Offset(mc.dx - mr * 0.8 - u * 60 + math.sin(u * 6) * 10, mc.dy + mr - u * 110), alpha: math.sin(u * math.pi) * night, deg: -12, bold: true);
+    }
+  }
+
+  void _sweetDreams(Canvas c, double t, math.Random r, double w, double h) {
+    final dusk = _fadeInOut(t, 0.16, 0.82);
+    c.drawRect(Offset.zero & Size(w, h), Paint()
+      ..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_a(const Color(0xFF2A1B4D), 0.72 * dusk), _a(const Color(0xFF6B3F8F), 0.35 * dusk), Colors.transparent])
+          .createShader(Offset.zero & Size(w, h)));
+    // moon resting on a cloud, rocking gently
+    final mc = Offset(w * 0.5, h * 0.3 - 24 * _smooth(_seg(t, 0.05, 0.4)) + math.sin(t * 9) * 4);
+    const mr = 44.0;
+    c.drawCircle(mc, mr * 2.6, Paint()..shader = RadialGradient(colors: [_a(const Color(0x55FFE3F1), dusk), Colors.transparent]).createShader(Rect.fromCircle(center: mc, radius: mr * 2.6)));
+    final moon = Path.combine(PathOperation.difference, Path()..addOval(Rect.fromCircle(center: mc, radius: mr)),
+        Path()..addOval(Rect.fromCircle(center: Offset(mc.dx + mr * 0.45, mc.dy - mr * 0.25), radius: mr * 0.9)));
+    c.drawPath(moon, _fill(_a(const Color(0xFFFFF1C9), dusk)));
+    final cloud = _fill(_a(const Color(0xFFF3E8FF), 0.95 * dusk));
+    for (final (dx, dy, rr) in [(-38.0, 0.0, 26.0), (-6.0, -12.0, 32.0), (30.0, -2.0, 26.0), (56.0, 8.0, 18.0), (-60.0, 10.0, 18.0)]) {
+      c.drawCircle(Offset(mc.dx + dx, mc.dy + mr * 0.9 + dy), rr, cloud);
+    }
+    c.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(mc.dx - 78, mc.dy + mr * 0.9, 156, 26), const Radius.circular(13)), cloud);
+    // little hearts and stars drift up slowly
+    for (var i = 0; i < 16; i++) {
+      final x = w * (0.08 + r.nextDouble() * 0.84);
+      final st = 0.1 + r.nextDouble() * 0.45;
+      final u = _seg(t, st, st + 0.45);
+      final s = 10 + r.nextDouble() * 12;
+      if (u <= 0 || u >= 1) continue;
+      final at = Offset(x + math.sin(u * 7 + i) * 16, h * (0.95 - u * 0.6));
+      final a = math.sin(u * math.pi) * dusk;
+      if (i.isEven) {
+        c.drawPath(_heart(at, s), _fill(_a(const Color(0xFFFF9CC7), a)));
+      } else {
+        c.drawPath(_sparkle(at, s * 0.7), _fill(_a(const Color(0xFFFFF3B0), a)));
+      }
+    }
+    final txt = _seg(t, 0.22, 0.4);
+    if (txt > 0) _glyph(c, 'Sweet dreams', 34, Offset(w / 2, h * 0.56), alpha: txt * (1 - _seg(t, 0.8, 0.95)), scale: 0.9 + 0.1 * _smooth(txt), bold: true, color: const Color(0xFFFFE3F1));
+  }
+
+  void _welcome(Canvas c, double t, math.Random r, double w, double h) {
+    final glow = _fadeInOut(t, 0.12, 0.8);
+    final center = Offset(w / 2, h * 0.42);
+    // golden rays turning slowly behind the ribbon
+    c.save();
+    c.translate(center.dx, center.dy);
+    c.rotate(t * 0.8);
+    for (var i = 0; i < 12; i++) {
+      final a = i * math.pi / 6;
+      final p = Path()
+        ..moveTo(0, 0)
+        ..lineTo(math.cos(a - 0.09) * h, math.sin(a - 0.09) * h)
+        ..lineTo(math.cos(a + 0.09) * h, math.sin(a + 0.09) * h)
+        ..close();
+      c.drawPath(p, _fill(_a(const Color(0xFFFFD54F), 0.16 * glow)));
+    }
+    c.restore();
+    c.drawCircle(center, 160, Paint()..shader = RadialGradient(colors: [_a(const Color(0x88FFE082), glow), Colors.transparent]).createShader(Rect.fromCircle(center: center, radius: 160)));
+    // the ribbon unrolls from the middle
+    final open = _smooth(_seg(t, 0.08, 0.32)) * (1 - _seg(t, 0.84, 0.96));
+    if (open > 0) {
+      final rw = (w * 0.82) * open, rh = 64.0;
+      final rect = Rect.fromCenter(center: center, width: rw, height: rh);
+      for (final side in [-1.0, 1.0]) {
+        final ex = center.dx + side * rw / 2;
+        c.drawPath(Path()
+          ..moveTo(ex, center.dy - rh * 0.3)
+          ..lineTo(ex + side * 34, center.dy - rh * 0.3)
+          ..lineTo(ex + side * 22, center.dy + rh * 0.2)
+          ..lineTo(ex + side * 34, center.dy + rh * 0.7)
+          ..lineTo(ex, center.dy + rh * 0.7)
+          ..close(), _fill(_a(const Color(0xFFC62828), open)));
+      }
+      c.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(6)), Paint()
+        ..shader = const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFF5252), Color(0xFFD32F2F)]).createShader(rect));
+      c.drawRect(Rect.fromLTWH(rect.left, rect.top + 6, rect.width, 2), _fill(_a(const Color(0xFFFFD54F), 0.8)));
+      c.drawRect(Rect.fromLTWH(rect.left, rect.bottom - 8, rect.width, 2), _fill(_a(const Color(0xFFFFD54F), 0.8)));
+      final tx = _seg(t, 0.24, 0.38);
+      if (tx > 0) _glyph(c, 'WELCOME', 34, center, alpha: tx * open, scale: _backOut(tx), bold: true, color: Colors.white);
+    }
+    // gold stars fall
+    for (var i = 0; i < 22; i++) {
+      final x = w * r.nextDouble();
+      final st = 0.2 + r.nextDouble() * 0.4;
+      final u = _seg(t, st, st + 0.4);
+      if (u <= 0 || u >= 1) continue;
+      c.drawPath(_sparkle(Offset(x + math.sin(u * 8 + i) * 12, -20 + u * h * 0.9), 6 + r.nextDouble() * 6), _fill(_a(i % 3 == 0 ? Colors.white : const Color(0xFFFFD54F), 1 - u)));
+    }
+  }
+
+  /// bye: the hand waves in the middle and floats up and away;
+  /// hi: it rises from the bottom, waves, ripples and a "Hi!" bubble pops.
+  void _wave(Canvas c, double t, math.Random r, double w, double h, {required bool bye}) {
+    final inU = _seg(t, 0, 0.18);
+    final outU = _seg(t, 0.72, 0.95);
+    final base = bye ? Offset(w / 2, h * 0.45) : Offset(w * 0.38, h * 0.52);
+    final rise = bye ? -h * 0.35 * _smooth(outU) : h * 0.4 * (1 - _smooth(inU));
+    final at = Offset(base.dx, base.dy + rise);
+    final waving = _seg(t, 0.12, 0.72);
+    final deg = math.sin(waving * math.pi * 6) * 22 * (1 - _seg(t, 0.62, 0.72));
+    final alpha = (bye ? 1 - outU : 1 - _seg(t, 0.82, 0.97)) * _seg(t, 0, 0.1);
+    // ripples from the hand
+    for (var i = 0; i < 3; i++) {
+      final u = _seg(t, 0.16 + i * 0.14, 0.56 + i * 0.14);
+      if (u <= 0 || u >= 1) continue;
+      c.drawCircle(at, 50 + u * 130, _stroke(_a(bye ? const Color(0xFFB39DDB) : const Color(0xFF8C96F6), 0.6 * (1 - u)), 4 * (1 - u) + 1));
+    }
+    c.drawCircle(at, 110, Paint()..shader = RadialGradient(colors: [_a(const Color(0x55FFD54F), alpha), Colors.transparent]).createShader(Rect.fromCircle(center: at, radius: 110)));
+    _glyph(c, '👋', 110, at, alpha: alpha, scale: _backOut(inU), deg: deg);
+    if (bye) {
+      final tx = _seg(t, 0.2, 0.36);
+      if (tx > 0) _glyph(c, 'Bye!', 40, Offset(w / 2, h * 0.45 + 110 + rise * 0.6), alpha: tx * (1 - outU), scale: _backOut(tx), bold: true);
+      // little sparkles trail behind as it floats away
+      for (var i = 0; i < 10; i++) {
+        final u = _seg(t, 0.7 + i * 0.015, 1);
+        if (u <= 0 || u >= 1) continue;
+        c.drawPath(_sparkle(Offset(at.dx + (r.nextDouble() - 0.5) * 120, at.dy + 60 + u * 90), 5 + r.nextDouble() * 5), _fill(_a(Colors.white, 1 - u)));
+      }
+    } else {
+      final pop = _seg(t, 0.26, 0.4);
+      if (pop > 0) {
+        final s = _backOut(pop) * (1 - _seg(t, 0.84, 0.97));
+        final bc = Offset(at.dx + 110, at.dy - 90);
+        c.save();
+        c.translate(bc.dx, bc.dy);
+        c.scale(s);
+        final rect = Rect.fromCenter(center: Offset.zero, width: 120, height: 70);
+        final bubble = Path()
+          ..addRRect(RRect.fromRectAndRadius(rect, const Radius.circular(35)))
+          ..moveTo(-40, 26)
+          ..lineTo(-62, 52)
+          ..lineTo(-14, 32)
+          ..close();
+        c.drawPath(bubble, _fill(const Color(0xFF5865F2)));
+        c.restore();
+        if (s > 0.05) _glyph(c, 'Hi!', 34, bc, scale: s, bold: true);
+      }
     }
   }
 

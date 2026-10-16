@@ -66,7 +66,7 @@ class _VibeUpdatesPageState extends State<VibeUpdatesPage> {
   List<String> _currentNotes() {
     final short = _version.split('.').take(2).join('.');
     final n = vibeReleaseNotes.where((e) => e.version == short).firstOrNull;
-    return n == null ? const [] : n.items.map((i) => '${i.$1}  ${i.$2}').toList();
+    return n == null ? const [] : n.items.toList();
   }
 
   @override

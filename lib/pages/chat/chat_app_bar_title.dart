@@ -9,6 +9,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/sync_status_localization.dart';
+import 'package:fluffychat/vibe/vibe_connection.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
 import 'package:fluffychat/vibe/vibe_user_sheet.dart';
@@ -98,30 +99,15 @@ class ChatAppBarTitle extends StatelessWidget {
                         !(room.client.onSync.value != null &&
                             status.status != SyncStatus.error &&
                             room.client.prevBatch != null);
-                    if (!syncing) {
-                      // connected: their local time, in the same spot
-                      return dmUser != null &&
+                    // connecting: •-•-• with a running light; connected:
+                    // the dots turn green, then their local time comes back
+                    return VibeConnectBar(
+                      syncing: syncing,
+                      label: status.calcLocalizedString(context),
+                      idle: dmUser != null &&
                               AppSettings.vibeStatusBubble.value
                           ? VibeTheirTime(room: room, userId: dmUser)
-                          : const SizedBox.shrink();
-                    }
-                    return Row(
-                      children: [
-                        SizedBox.square(
-                          dimension: 10,
-                          child: CircularProgressIndicator.adaptive(
-                            strokeWidth: 1,
-                            value: status.progress,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            status.calcLocalizedString(context),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ],
+                          : const SizedBox.shrink(),
                     );
                   },
                 ),

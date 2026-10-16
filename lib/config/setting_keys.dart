@@ -107,6 +107,8 @@ enum AppSettings<T> {
   vibeAutoBackup<String>('chat.vibe.auto_backup', 'off'),
   vibeLastAutoBackup<int>('chat.vibe.last_auto_backup', 0),
   vibeAutoBackupResult<String>('chat.vibe.auto_backup_result', ''),
+  // Where automatic backups go when picked (Google Drive file), '' = this phone
+  vibeBackupCloudUri<String>('chat.vibe.backup_cloud_uri', ''),
   vibeNtfyTopic<String>('chat.vibe.ntfy_topic', ''),
   vibeNtfyLastId<String>('chat.vibe.ntfy_last_id', ''),
   // Days to keep downloaded media on this phone. 0 = forever.

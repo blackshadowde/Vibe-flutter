@@ -747,7 +747,15 @@ class _DmSheetState extends State<_DmSheet> {
     }
     f.loading = false;
     if (mounted) setState(() {});
+    // A page of history can hold few or no photos, and a short grid can't be
+    // scrolled to ask for more: keep going back through the chat's history
+    // on the server until the pane is filled (or the chat's start is reached).
+    if (mounted && !f.end && f.events.length < 60 && _autoPages++ < 40) {
+      await _more();
+    }
   }
+
+  int _autoPages = 0;
 
   Future<void> _loadIds() async {
     _ids = VibeStarred.ids(widget.room.id).toList();

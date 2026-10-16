@@ -131,6 +131,22 @@ abstract class VibeBackup {
     return where ?? 'Downloads';
   }
 
+  /// Picks the Google Drive (or other) file automatic backups go to; null if cancelled.
+  static Future<String?> pickCloud() =>
+      _ch.invokeMethod<String>('pickCloud', {'name': 'vibe-backup.vibebackup'});
+
+  static Future<String?> cloudName(String uri) async {
+    try {
+      return await _ch.invokeMethod<String>('cloudName', {'uri': uri});
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<String> _saveToCloud(String uri, Uint8List bytes) async =>
+      await _ch.invokeMethod<String>('saveCloud', {'uri': uri, 'data': bytes}) ??
+      'Google Drive';
+
   static Future<String?> savedPassword() =>
       const FlutterSecureStorage().read(key: _pwKey);
 
@@ -164,11 +180,15 @@ abstract class VibeBackup {
       final data = await collect(client);
       final bytes = await _seal(data, pw);
       final now = DateTime.now();
-      final where = await _saveToPhone(
-        '$_autoPrefix${_stamp(now, time: false)}.vibebackup',
-        bytes,
-        auto: true,
-      );
+      final cloud = AppSettings.vibeBackupCloudUri.value;
+      // Google Drive: the one backup file there is replaced, like WhatsApp
+      final where = cloud.isNotEmpty
+          ? await _saveToCloud(cloud, bytes)
+          : await _saveToPhone(
+              '$_autoPrefix${_stamp(now, time: false)}.vibebackup',
+              bytes,
+              auto: true,
+            );
       await AppSettings.vibeLastAutoBackup.setItem(now.millisecondsSinceEpoch);
       await AppSettings.vibeAutoBackupResult.setItem(
         'Last backup ${_stamp(now)} · $where',
@@ -239,6 +259,44 @@ class _VibeBackupPageState extends State<VibeBackupPage> {
   void _say(String text) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  String? _cloud;
+
+  @override
+  void initState() {
+    super.initState();
+    final u = AppSettings.vibeBackupCloudUri.value;
+    if (u.isNotEmpty) {
+      VibeBackup.cloudName(u).then((n) {
+        if (mounted) setState(() => _cloud = n ?? 'Google Drive');
+      });
+    }
+  }
+
+  /// Once: pick the file in Google Drive; automatic backups replace it from then on.
+  Future<void> _pickCloud() async {
+    String? uri;
+    try {
+      uri = await VibeBackup.pickCloud();
+    } catch (e) {
+      _say('$e');
+      return;
+    }
+    if (uri == null || !mounted) return;
+    await AppSettings.vibeBackupCloudUri.setItem(uri);
+    final n = await VibeBackup.cloudName(uri);
+    if (!mounted) return;
+    setState(() => _cloud = n ?? 'Google Drive');
+    if (AppSettings.vibeAutoBackup.value == 'off') {
+      _say('Now turn on "Back up automatically" to keep it up to date');
+    } else {
+      // back up right away so Drive has a copy now
+      await AppSettings.vibeLastAutoBackup.setItem(0);
+      if (!mounted) return;
+      VibeBackup.maybeAuto(Matrix.of(context).client);
+      _say('Backing up to Google Drive…');
+    }
   }
 
   Future<void> _backupNow() async {
@@ -436,6 +494,24 @@ class _VibeBackupPageState extends State<VibeBackupPage> {
                   }),
                   trailing: const Icon(Icons.chevron_right_outlined),
                   onTap: _pickAuto,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.add_to_drive),
+                  title: const Text('Back up to Google Drive'),
+                  subtitle: Text(
+                    _cloud ?? 'Off · automatic backups stay on this phone',
+                  ),
+                  trailing: _cloud == null
+                      ? const Icon(Icons.chevron_right_outlined)
+                      : IconButton(
+                          tooltip: 'Stop',
+                          icon: const Icon(Icons.close),
+                          onPressed: () async {
+                            await AppSettings.vibeBackupCloudUri.setItem('');
+                            if (mounted) setState(() => _cloud = null);
+                          },
+                        ),
+                  onTap: _pickCloud,
                 ),
                 if (auto != 'off')
                   ListTile(

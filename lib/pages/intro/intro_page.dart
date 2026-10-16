@@ -10,7 +10,6 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/sign_in_flows/check_homeserver.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_sign_up.dart';
-import 'package:fluffychat/vibe/vibe_auto_keys.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
@@ -102,7 +101,6 @@ class _IntroPageState extends State<IntroPage>
       }
       final client = await Matrix.of(context).getLoginClient();
       await client.checkHomeserver(Uri.parse(_homeserver));
-      VibeAutoKeys.remember(password);
       final AuthenticationIdentifier identifier =
           RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(username)
           ? AuthenticationThirdPartyIdentifier(
