@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/permission_slider_dialog.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,7 @@ Future<void> showMemberActionsPopupMenu({
 
   const defaultPowerLevels = {0, 50, 100, 9007199254740991};
 
-  final action = await showMenu<_MemberActions>(
+  final action = await showVibeMenu<_MemberActions>(
     context: context,
     position: position,
     items: <PopupMenuEntry<_MemberActions>>[

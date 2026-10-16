@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
@@ -19,7 +20,7 @@ import 'package:qr_image/qr_image.dart';
 import '../config/themes.dart';
 
 Future<void> showQrCodeViewer(BuildContext context, String content) =>
-    showDialog(
+    showVibeDialog(
       context: context,
       builder: (context) => QrCodeViewer(content: content),
     );

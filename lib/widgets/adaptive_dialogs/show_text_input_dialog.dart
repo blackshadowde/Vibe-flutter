@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
@@ -33,7 +34,7 @@ Future<String?> showTextInputDialog({
 }) {
   // TODO: Dispose this somewhere
   final controller = TextEditingController(text: initialText);
-  return showAdaptiveDialog<String>(
+  return showVibeDialog<String>(
     context: context,
     useRootNavigator: useRootNavigator,
     builder: (context) {

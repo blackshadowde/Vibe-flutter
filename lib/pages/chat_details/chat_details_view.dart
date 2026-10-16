@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_details/chat_details.dart';
@@ -111,7 +112,7 @@ class ChatDetailsView extends StatelessWidget {
                                   name: displayname,
                                   size: Avatar.defaultSize * 2.5,
                                   onTap: roomAvatar != null
-                                      ? () => showDialog(
+                                      ? () => showVibeDialog(
                                           context: context,
                                           builder: (_) =>
                                               MxcImageViewer(roomAvatar),

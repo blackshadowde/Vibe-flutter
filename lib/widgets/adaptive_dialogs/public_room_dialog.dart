@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
@@ -123,7 +124,7 @@ class PublicRoomDialog extends StatelessWidget {
                         name: profile?.name ?? roomLink,
                         size: Avatar.defaultSize * 1.5,
                         onTap: avatar != null
-                            ? () => showDialog(
+                            ? () => showVibeDialog(
                                 context: context,
                                 builder: (_) => MxcImageViewer(avatar),
                               )

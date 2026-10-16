@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/vibe/vibe_app_info.dart';
 import 'package:fluffychat/vibe/vibe_updater.dart';
@@ -155,7 +156,7 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
           const SizedBox(height: 10),
           _AboutButton(
             text: 'How Vibe keeps you safe',
-            onTap: () => showDialog<void>(
+            onTap: () => showVibeDialog<void>(
               context: context,
               useSafeArea: false,
               builder: (ctx) => Dialog.fullscreen(

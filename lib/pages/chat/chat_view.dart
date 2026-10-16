@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:ui' as ui;
 
 import 'package:desktop_drop/desktop_drop.dart';
@@ -176,7 +177,7 @@ class ChatView extends StatelessWidget {
                         onPressed: controller.redactEventsAction,
                       ),
                     if (controller.selectedEvents.length == 1)
-                      PopupMenuButton<_EventContextAction>(
+                      VibeMenuButton<_EventContextAction>(
                         useRootNavigator: true,
                         onSelected: (action) {
                           switch (action) {

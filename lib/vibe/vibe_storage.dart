@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:io';
 
 import 'package:fluffychat/config/setting_keys.dart';
@@ -150,7 +151,7 @@ class _VibeStoragePageState extends State<VibeStoragePage> {
   }
 
   Future<T?> _pick<T>(String title, List<(T, String)> options, T current) =>
-      showDialog<T>(
+      showVibeDialog<T>(
         context: context,
         builder: (ctx) => SimpleDialog(
           title: Text(title),

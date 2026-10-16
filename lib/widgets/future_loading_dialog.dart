@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
 import 'package:async/async.dart';
@@ -55,7 +56,7 @@ Future<Result<T>> showFutureLoadingDialog<T>({
     return Result.capture(futureExec);
   }
 
-  final result = await showAdaptiveDialog<Result<T>>(
+  final result = await showVibeDialog<Result<T>>(
     context: context,
     barrierDismissible: barrierDismissible,
     builder: (BuildContext context) => LoadingDialog<T>(

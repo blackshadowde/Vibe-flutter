@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -37,7 +38,7 @@ class LogViewerState extends State<LogViewer> {
             icon: const Icon(Icons.zoom_out_outlined),
             onPressed: () => setState(() => fontSize--),
           ),
-          PopupMenuButton<Level>(
+          VibeMenuButton<Level>(
             useRootNavigator: true,
             itemBuilder: (context) => Level.values
                 .map(

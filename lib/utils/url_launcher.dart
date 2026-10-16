@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -187,7 +188,7 @@ class UrlLauncher {
         return;
       } else {
         if (!context.mounted) return;
-        await showAdaptiveDialog(
+        await showVibeDialog(
           context: context,
           barrierDismissible: true,
           builder: (c) =>

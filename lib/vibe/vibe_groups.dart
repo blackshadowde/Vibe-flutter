@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/file_selector.dart';
@@ -216,7 +217,7 @@ abstract class VibeGroups {
 
   static Future<void> rename(BuildContext context, Room room) async {
     final ctrl = TextEditingController(text: nameOf(context, room));
-    final name = await showDialog<String>(
+    final name = await showVibeDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Group name'),
@@ -252,7 +253,7 @@ abstract class VibeGroups {
 
   static Future<void> leave(BuildContext context, Room room) async {
     final name = nameOf(context, room);
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('Leave $name?'),
@@ -545,7 +546,7 @@ abstract class VibeGroupEdit {
     if (action == null || !context.mounted) return false;
     final name = u.calcDisplayname();
     if (action == 'admin') {
-      final ok = await showDialog<bool>(
+      final ok = await showVibeDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
           title: Text('Make $name an admin?'),
@@ -569,7 +570,7 @@ abstract class VibeGroupEdit {
       if (ok != true || !context.mounted) return false;
     }
     if (action == 'kick') {
-      final ok = await showDialog<bool>(
+      final ok = await showVibeDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
           title: Text('Remove $name?'),

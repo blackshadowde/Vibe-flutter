@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -149,7 +150,7 @@ class ChatController extends State<ChatPageWithRoom>
     setState(() => dragging = false);
     if (details.files.isEmpty) return;
 
-    await showAdaptiveDialog(
+    await showVibeDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: details.files,
@@ -339,7 +340,7 @@ class ChatController extends State<ChatPageWithRoom>
         .map((item) => item.value)
         .toList();
     if (files.isEmpty) return;
-    showAdaptiveDialog(
+    showVibeDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: files,
@@ -416,7 +417,7 @@ class ChatController extends State<ChatPageWithRoom>
 
   @override
   void initState() {
-    // the chat sliding in gets a light tap (and sliding out, in dispose)
+    // the chat sliding in gets a light tap (closing has none)
     VibeHaptics.light();
     inputFocus = FocusNode(onKeyEvent: _customEnterKeyHandling);
     Future<void>.delayed(const Duration(milliseconds: 380), () {
@@ -692,7 +693,6 @@ class ChatController extends State<ChatPageWithRoom>
 
   @override
   void dispose() {
-    VibeHaptics.light();
     timeline?.cancelSubscriptions();
     timeline = null;
     _storeInputTimeoutTimer?.cancel();
@@ -810,7 +810,7 @@ class ChatController extends State<ChatPageWithRoom>
     final files = await selectFiles(context, allowMultiple: true, type: type);
     if (files.isEmpty) return;
     if (!mounted) return;
-    await showAdaptiveDialog(
+    await showVibeDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: files,
@@ -824,7 +824,7 @@ class ChatController extends State<ChatPageWithRoom>
 
   Future<void> sendImageFromClipBoard(Uint8List? image) async {
     if (image == null) return;
-    await showAdaptiveDialog(
+    await showVibeDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [XFile.fromData(image)],
@@ -842,7 +842,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (file == null) return;
     if (!mounted) return;
 
-    await showAdaptiveDialog(
+    await showVibeDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [file],
@@ -885,7 +885,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (xFiles == null || xFiles.isEmpty) return;
 
     if (!mounted) return;
-    showAdaptiveDialog(
+    showVibeDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: xFiles,
@@ -901,7 +901,7 @@ class ChatController extends State<ChatPageWithRoom>
     final files = await Pasteboard.files();
     if (files.isNotEmpty) {
       if (!mounted) return;
-      await showAdaptiveDialog(
+      await showVibeDialog(
         context: context,
         builder: (c) => SendFileDialog(
           files: files.map(XFile.new).toList(),
@@ -947,7 +947,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (file == null) return;
     if (!mounted) return;
 
-    await showAdaptiveDialog(
+    await showVibeDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [file],
@@ -1037,7 +1037,7 @@ class ChatController extends State<ChatPageWithRoom>
   }
 
   Future<void> sendLocationAction() async {
-    await showAdaptiveDialog(
+    await showVibeDialog(
       context: context,
       builder: (c) => SendLocationDialog(room: room),
     );

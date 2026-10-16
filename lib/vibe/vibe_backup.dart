@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -216,7 +217,7 @@ class _VibeBackupPageState extends State<VibeBackupPage> {
   Future<String?> _askPassword({
     required String title,
     required bool confirm,
-  }) => showDialog<String>(
+  }) => showVibeDialog<String>(
     context: context,
     builder: (ctx) => _PasswordDialog(title: title, confirm: confirm),
   );
@@ -225,7 +226,7 @@ class _VibeBackupPageState extends State<VibeBackupPage> {
     Future<T> Function(ValueNotifier<String> step) work,
   ) async {
     final step = ValueNotifier<String>('Starting…');
-    showDialog<void>(
+    showVibeDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => PopScope(
@@ -399,7 +400,7 @@ class _VibeBackupPageState extends State<VibeBackupPage> {
   }
 
   Future<void> _pickAuto() async {
-    final choice = await showDialog<String>(
+    final choice = await showVibeDialog<String>(
       context: context,
       builder: (ctx) => SimpleDialog(
         title: const Text('Back up automatically'),

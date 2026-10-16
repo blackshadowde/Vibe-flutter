@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
@@ -68,7 +69,7 @@ class EmotesSettingsView extends StatelessWidget {
               ),
             )
           else
-            PopupMenuButton<PopupMenuEmojiActions>(
+            VibeMenuButton<PopupMenuEmojiActions>(
               useRootNavigator: true,
               onSelected: (value) {
                 switch (value) {
@@ -297,7 +298,7 @@ class EmotesSettingsView extends StatelessWidget {
                               ),
                             ),
                             if (!controller.readonly)
-                              PopupMenuButton<ImagePackUsage>(
+                              VibeMenuButton<ImagePackUsage>(
                                 onSelected: (usage) =>
                                     controller.toggleUsage(imageCode, usage),
                                 itemBuilder: (context) => [
@@ -367,7 +368,7 @@ class _EmoteImage extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(4),
       onTap: () =>
-          showDialog(context: context, builder: (_) => MxcImageViewer(mxc)),
+          showVibeDialog(context: context, builder: (_) => MxcImageViewer(mxc)),
       child: MxcImage(
         key: ValueKey(key),
         cacheKey: key,

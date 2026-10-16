@@ -39,6 +39,7 @@ import 'package:fluffychat/widgets/layouts/two_column_layout.dart';
 import 'package:fluffychat/widgets/log_view.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
+import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:flutter/material.dart';
 import 'package:fluffychat/vibe/vibe_about_page.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
@@ -543,9 +544,11 @@ abstract class AppRoutes {
     }
     return FluffyThemes.isColumnMode(context)
         ? noTransitionPageBuilder(context, state, child)
-        : MaterialPage(
+        : VibePage(
             key: state.pageKey,
             restorationId: state.pageKey.value,
+            // Settings pages slide up from the bottom and close with a swipe down
+            sheet: state.matchedLocation.startsWith('/rooms/settings/'),
             child: child,
           );
   }

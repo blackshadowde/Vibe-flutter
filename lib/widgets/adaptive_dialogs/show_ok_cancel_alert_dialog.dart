@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
@@ -19,7 +20,7 @@ Future<OkCancelResult?> showOkCancelAlertDialog({
   String? cancelLabel,
   bool isDestructive = false,
   bool useRootNavigator = true,
-}) => showAdaptiveDialog<OkCancelResult>(
+}) => showVibeDialog<OkCancelResult>(
   context: context,
   useRootNavigator: useRootNavigator,
   builder: (context) => AlertDialog.adaptive(
@@ -71,7 +72,7 @@ Future<OkCancelResult?> showOkAlertDialog({
   String? message,
   String? okLabel,
   bool useRootNavigator = true,
-}) => showAdaptiveDialog<OkCancelResult>(
+}) => showVibeDialog<OkCancelResult>(
   context: context,
   useRootNavigator: useRootNavigator,
   builder: (context) => AlertDialog.adaptive(

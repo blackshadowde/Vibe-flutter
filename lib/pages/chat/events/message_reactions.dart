@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -188,7 +189,7 @@ class _AdaptableReactorsDialog extends StatelessWidget {
 
   const _AdaptableReactorsDialog({this.client, this.reactionEntry});
 
-  Future<bool?> show(BuildContext context) => showDialog(
+  Future<bool?> show(BuildContext context) => showVibeDialog(
     context: context,
     builder: (context) => this,
     barrierDismissible: true,

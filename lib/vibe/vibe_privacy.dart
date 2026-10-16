@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -55,7 +56,7 @@ class VibePrivacyTiles extends StatefulWidget {
 class _VibePrivacyTilesState extends State<VibePrivacyTiles> {
   Future<void> _pickAudience() async {
     final client = Matrix.of(context).client;
-    final choice = await showDialog<String>(
+    final choice = await showVibeDialog<String>(
       context: context,
       builder: (ctx) => SimpleDialog(
         title: const Text('Who can see my status and local time'),

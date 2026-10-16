@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/event_info_dialog.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
@@ -17,7 +18,7 @@ class UtdDialog extends StatelessWidget {
 
   static Future<void> show(BuildContext context, Event event) async {
     event.requestKey();
-    final action = await showAdaptiveDialog<_UtdDialogAction>(
+    final action = await showVibeDialog<_UtdDialogAction>(
       barrierDismissible: true,
       context: context,
       builder: (_) => UtdDialog(event),

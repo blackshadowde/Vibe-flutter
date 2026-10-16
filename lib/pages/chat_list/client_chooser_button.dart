@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:async/async.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -179,7 +180,7 @@ class ClientChooserButton extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         borderRadius: BorderRadius.circular(99),
         color: Colors.transparent,
-        child: PopupMenuButton<Object>(
+        child: VibeMenuButton<Object>(
           key: Key('accounts_and_settings_buttons'),
           tooltip: 'Accounts and settings',
           onSelected: (o) => _clientSelected(o, context),

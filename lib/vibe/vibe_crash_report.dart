@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/vibe/vibe_app_info.dart';
@@ -45,7 +46,7 @@ abstract class VibeCrashReport {
         '',
         info['trace'] as String? ?? '',
       ].join('\n');
-      await showDialog<void>(
+      await showVibeDialog<void>(
         context: ctx,
         builder: (dctx) => AlertDialog(
           title: const Text('Vibe closed unexpectedly'),

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
 import 'package:archive/archive.dart'
@@ -376,7 +377,7 @@ class EmotesSettingsController extends State<EmotesSettings> {
     final archive = ZipDecoder().decodeStream(buffer);
     if (!mounted) return;
 
-    await showDialog(
+    await showVibeDialog(
       context: context,
       // breaks [Matrix.of] calls otherwise
       useRootNavigator: false,

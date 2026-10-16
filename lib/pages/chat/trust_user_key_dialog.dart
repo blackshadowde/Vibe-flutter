@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/key_verification/key_verification_dialog.dart';
 import 'package:fluffychat/utils/beautify_string_extension.dart';
@@ -37,7 +38,7 @@ Future<bool> showTrustUserInRoomDialog(BuildContext context, Room room) async {
   final l10n = L10n.of(context);
   final theme = Theme.of(context);
 
-  final action = await showAdaptiveDialog<_Action>(
+  final action = await showVibeDialog<_Action>(
     context: context,
     builder: (context) => AlertDialog.adaptive(
       title: Center(

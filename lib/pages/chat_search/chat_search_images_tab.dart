@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/pages/chat/events/video_player.dart';
 import 'package:fluffychat/pages/chat_search/search_footer.dart';
@@ -101,7 +102,7 @@ class ChatSearchImagesTab extends StatelessWidget {
                   );
                 }
                 return InkWell(
-                  onTap: () => showDialog(
+                  onTap: () => showVibeDialog(
                     context: context,
                     builder: (_) => ImageViewer(event, outerContext: context),
                   ),

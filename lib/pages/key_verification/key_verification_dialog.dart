@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:convert';
 import 'dart:ui';
 
@@ -17,7 +18,7 @@ import 'package:matrix/encryption.dart';
 import 'package:matrix/matrix.dart';
 
 class KeyVerificationDialog extends StatefulWidget {
-  Future<bool?> show(BuildContext context) => showAdaptiveDialog<bool>(
+  Future<bool?> show(BuildContext context) => showVibeDialog<bool>(
     context: context,
     builder: (context) => this,
     barrierDismissible: false,

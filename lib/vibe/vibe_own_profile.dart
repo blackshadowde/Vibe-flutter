@@ -7,6 +7,8 @@ import 'package:fluffychat/vibe/vibe_set_status.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:fluffychat/widgets/mxc_image.dart';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -177,6 +179,77 @@ class _OwnSheetState extends State<_OwnSheet> {
     ),
   );
 
+  Widget _wideButton({
+    required IconData icon,
+    required String label,
+    required bool filled,
+    required VoidCallback onTap,
+  }) {
+    const blurple = Color(0xFF5865F2);
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(30),
+      side: filled
+          ? BorderSide.none
+          : BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+    );
+    return Material(
+      color: filled ? blurple : Colors.transparent,
+      shape: shape,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          height: 54,
+          width: double.infinity,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 22, color: filled ? Colors.white : blurple),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: filled ? Colors.white : blurple,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _barItem(IconData icon, String label, VoidCallback onTap) {
+    final ink = Theme.of(context).colorScheme.onSurface;
+    return InkWell(
+      borderRadius: BorderRadius.circular(28),
+      onTap: onTap,
+      child: SizedBox(
+        width: 88,
+        height: 62,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 24, color: ink),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: ink,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _squareButton(BuildContext context, IconData icon, VoidCallback onTap) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return Material(
@@ -210,7 +283,12 @@ class _OwnSheetState extends State<_OwnSheet> {
             ? profile!.displayName!
             : userId.localpart ?? userId;
         final avatar = profile?.avatarUrl;
-        return SingleChildScrollView(
+        // The keyboard pushes the pane up, so you see what you type.
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,35 +300,43 @@ class _OwnSheetState extends State<_OwnSheet> {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Container(height: 128, color: const Color(0xFF1F2624)),
+                    // Vibe X's banner: your picture, blurred and dimmed
+                    SizedBox(
+                      height: 128,
+                      width: double.infinity,
+                      child: ClipRect(
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            const ColoredBox(color: Color(0xFF1F2624)),
+                            if (avatar != null)
+                              ImageFiltered(
+                                imageFilter: ui.ImageFilter.blur(
+                                  sigmaX: 28,
+                                  sigmaY: 28,
+                                  tileMode: TileMode.clamp,
+                                ),
+                                child: MxcImage(
+                                  uri: avatar,
+                                  client: client,
+                                  fit: BoxFit.cover,
+                                  width: 360,
+                                  height: 128,
+                                  isThumbnail: true,
+                                  placeholder: (_) => const SizedBox.shrink(),
+                                ),
+                              ),
+                            ColoredBox(color: Colors.black.withValues(alpha: 0.35)),
+                          ],
+                        ),
+                      ),
+                    ),
                     Positioned(
                       left: 14,
                       top: 16,
                       child: _circleButton(
                         Icons.close,
                         () => Navigator.of(context).pop(),
-                      ),
-                    ),
-                    Positioned(
-                      right: 14,
-                      top: 16,
-                      child: Row(
-                        children: [
-                          _circleButton(
-                            Icons.photo_camera_outlined,
-                            () => _photo(profile),
-                          ),
-                          const SizedBox(width: 10),
-                          _circleButton(
-                            Icons.edit_outlined,
-                            () => _startEdit(name),
-                          ),
-                          const SizedBox(width: 10),
-                          _circleButton(Icons.settings_outlined, () {
-                            Navigator.of(context).pop();
-                            widget.router.go('/rooms/settings');
-                          }),
-                        ],
                       ),
                     ),
                     Positioned(
@@ -268,7 +354,9 @@ class _OwnSheetState extends State<_OwnSheet> {
                       left: 158,
                       right: 16,
                       top: 104,
-                      child: Builder(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Builder(
                         builder: (context) {
                           final s = VibeStatus.mine(client);
                           final active = s != null && s.active;
@@ -293,6 +381,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                             },
                           );
                         },
+                      ),
                       ),
                     ),
                   ],
@@ -388,48 +477,67 @@ class _OwnSheetState extends State<_OwnSheet> {
                 index: 3,
                 dy: 20,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                  child: Row(
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+                  child: Column(
                     children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 42,
-                          child: FilledButton.icon(
-                            onPressed: () => _startEdit(name),
-                            icon: const Icon(Icons.edit, size: 18),
-                            label: const Text('Edit profile'),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF5865F2),
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              textStyle: const TextStyle(fontFamily: 'Figtree', 
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
+                      _wideButton(
+                        icon: Icons.qr_code_2,
+                        label: 'Share my Vibe ID',
+                        filled: true,
+                        onTap: () => FluffyShare.share(userId, context),
                       ),
-                      const SizedBox(width: 8),
-                      _squareButton(
-                        context,
-                        Icons.qr_code_2,
-                        () => FluffyShare.share(userId, context),
+                      const SizedBox(height: 12),
+                      _wideButton(
+                        icon: Icons.edit,
+                        label: 'Edit profile',
+                        filled: false,
+                        onTap: () => _startEdit(name),
                       ),
-                      const SizedBox(width: 8),
-                      _squareButton(context, Icons.settings, () {
-                        Navigator.of(context).pop();
-                        widget.router.go('/rooms/settings');
-                      }),
                     ],
+                  ),
+                ),
+              ),
+              // Vibe X's floating bar
+              VibeStagger(
+                index: 4,
+                dy: 20,
+                child: Center(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 22),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF2B2D31)
+                          : const Color(0xFFEBEDEF),
+                      borderRadius: BorderRadius.circular(36),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x33000000),
+                          blurRadius: 16,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _barItem(Icons.photo_camera, 'Photo', () => _photo(profile)),
+                        _barItem(Icons.edit, 'Edit', () => _startEdit(name)),
+                        _barItem(Icons.settings, 'Settings', () {
+                          Navigator.of(context).pop();
+                          widget.router.go('/rooms/settings');
+                        }),
+                      ],
+                    ),
                   ),
                 ),
               ),
               const SafeArea(top: false, child: SizedBox(height: 16)),
             ],
+          ),
           ),
         );
       },

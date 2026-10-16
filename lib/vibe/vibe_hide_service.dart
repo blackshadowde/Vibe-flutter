@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,7 +15,7 @@ abstract class VibeHideService {
   static const channelId = 'vibe_connection';
 
   static Future<void> open(BuildContext context) async {
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         icon: const Icon(Icons.notifications_paused, size: 32),

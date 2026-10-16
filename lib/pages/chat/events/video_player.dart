@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:math';
 
 import 'package:fluffychat/config/app_config.dart';
@@ -76,7 +77,7 @@ class EventVideoPlayer extends StatelessWidget {
                 ? VibeMediaSaver.save(context, event)
                 : timeline != null
                 ? VibeMediaViewer.openFromTimeline(context, event, timeline)
-                : showDialog(
+                : showVibeDialog(
                     context: context,
                     builder: (_) => ImageViewer(
                       event,

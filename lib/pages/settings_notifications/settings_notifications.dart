@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:convert';
 
 import 'package:fluffychat/config/app_config.dart';
@@ -98,7 +99,7 @@ class SettingsNotificationsController extends State<SettingsNotifications> {
 
   Future<void> editPushRule(PushRule rule, PushRuleKind kind) async {
     final theme = Theme.of(context);
-    final action = await showAdaptiveDialog<PushRuleDialogAction>(
+    final action = await showVibeDialog<PushRuleDialogAction>(
       context: context,
       builder: (context) => ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 256),

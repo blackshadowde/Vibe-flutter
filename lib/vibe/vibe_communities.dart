@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
 import 'package:fluffychat/l10n/l10n.dart';
@@ -156,7 +157,7 @@ abstract class VibeCommunities {
   static Future<void> newChannel(BuildContext context, Room space) async {
     final ctrl = TextEditingController();
     var voice = false;
-    final name = await showDialog<String>(
+    final name = await showVibeDialog<String>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
@@ -524,7 +525,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
       return;
     }
     if (action != 'remove') return;
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('Remove #${c.name} from this community?'),
@@ -577,7 +578,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
 
   Future<void> _leave() async {
     final name = VibeGroups.nameOf(context, space);
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('Leave $name?'),

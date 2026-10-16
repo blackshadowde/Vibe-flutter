@@ -3,6 +3,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'package:flutter/material.dart';
 
 /// State for the "drag the chat in with your finger" gesture on the home
@@ -283,4 +284,73 @@ class _VibeBackSwipeState<T> extends State<_VibeBackSwipe<T>> {
     onPointerCancel: _up,
     child: widget.child,
   );
+}
+
+
+/// The app's pages. Normal pages slide over from the right (a little slower
+/// than Android's default, so it feels smooth); [sheet] pages (settings)
+/// slide up from the bottom and close with a swipe down.
+class VibePage<T> extends Page<T> {
+  final Widget child;
+  final bool sheet;
+  const VibePage({
+    required this.child,
+    this.sheet = false,
+    super.key,
+    super.restorationId,
+  });
+
+  @override
+  Route<T> createRoute(BuildContext context) => _VibePageRoute<T>(this);
+}
+
+class _VibePageRoute<T> extends PageRoute<T>
+    with MaterialRouteTransitionMixin<T> {
+  _VibePageRoute(VibePage<T> page) : super(settings: page);
+
+  VibePage<T> get _page => settings as VibePage<T>;
+
+  @override
+  Widget buildContent(BuildContext context) =>
+      _page.sheet ? VibeSheetDragClose(child: _page.child) : _page.child;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Duration get transitionDuration => _page.sheet
+      ? const Duration(milliseconds: 420)
+      : const Duration(milliseconds: 440);
+
+  @override
+  Duration get reverseTransitionDuration => _page.sheet
+      ? const Duration(milliseconds: 320)
+      : const Duration(milliseconds: 380);
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    if (!_page.sheet) {
+      return super.buildTransitions(
+        context,
+        animation,
+        secondaryAnimation,
+        child,
+      );
+    }
+    return SlideTransition(
+      position: Tween(begin: const Offset(0, 1), end: Offset.zero).animate(
+        CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutQuint,
+          reverseCurve: Curves.easeInCubic,
+        ),
+      ),
+      child: child,
+    );
+  }
 }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ class _VibeEncryptionPageState extends State<VibeEncryptionPage> {
   }
 
   Future<void> _reset() async {
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Reset recovery key?'),

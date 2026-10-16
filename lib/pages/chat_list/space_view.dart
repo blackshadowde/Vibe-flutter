@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -227,7 +228,7 @@ class _SpaceViewState extends State<SpaceView> {
       Offset.zero & overlay.size,
     );
 
-    final action = await showMenu<SpaceChildAction>(
+    final action = await showVibeMenu<SpaceChildAction>(
       context: posContext,
       position: position,
       items: [
@@ -414,7 +415,7 @@ class _SpaceViewState extends State<SpaceView> {
                               color: theme.colorScheme.onPrimaryContainer,
                             ),
                           ),
-                          suffixIcon: PopupMenuButton<SpaceActions>(
+                          suffixIcon: VibeMenuButton<SpaceActions>(
                             icon: Avatar(
                               size: avatarSize,
                               mxContent: room.avatar,

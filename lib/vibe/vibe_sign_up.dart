@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:math';
 
 import 'package:fluffychat/utils/platform_infos.dart';
@@ -324,7 +325,7 @@ mixin VibeSignUpMixin<T extends StatefulWidget> on State<T> {
         }
       }
     }
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('$suHost terms'),
@@ -366,7 +367,7 @@ mixin VibeSignUpMixin<T extends StatefulWidget> on State<T> {
     TextInputType keyboard = TextInputType.text,
   }) async {
     final ctrl = TextEditingController();
-    final v = await showDialog<String>(
+    final v = await showVibeDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(title),
@@ -400,7 +401,7 @@ mixin VibeSignUpMixin<T extends StatefulWidget> on State<T> {
   }
 
   Future<bool> _waitForEmail(String email) async {
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
@@ -440,7 +441,7 @@ mixin VibeSignUpMixin<T extends StatefulWidget> on State<T> {
           );
     await launchUrl(url, mode: LaunchMode.inAppBrowserView);
     if (!mounted) return false;
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(

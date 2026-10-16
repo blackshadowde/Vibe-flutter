@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/pages/chat/events/video_player.dart';
 import 'package:fluffychat/pages/image_viewer/image_viewer.dart';
@@ -378,7 +379,7 @@ class _Slide extends StatelessWidget {
       // tap a photo to zoom in the full image viewer
       onTap: event.messageType == MessageTypes.Video
           ? null
-          : () => showDialog(
+          : () => showVibeDialog(
               context: context,
               builder: (_) => ImageViewer(event, outerContext: context),
             ),

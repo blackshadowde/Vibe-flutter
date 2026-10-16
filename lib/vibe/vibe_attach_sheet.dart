@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:typed_data';
 
 import 'package:fluffychat/vibe/vibe_contact_share.dart';
@@ -126,7 +127,7 @@ class _AttachSheetState extends State<_AttachSheet> {
     if (!mounted) return;
     Navigator.of(context).pop();
     if (!c.context.mounted) return;
-    await showAdaptiveDialog(
+    await showVibeDialog(
       context: c.context,
       builder: (_) => SendFileDialog(
         files: files,

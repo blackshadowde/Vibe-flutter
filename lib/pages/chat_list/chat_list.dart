@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -486,7 +487,7 @@ class ChatListController extends State<ChatList>
         )
         .toList();
 
-    var action = await showMenu<ChatContextAction>(
+    var action = await showVibeMenu<ChatContextAction>(
       context: posContext,
       position: position,
       items: [
@@ -623,7 +624,7 @@ class ChatListController extends State<ChatList>
     );
     if (!posContext.mounted || !mounted) return;
     if (action == ChatContextAction.showMore) {
-      action = await showMenu<ChatContextAction>(
+      action = await showVibeMenu<ChatContextAction>(
         context: posContext,
         position: position,
         items: [

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
 import 'package:fluffychat/vibe/vibe_haptics.dart';
@@ -75,7 +76,7 @@ abstract class VibeDisappearing {
   static Future<void> pick(BuildContext context, Room room) async {
     final current = of(room)?.duration;
     final messenger = ScaffoldMessenger.of(context);
-    final choice = await showDialog<(Duration?, String)>(
+    final choice = await showVibeDialog<(Duration?, String)>(
       context: context,
       builder: (ctx) => SimpleDialog(
         title: const Text('Disappearing messages'),

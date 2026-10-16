@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -37,7 +38,7 @@ class _VibeContactShareSheetState extends State<VibeContactShareSheet> {
   }
 
   Future<bool> _confirm(String name, String detail) async {
-    final ok = await showDialog<bool>(
+    final ok = await showVibeDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('Send $name?'),

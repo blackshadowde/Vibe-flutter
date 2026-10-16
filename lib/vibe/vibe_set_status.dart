@@ -8,7 +8,7 @@ import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
-const _statusHint = 'What are you currently obsessed with?';
+const _statusHint = 'What are you up to?';
 const _bannerColor = Color(0xFF1F2624);
 const _onlineGreen = Color(0xFF23A55A);
 const _blurple = Color(0xFF5865F2);
@@ -52,10 +52,10 @@ class VibeThoughtBubble extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 2, top: 22),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: fill,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(28),
                 border: Border.all(color: edge),
                 boxShadow: const [
                   BoxShadow(
@@ -87,10 +87,10 @@ class VibeThoughtBubble extends StatelessWidget {
                     TextSpan(text: empty ? _statusHint : text),
                   ],
                 ),
-                maxLines: 3,
+                maxLines: empty ? 1 : 3,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   height: 1.3,
                   fontStyle: empty ? FontStyle.italic : FontStyle.normal,
                   color: empty ? ink.withValues(alpha: 0.85) : ink,

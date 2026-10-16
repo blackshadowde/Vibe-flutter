@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
 import 'package:fluffychat/l10n/l10n.dart';
@@ -60,7 +61,7 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
       alignment: Alignment.center,
       children: [
         const SizedBox.shrink(),
-        PopupMenuButton<ChatPopupMenuActions>(
+        VibeMenuButton<ChatPopupMenuActions>(
           useRootNavigator: true,
           onSelected: (choice) async {
             switch (choice) {

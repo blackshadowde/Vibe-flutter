@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
@@ -31,7 +32,7 @@ class UserDialog extends StatelessWidget {
     required BuildContext context,
     required Profile profile,
     bool noProfileWarning = false,
-  }) => showAdaptiveDialog(
+  }) => showVibeDialog(
     context: context,
     barrierDismissible: true,
     builder: (context) =>
@@ -82,7 +83,7 @@ class UserDialog extends StatelessWidget {
                     name: displayname,
                     size: Avatar.defaultSize * 1.5,
                     onTap: avatar != null
-                        ? () => showDialog(
+                        ? () => showVibeDialog(
                             context: context,
                             builder: (_) => MxcImageViewer(avatar),
                           )

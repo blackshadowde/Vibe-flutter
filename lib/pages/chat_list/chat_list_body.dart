@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_list/chat_list.dart';
@@ -285,7 +286,7 @@ class PublicRoomsHorizontalList extends StatelessWidget {
                     publicRooms[i].canonicalAlias?.localpart ??
                     L10n.of(context).group,
                 avatar: publicRooms[i].avatarUrl,
-                onPressed: () => showAdaptiveDialog(
+                onPressed: () => showVibeDialog(
                   context: context,
                   barrierDismissible: true,
                   builder: (c) => PublicRoomDialog(
