@@ -8,9 +8,6 @@ import 'package:fluffychat/pages/chat/events/audio_player.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/vibe/call/vibe_call.dart';
-import 'package:fluffychat/vibe/call/vibe_missed_calls.dart';
-import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_media_viewer.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -188,85 +185,6 @@ class VibeDmDetail extends StatelessWidget {
                       : (room.markedUnread ? 1 : 0),
                   onTap: onOpenChat,
                 ),
-              ),
-              VibeCallWatch(
-                room: room,
-                builder: (context, inCall) {
-                  final mine = VibeCall.instance.isIn(room);
-                  final live = mine || inCall.isNotEmpty;
-                  const green = Color(0xFF23A55A);
-                  final liveText = mine
-                      ? 'You\'re in the call · tap to open'
-                      : 'Live · ${inCall.length} in the call · tap to join';
-                  final faces = inCall.isEmpty
-                      ? null
-                      : VibeCallFaces(room: room, userIds: inCall);
-                  if (group) {
-                    return VibeHashRow(
-                      label: 'voice',
-                      icon: Icons.volume_up,
-                      iconColor: live ? green : null,
-                      bold: live,
-                      subtitle: live
-                          ? liveText
-                          : 'Start a voice chat for the group',
-                      trailing: faces,
-                      onTap: () => VibeCall.join(context, room),
-                    );
-                  }
-                  return ListenableBuilder(
-                    listenable: VibeMissedCalls.instance,
-                    builder: (context, _) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      VibeHashRow(
-                        label: 'audio-call',
-                        unread: live
-                            ? 0
-                            : VibeMissedCalls.instance.count(
-                                room.id,
-                                video: false,
-                              ),
-                        icon: Icons.call,
-                        iconColor: live ? green : null,
-                        bold: live,
-                        subtitle: live
-                            ? liveText
-                            : VibeMissedCalls.instance.count(
-                                    room.id,
-                                    video: false,
-                                  ) >
-                                  0
-                            ? 'Missed call'
-                            : null,
-                        trailing: faces,
-                        onTap: () => VibeCall.join(context, room),
-                      ),
-                      VibeHashRow(
-                        label: 'video-call',
-                        icon: Icons.videocam,
-                        iconColor: live ? green : null,
-                        unread: live
-                            ? 0
-                            : VibeMissedCalls.instance.count(
-                                room.id,
-                                video: true,
-                              ),
-                        subtitle: !live &&
-                                VibeMissedCalls.instance.count(
-                                      room.id,
-                                      video: true,
-                                    ) >
-                                    0
-                            ? 'Missed video call'
-                            : null,
-                        onTap: () =>
-                            VibeCall.join(context, room, video: true),
-                      ),
-                    ],
-                  ),
-                  );
-                },
               ),
               const VibePaneHeader('INFO'),
               VibeHashRow(

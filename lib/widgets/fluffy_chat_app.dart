@@ -9,7 +9,6 @@ import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/app_lock.dart';
-import 'package:fluffychat/vibe/call/vibe_call_layer.dart';
 import 'package:fluffychat/vibe/vibe_activity_pill.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/widgets/theme_builder.dart';
@@ -89,10 +88,8 @@ class FluffyChatApp extends StatelessWidget {
           child: Matrix(
             clients: clients,
             store: store,
-            child: VibeCallHost(
-              child: VibeTapHaptics(
-                child: VibeActivityHost(child: testWidget ?? child!),
-              ),
+            child: VibeTapHaptics(
+              child: VibeActivityHost(child: testWidget ?? child!),
             ),
           ),
         ),

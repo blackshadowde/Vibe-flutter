@@ -18,8 +18,6 @@ import 'package:fluffychat/utils/notification_avatar_extension.dart';
 import 'package:fluffychat/utils/notification_background_handler.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/start_push_foreground_service.dart';
-import 'package:fluffychat/vibe/call/vibe_call_members.dart';
-import 'package:fluffychat/vibe/call/vibe_missed_calls.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_peek.dart';
 import 'package:flutter/foundation.dart';
@@ -242,63 +240,6 @@ Future<void> _tryPushHelper(
   }
 
   Logs().v('Push helper got notification event of type ${event.type}.');
-
-  // Vibe calls: someone is ringing you (Element Call / MatrixRTC ring).
-  if (VibeCallMembers.ringTypes.contains(event.type)) {
-    if (!VibeCallMembers.isRing(event) || event.senderId == client.userID) {
-      return;
-    }
-    final life = VibeCallMembers.ringLifetime(event);
-    final left = VibeCallMembers.ringStart(
-      event,
-    ).add(life).difference(DateTime.now());
-    if (left <= Duration.zero) return;
-    await VibeMissedCalls.ringing(
-      event.room.id,
-      event.eventId,
-      video: VibeCallMembers.ringVideo(event),
-    );
-    final caller = event.senderFromMemoryOrFallback.calcDisplayname();
-    final locked = VibeLock.isLocked(event.room.id);
-    await flutterLocalNotificationsPlugin.show(
-      id: '${client.clientName}_call_${notification.roomId}'.hashCode,
-      title: locked
-          ? 'Vibe'
-          : event.room.isDirectChat
-          ? caller
-          : event.room.getLocalizedDisplayname(MatrixLocals(l10n)),
-      body: locked
-          ? '📞 Incoming call'
-          : VibeCallMembers.ringVideo(event)
-          ? '📹 Incoming video call · tap to answer'
-          : event.room.isDirectChat
-          ? '📞 Incoming voice call · tap to answer'
-          : '📞 $caller started a call · tap to join',
-      notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          'vibe_incoming_calls',
-          'Incoming calls',
-          channelDescription: 'Rings when someone calls you on Vibe',
-          importance: Importance.max,
-          priority: Priority.max,
-          category: AndroidNotificationCategory.call,
-          fullScreenIntent: true,
-          ongoing: true,
-          autoCancel: true,
-          timeoutAfter: left.inMilliseconds,
-        ),
-        iOS: const DarwinNotificationDetails(
-          interruptionLevel: InterruptionLevel.timeSensitive,
-        ),
-      ),
-      payload: FluffyChatPushPayload(
-        client.clientName,
-        event.room.id,
-        event.eventId,
-      ).toString(),
-    );
-    return;
-  }
 
   if (!client.pushruleEvaluator.match(event).notify) {
     Logs().i('Push helper: filtered by client-side push rules.');

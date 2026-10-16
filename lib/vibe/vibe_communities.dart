@@ -4,9 +4,6 @@ import 'dart:async';
 
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/vibe/call/vibe_call.dart';
-import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
-import 'package:fluffychat/vibe/call/vibe_call_members.dart';
 import 'package:fluffychat/vibe/vibe_dm_detail.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
@@ -129,8 +126,7 @@ abstract class VibeCommunities {
     final id = await client.createRoom(
       name: name,
       // voice channels are call rooms, the same kind Sable and Element use
-      creationContent: voice ? {'type': VibeCallMembers.voiceRoomType} : null,
-      powerLevelContentOverride: VibeCallPower.createOverride,
+      creationContent: voice ? {'type': _voiceRoomType} : null,
       preset: isPublic
           ? CreateRoomPreset.publicChat
           : CreateRoomPreset.privateChat,
@@ -389,7 +385,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
               topic: r.topic,
               members: r.numJoinedMembers,
               via: via[r.roomId] ?? const [],
-              voice: r.roomType == VibeCallMembers.voiceRoomType,
+              voice: r.roomType == _voiceRoomType,
             ),
       ];
       if (mounted) setState(() => _remote = list);
@@ -414,7 +410,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
           name: VibeGroups.nameOf(context, r),
           members: VibeGroups.memberCount(r),
           via: c.via,
-          voice: VibeCallMembers.isVoiceRoom(r),
+          voice: r.getState(EventTypes.RoomCreate)?.content['type'] == _voiceRoomType,
         ),
       );
     }
@@ -425,11 +421,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
     final client = space.client;
     final local = client.getRoomById(c.id);
     if (local != null && local.membership == Membership.join) {
-      if (c.voice) {
-        await VibeCall.join(context, local);
-      } else {
-        widget.onOpenRoom(local);
-      }
+      widget.onOpenRoom(local);
       return;
     }
     setState(() => _joining = c.id);
@@ -439,11 +431,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
       VibeHaptics.light();
       final r = client.getRoomById(c.id);
       if (r != null && mounted) {
-        if (c.voice) {
-          await VibeCall.join(context, r);
-        } else {
-          widget.onOpenRoom(r);
-        }
+        widget.onOpenRoom(r);
       }
     } catch (e) {
       if (mounted) {
@@ -849,35 +837,6 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
         ),
       );
     }
-    if (c.voice && local != null) {
-      // Voice channel you're in: show who's talking in it, Discord style.
-      return VibeCallWatch(
-        key: ValueKey(c.id),
-        room: local,
-        builder: (context, inCall) {
-          final mine = VibeCall.instance.isIn(local);
-          final live = mine || inCall.isNotEmpty;
-          return VibeHashRow(
-            label: label.isEmpty ? 'voice' : label,
-            icon: Icons.volume_up,
-            iconColor: live ? const Color(0xFF23A55A) : null,
-            bold: live,
-            subtitle: mine
-                ? 'You\'re here · tap to open'
-                : inCall.isNotEmpty
-                ? '${inCall.length} talking · tap to join'
-                : 'Tap to join voice',
-            trailing: _joining == c.id
-                ? trailing
-                : inCall.isEmpty
-                ? null
-                : VibeCallFaces(room: local, userIds: inCall),
-            onTap: () => _open(c),
-            onLongPress: () => _channelMenu(c),
-          );
-        },
-      );
-    }
     return VibeHashRow(
       key: ValueKey(c.id),
       label: label.isEmpty ? 'channel' : label,
@@ -947,3 +906,6 @@ class _InviteBanner extends StatelessWidget {
     );
   }
 }
+
+/// Voice channels (call rooms, the kind Sable and Element make); they open as chats now.
+const _voiceRoomType = 'org.matrix.msc3417.call';

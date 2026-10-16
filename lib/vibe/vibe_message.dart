@@ -28,6 +28,7 @@ import 'package:matrix/matrix.dart';
 import 'package:fluffychat/vibe/vibe_swipe_reply.dart';
 import 'package:fluffychat/vibe/vibe_chunks.dart';
 import 'package:fluffychat/vibe/vibe_link_preview.dart';
+import 'package:fluffychat/vibe/vibe_hot_words.dart';
 
 const Color _ownNameColor = Color(0xFFB5BAC1);
 const Color _otherNameColor = Color(0xFFF2F3F5);
@@ -644,7 +645,12 @@ class VibeMessage extends StatelessWidget {
               // Sent with an effect: play it once as it arrives, and keep a
               // small badge to play it again.
               final effect = VibeEffects.of(event);
-              if (effect != null) VibeEffects.maybePlay(context, event);
+              if (effect != null) {
+                VibeEffects.maybePlay(context, event);
+              } else {
+                // hot words (hahaha, congrats, kiss, hug, party...) fill the screen
+                VibeHotWords.maybePlay(context, event);
+              }
               // Status sits right after the text the whole time:
               // "Encrypting…" → ✓ → blue ✓✓, changing in place. Only
               // failures and file uploads (with Retry / Cancel) go below.

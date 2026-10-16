@@ -2,7 +2,6 @@
 
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_archive.dart';
 import 'package:fluffychat/vibe/vibe_communities.dart';
 import 'package:fluffychat/vibe/vibe_dm_finder.dart';
@@ -70,7 +69,6 @@ abstract class VibeChatActions {
             ),
           );
           if (ok != true) return;
-          if (VibeCall.instance.isIn(room)) await VibeCall.instance.hangup();
           final name = room.getLocalizedDisplayname();
           final problem = await VibeDmFinder.delete(room);
           if (problem != null) {

@@ -17,7 +17,6 @@ import 'package:fluffychat/pages/chat/pinned_events.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/vibe/vibe_peek.dart';
-import 'package:fluffychat/vibe/call/vibe_call_buttons.dart';
 import 'package:fluffychat/vibe/vibe_lock_button.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
@@ -247,9 +246,6 @@ class ChatView extends StatelessWidget {
                         ],
                       ),
                   ] else if (!controller.room.isArchived) ...[
-                    // Live call here: a small green "Join" pill (the call
-                    // buttons themselves live in the chat pane).
-                    VibeCallActions(room: controller.room),
                     VibeLockButton(room: controller.room),
                     ChatSettingsPopupMenu(controller.room, true),
                   ],

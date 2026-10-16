@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/call/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
@@ -146,15 +145,6 @@ class _SheetState extends State<_Sheet> {
     if (roomId == null || !context.mounted) return;
     Navigator.of(context).pop();
     if (roomId != widget.currentRoomId) widget.router.go('/rooms/$roomId');
-  }
-
-  Future<void> _call(BuildContext context, {bool video = false}) async {
-    final roomId = await _dm(context);
-    if (roomId == null || !context.mounted) return;
-    final room = client.getRoomById(roomId);
-    if (room == null) return;
-    Navigator.of(context).pop();
-    await VibeCall.join(context, room, video: video);
   }
 
   @override
@@ -327,20 +317,6 @@ class _SheetState extends State<_Sheet> {
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      _SquareButton(
-                        icon: Icons.call,
-                        background: soft,
-                        color: cs.onSurface,
-                        onTap: () => _call(context),
-                      ),
-                      const SizedBox(width: 8),
-                      _SquareButton(
-                        icon: Icons.videocam,
-                        background: soft,
-                        color: cs.onSurface,
-                        onTap: () => _call(context, video: true),
                       ),
                     ],
                   ),
