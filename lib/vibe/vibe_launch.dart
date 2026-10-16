@@ -19,7 +19,7 @@ class VibeLaunch extends StatefulWidget {
 
 class _VibeLaunchState extends State<VibeLaunch> with SingleTickerProviderStateMixin {
   late final bool _show = !VibeLaunch._shown;
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 820));
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1150));
   bool _done = false;
 
   @override
@@ -27,8 +27,16 @@ class _VibeLaunchState extends State<VibeLaunch> with SingleTickerProviderStateM
     super.initState();
     VibeLaunch._shown = true;
     if (_show) {
-      _c.forward().whenComplete(() {
-        if (mounted) setState(() => _done = true);
+      // The first frames after start are heavy (the chat list builds), so
+      // wait until they're drawn, or the hop plays while frames are dropped
+      // and you'd only see a still icon.
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await WidgetsBinding.instance.endOfFrame;
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+        if (!mounted) return;
+        _c.forward().whenComplete(() {
+          if (mounted) setState(() => _done = true);
+        });
       });
     }
   }
