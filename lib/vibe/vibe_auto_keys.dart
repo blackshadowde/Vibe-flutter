@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:matrix/encryption.dart';
 import 'package:matrix/matrix.dart';
 
 /// No recovery-key screens: right after you log in or sign up, Vibe sets up
