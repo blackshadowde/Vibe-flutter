@@ -316,10 +316,10 @@ class _VibePageRoute<T> extends PageRoute<T>
   bool get maintainState => true;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 440);
+  Duration get transitionDuration => vibeSpring.duration;
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 380);
+  Duration get reverseTransitionDuration => vibeSpring.duration;
 }
 
 /// A settings page as a pane: it rises to half the screen, then on up to
@@ -353,10 +353,10 @@ class _VibeSheetPageRoute<T> extends PageRoute<T> {
   bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 380);
+  Duration get transitionDuration => vibeSheetSpring.duration;
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 260);
 
   @override
   Widget buildPage(
@@ -381,7 +381,7 @@ class _VibeSheetPageRoute<T> extends PageRoute<T> {
           ? 1 - v
           : 1 - (animation.status == AnimationStatus.reverse
                 ? Curves.easeInCubic.transform(v)
-                : Curves.easeOutCubic.transform(v));
+                : vibeSheetSpring.transform(v));
       return FractionalTranslation(translation: Offset(0, y), child: child);
     },
   );

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 
 /// Vibgram's Discord-style settings look, shared by Settings and every page
@@ -350,7 +351,8 @@ class VibeSettingsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = color ?? VibeSettingsStyle.text(context);
-    return InkWell(
+    return VibePressable(
+      child: InkWell(
       onTap: onTap,
       child: SizedBox(
         height: 52,
@@ -405,6 +407,7 @@ class VibeSettingsRow extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

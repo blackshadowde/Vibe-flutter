@@ -16,7 +16,7 @@ import 'package:flutter/physics.dart';
 class VibePressable extends StatefulWidget {
   final Widget child;
   final double scale;
-  const VibePressable({required this.child, this.scale = 0.95, super.key});
+  const VibePressable({required this.child, this.scale = 0.965, super.key});
 
   @override
   State<VibePressable> createState() => _VibePressableState();
@@ -65,7 +65,8 @@ class _VibePressableState extends State<VibePressable> {
       if (_timer?.isActive ?? false) {
         _timer!.cancel();
         _set(true);
-        Future<void>.delayed(const Duration(milliseconds: 90), () => _set(false));
+        VibeHaptics.light();
+        Future<void>.delayed(const Duration(milliseconds: 70), () => _set(false));
         _start = null;
         return;
       }
@@ -74,8 +75,8 @@ class _VibePressableState extends State<VibePressable> {
     onPointerCancel: (_) => _cancel(),
     child: AnimatedScale(
       scale: _down ? widget.scale : 1,
-      duration: Duration(milliseconds: _down ? 90 : 320),
-      curve: _down ? Curves.easeOut : Curves.easeOutBack,
+      duration: _down ? const Duration(milliseconds: 160) : vibeReleaseSpring.duration,
+      curve: _down ? Curves.easeOutCubic : vibeReleaseSpring,
       child: widget.child,
     ),
   );
@@ -250,10 +251,26 @@ class VibeSpringCurve extends Curve {
 
   @override
   double transformInternal(double t) => _sim.x(t * _end);
+
+  /// How long the spring takes to settle (the animation's length).
+  Duration get duration => Duration(milliseconds: (_end * 1000).round());
 }
 
-/// The spring every pane and page uses.
-final VibeSpringCurve vibeSpring = VibeSpringCurve();
+/// Vibe X's springs (VibeSprings), stiffness = (2π / response)².
+/// Pages: response 0.42 s, no overshoot.
+final VibeSpringCurve vibeSpring = VibeSpringCurve(stiffness: 224);
+
+/// Panes rising from the bottom: response 0.40 s, damping 0.9.
+final VibeSpringCurve vibeSheetSpring = VibeSpringCurve(
+  damping: 0.9,
+  stiffness: 247,
+);
+
+/// A pressed control springing back: response 0.32 s, damping 0.52.
+final VibeSpringCurve vibeReleaseSpring = VibeSpringCurve(
+  damping: 0.52,
+  stiffness: 385,
+);
 
 /// The same spring as a physics simulation, for gestures: starts from where
 /// the finger left it, with the finger's speed (velocity handoff).
@@ -269,9 +286,9 @@ SpringSimulation vibeSpringFrom(double from, double to, double velocity) =>
 /// dragging a pane carries its speed into the close (Flutter's sheets fling
 /// with the drag velocity), and a pane can be grabbed mid-slide.
 final AnimationStyle vibeSheetStyle = AnimationStyle(
-  duration: const Duration(milliseconds: 380),
-  reverseDuration: const Duration(milliseconds: 220),
-  curve: vibeSpring,
+  duration: vibeSheetSpring.duration,
+  reverseDuration: const Duration(milliseconds: 260),
+  curve: vibeSheetSpring,
   reverseCurve: Curves.easeInCubic,
 );
 
