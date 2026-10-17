@@ -350,7 +350,9 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
     final newName = _name.text.trim();
     if (newName.isNotEmpty && newName != _origName) {
       try {
-        await widget.client.setDisplayName(widget.client.userID!, newName);
+        await widget.client.setProfileField(widget.client.userID!, 'displayname', {
+          'displayname': newName,
+        });
         _origName = newName;
         VibeProfileCache.refresh();
       } catch (_) {
