@@ -80,7 +80,14 @@ class FluffyChatApp extends StatelessWidget {
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
         routerConfig: router,
-        builder: (context, child) => AppLockWidget(
+        // One text size everywhere, like Telegram and Discord: the phone's
+        // font size and bold-text settings don't make Vibe bigger or heavier.
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.noScaling,
+            boldText: false,
+          ),
+          child: AppLockWidget(
           pincode: appLockSettings.pincode,
           useBiometrics: appLockSettings.useBiometrics,
           isLoggedIn: clients.any((client) => client.isLogged()),
@@ -95,6 +102,7 @@ class FluffyChatApp extends StatelessWidget {
               ),
             ),
           ),
+        ),
         ),
       ),
     );
