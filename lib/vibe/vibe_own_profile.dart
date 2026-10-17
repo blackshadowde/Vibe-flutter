@@ -187,7 +187,7 @@ class _OwnSheetState extends State<_OwnSheet> {
   }) {
     const blurple = Color(0xFF5865F2);
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(20),
       side: filled
           ? BorderSide.none
           : BorderSide(
@@ -201,18 +201,18 @@ class _OwnSheetState extends State<_OwnSheet> {
       child: InkWell(
         onTap: onTap,
         child: SizedBox(
-          height: 54,
+          height: 40,
           width: double.infinity,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 22, color: filled ? Colors.white : blurple),
-              const SizedBox(width: 10),
+              Icon(icon, size: 18, color: filled ? Colors.white : blurple),
+              const SizedBox(width: 8),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w600,
                   color: filled ? Colors.white : blurple,
                 ),
               ),
@@ -229,17 +229,17 @@ class _OwnSheetState extends State<_OwnSheet> {
       borderRadius: BorderRadius.circular(28),
       onTap: onTap,
       child: SizedBox(
-        width: 88,
-        height: 62,
+        width: 72,
+        height: 50,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 24, color: ink),
-            const SizedBox(height: 4),
+            Icon(icon, size: 20, color: ink),
+            const SizedBox(height: 3),
             Text(
               label,
               style: TextStyle(
-                fontSize: 13.5,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: ink,
               ),
@@ -296,13 +296,13 @@ class _OwnSheetState extends State<_OwnSheet> {
               // Discord-style header: banner, round picture with the
               // online dot, and the status thought bubble.
               SizedBox(
-                height: 236,
+                height: 184,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     // Vibe X's banner: your picture, blurred and dimmed
                     SizedBox(
-                      height: 128,
+                      height: 104,
                       width: double.infinity,
                       child: ClipRect(
                         child: Stack(
@@ -321,7 +321,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                                   client: client,
                                   fit: BoxFit.cover,
                                   width: 360,
-                                  height: 128,
+                                  height: 104,
                                   isThumbnail: true,
                                   placeholder: (_) => const SizedBox.shrink(),
                                 ),
@@ -340,20 +340,20 @@ class _OwnSheetState extends State<_OwnSheet> {
                       ),
                     ),
                     Positioned(
-                      left: 16,
-                      top: 80,
+                      left: 14,
+                      top: 60,
                       child: VibeRingAvatar(
                         mxc: avatar,
                         name: name,
                         client: client,
                         ring: cs.surface,
-                        size: 120,
+                        size: 92,
                       ),
                     ),
                     Positioned(
-                      left: 158,
-                      right: 16,
-                      top: 104,
+                      left: 122,
+                      right: 14,
+                      top: 76,
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Builder(
@@ -432,7 +432,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: cs.onSurface,
                           height: 1.15,
@@ -456,7 +456,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 14.5,
+                                fontSize: 13,
                                 color: cs.onSurfaceVariant,
                               ),
                             ),
@@ -477,7 +477,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                 index: 3,
                 dy: 20,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                   child: Column(
                     children: [
                       _wideButton(
@@ -485,13 +485,6 @@ class _OwnSheetState extends State<_OwnSheet> {
                         label: 'Share my Vibe ID',
                         filled: true,
                         onTap: () => FluffyShare.share(userId, context),
-                      ),
-                      const SizedBox(height: 12),
-                      _wideButton(
-                        icon: Icons.edit,
-                        label: 'Edit profile',
-                        filled: false,
-                        onTap: () => _startEdit(name),
                       ),
                     ],
                   ),
@@ -503,7 +496,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                 dy: 20,
                 child: Center(
                   child: Container(
-                    margin: const EdgeInsets.only(top: 22),
+                    margin: const EdgeInsets.only(top: 18),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 8,
@@ -525,7 +518,12 @@ class _OwnSheetState extends State<_OwnSheet> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _barItem(Icons.photo_camera, 'Photo', () => _photo(profile)),
-                        _barItem(Icons.edit, 'Edit', () => _startEdit(name)),
+                        _barItem(Icons.edit, 'Edit', () async {
+                          await VibeSetStatusPage.open(context, client);
+                          if (!mounted) return;
+                          VibeProfileCache.refresh();
+                          setState(() => _profile = VibeProfileCache.get(client));
+                        }),
                         _barItem(Icons.settings, 'Settings', () {
                           Navigator.of(context).pop();
                           widget.router.go('/rooms/settings');

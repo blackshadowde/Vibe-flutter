@@ -90,7 +90,7 @@ class VibeThoughtBubble extends StatelessWidget {
                 maxLines: empty ? 1 : 3,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 14,
                   height: 1.3,
                   fontStyle: empty ? FontStyle.italic : FontStyle.normal,
                   color: empty ? ink.withValues(alpha: 0.85) : ink,
@@ -174,6 +174,8 @@ enum _Clear { min30, hour1, hour4, today, tomorrow, week, never }
 
 class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
   final _text = TextEditingController();
+  final _name = TextEditingController();
+  String _origName = '';
   final _focus = FocusNode();
   String _emoji = '';
   late DateTime? _clearAt; // null = don't clear
@@ -191,6 +193,11 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
   void initState() {
     super.initState();
     _profile = VibeProfileCache.get(widget.client);
+    _profile.then((p) {
+      if (!mounted) return;
+      _origName = p.displayName ?? '';
+      if (_name.text.isEmpty) setState(() => _name.text = _origName);
+    });
     final s = VibeStatus.mine(widget.client);
     if (s != null && s.active) {
       _hadStatus = true;
@@ -205,6 +212,7 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
   @override
   void dispose() {
     _text.dispose();
+    _name.dispose();
     _focus.dispose();
     super.dispose();
   }
@@ -338,6 +346,24 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
     final clearing = clear || text.isEmpty;
     setState(() => _saving = true);
     final messenger = ScaffoldMessenger.of(context);
+    // the display name (this page is also "Edit profile")
+    final newName = _name.text.trim();
+    if (newName.isNotEmpty && newName != _origName) {
+      try {
+        await widget.client.setDisplayName(widget.client.userID!, newName);
+        _origName = newName;
+        VibeProfileCache.refresh();
+      } catch (_) {
+        messenger.showSnackBar(const SnackBar(content: Text('Could not change your name')));
+      }
+    }
+    if (!clear && text.isEmpty && !_hadStatus) {
+      // only the name changed
+      VibeHaptics.light();
+      if (mounted) Navigator.of(context).pop();
+      messenger.showSnackBar(const SnackBar(content: Text('Saved'), duration: Duration(seconds: 2)));
+      return;
+    }
     final s = clearing
         ? const VibeStatus()
         : VibeStatus(
@@ -369,7 +395,9 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
     final dark = theme.brightness == Brightness.dark;
     final cardColor = dark ? const Color(0xFF232428) : const Color(0xFFF2F3F5);
     final fieldColor = dark ? const Color(0xFF1E1F22) : const Color(0xFFEBEDEF);
-    final canSave = _text.text.trim().isNotEmpty || _hadStatus;
+    final canSave = _text.text.trim().isNotEmpty ||
+        _hadStatus ||
+        (_name.text.trim().isNotEmpty && _name.text.trim() != _origName);
     final userId = widget.client.userID ?? '';
     final preview = _text.text.trim().isEmpty
         ? null
@@ -383,7 +411,7 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
         ),
         centerTitle: true,
         title: const Text(
-          'Set your status',
+          'Edit profile',
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
@@ -494,7 +522,55 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 22),
+              const Padding(
+                padding: EdgeInsets.only(left: 4, bottom: 8),
+                child: Text(
+                  'DISPLAY NAME',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.6),
+                ),
+              ),
+              TextField(
+                controller: _name,
+                maxLength: 64,
+                onChanged: (_) => setState(() {}),
+                style: const TextStyle(fontSize: 15),
+                decoration: InputDecoration(
+                  counterText: '',
+                  filled: true,
+                  fillColor: fieldColor,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              const Padding(
+                padding: EdgeInsets.only(left: 4, bottom: 8),
+                child: Text(
+                  'USERNAME',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.6),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: fieldColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(userId, style: TextStyle(fontSize: 15, color: cs.onSurfaceVariant)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 4, top: 6),
+                child: Text(
+                  'Your Matrix ID can\'t be changed',
+                  style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                ),
+              ),
+              const SizedBox(height: 22),
               const Padding(
                 padding: EdgeInsets.only(left: 4, bottom: 8),
                 child: Text(

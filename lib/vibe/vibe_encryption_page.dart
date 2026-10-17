@@ -267,12 +267,12 @@ class _VibeEncryptionPageState extends State<VibeEncryptionPage> {
                     const SizedBox(height: 2),
                     GestureDetector(
                       onTap: _reset,
-                      child: const Text(
+                      child: Text(
                         'Forgot your recovery key?',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFC9CFFF),
+                          color: _encInk(context),
                         ),
                       ),
                     ),
@@ -308,12 +308,12 @@ class _VibeEncryptionPageState extends State<VibeEncryptionPage> {
                     const SizedBox(height: 10),
                     GestureDetector(
                       onTap: _reset,
-                      child: const Text(
+                      child: Text(
                         'Forgot your recovery key?',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFC9CFFF),
+                          color: _encInk(context),
                         ),
                       ),
                     ),
@@ -393,7 +393,7 @@ class _Tile extends StatelessWidget {
         color: cs.primary.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Icon(icon, size: 22, color: const Color(0xFFC9CFFF)),
+      child: Icon(icon, size: 22, color: _encInk(context)),
     );
   }
 }
@@ -405,7 +405,7 @@ class _Badge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final color = on ? const Color(0xFFC9CFFF) : cs.error;
+    final color = on ? _encInk(context) : cs.error;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
@@ -457,3 +457,9 @@ class _Stat extends StatelessWidget {
     );
   }
 }
+
+/// Lavender on dark, Vibe blue on light (the lavender was invisible on white).
+Color _encInk(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark
+    ? const Color(0xFFC9CFFF)
+    : const Color(0xFF5865F2);

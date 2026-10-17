@@ -3,7 +3,6 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'package:flutter/material.dart';
 
 /// State for the "drag the chat in with your finger" gesture on the home
@@ -354,58 +353,17 @@ class _VibeSheetPageRoute<T> extends PageRoute<T> {
   bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 620);
+  Duration get transitionDuration => const Duration(milliseconds: 380);
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 320);
-
-  static final _rise = TweenSequence<double>([
-    TweenSequenceItem(
-      tween: Tween(begin: 1.0, end: 0.5).chain(CurveTween(curve: Curves.easeOutCubic)),
-      weight: 42,
-    ),
-    TweenSequenceItem(
-      tween: Tween(begin: 0.5, end: 0.0).chain(CurveTween(curve: Curves.easeInOutCubic)),
-      weight: 58,
-    ),
-  ]);
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
 
   @override
   Widget buildPage(
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
-  ) {
-    final cs = Theme.of(context).colorScheme;
-    return VibeSheetDragClose(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        child: Stack(
-          children: [
-            Positioned.fill(child: builder(context)),
-            // the grab handle (it closes by sliding down, no back button)
-            Positioned(
-              top: MediaQuery.paddingOf(context).top + 6,
-              left: 0,
-              right: 0,
-              child: IgnorePointer(
-                child: Center(
-                  child: Container(
-                    width: 40,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: cs.onSurfaceVariant.withValues(alpha: 0.45),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  ) => _SheetPage(route: this, child: builder(context));
 
   @override
   Widget buildTransitions(
@@ -418,17 +376,183 @@ class _VibeSheetPageRoute<T> extends PageRoute<T> {
     child: child,
     builder: (context, child) {
       final v = animation.value.clamp(0.0, 1.0);
-      // following a finger: 1:1; opening: half way, then all the way;
-      // closing: straight down
-      final double y;
-      if (navigator?.userGestureInProgress == true) {
-        y = 1 - v;
-      } else if (animation.status == AnimationStatus.reverse) {
-        y = 1 - Curves.easeOutCubic.transform(v);
-      } else {
-        y = _rise.transform(v);
-      }
+      // following a finger: 1:1; otherwise eased
+      final y = navigator?.userGestureInProgress == true
+          ? 1 - v
+          : 1 - (animation.status == AnimationStatus.reverse
+                ? Curves.easeInCubic.transform(v)
+                : Curves.easeOutCubic.transform(v));
       return FractionalTranslation(translation: Offset(0, y), child: child);
     },
   );
+}
+
+/// A settings page as a pane: it opens half way up; drag it up (it follows
+/// the finger) for the full page, drag it down to close. While it is half
+/// open its list doesn't scroll, so the drag moves the pane.
+class _SheetPage extends StatefulWidget {
+  final PageRoute<dynamic> route;
+  final Widget child;
+  const _SheetPage({required this.route, required this.child});
+
+  @override
+  State<_SheetPage> createState() => _SheetPageState();
+}
+
+class _SheetPageState extends State<_SheetPage>
+    with SingleTickerProviderStateMixin {
+  // 0 = half open, 1 = full page
+  late final AnimationController _full = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 280),
+  )..addStatusListener((_) {
+      if (mounted) setState(() {});
+    });
+  bool _closingDrag = false;
+  bool _closing = false;
+  double _h = 1;
+
+  // ignore: invalid_use_of_protected_member
+  AnimationController? get _route => (widget.route as TransitionRoute).controller;
+
+  @override
+  void dispose() {
+    _full.dispose();
+    super.dispose();
+  }
+
+  void _move(double dy) {
+    if (_closing) return;
+    if (_closingDrag) {
+      final c = _route;
+      if (c == null) return;
+      c.value = (c.value - dy / _h).clamp(0.0, 1.0);
+      return;
+    }
+    if (dy > 0 && _full.value <= 0) {
+      // already half open: pulling down closes it
+      _closingDrag = true;
+      widget.route.navigator?.didStartUserGesture();
+      _move(dy);
+      return;
+    }
+    _full.value = (_full.value - dy / (_h / 2)).clamp(0.0, 1.0);
+  }
+
+  void _end(double v) {
+    if (_closingDrag) {
+      _closingDrag = false;
+      final c = _route;
+      final nav = widget.route.navigator;
+      if (c == null) return;
+      if (v > 700 || c.value < 0.75) {
+        _closing = true;
+        Navigator.of(context).pop();
+        if (c.isAnimating) {
+          late AnimationStatusListener l;
+          l = (s) {
+            if (!c.isAnimating) {
+              c.removeStatusListener(l);
+              nav?.didStopUserGesture();
+            }
+          };
+          c.addStatusListener(l);
+        } else {
+          nav?.didStopUserGesture();
+        }
+      } else {
+        c
+            .animateTo(1, duration: const Duration(milliseconds: 220))
+            .whenComplete(() => nav?.didStopUserGesture());
+      }
+      return;
+    }
+    if (v < -500 || (v.abs() <= 500 && _full.value > 0.5)) {
+      _full.animateTo(1, curve: Curves.easeOutCubic);
+    } else {
+      _full.animateBack(0, curve: Curves.easeOutCubic);
+    }
+  }
+
+  bool _onScroll(ScrollNotification n) {
+    if (n.metrics.axis != Axis.vertical) return false;
+    // full page, list at the top, pulling down: the pane comes down again
+    if (n is OverscrollNotification &&
+        n.dragDetails != null &&
+        n.overscroll < 0) {
+      _move(-n.overscroll);
+    } else if (n is ScrollEndNotification &&
+        _full.value < 1 &&
+        !_full.isAnimating &&
+        !_closingDrag) {
+      _end(n.dragDetails?.velocity.pixelsPerSecond.dy ?? 0);
+    } else if (n is ScrollEndNotification && _closingDrag) {
+      _end(n.dragDetails?.velocity.pixelsPerSecond.dy ?? 0);
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final full = _full.value >= 1;
+    return LayoutBuilder(
+      builder: (context, box) {
+        _h = box.maxHeight;
+        return AnimatedBuilder(
+          animation: _full,
+          child: NotificationListener<ScrollNotification>(
+            onNotification: _onScroll,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: ScrollConfiguration(
+                      // half open: the list stays put, the drag moves the pane
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        physics: full
+                            ? const ClampingScrollPhysics()
+                            : const NeverScrollableScrollPhysics(),
+                      ),
+                      child: widget.child,
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.paddingOf(context).top + 6,
+                    left: 0,
+                    right: 0,
+                    child: IgnorePointer(
+                      child: Center(
+                        child: Container(
+                          width: 40,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: cs.onSurfaceVariant.withValues(alpha: 0.45),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          builder: (context, child) => Transform.translate(
+            offset: Offset(0, _h / 2 * (1 - _full.value)),
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onVerticalDragUpdate: (d) => _move(d.delta.dy),
+              onVerticalDragEnd: (d) => _end(d.primaryVelocity ?? 0),
+              onVerticalDragCancel: () => _end(0),
+              child: child,
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
