@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -270,7 +271,7 @@ abstract class VibeEmojiPack {
 
   static void _love(Canvas c, double t) {
     final o = _body(c);
-    final beat = 1 + 0.18 * math.max(0, _wave(t, 2));
+    final beat = 1 + 0.18 * math.max(0.0, _wave(t, 2));
     for (final dx in [-16.0, 16.0]) {
       c.drawPath(_heart(o.translate(dx, -6), 18 * beat), _p(_red));
     }
@@ -405,7 +406,7 @@ abstract class VibeEmojiPack {
   }
 
   static void _yes(Canvas c, double t) {
-    final nod = math.max(0, _wave(t, 2)) * 6;
+    final nod = math.max(0.0, _wave(t, 2)) * 6;
     final o = _body(c, dy: nod);
     _happyEyes(c, o);
     _smile(c, o);
