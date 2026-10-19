@@ -78,7 +78,14 @@ class VibeTextStickerBar extends StatelessWidget {
   ) async {
     VibeHaptics.light();
     final messenger = ScaffoldMessenger.of(context);
-    controller.sendController.clear();
+    controller.clearInput();
+    // the keyboard can put back the word it was still composing: clear again
+    Future<void>.delayed(const Duration(milliseconds: 300), () {
+      if (controller.mounted &&
+          controller.sendController.text.trim() == text) {
+        controller.clearInput();
+      }
+    });
     try {
       final (bytes, sw, sh) = await render(text, style);
       // the name is the words, so there's no caption under the sticker

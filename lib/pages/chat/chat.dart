@@ -742,6 +742,17 @@ class ChatController extends State<ChatPageWithRoom>
     Matrix.of(context).setActiveClient(c);
   });
 
+  /// Empties the message box after something else was sent instead of the
+  /// text (a sticker): also forgets the saved draft, so the words don't come
+  /// back when the chat is opened again.
+  void clearInput() {
+    _storeInputTimeoutTimer?.cancel();
+    Matrix.of(context).store.remove('draft_$roomId');
+    sendController.value = const TextEditingValue(
+      selection: TextSelection.collapsed(offset: 0),
+    );
+  }
+
   Future<void> send() async {
     final proceed = await showTrustUserInRoomDialog(context, room);
     if (!mounted || !proceed) return;
