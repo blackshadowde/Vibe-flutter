@@ -1623,54 +1623,6 @@ class ChatController extends State<ChatPageWithRoom>
   void showEventInfo([Event? event]) =>
       (event ?? selectedEvents.single).showInfoDialog(context);
 
-  Future<void> onPhoneButtonTap() async {
-    // VoIP required Android SDK 21
-    if (PlatformInfos.isAndroid) {
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      if (!mounted) return;
-      if (androidInfo.version.sdkInt < 21) {
-        Navigator.pop(context);
-        await showOkAlertDialog(
-          context: context,
-          title: L10n.of(context).unsupportedAndroidVersion,
-          message: L10n.of(context).unsupportedAndroidVersionLong,
-          okLabel: L10n.of(context).close,
-        );
-        return;
-      }
-    }
-    final callType = await showModalActionPopup<CallType>(
-      context: context,
-      title: L10n.of(context).warning,
-      message: L10n.of(context).videoCallsBetaWarning,
-      cancelLabel: L10n.of(context).cancel,
-      actions: [
-        AdaptiveModalAction(
-          label: L10n.of(context).voiceCall,
-          icon: const Icon(Icons.phone_outlined),
-          value: CallType.kVoice,
-        ),
-        AdaptiveModalAction(
-          label: L10n.of(context).videoCall,
-          icon: const Icon(Icons.video_call_outlined),
-          value: CallType.kVideo,
-        ),
-      ],
-    );
-    if (callType == null) return;
-    if (!mounted) return;
-
-    final voipPlugin = Matrix.of(context).voipPlugin;
-    try {
-      await voipPlugin!.voip.inviteToCall(room, callType);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toLocalizedString(context))));
-    }
-  }
-
   void cancelReplyEventAction() => setState(() {
     if (editEvent != null) {
       sendController.text = pendingText;
