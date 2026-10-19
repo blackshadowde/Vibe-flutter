@@ -32,6 +32,13 @@ configurations.all {
     }
 }
 
+// Jitsi (calls) ships its own copy of ExoPlayer's RTSP classes inside
+// react-native-video; the video player's copy would be a duplicate.
+// (RTSP live streams aren't used anywhere in Vibe.)
+configurations.all {
+    exclude(group = "androidx.media3", module = "media3-exoplayer-rtsp")
+}
+
 
 android {
     namespace = "chat.fluffy.fluffychat"
