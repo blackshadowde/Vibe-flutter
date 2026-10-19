@@ -60,8 +60,11 @@ class MessageContent extends StatelessWidget {
           case MessageTypes.Image:
           case MessageTypes.Sticker:
             if (event.redacted) continue textmessage;
-            final maxSize = event.messageType == MessageTypes.Sticker
-                ? 128.0
+            // Vibe text stickers: shown like stickers, no frame
+            final vibeSticker = event.content['chat.vibe.sticker'] == true;
+            final maxSize =
+                event.messageType == MessageTypes.Sticker || vibeSticker
+                ? (vibeSticker ? 150.0 : 128.0)
                 : 256.0;
             final w = event.content
                 .tryGetMap<String, Object?>('info')
@@ -71,7 +74,7 @@ class MessageContent extends StatelessWidget {
                 ?.tryGet<int>('h');
             var width = maxSize;
             var height = maxSize;
-            var fit = event.messageType == MessageTypes.Sticker
+            var fit = event.messageType == MessageTypes.Sticker || vibeSticker
                 ? BoxFit.contain
                 : BoxFit.cover;
             if (w != null && h != null) {
@@ -89,7 +92,8 @@ class MessageContent extends StatelessWidget {
               width: width,
               height: height,
               fit: fit,
-              borderRadius: borderRadius,
+              borderRadius: vibeSticker ? BorderRadius.zero : borderRadius,
+              backgroundColor: vibeSticker ? Colors.transparent : null,
               timeline: timeline,
               textColor: textColor,
               // Slideshow of the chat's photos and videos (Google Messages

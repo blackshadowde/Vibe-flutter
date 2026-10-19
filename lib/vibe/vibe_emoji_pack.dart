@@ -40,13 +40,15 @@ abstract class VibeEmojiPack {
   /// Installs the pack; [progress] gets "3/12" style updates.
   static Future<void> install(
     Client client, {
+    Map<String, void Function(Canvas, double)>? pack,
     void Function(String)? progress,
   }) async {
+    final set = pack ?? emotes;
     final images = <String, Object?>{};
     var i = 0;
-    for (final e in emotes.entries) {
+    for (final e in set.entries) {
       i++;
-      progress?.call('Drawing ${e.key} ($i/${emotes.length})');
+      progress?.call('Drawing ${e.key} ($i/${set.length})');
       final gif = await _gif(e.value);
       final uri = await client.uploadContent(
         gif,
@@ -83,11 +85,23 @@ abstract class VibeEmojiPack {
     );
   }
 
-  static bool installed(Client client) {
+  static bool installed(Client client, [String key = 'vibe_hi']) {
     final images = client.accountData['im.ponies.user_emotes']?.content
         .tryGetMap<String, Object?>('images');
-    return images?.containsKey('vibe_hi') ?? false;
+    return images?.containsKey(key) ?? false;
   }
+
+  /// Vibe's love pack (Valentine's day): hearts, hugs, kisses, a rose…
+  static final Map<String, void Function(Canvas, double)> lovePack = {
+    'love_heart': _loveHeart,
+    'love_hug': _loveHug,
+    'love_kiss': _loveKiss,
+    'love_rose': _loveRose,
+    'love_letter': _loveLetter,
+    'love_you': _loveYou,
+    'love_cupid': _loveCupid,
+    'love_miss': _loveMiss,
+  };
 
   // ---- drawing → GIF ------------------------------------------------------
 
@@ -424,5 +438,151 @@ abstract class VibeEmojiPack {
       ..lineTo(116, 16);
     final m = tick.computeMetrics().first;
     c.drawPath(m.extractPath(0, m.length * k), p);
+  }
+
+  // ---- love pack ----------------------------------------------------------
+
+  static void _sparkle(Canvas c, Offset p, double r, Color col) {
+    final path = Path()
+      ..moveTo(p.dx, p.dy - r)
+      ..quadraticBezierTo(p.dx, p.dy, p.dx + r, p.dy)
+      ..quadraticBezierTo(p.dx, p.dy, p.dx, p.dy + r)
+      ..quadraticBezierTo(p.dx, p.dy, p.dx - r, p.dy)
+      ..quadraticBezierTo(p.dx, p.dy, p.dx, p.dy - r);
+    c.drawPath(path, _p(col));
+  }
+
+  static void _loveHeart(Canvas c, double t) {
+    final beat = 1 + 0.12 * math.max(0.0, _wave(t, 2));
+    c.drawPath(_heart(const Offset(64, 70), 100 * beat), _p(_red));
+    c.drawPath(_heart(const Offset(50, 54), 26 * beat), _p(_pink));
+    for (var n = 0; n < 3; n++) {
+      final k = (t + n / 3) % 1;
+      _sparkle(c, Offset(20.0 + n * 44, 26 + (n.isEven ? 0 : 70)), 9 * math.sin(k * math.pi), _yellow);
+    }
+  }
+
+  static void _blob(Canvas c, Offset o, double r, Color col, {bool happy = true}) {
+    c.drawCircle(o, r, _p(col));
+    for (final dx in [-r * 0.35, r * 0.35]) {
+      c.drawArc(Rect.fromCenter(center: o.translate(dx, -r * 0.1), width: r * 0.32, height: r * 0.26), math.pi, math.pi, false, _s(_ink, 3.5));
+    }
+    if (happy) {
+      c.drawArc(Rect.fromCenter(center: o.translate(0, r * 0.25), width: r * 0.5, height: r * 0.3), 0.2, math.pi - 0.4, false, _s(_ink, 3.5));
+    }
+    c.drawCircle(o.translate(-r * 0.55, r * 0.15), r * 0.12, _p(_pink.withValues(alpha: 0.7)));
+    c.drawCircle(o.translate(r * 0.55, r * 0.15), r * 0.12, _p(_pink.withValues(alpha: 0.7)));
+  }
+
+  static void _loveHug(Canvas c, double t) {
+    final squeeze = math.max(0.0, _wave(t, 1)) * 6;
+    _blob(c, Offset(44 + squeeze, 78), 32, _blue);
+    _blob(c, Offset(84 - squeeze, 78), 32, const Color(0xFFFF6B8B));
+    // arms
+    c.drawArc(Rect.fromCenter(center: const Offset(64, 84), width: 70 - squeeze * 2, height: 30), 0.2, math.pi - 0.4, false, _s(_light, 8));
+    final k = t;
+    c.drawPath(_heart(Offset(64, 36 - k * 18), 26 * (0.6 + 0.4 * math.sin(k * math.pi))), _p(_red.withValues(alpha: 1 - k * 0.6)));
+  }
+
+  static void _loveKiss(Canvas c, double t) {
+    _blob(c, const Offset(50, 72), 36, const Color(0xFFFF6B8B), happy: false);
+    // pursed lips
+    c.drawOval(Rect.fromCenter(center: const Offset(56, 84), width: 12, height: 10), _p(_red));
+    final k = t;
+    final p = Offset(70 + k * 46, 72 - k * 40);
+    c.drawPath(_heart(p, 20 + k * 10), _p(_red.withValues(alpha: 1 - k * 0.7)));
+  }
+
+  static void _loveRose(Canvas c, double t) {
+    final open = 0.85 + 0.15 * math.sin(t * 2 * math.pi);
+    c.drawLine(const Offset(64, 70), const Offset(64, 122), _s(const Color(0xFF23A55A), 6));
+    c.drawOval(Rect.fromCenter(center: const Offset(52, 100), width: 22, height: 10), _p(const Color(0xFF23A55A)));
+    for (var n = 0; n < 6; n++) {
+      final a = n * math.pi / 3 + t * 0.6;
+      c.drawCircle(Offset(64 + math.cos(a) * 16 * open, 50 + math.sin(a) * 14 * open), 16 * open, _p(_red));
+    }
+    c.drawCircle(const Offset(64, 50), 14, _p(const Color(0xFFC62828)));
+    c.drawArc(Rect.fromCenter(center: const Offset(64, 50), width: 16, height: 14), 0, math.pi * 1.4, false, _s(const Color(0xFF8E1B1B), 3));
+  }
+
+  static void _loveLetter(Canvas c, double t) {
+    final env = RRect.fromRectAndRadius(const Rect.fromLTWH(18, 58, 92, 58), const Radius.circular(8));
+    final k = math.min(1.0, t * 2);
+    // heart rising out
+    c.drawPath(_heart(Offset(64, 80 - k * 46), 40), _p(_red));
+    c.drawRRect(env, _p(_white));
+    c.drawLine(const Offset(18, 58), const Offset(64, 92), _s(const Color(0xFFB0BEC5), 3));
+    c.drawLine(const Offset(110, 58), const Offset(64, 92), _s(const Color(0xFFB0BEC5), 3));
+    c.drawCircle(const Offset(64, 92), 7, _p(_pink));
+  }
+
+  static void _loveYou(Canvas c, double t) {
+    final s = 1 + 0.08 * _wave(t, 2);
+    c.save();
+    c.translate(64, 64);
+    c.scale(s);
+    c.rotate(-0.12);
+    final tp = TextPainter(
+      text: TextSpan(
+        text: 'Love\nyou',
+        style: TextStyle(
+          fontSize: 40,
+          height: 0.95,
+          fontWeight: FontWeight.w900,
+          foreground: Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 8
+            ..color = _white,
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(c, Offset(-tp.width / 2, -tp.height / 2));
+    final fill = TextPainter(
+      text: const TextSpan(
+        text: 'Love\nyou',
+        style: TextStyle(fontSize: 40, height: 0.95, fontWeight: FontWeight.w900, color: _red),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    )..layout();
+    fill.paint(c, Offset(-fill.width / 2, -fill.height / 2));
+    c.restore();
+    for (var n = 0; n < 3; n++) {
+      final k = (t + n / 3) % 1;
+      c.drawPath(_heart(Offset(18.0 + n * 46, 118 - k * 40), 14), _p(_pink.withValues(alpha: 1 - k)));
+    }
+  }
+
+  static void _loveCupid(Canvas c, double t) {
+    final beat = 1 + 0.08 * math.max(0.0, _wave(t, 2));
+    c.drawPath(_heart(const Offset(64, 68), 84 * beat), _p(_red));
+    final k = math.min(1.0, t * 2.5);
+    final x = -20 + k * 104;
+    c.drawLine(Offset(x - 40, 82 - (x - 40) * 0.3 + 10), Offset(x, 82 - x * 0.3 + 10), _s(const Color(0xFF8D6E63), 4));
+    final tip = Offset(x, 82 - x * 0.3 + 10);
+    c.drawPath(
+      Path()
+        ..moveTo(tip.dx + 10, tip.dy - 3)
+        ..lineTo(tip.dx - 2, tip.dy - 8)
+        ..lineTo(tip.dx, tip.dy + 4)
+        ..close(),
+      _p(_yellow),
+    );
+  }
+
+  static void _loveMiss(Canvas c, double t) {
+    final o = _body(c, dy: 10);
+    for (final dx in [-16.0, 16.0]) {
+      c.drawArc(Rect.fromCenter(center: o.translate(dx, -2), width: 14, height: 10), math.pi + 0.2, math.pi - 0.4, false, _s(_ink, 4));
+    }
+    c.drawArc(Rect.fromCenter(center: o.translate(0, 24), width: 18, height: 10), math.pi + 0.3, math.pi - 0.6, false, _s(_ink, 4));
+    // a thought of a heart
+    c.drawCircle(Offset(o.dx + 30, o.dy - 40), 4, _p(_white));
+    c.drawCircle(Offset(o.dx + 38, o.dy - 50), 6, _p(_white));
+    c.drawCircle(const Offset(106, 22), 18, _p(_white));
+    final b = 1 + 0.15 * math.max(0.0, _wave(t, 2));
+    c.drawPath(_heart(const Offset(106, 24), 22 * b), _p(_red));
   }
 }

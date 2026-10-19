@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_text_sticker.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:ui' as ui;
 
@@ -508,6 +509,8 @@ class ChatView extends StatelessWidget {
                                             : Column(
                                                 mainAxisSize: .min,
                                                 children: [
+                                                  // Hike-style text stickers
+                                                  VibeTextStickerBar(controller),
                                                   ChatInputRow(controller),
                                                   ChatEmojiPicker(controller),
                                                 ],

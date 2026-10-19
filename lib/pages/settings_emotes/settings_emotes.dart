@@ -244,11 +244,14 @@ class EmotesSettingsController extends State<EmotesSettings> {
       room?.canChangeStateEvent('im.ponies.room_emotes') == false;
 
   /// Draws Vibe's own animated emojis and adds them to your pack.
-  Future<void> addVibePack() async {
+  Future<void> addVibePack({bool love = false}) async {
     final client = Matrix.of(context).client;
     final r = await showFutureLoadingDialog(
       context: context,
-      future: () => VibeEmojiPack.install(client),
+      future: () => VibeEmojiPack.install(
+        client,
+        pack: love ? VibeEmojiPack.lovePack : null,
+      ),
     );
     if (r.isError || !mounted) return;
     // the pack arrives with the next sync; show it now

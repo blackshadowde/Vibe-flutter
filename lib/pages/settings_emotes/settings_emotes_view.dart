@@ -222,6 +222,16 @@ class EmotesSettingsView extends StatelessWidget {
                     label: const Text('Add Vibe animated emoji pack'),
                   ),
                 ),
+              if (controller.room == null &&
+                  !VibeEmojiPack.installed(client, 'love_heart'))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: ElevatedButton.icon(
+                    onPressed: () => controller.addVibePack(love: true),
+                    icon: const Icon(Icons.favorite),
+                    label: const Text('Add Vibe love pack'),
+                  ),
+                ),
               const Divider(),
             ],
             if (controller.room != null && imageKeys.isNotEmpty)
