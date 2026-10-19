@@ -119,7 +119,7 @@ class VibeTextStickerBar extends StatelessWidget {
 
 /// Die-cut text stickers (like printed vinyl stickers): bold words with a
 /// dark outline, a thick white border cut around them and a soft shadow.
-enum VibeTextSticker { classic, duo, sunny, love, vibey }
+enum VibeTextSticker { marker, bubble, comic, brush, script, retro, classic, vibey }
 
 class _StickerPainter extends CustomPainter {
   final String text;
@@ -159,6 +159,7 @@ class _StickerPainter extends CustomPainter {
     Color border = Colors.white,
     double maxFrac = 0.36,
     bool italic = false,
+    String? font,
   }) {
     TextPainter make(double size, Paint? stroke, {bool fill = false}) =>
         TextPainter(
@@ -170,7 +171,8 @@ class _StickerPainter extends CustomPainter {
                   style: TextStyle(
                     fontSize: size,
                     height: 0.98,
-                    fontWeight: FontWeight.w900,
+                    fontFamily: font,
+                    fontWeight: font == null ? FontWeight.w900 : FontWeight.w400,
                     fontStyle: italic ? FontStyle.italic : FontStyle.normal,
                     letterSpacing: -size * 0.02,
                     color: stroke == null ? col : null,
@@ -247,23 +249,28 @@ class _StickerPainter extends CustomPainter {
     }
 
     switch (style) {
-      case VibeTextSticker.classic:
-        // white letters, black outline, white border (like "Verified")
-        tilt(-0.04);
-        _dieCut(c, box, [(text, Colors.white)]);
-      case VibeTextSticker.duo:
-        // two colours with little sparks (like "Not my problem")
+      case VibeTextSticker.marker:
+        // marker lettering, white then pink, with sparks ("Not My Problem")
         tilt(-0.06);
-        final r = _dieCut(c, box, _parts(Colors.white, _pink));
+        final r = _dieCut(c, box, _parts(Colors.white, _pink), font: 'PermanentMarker', maxFrac: 0.3);
         _sparks(c, r, _ink);
-      case VibeTextSticker.sunny:
-        // yellow italic letters, a bit more tilt
-        tilt(0.07);
-        _dieCut(c, box, [(text, _yellow)], italic: true);
-      case VibeTextSticker.love:
-        // pink and red with hearts
+      case VibeTextSticker.bubble:
+        // fat round letters, white with black outline
+        tilt(-0.04);
+        _dieCut(c, box, [(text, Colors.white)], font: 'LuckiestGuy', maxFrac: 0.3);
+      case VibeTextSticker.comic:
+        // comic-book yellow
+        tilt(0.06);
+        _dieCut(c, box, [(text, _yellow)], font: 'Bangers', maxFrac: 0.38);
+      case VibeTextSticker.brush:
+        // hand brush lettering, pink and white
         tilt(-0.05);
-        final r = _dieCut(c, box, _parts(_pink, _red), outline: const Color(0xFF6A1B3A));
+        final r = _dieCut(c, box, _parts(_pink, Colors.white), font: 'CaveatBrush', maxFrac: 0.38);
+        _sparks(c, r, _pink);
+      case VibeTextSticker.script:
+        // flowing script in pink and red, with hearts
+        tilt(-0.07);
+        final r = _dieCut(c, box, _parts(_pink, _red), outline: const Color(0xFF6A1B3A), font: 'Pacifico', maxFrac: 0.28);
         for (final (o, sz) in [
           (r.topRight + Offset(-w * 0.02, -w * 0.02), w * 0.16),
           (r.bottomLeft + Offset(w * 0.02, w * 0.03), w * 0.12),
@@ -271,6 +278,14 @@ class _StickerPainter extends CustomPainter {
           c.drawPath(_heart(o, sz * 1.25), Paint()..color = Colors.white);
           c.drawPath(_heart(o, sz), Paint()..color = _red);
         }
+      case VibeTextSticker.retro:
+        // retro script, Vibe blue and white
+        tilt(-0.05);
+        _dieCut(c, box, _parts(_blue, const Color(0xFF4FC3F7)), font: 'Lobster', maxFrac: 0.32);
+      case VibeTextSticker.classic:
+        // plain heavy letters, white on black (like "Verified")
+        tilt(-0.03);
+        _dieCut(c, box, [(text, Colors.white)]);
       case VibeTextSticker.vibey:
         // Vibey holding up a sign
         final sign = RRect.fromRectAndRadius(

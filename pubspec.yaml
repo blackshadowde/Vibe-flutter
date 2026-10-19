@@ -106,6 +106,7 @@ flutter:
     - assets/logo/mini/
     - assets/sounds/
     - assets/vodozemac/
+    - assets/fonts/stickers/
   fonts:
     # Figtree (SIL Open Font License, assets/fonts/Figtree-OFL.txt)
     - family: Figtree
@@ -121,6 +122,30 @@ flutter:
           weight: 600
         - asset: assets/fonts/Figtree-Bold.ttf
           weight: 700
+    # sticker lettering (Google Fonts, OFL / Apache 2.0, licences next to the files)
+    - family: PermanentMarker
+      fonts:
+        - asset: assets/fonts/stickers/PermanentMarker-Regular.ttf
+    # sticker lettering (Google Fonts, OFL / Apache 2.0, licences next to the files)
+    - family: LuckiestGuy
+      fonts:
+        - asset: assets/fonts/stickers/LuckiestGuy-Regular.ttf
+    # sticker lettering (Google Fonts, OFL / Apache 2.0, licences next to the files)
+    - family: Bangers
+      fonts:
+        - asset: assets/fonts/stickers/Bangers-Regular.ttf
+    # sticker lettering (Google Fonts, OFL / Apache 2.0, licences next to the files)
+    - family: Pacifico
+      fonts:
+        - asset: assets/fonts/stickers/Pacifico-Regular.ttf
+    # sticker lettering (Google Fonts, OFL / Apache 2.0, licences next to the files)
+    - family: Lobster
+      fonts:
+        - asset: assets/fonts/stickers/Lobster-Regular.ttf
+    # sticker lettering (Google Fonts, OFL / Apache 2.0, licences next to the files)
+    - family: CaveatBrush
+      fonts:
+        - asset: assets/fonts/stickers/CaveatBrush-Regular.ttf
 
 hooks:
   user_defines:
