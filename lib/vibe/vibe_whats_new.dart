@@ -4,6 +4,7 @@ import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_updater.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -59,11 +60,20 @@ abstract class VibeWhatsNew {
 
   /// Vibe X's card: the logo, the title, one dot per change (each pops in,
   /// one after another) and a round "Got it".
-  static Future<void> show(BuildContext context, String version) {
+  static Future<void> show(BuildContext context, String version) async {
     final short = version.split('.').take(2).join('.');
     final notes =
         vibeReleaseNotes.where((n) => n.version == short).firstOrNull ??
         vibeReleaseNotes.first;
+    // this version's own notes from its release page (what really changed);
+    // the list built into the app only if that can't be reached
+    var items = notes.items;
+    final fetched = await VibeUpdater.notesFor(version).timeout(
+      const Duration(seconds: 6),
+      onTimeout: () => const <String>[],
+    );
+    if (fetched.isNotEmpty) items = fetched;
+    if (!context.mounted) return;
     VibeHaptics.medium();
     return showVibeSheet<void>(
       context: context,
@@ -121,7 +131,7 @@ abstract class VibeWhatsNew {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  for (final (i, line) in notes.items.indexed)
+                  for (final (i, line) in items.indexed)
                     _PopIn(
                       index: i,
                       child: Padding(

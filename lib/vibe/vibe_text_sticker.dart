@@ -117,128 +117,171 @@ class VibeTextStickerBar extends StatelessWidget {
   }
 }
 
-enum VibeTextSticker { love, pop, vibey }
+/// Die-cut text stickers (like printed vinyl stickers): bold words with a
+/// dark outline, a thick white border cut around them and a soft shadow.
+enum VibeTextSticker { classic, duo, sunny, love, vibey }
 
 class _StickerPainter extends CustomPainter {
   final String text;
   final VibeTextSticker style;
   _StickerPainter(this.text, this.style);
 
+  static const _ink = Color(0xFF1E1F22);
   static const _blue = Color(0xFF5865F2);
+  static const _pink = Color(0xFFFF8FB1);
   static const _red = Color(0xFFF23F43);
-  static const _pink = Color(0xFFFF6B8B);
+  static const _yellow = Color(0xFFFFD54F);
 
   static Path _heart(Offset c, double w) => Path()
     ..moveTo(c.dx, c.dy + w * 0.35)
     ..cubicTo(c.dx - w * 0.6, c.dy - w * 0.05, c.dx - w * 0.3, c.dy - w * 0.55, c.dx, c.dy - w * 0.2)
     ..cubicTo(c.dx + w * 0.3, c.dy - w * 0.55, c.dx + w * 0.6, c.dy - w * 0.05, c.dx, c.dy + w * 0.35);
 
-  /// Draws [text] as big as fits in [box] (up to 3 lines), outlined.
-  void _words(Canvas c, Rect box, Color fill, Color edge, {double max = 0.34}) {
-    var size = box.height * max;
-    TextPainter make(double s, Paint? stroke) => TextPainter(
-      text: TextSpan(
-        text: text,
-        style: TextStyle(
-          fontSize: s,
-          height: 1.0,
-          fontWeight: FontWeight.w900,
-          color: stroke == null ? fill : null,
-          foreground: stroke,
-        ),
-      ),
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-      maxLines: 3,
-    );
-    late TextPainter tp;
+  /// The words split in two colours (first half / second half), like
+  /// "Not my" white and "problem" pink.
+  List<(String, Color)> _parts(Color a, Color b) {
+    final words = text.split(RegExp(r'\s+'));
+    if (words.length < 2 || a == b) return [(text, a)];
+    final half = (words.length / 2).ceil();
+    return [
+      ('${words.take(half).join(' ')}\n', a),
+      (words.skip(half).join(' '), b),
+    ];
+  }
+
+  /// Lays the words out as big as fit in [box] (up to 3 lines) and paints
+  /// them die-cut: shadow, white border, dark outline, colour fill.
+  Rect _dieCut(
+    Canvas c,
+    Rect box,
+    List<(String, Color)> parts, {
+    Color outline = _ink,
+    Color border = Colors.white,
+    double maxFrac = 0.36,
+    bool italic = false,
+  }) {
+    TextPainter make(double size, Paint? stroke, {bool fill = false}) =>
+        TextPainter(
+          text: TextSpan(
+            children: [
+              for (final (t, col) in parts)
+                TextSpan(
+                  text: t,
+                  style: TextStyle(
+                    fontSize: size,
+                    height: 0.98,
+                    fontWeight: FontWeight.w900,
+                    fontStyle: italic ? FontStyle.italic : FontStyle.normal,
+                    letterSpacing: -size * 0.02,
+                    color: stroke == null ? col : null,
+                    foreground: stroke,
+                  ),
+                ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+          textDirection: TextDirection.ltr,
+          maxLines: 3,
+        );
+    var size = box.height * maxFrac;
+    late TextPainter fill;
     while (true) {
-      tp = make(size, null)..layout(maxWidth: box.width);
-      if ((tp.height <= box.height && !tp.didExceedMaxLines) || size < 10) {
+      fill = make(size, null)..layout(maxWidth: box.width);
+      if ((fill.height <= box.height && !fill.didExceedMaxLines) || size < 10) {
         break;
       }
-      size *= 0.9;
+      size *= 0.92;
     }
     final at = Offset(
-      box.center.dx - tp.width / 2,
-      box.center.dy - tp.height / 2,
+      box.center.dx - fill.width / 2,
+      box.center.dy - fill.height / 2,
     );
-    final outline = make(
-      size,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = size * 0.22
-        ..strokeJoin = StrokeJoin.round
-        ..color = edge,
-    )..layout(maxWidth: box.width);
-    outline.paint(c, at);
-    tp.paint(c, at);
+    Paint stroke(Color col, double w) => Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round
+      ..color = col;
+    // soft shadow under the whole sticker
+    make(size, stroke(const Color(0x40000000), size * 0.62)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, size * 0.08))
+      ..layout(maxWidth: box.width)
+      ..paint(c, at + Offset(0, size * 0.06));
+    // the white die-cut border
+    make(size, stroke(border, size * 0.58))
+      ..layout(maxWidth: box.width)
+      ..paint(c, at);
+    // the dark outline of the letters
+    make(size, stroke(outline, size * 0.2))
+      ..layout(maxWidth: box.width)
+      ..paint(c, at);
+    fill.paint(c, at);
+    return Rect.fromLTWH(at.dx, at.dy, fill.width, fill.height);
+  }
+
+  void _sparks(Canvas c, Rect r, Color col) {
+    final p = Paint()
+      ..color = col
+      ..strokeWidth = r.height * 0.045 + 3
+      ..strokeCap = StrokeCap.round;
+    for (final side in [-1.0, 1.0]) {
+      final o = side < 0 ? r.topLeft : r.topRight;
+      for (var k = 0; k < 3; k++) {
+        final a = -math.pi / 2 + side * (0.5 + k * 0.45);
+        final from = o + Offset(math.cos(a), math.sin(a)) * 14;
+        final to = o + Offset(math.cos(a), math.sin(a)) * 30;
+        c.drawLine(from, to, p);
+      }
+    }
   }
 
   @override
   void paint(Canvas c, Size s) {
     final w = s.width;
+    final box = Rect.fromLTWH(w * 0.12, w * 0.14, w * 0.76, w * 0.72);
     c.save();
+    void tilt(double a) {
+      c.translate(w / 2, w / 2);
+      c.rotate(a);
+      c.translate(-w / 2, -w / 2);
+    }
+
     switch (style) {
+      case VibeTextSticker.classic:
+        // white letters, black outline, white border (like "Verified")
+        tilt(-0.04);
+        _dieCut(c, box, [(text, Colors.white)]);
+      case VibeTextSticker.duo:
+        // two colours with little sparks (like "Not my problem")
+        tilt(-0.06);
+        final r = _dieCut(c, box, _parts(Colors.white, _pink));
+        _sparks(c, r, _ink);
+      case VibeTextSticker.sunny:
+        // yellow italic letters, a bit more tilt
+        tilt(0.07);
+        _dieCut(c, box, [(text, _yellow)], italic: true);
       case VibeTextSticker.love:
-        // a soft pink card, hearts around, tilted a little
-        c.translate(w / 2, w / 2);
-        c.rotate(-0.08);
-        c.translate(-w / 2, -w / 2);
-        final card = RRect.fromRectAndRadius(
-          Rect.fromLTWH(w * 0.06, w * 0.2, w * 0.88, w * 0.6),
-          Radius.circular(w * 0.12),
-        );
-        c.drawRRect(card.inflate(w * 0.025), Paint()..color = Colors.white);
-        c.drawRRect(
-          card,
-          Paint()
-            ..shader = const LinearGradient(
-              colors: [Color(0xFFFF8FB1), Color(0xFFE91E63)],
-            ).createShader(card.outerRect),
-        );
-        _words(c, card.outerRect.deflate(w * 0.06), Colors.white, const Color(0xFFAD1457));
-        c.drawPath(_heart(Offset(w * 0.86, w * 0.18), w * 0.2), Paint()..color = _red);
-        c.drawPath(_heart(Offset(w * 0.14, w * 0.84), w * 0.15), Paint()..color = _pink);
-        c.drawPath(_heart(Offset(w * 0.1, w * 0.2), w * 0.1), Paint()..color = Colors.white);
-      case VibeTextSticker.pop:
-        // a yellow comic burst
-        final center = Offset(w / 2, w / 2);
-        final burst = Path();
-        for (var i = 0; i < 24; i++) {
-          final a = i * math.pi / 12;
-          final r = i.isEven ? w * 0.47 : w * 0.38;
-          final p = center + Offset(math.cos(a) * r, math.sin(a) * r * 0.86);
-          i == 0 ? burst.moveTo(p.dx, p.dy) : burst.lineTo(p.dx, p.dy);
+        // pink and red with hearts
+        tilt(-0.05);
+        final r = _dieCut(c, box, _parts(_pink, _red), outline: const Color(0xFF6A1B3A));
+        for (final (o, sz) in [
+          (r.topRight + Offset(-w * 0.02, -w * 0.02), w * 0.16),
+          (r.bottomLeft + Offset(w * 0.02, w * 0.03), w * 0.12),
+        ]) {
+          c.drawPath(_heart(o, sz * 1.25), Paint()..color = Colors.white);
+          c.drawPath(_heart(o, sz), Paint()..color = _red);
         }
-        burst.close();
-        c.drawPath(
-          burst,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = w * 0.03
-            ..strokeJoin = StrokeJoin.round
-            ..color = const Color(0xFF1E1F22),
-        );
-        c.drawPath(burst, Paint()..color = const Color(0xFFFFD54F));
-        _words(
-          c,
-          Rect.fromCenter(center: center, width: w * 0.62, height: w * 0.44),
-          const Color(0xFF1E1F22),
-          Colors.white,
-        );
       case VibeTextSticker.vibey:
         // Vibey holding up a sign
         final sign = RRect.fromRectAndRadius(
           Rect.fromLTWH(w * 0.08, w * 0.06, w * 0.84, w * 0.46),
           Radius.circular(w * 0.06),
         );
-        c.drawRRect(sign.inflate(w * 0.02), Paint()..color = const Color(0xFF1E1F22));
+        c.drawRRect(sign.inflate(w * 0.02), Paint()..color = _ink);
         c.drawRRect(sign, Paint()..color = Colors.white);
-        _words(c, sign.outerRect.deflate(w * 0.05), _blue, Colors.white);
+        _dieCut(c, sign.outerRect.deflate(w * 0.06), [(text, _blue)], outline: Colors.white, border: Colors.white, maxFrac: 0.4);
         final body = Offset(w / 2, w * 0.78);
         c.drawOval(Rect.fromCenter(center: body, width: w * 0.5, height: w * 0.4), Paint()..color = _blue);
-        // arms up to the sign
         final arm = Paint()
           ..color = _blue
           ..strokeWidth = w * 0.06
@@ -247,7 +290,7 @@ class _StickerPainter extends CustomPainter {
         c.drawLine(body.translate(w * 0.2, -w * 0.05), Offset(w * 0.76, w * 0.52), arm);
         for (final dx in [-w * 0.08, w * 0.08]) {
           c.drawCircle(body.translate(dx, -w * 0.03), w * 0.035, Paint()..color = Colors.white);
-          c.drawCircle(body.translate(dx, -w * 0.03), w * 0.017, Paint()..color = const Color(0xFF1E1F22));
+          c.drawCircle(body.translate(dx, -w * 0.03), w * 0.017, Paint()..color = _ink);
         }
         c.drawArc(
           Rect.fromCenter(center: body.translate(0, w * 0.06), width: w * 0.12, height: w * 0.07),
@@ -258,7 +301,7 @@ class _StickerPainter extends CustomPainter {
             ..style = PaintingStyle.stroke
             ..strokeWidth = w * 0.015
             ..strokeCap = StrokeCap.round
-            ..color = const Color(0xFF1E1F22),
+            ..color = _ink,
         );
     }
     c.restore();
