@@ -30,8 +30,11 @@ class _VibeUpdatesPageState extends State<VibeUpdatesPage> {
   @override
   void initState() {
     super.initState();
-    VibeUpdater.currentVersion().then((v) {
+    VibeUpdater.currentVersion().then((v) async {
       if (mounted) setState(() => _version = v);
+      // the installed version's notes, from its release page
+      final n = await VibeUpdater.notesFor(v);
+      if (mounted && n.isNotEmpty) setState(() => _installedNotes = n);
     });
     VibeUpdater.load().then((_) {
       // Fresh check when the page opens, unless we just checked.
@@ -64,7 +67,10 @@ class _VibeUpdatesPageState extends State<VibeUpdatesPage> {
   }
 
   /// Notes bundled in this app for the installed version.
+  List<String>? _installedNotes;
+
   List<String> _currentNotes() {
+    if (_installedNotes != null) return _installedNotes!;
     final short = _version.split('.').take(2).join('.');
     final n = vibeReleaseNotes.where((e) => e.version == short).firstOrNull;
     return n == null ? const [] : n.items.toList();

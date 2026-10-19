@@ -17,6 +17,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the earlier release tags, for the automatic notes
 
       - name: Apply Vibe branding (icon, splash, in-app logo)
         run: |
@@ -165,6 +167,16 @@ jobs:
         if: ${{ inputs.publish }}
         run: |
           cp build/app/outputs/flutter-apk/app-release.apk "Vibe-${VIBE_VERSION}.apk"
+          # What's new: if RELEASE_NOTES.md wasn't updated since the last
+          # release, list the changes made since then (one line per change)
+          PREV=$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)
+          if [ -n "$PREV" ] && git diff --quiet "$PREV" HEAD -- RELEASE_NOTES.md; then
+            git log "$PREV"..HEAD --no-merges --pretty=%s \
+              | sed -E 's/^Vibe:? *//' \
+              | grep -viE '^(merge|bump|wip|ci|revert|.*import fix$)' \
+              | sed -E 's/^(.)/\U\1/; s/^/- /' \
+              | head -30 > RELEASE_NOTES.md || true
+          fi
           {
             echo "## Vibe ${VIBE_VERSION}"
             echo

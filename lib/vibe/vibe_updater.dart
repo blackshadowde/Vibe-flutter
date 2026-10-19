@@ -169,6 +169,23 @@ abstract class VibeUpdater {
         .toList();
   }
 
+  /// What's new in an already released version (from its GitHub page).
+  static Future<List<String>> notesFor(String version) async {
+    try {
+      final res = await http
+          .get(
+            Uri.parse('https://api.github.com/repos/$_repo/releases/tags/v$version'),
+            headers: {'Accept': 'application/vnd.github+json'},
+          )
+          .timeout(const Duration(seconds: 15));
+      if (res.statusCode != 200) return const [];
+      final j = jsonDecode(res.body) as Map<String, dynamic>;
+      return _notesFrom(j['body'] as String? ?? '');
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Latest release if it is newer than this app, else null.
   static Future<VibeRelease?> fetchNewer() async {
     final current = await currentVersion();
