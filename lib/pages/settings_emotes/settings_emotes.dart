@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_text_sticker.dart';
 import 'package:fluffychat/vibe/vibe_stickers.dart';
 import 'package:fluffychat/vibe/vibe_emoji_pack.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
@@ -258,6 +259,16 @@ class EmotesSettingsController extends State<EmotesSettings> {
     // the pack arrives with the next sync; show it now
     await Future.delayed(const Duration(milliseconds: 800));
     if (mounted) resetAction();
+  }
+
+  Future<void> addTeluguPack() async {
+    final client = Matrix.of(context).client;
+    final r = await showFutureLoadingDialog(
+      context: context,
+      future: () => VibeTeluguPack.install(client),
+    );
+    if (r.isError || !mounted) return;
+    resetAction();
   }
 
   void resetAction() {

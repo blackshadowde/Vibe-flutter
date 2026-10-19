@@ -84,6 +84,34 @@ class _ShareScaffoldDialogState extends State<ShareScaffoldDialog> {
     super.dispose();
   }
 
+  /// A shared sticker.ly pack link.
+  String? get _stickerLink {
+    for (final i in widget.items) {
+      if (i is TextShareItem) {
+        final l = VibeStickers.stickerLink(i.value);
+        if (l != null) return l;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _importLink() async {
+    final client = Matrix.of(context).client;
+    final link = _stickerLink!;
+    final messenger = ScaffoldMessenger.of(context);
+    final r = await showFutureLoadingDialog(
+      context: context,
+      future: () => VibeStickers.importLink(client, link),
+    );
+    if (!mounted || r.result == null) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('Added ${r.result!.$2} stickers to "${r.result!.$1}"'),
+      ),
+    );
+    context.pop();
+  }
+
   /// Shared files that can become stickers (pictures or a pack file).
   List<XFile> get _stickerFiles {
     final files = [
@@ -188,6 +216,22 @@ class _ShareScaffoldDialogState extends State<ShareScaffoldDialog> {
           ),
           // Vibe: a shared sticker (or a WhatsApp sticker pack file) can go
           // straight into your stickers
+          if (_stickerLink != null)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  tileColor: theme.colorScheme.secondaryContainer,
+                  leading: const Icon(Icons.emoji_emotions_outlined),
+                  title: const Text('Import this sticker pack'),
+                  subtitle: Text(_stickerLink!),
+                  onTap: _importLink,
+                ),
+              ),
+            ),
           if (_stickerFiles.isNotEmpty)
             SliverToBoxAdapter(
               child: Padding(

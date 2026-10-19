@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_text_sticker.dart';
 import 'package:fluffychat/vibe/vibe_stickers.dart';
 import 'package:fluffychat/vibe/vibe_emoji_pack.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
@@ -255,6 +256,16 @@ class EmotesSettingsView extends StatelessWidget {
                       ],
                     );
                   },
+                ),
+              if (controller.room == null &&
+                  !VibeStickers.packNames(client).contains(VibeTeluguPack.name))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: ElevatedButton.icon(
+                    onPressed: controller.addTeluguPack,
+                    icon: const Icon(Icons.translate),
+                    label: const Text('Add Vibe Telugu sticker pack'),
+                  ),
                 ),
               if (controller.room == null &&
                   !VibeEmojiPack.installed(client, 'love_heart'))

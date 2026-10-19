@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_stickers.dart';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -380,4 +381,41 @@ class _StickerPainter extends CustomPainter {
   @override
   bool shouldRepaint(_StickerPainter old) =>
       old.text != text || old.style != style;
+}
+
+/// Vibe's own Telugu (Tenglish) text sticker pack: everyday phrases in the
+/// sticker lettering styles, made on this phone and added to your stickers.
+abstract class VibeTeluguPack {
+  static const name = 'Telugu';
+  static const phrases = [
+    'Em chestunnav?',
+    'Baagunnava?',
+    'Super ra!',
+    'Sare sare',
+    'Ayyo!',
+    'Chill ra',
+    'Thinnava?',
+    'Miss you ra',
+    'Vasthunna!',
+    'Late ayyindi',
+    'Good night ra',
+    'Hahaha',
+    'Enti idhi?',
+    'Thanks ra',
+    'Kopam ah?',
+    'Nijamga?',
+  ];
+
+  static Future<int> install(Client client) async {
+    final files = <(String, Uint8List)>[];
+    final styles = VibeTextSticker.values;
+    for (final (i, ph) in phrases.indexed) {
+      final (bytes, _, _) = await VibeTextStickerBar.render(
+        ph,
+        styles[i % styles.length],
+      );
+      files.add(('${ph.replaceAll(RegExp(r'[^A-Za-z ]'), '').trim()}.png', bytes));
+    }
+    return VibeStickers.add(client, files, name);
+  }
 }

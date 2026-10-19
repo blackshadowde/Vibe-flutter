@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:fluffychat/config/setting_keys.dart';
+import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 
 /// Your stickers live in your Matrix account (your personal emoji pack,
@@ -129,6 +130,49 @@ abstract class VibeStickers {
       for (final f in archive.files) {
         final name = f.name.split('/').last;
         if (f.isFile && isImage(name)) files.add((name, f.content));
+      }
+    }
+    final n = await add(c, files, title);
+    return (title, n);
+  }
+
+  static final _stickerLy = RegExp(
+    r'https?://(?:www\.)?sticker\.ly/s/[A-Za-z0-9]+',
+    caseSensitive: false,
+  );
+
+  /// The sticker.ly pack link in a shared text, if there is one.
+  static String? stickerLink(String text) => _stickerLy.firstMatch(text)?.group(0);
+
+  /// Imports a sticker.ly pack from its link (the pack's public page lists
+  /// its stickers). The stickers belong to whoever made the pack; this saves
+  /// them for your own use, like saving them from WhatsApp.
+  static Future<(String, int)> importLink(Client c, String link) async {
+    final page = await http
+        .get(Uri.parse(link), headers: {'User-Agent': 'Mozilla/5.0 (Android)'})
+        .timeout(const Duration(seconds: 20));
+    if (page.statusCode != 200) {
+      throw Exception('The pack page answered ${page.statusCode}');
+    }
+    final html = page.body;
+    final title = RegExp(r'<meta[^>]+property="og:title"[^>]+content="([^"]+)"')
+            .firstMatch(html)
+            ?.group(1)
+            ?.replaceAll(RegExp(r'\s*[-|]\s*Sticker\.ly.*$', caseSensitive: false), '')
+            .trim() ??
+        'Sticker.ly pack';
+    final urls = RegExp(r'https://stickerly\.pstatic\.net/sticker_pack/[^"\s<>]+?\.webp')
+        .allMatches(html)
+        .map((m) => m.group(0)!)
+        .toSet()
+        .take(60)
+        .toList();
+    if (urls.isEmpty) throw Exception('No stickers found on that page');
+    final files = <(String, Uint8List)>[];
+    for (final u in urls) {
+      final r = await http.get(Uri.parse(u)).timeout(const Duration(seconds: 20));
+      if (r.statusCode == 200 && r.bodyBytes.isNotEmpty) {
+        files.add((u.split('/').last, r.bodyBytes));
       }
     }
     final n = await add(c, files, title);
