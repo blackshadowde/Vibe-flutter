@@ -42,6 +42,7 @@ import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -419,6 +420,9 @@ class ChatController extends State<ChatPageWithRoom>
   void initState() {
     // the chat sliding in gets a light tap (closing has none)
     VibeHaptics.light();
+    // The send / mic button follows the text box whatever changes it (typing,
+    // a sticker clearing it, a draft coming back), not only typing.
+    sendController.addListener(_syncInputEmpty);
     inputFocus = FocusNode(onKeyEvent: _customEnterKeyHandling);
     Future<void>.delayed(const Duration(milliseconds: 380), () {
       if (mounted) setState(() => routeSettled = true);
@@ -1564,6 +1568,20 @@ class ChatController extends State<ChatPageWithRoom>
     final height = renderBox?.size.height ?? 72.0;
     if (height != inputBarHeightNotifier.value) {
       inputBarHeightNotifier.value = height;
+    }
+  }
+
+  void _syncInputEmpty() {
+    if (!mounted) return;
+    // never set state in the middle of a build: do it right after
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _syncInputEmpty());
+      return;
+    }
+    final empty = sendController.text.isEmpty;
+    if (empty != _inputTextIsEmpty) {
+      setState(() => _inputTextIsEmpty = empty);
     }
   }
 
