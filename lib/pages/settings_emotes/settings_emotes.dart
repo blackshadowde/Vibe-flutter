@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_emoji_pack.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
@@ -241,6 +242,19 @@ class EmotesSettingsController extends State<EmotesSettings> {
   bool get readonly =>
       room != null &&
       room?.canChangeStateEvent('im.ponies.room_emotes') == false;
+
+  /// Draws Vibe's own animated emojis and adds them to your pack.
+  Future<void> addVibePack() async {
+    final client = Matrix.of(context).client;
+    final r = await showFutureLoadingDialog(
+      context: context,
+      future: () => VibeEmojiPack.install(client),
+    );
+    if (r.isError || !mounted) return;
+    // the pack arrives with the next sync; show it now
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) resetAction();
+  }
 
   void resetAction() {
     setState(() {

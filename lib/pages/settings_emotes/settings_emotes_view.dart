@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_emoji_pack.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
@@ -210,6 +211,17 @@ class EmotesSettingsView extends StatelessWidget {
                   label: Text(L10n.of(context).createSticker),
                 ),
               ),
+              // Vibe's own animated pack (Vibey)
+              if (controller.room == null &&
+                  !VibeEmojiPack.installed(client))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: ElevatedButton.icon(
+                    onPressed: controller.addVibePack,
+                    icon: const Icon(Icons.auto_awesome),
+                    label: const Text('Add Vibe animated emoji pack'),
+                  ),
+                ),
               const Divider(),
             ],
             if (controller.room != null && imageKeys.isNotEmpty)
