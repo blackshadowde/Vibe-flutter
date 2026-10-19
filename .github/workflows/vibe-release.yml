@@ -155,8 +155,13 @@ jobs:
           VERSION="$BASE.${{ github.run_number }}"
           echo "VIBE_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Building Vibe $VERSION"
+          set -o pipefail
           flutter build apk --release --target-platform android-arm64 \
-            --build-name="$VERSION" --build-number="${{ github.run_number }}" $EXTRA
+            --build-name="$VERSION" --build-number="${{ github.run_number }}" $EXTRA 2>&1 | tee build.txt || {
+            # the reason as annotations (readable without the full log)
+            grep -E "What went wrong|error:|Error:|e: |FAILURE|Could not|Execution failed|> " build.txt | head -40 | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
 
       - uses: actions/upload-artifact@v4
         with:
