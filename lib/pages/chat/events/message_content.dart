@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_sticker.dart';
 import 'dart:math';
 
@@ -181,6 +182,9 @@ class MessageContent extends StatelessWidget {
             if (event.messageType == MessageTypes.Emote) {
               html = '* $html';
             }
+
+            // a Vibe call: the card with Join
+            if (VibeCall.info(event) != null) return VibeCallCard(event);
 
             final bigEmotes =
                 !event.isRichMessage && bigEmojis.contains(event.body);

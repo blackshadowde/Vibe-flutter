@@ -110,6 +110,8 @@ enum AppSettings<T> {
   vibeAutoBackupResult<String>('chat.vibe.auto_backup_result', ''),
   // Sticker packs hidden from the sticker tray (names, one per line)
   vibeHiddenStickerPacks<String>('chat.vibe.hidden_sticker_packs', ''),
+  // Jitsi server for calls ('' = the default, meet.ffmuc.net)
+  vibeCallServer<String>('chat.vibe.call_server', ''),
   // Where automatic backups go when picked (Google Drive file), '' = this phone
   vibeBackupCloudUri<String>('chat.vibe.backup_cloud_uri', ''),
   vibeNtfyTopic<String>('chat.vibe.ntfy_topic', ''),

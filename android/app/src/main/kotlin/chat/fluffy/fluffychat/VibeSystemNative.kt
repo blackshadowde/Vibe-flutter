@@ -28,6 +28,8 @@ import io.flutter.plugin.common.MethodChannel
 object VibeSystemNative {
     private const val CHANNEL = "vibe/system"
 
+    private var ringtone: android.media.Ringtone? = null
+
     fun register(context: Context, engine: FlutterEngine) {
         val app = context.applicationContext
         MethodChannel(engine.dartExecutor.binaryMessenger, CHANNEL)
@@ -54,6 +56,20 @@ object VibeSystemNative {
                     "setSpeaker" -> {
                         val on = call.argument<Boolean>("on") ?: false
                         result.success(setSpeaker(app, on))
+                    }
+                    // incoming call: the phone's ringtone (Dart: VibeCall)
+                    "ring" -> {
+                        val on = call.argument<Boolean>("on") ?: false
+                        try {
+                            ringtone?.stop()
+                            ringtone = null
+                            if (on) {
+                                val uri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE)
+                                ringtone = android.media.RingtoneManager.getRingtone(app, uri)?.also { it.play() }
+                            }
+                        } catch (_: Throwable) {
+                        }
+                        result.success(null)
                     }
                     "isSpeaker" -> result.success(isSpeaker(app))
                     "lastExit" -> result.success(lastExit(app))

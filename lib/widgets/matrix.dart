@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -217,6 +218,8 @@ class MatrixState extends State<Matrix> {
       );
       return;
     }
+    // Vibe: ring for calls someone starts in your chats
+    VibeCall.watch(c);
     onRoomKeyRequestSub[name] ??= c.onRoomKeyRequest.stream.listen((
       RoomKeyRequest request,
     ) async {
