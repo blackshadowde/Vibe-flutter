@@ -78,8 +78,8 @@ android {
 
     defaultConfig {
         applicationId = "app.vibe.chat"
-        // Jitsi (calls) needs Android 8+
-        minSdk = maxOf(26, flutter.minSdkVersion)
+        // Vibe supports Android 10+
+        minSdk = maxOf(29, flutter.minSdkVersion)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
