@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_sticker.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/events/audio_player.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
@@ -633,10 +634,9 @@ extension on _Kind {
   };
 
   bool Function(Event)? get filter => switch (this) {
-    _Kind.media => (e) => {
-      MessageTypes.Image,
-      MessageTypes.Video,
-    }.contains(e.messageType),
+    _Kind.media => (e) =>
+        {MessageTypes.Image, MessageTypes.Video}.contains(e.messageType) &&
+        !e.isVibeSticker,
     _Kind.files => (e) =>
         e.messageType == MessageTypes.File ||
         (e.messageType == MessageTypes.Audio && !_isVoice(e)),

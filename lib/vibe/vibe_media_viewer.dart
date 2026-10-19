@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_sticker.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/pages/chat/events/video_player.dart';
@@ -66,7 +67,8 @@ class VibeMediaViewer extends StatefulWidget {
                   {
                     MessageTypes.Image,
                     MessageTypes.Video,
-                  }.contains(e.messageType),
+                  }.contains(e.messageType) &&
+                  !e.isVibeSticker,
             )
             .toList()
             .reversed

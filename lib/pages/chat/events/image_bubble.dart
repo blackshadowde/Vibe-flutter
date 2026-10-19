@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_sticker.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/utils/file_description.dart';
@@ -76,7 +77,7 @@ class ImageBubble extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius,
             side: BorderSide(
-              color: event.messageType == MessageTypes.Sticker
+              color: event.isVibeSticker
                   ? Colors.transparent
                   : theme.dividerColor,
             ),

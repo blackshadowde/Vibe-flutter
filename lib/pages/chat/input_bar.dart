@@ -476,7 +476,12 @@ class InputBar extends StatelessWidget {
                 bytes: data,
                 name: content.uri.split('/').last,
               );
-              room.sendFileEvent(file, shrinkImageMaxDimension: 1600);
+              // keyboard stickers (Gboard…) go as stickers: no frame, not in media
+              room.sendFileEvent(
+                file,
+                shrinkImageMaxDimension: 1600,
+                extraContent: {'chat.vibe.sticker': true},
+              );
             },
           ),
           minLines: minLines,

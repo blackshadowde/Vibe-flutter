@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_sticker.dart';
 import 'dart:math';
 
 import 'package:fluffychat/config/setting_keys.dart';
@@ -61,7 +62,8 @@ class MessageContent extends StatelessWidget {
           case MessageTypes.Sticker:
             if (event.redacted) continue textmessage;
             // Vibe text stickers: shown like stickers, no frame
-            final vibeSticker = event.content['chat.vibe.sticker'] == true;
+            final vibeSticker = event.isVibeSticker &&
+                event.messageType != MessageTypes.Sticker;
             final maxSize =
                 event.messageType == MessageTypes.Sticker || vibeSticker
                 ? (vibeSticker ? 150.0 : 128.0)
