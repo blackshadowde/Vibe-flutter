@@ -48,31 +48,34 @@ class _VibeConnectionBuilderState extends State<VibeConnectionBuilder> {
   @override
   void initState() {
     super.initState();
-    _conn = widget.client.prevBatch == null
-        ? VibeConn.connecting
-        : VibeConn.online;
-    _sub = widget.client.onSyncStatus.stream.listen(_onStatus);
+    _conn = _calc();
+    _sub = widget.client.onSyncStatus.stream.listen((_) => _update());
+    _syncSub = widget.client.onSync.stream.listen((_) => _update());
   }
 
-  void _onStatus(SyncStatusUpdate update) {
-    final VibeConn next;
-    if (update.status == SyncStatus.error) {
-      next = VibeConn.offline;
-    } else if (update.status == SyncStatus.waitingForResponse &&
-        _conn == VibeConn.offline) {
-      next = VibeConn.connecting;
-    } else if (update.status == SyncStatus.waitingForResponse &&
-        widget.client.prevBatch == null) {
-      next = VibeConn.connecting;
-    } else {
-      next = VibeConn.online;
+  StreamSubscription? _syncSub;
+
+  /// The same rule as the chat's top bar, so both always agree: connected
+  /// once a sync has come in and the last one didn't fail.
+  VibeConn _calc() {
+    final c = widget.client;
+    final status = c.onSyncStatus.value?.status;
+    if (status == SyncStatus.error) return VibeConn.offline;
+    if (c.onSync.value == null || c.prevBatch == null) {
+      return VibeConn.connecting;
     }
+    return VibeConn.online;
+  }
+
+  void _update() {
+    final next = _calc();
     if (next != _conn && mounted) setState(() => _conn = next);
   }
 
   @override
   void dispose() {
     _sub?.cancel();
+    _syncSub?.cancel();
     super.dispose();
   }
 

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -351,6 +352,8 @@ class MatrixState extends State<Matrix> {
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    // locked chats ask for the fingerprint again after leaving Vibe
+    if (state == AppLifecycleState.paused) VibeLock.relock();
     final foreground =
         state != AppLifecycleState.inactive &&
         state != AppLifecycleState.paused;

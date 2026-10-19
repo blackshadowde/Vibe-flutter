@@ -28,7 +28,8 @@ abstract class VibeLock {
 
   static bool isLocked(String roomId) => locked().contains(roomId);
 
-  /// After one successful unlock, locked chats stay open for 5 minutes.
+  /// After an unlock, a few seconds' grace (unlocking the folder, then
+  /// opening a chat from it, asks once). Leaving Vibe locks them again.
   static bool get sessionUnlocked => DateTime.now().isBefore(_unlockedUntil);
 
   static void relock() => _unlockedUntil = DateTime(2000);
@@ -44,7 +45,7 @@ abstract class VibeLock {
         persistAcrossBackgrounding: true,
       );
       if (ok) {
-        _unlockedUntil = DateTime.now().add(const Duration(minutes: 5));
+        _unlockedUntil = DateTime.now().add(const Duration(seconds: 15));
       }
       return ok;
     } catch (e) {
