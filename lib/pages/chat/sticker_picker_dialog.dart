@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_stickers.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
@@ -28,13 +29,40 @@ class StickerPickerDialog extends StatefulWidget {
 
 class StickerPickerDialogState extends State<StickerPickerDialog> {
   String? searchFilter;
+  String? _tab;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final stickerPacks = widget.room.getImagePacks(ImagePackUsage.sticker);
-    final packSlugs = stickerPacks.keys.toList();
+    final client = widget.room.client;
+    final hidden = VibeStickers.hidden();
+    // Your personal pack is split into its packs (Vibey, Love, imported…)
+    final stickerPacks = <String, ImagePackContent>{};
+    widget.room.getImagePacks(ImagePackUsage.sticker).forEach((slug, pack) {
+      if (slug == 'user') {
+        final groups = <String, Map<String, Object?>>{};
+        pack.images.forEach((k, v) {
+          final name = VibeStickers.packOf(client, k);
+          (groups[name] ??= {})[k] = v.toJson();
+        });
+        groups.forEach((name, images) {
+          if (hidden.contains(name)) return;
+          stickerPacks['user:$name'] = ImagePackContent.fromJson({
+            'pack': {'display_name': name},
+            'images': images,
+          });
+        });
+      } else {
+        final name = pack.pack.displayName ?? slug;
+        if (!hidden.contains(name)) stickerPacks[slug] = pack;
+      }
+    });
+    final allSlugs = stickerPacks.keys.toList();
+    // the tab picked at the top (null = all packs)
+    final packSlugs = _tab != null && allSlugs.contains(_tab)
+        ? [_tab!]
+        : allSlugs;
 
     return Material(
       color: theme.colorScheme.onInverseSurface,
@@ -70,6 +98,33 @@ class StickerPickerDialogState extends State<StickerPickerDialog> {
                 onChanged: (s) => setState(() => searchFilter = s),
               ),
             ),
+            // a tab per pack (like WhatsApp's sticker tray)
+            if (allSlugs.length > 1)
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 46,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    children: [
+                      for (final slug in [null, ...allSlugs])
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8, bottom: 8),
+                          child: ChoiceChip(
+                            label: Text(
+                              slug == null
+                                  ? 'All'
+                                  : (stickerPacks[slug]!.pack.displayName ??
+                                        slug),
+                            ),
+                            selected: _tab == slug,
+                            onSelected: (_) => setState(() => _tab = slug),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
             if (packSlugs.isEmpty)
               SliverFillRemaining(
                 child: Center(
@@ -120,7 +175,7 @@ class StickerPickerDialogState extends State<StickerPickerDialog> {
                   return Column(
                     children: <Widget>[
                       if (packIndex != 0) const SizedBox(height: 20),
-                      if (packName != 'user')
+                      if (packName != 'user' && packSlugs.length > 1)
                         ListTile(
                           leading: Avatar(
                             mxContent: pack.pack.avatarUrl,

@@ -3,6 +3,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:typed_data';
+import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:fluffychat/vibe/vibe_stickers.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/themes.dart';
@@ -81,6 +84,55 @@ class _ShareScaffoldDialogState extends State<ShareScaffoldDialog> {
     super.dispose();
   }
 
+  /// Shared files that can become stickers (pictures or a pack file).
+  List<XFile> get _stickerFiles {
+    final files = [
+      for (final i in widget.items)
+        if (i is FileShareItem) i.value,
+    ];
+    if (files.isEmpty || files.length != widget.items.length) return const [];
+    final ok = files.every(
+      (f) => VibeStickers.isImage(f.name) || VibeStickers.isPackFile(f.name),
+    );
+    return ok ? files : const [];
+  }
+
+  Future<void> _addToStickers() async {
+    final client = Matrix.of(context).client;
+    final files = _stickerFiles;
+    final messenger = ScaffoldMessenger.of(context);
+    final r = await showFutureLoadingDialog<String>(
+      context: context,
+      future: () async {
+        var total = 0;
+        String? packName;
+        final singles = <(String, Uint8List)>[];
+        for (final f in files) {
+          final bytes = await f.readAsBytes();
+          if (VibeStickers.isPackFile(f.name)) {
+            final (title, n) = await VibeStickers.importPack(client, bytes, f.name);
+            total += n;
+            packName = title;
+          } else {
+            singles.add((f.name, bytes));
+          }
+        }
+        if (singles.isNotEmpty) {
+          total += await VibeStickers.add(client, singles, 'My stickers');
+          packName ??= 'My stickers';
+        }
+        return total == 0
+            ? 'No stickers found in that file'
+            : 'Added $total sticker${total == 1 ? '' : 's'} to "$packName"';
+      },
+    );
+    if (!mounted) return;
+    if (r.result != null) {
+      messenger.showSnackBar(SnackBar(content: Text(r.result!)));
+      context.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -134,6 +186,28 @@ class _ShareScaffoldDialogState extends State<ShareScaffoldDialog> {
               ),
             ),
           ),
+          // Vibe: a shared sticker (or a WhatsApp sticker pack file) can go
+          // straight into your stickers
+          if (_stickerFiles.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  tileColor: theme.colorScheme.secondaryContainer,
+                  leading: const Icon(Icons.emoji_emotions_outlined),
+                  title: Text(
+                    _stickerFiles.any((f) => VibeStickers.isPackFile(f.name))
+                        ? 'Import sticker pack'
+                        : 'Add to my stickers',
+                  ),
+                  subtitle: const Text('Use them from the sticker tray'),
+                  onTap: _addToStickers,
+                ),
+              ),
+            ),
           SliverList.builder(
             itemCount: rooms.length,
             itemBuilder: (context, i) {

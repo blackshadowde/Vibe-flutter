@@ -108,6 +108,8 @@ enum AppSettings<T> {
   vibeAutoBackup<String>('chat.vibe.auto_backup', 'off'),
   vibeLastAutoBackup<int>('chat.vibe.last_auto_backup', 0),
   vibeAutoBackupResult<String>('chat.vibe.auto_backup_result', ''),
+  // Sticker packs hidden from the sticker tray (names, one per line)
+  vibeHiddenStickerPacks<String>('chat.vibe.hidden_sticker_packs', ''),
   // Where automatic backups go when picked (Google Drive file), '' = this phone
   vibeBackupCloudUri<String>('chat.vibe.backup_cloud_uri', ''),
   vibeNtfyTopic<String>('chat.vibe.ntfy_topic', ''),

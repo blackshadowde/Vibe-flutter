@@ -65,6 +65,7 @@ abstract class VibeEmojiPack {
           'size': gif.length,
         },
         'usage': ['emoticon', 'sticker'],
+        'chat.vibe.pack': identical(set, lovePack) ? 'Love' : 'Vibey',
       };
     }
     progress?.call('Saving the pack');

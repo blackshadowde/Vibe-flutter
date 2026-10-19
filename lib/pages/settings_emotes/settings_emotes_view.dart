@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_stickers.dart';
 import 'package:fluffychat/vibe/vibe_emoji_pack.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -221,6 +222,39 @@ class EmotesSettingsView extends StatelessWidget {
                     icon: const Icon(Icons.auto_awesome),
                     label: const Text('Add Vibe animated emoji pack'),
                   ),
+                ),
+              if (controller.room == null &&
+                  VibeStickers.packNames(client).length > 1)
+                StatefulBuilder(
+                  builder: (context, setLocal) {
+                    final hidden = VibeStickers.hidden();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(20, 4, 20, 4),
+                          child: Text(
+                            'SHOWN IN THE STICKER TRAY',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                        ),
+                        for (final name in VibeStickers.packNames(client))
+                          SwitchListTile.adaptive(
+                            title: Text(name),
+                            value: !hidden.contains(name),
+                            onChanged: (v) async {
+                              await VibeStickers.setShown(name, v);
+                              setLocal(() {});
+                            },
+                          ),
+                        const Divider(),
+                      ],
+                    );
+                  },
                 ),
               if (controller.room == null &&
                   !VibeEmojiPack.installed(client, 'love_heart'))

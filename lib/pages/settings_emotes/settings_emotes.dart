@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_stickers.dart';
 import 'package:fluffychat/vibe/vibe_emoji_pack.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
@@ -388,6 +389,28 @@ class EmotesSettingsController extends State<EmotesSettings> {
     final result = await selectFiles(context, type: FileType.any);
 
     if (result.isEmpty) return;
+
+    // a WhatsApp sticker pack file: its stickers become one pack
+    if (result.single.name.toLowerCase().endsWith('.wastickers')) {
+      final client = Matrix.of(context).client;
+      final bytes = await result.single.readAsBytes();
+      if (!mounted) return;
+      final r = await showFutureLoadingDialog(
+        context: context,
+        future: () =>
+            VibeStickers.importPack(client, bytes, result.single.name),
+      );
+      if (!mounted) return;
+      if (r.result != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Added ${r.result!.$2} stickers to "${r.result!.$1}"'),
+          ),
+        );
+        resetAction();
+      }
+      return;
+    }
 
     final buffer = InputMemoryStream(await result.single.readAsBytes());
 
