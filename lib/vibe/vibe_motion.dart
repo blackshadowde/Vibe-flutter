@@ -258,7 +258,7 @@ class VibeSpringCurve extends Curve {
 
 /// Vibe X's springs (VibeSprings), stiffness = (2π / response)².
 /// Pages: response 0.42 s, no overshoot.
-final VibeSpringCurve vibeSpring = VibeSpringCurve(stiffness: 224);
+final VibeSpringCurve vibeSpring = VibeSpringCurve(stiffness: 320);
 
 /// Panes rising from the bottom: response 0.40 s, damping 0.9.
 final VibeSpringCurve vibeSheetSpring = VibeSpringCurve(

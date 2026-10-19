@@ -308,16 +308,48 @@ class ChatView extends StatelessWidget {
                       padding: EdgeInsets.only(
                         bottom: theme.appBarTheme.toolbarHeight ?? 56,
                       ),
-                      child: FloatingActionButton(
-                        onPressed: controller.scrollDown,
-                        heroTag: null,
-                        mini: true,
-                        backgroundColor: theme.colorScheme.surface,
-                        foregroundColor: theme.colorScheme.onSurface,
-                        child: const Icon(Icons.arrow_downward_outlined),
+                      // Vibe X's "Jump to present" pill
+                      child: Material(
+                        color: theme.brightness == Brightness.dark
+                            ? const Color(0xFF2B2D31)
+                            : const Color(0xFFEBEDEF),
+                        elevation: 3,
+                        shadowColor: Colors.black54,
+                        shape: const StadiumBorder(),
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: controller.scrollDown,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 9,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.keyboard_arrow_down,
+                                  size: 20,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Jump to present',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     )
                   : null,
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
               body: NotificationListener<SizeChangedLayoutNotification>(
                 onNotification: (SizeChangedLayoutNotification notification) {
                   WidgetsBinding.instance.addPostFrameCallback(

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_date_pill.dart';
 import 'package:collection/collection.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -61,7 +62,9 @@ class ChatEventList extends StatelessWidget {
     final hasWallpaper =
         controller.room.client.applicationAccountConfig.wallpaperUrl != null;
 
-    return MediaQuery(
+    return Stack(
+      children: [
+        MediaQuery(
         data: MediaQuery.of(context).copyWith(
           // Like Telegram: message text uses the Text size setting, names
           // and times keep their size (no scaling of the whole chat).
@@ -252,6 +255,20 @@ class ChatEventList extends StatelessWidget {
           ),
         ),
         ),
-      );
+      ),
+        // the day of the messages at the top, while scrolling (like Vibe X)
+        Positioned(
+          top: 8 + MediaQuery.paddingOf(context).top,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: VibeDatePill(
+              scroll: controller.scrollController,
+              events: () => events,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
