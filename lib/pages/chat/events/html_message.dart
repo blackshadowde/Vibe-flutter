@@ -9,6 +9,8 @@ import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/code_highlight_theme.dart';
 import 'package:fluffychat/utils/event_checkbox_extension.dart';
+import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
+import 'package:fluffychat/vibe/vibe_low_data.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
@@ -171,6 +173,42 @@ class HtmlMessage extends StatelessWidget {
       var text = node.text ?? '';
       // Single linebreak nodes between Elements are ignored:
       if (text == '\n') text = '';
+
+      // Vibe: emojis inside the text are animated (Noto Animated Emoji)
+      if (_emojiRe.hasMatch(text) && !VibeLowData.on) {
+        final parts = <InlineSpan>[];
+        final buf = StringBuffer();
+        void flush() {
+          if (buf.isEmpty) return;
+          parts.add(
+            LinkifySpan(
+              text: buf.toString(),
+              options: const LinkifyOptions(humanize: false),
+              linkStyle: linkStyle,
+              onOpen: onOpen,
+            ),
+          );
+          buf.clear();
+        }
+
+        var count = 0;
+        for (final g in text.characters) {
+          if (count < 40 && _emojiRe.hasMatch(g)) {
+            flush();
+            count++;
+            parts.add(
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: VibeAnimatedEmoji(g, size: fontSize * 1.3),
+              ),
+            );
+          } else {
+            buf.write(g);
+          }
+        }
+        flush();
+        return TextSpan(children: parts);
+      }
 
       return LinkifySpan(
         text: text,
@@ -741,3 +779,6 @@ extension on String {
 extension on dom.Element {
   dom.Element get rootElement => parent?.rootElement ?? this;
 }
+
+/// An emoji (one grapheme with a pictographic character in it).
+final RegExp _emojiRe = RegExp(r'\p{Extended_Pictographic}', unicode: true);
