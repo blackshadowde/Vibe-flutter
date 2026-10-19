@@ -79,18 +79,31 @@ class VibeTextStickerBar extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
     controller.sendController.clear();
     try {
-      final bytes = await render(text, style);
+      final (bytes, sw, sh) = await render(text, style);
+      // the name is the words, so there's no caption under the sticker
+      final name =
+          '${text.replaceAll(RegExp(r'[\\/:*?"<>|\n]'), '').trim()}.png';
       final file = MatrixImageFile(
         bytes: bytes,
-        name: 'sticker.png',
+        name: name,
         mimeType: 'image/png',
-        width: _px,
-        height: _px,
+        width: sw,
+        height: sh,
+      );
+      // its own thumbnail: Matrix would otherwise make a JPEG one, which
+      // has no see-through background (the black square)
+      final thumb = MatrixImageFile(
+        bytes: bytes,
+        name: name,
+        mimeType: 'image/png',
+        width: sw,
+        height: sh,
       );
       await controller.room.sendFileEvent(
         file,
+        thumbnail: thumb,
         inReplyTo: controller.replyEvent,
-        extraContent: {'body': text, 'chat.vibe.sticker': true},
+        extraContent: {'chat.vibe.sticker': true, 'chat.vibe.sticker_text': text},
       );
       controller.cancelReplyEventAction();
     } catch (e) {
@@ -103,17 +116,59 @@ class VibeTextStickerBar extends StatelessWidget {
 
   static const int _px = 384;
 
-  /// The sticker as a see-through PNG.
-  static Future<Uint8List> render(String text, VibeTextSticker style) async {
+  /// The sticker as a see-through PNG, cut tight around the drawing (no
+  /// empty space around it). Returns the bytes and the size.
+  static Future<(Uint8List, int, int)> render(
+    String text,
+    VibeTextSticker style,
+  ) async {
     final rec = ui.PictureRecorder();
     final c = Canvas(rec);
     _StickerPainter(text, style).paint(c, const Size(384, 384));
     final pic = rec.endRecording();
     final image = await pic.toImage(_px, _px);
-    final data = await image.toByteData(format: ui.ImageByteFormat.png);
-    image.dispose();
     pic.dispose();
-    return data!.buffer.asUint8List();
+    // find where the drawing is
+    final raw = (await image.toByteData(
+      format: ui.ImageByteFormat.rawStraightRgba,
+    ))!.buffer.asUint8List();
+    var minX = _px, minY = _px, maxX = -1, maxY = -1;
+    for (var y = 0; y < _px; y++) {
+      for (var x = 0; x < _px; x++) {
+        if (raw[(y * _px + x) * 4 + 3] > 8) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (maxX < 0) {
+      minX = minY = 0;
+      maxX = maxY = _px - 1;
+    }
+    const pad = 4;
+    final src = Rect.fromLTRB(
+      (minX - pad).clamp(0, _px).toDouble(),
+      (minY - pad).clamp(0, _px).toDouble(),
+      (maxX + 1 + pad).clamp(0, _px).toDouble(),
+      (maxY + 1 + pad).clamp(0, _px).toDouble(),
+    );
+    final w = src.width.round(), h = src.height.round();
+    final rec2 = ui.PictureRecorder();
+    Canvas(rec2).drawImageRect(
+      image,
+      src,
+      Rect.fromLTWH(0, 0, w.toDouble(), h.toDouble()),
+      Paint()..filterQuality = FilterQuality.high,
+    );
+    final pic2 = rec2.endRecording();
+    final out = await pic2.toImage(w, h);
+    final data = await out.toByteData(format: ui.ImageByteFormat.png);
+    image.dispose();
+    out.dispose();
+    pic2.dispose();
+    return (data!.buffer.asUint8List(), w, h);
   }
 }
 
