@@ -22,6 +22,8 @@ abstract class VibeSlash {
     if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return;
     final ids = eventIds.toSet();
     if (ids.isEmpty) return;
+    // let the message menu / confirm dialog finish sliding down first
+    await Future<void>.delayed(const Duration(milliseconds: 420));
     active.value = {...active.value, ...ids};
     await Future<void>.delayed(duration);
   }
