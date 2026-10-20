@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_text_sticker.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:ui' as ui;
@@ -249,13 +248,6 @@ class ChatView extends StatelessWidget {
                         ],
                       ),
                   ] else if (!controller.room.isArchived) ...[
-                    if (controller.room.canSendDefaultMessages)
-                      IconButton(
-                        tooltip: 'Call',
-                        icon: const Icon(Icons.call_outlined),
-                        onPressed: () =>
-                            VibeCall.pickAndStart(context, controller.room),
-                      ),
                     VibeLockButton(room: controller.room),
                     ChatSettingsPopupMenu(controller.room, true),
                   ],

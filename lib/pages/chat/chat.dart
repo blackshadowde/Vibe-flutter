@@ -43,6 +43,7 @@ import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:fluffychat/vibe/vibe_slash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -1147,6 +1148,9 @@ class ChatController extends State<ChatPageWithRoom>
     if (reasonInput == null) return;
     final reason = reasonInput.isEmpty ? null : reasonInput;
     if (!mounted) return;
+    final slashed = selectedEvents.map((e) => e.eventId).toList();
+    await VibeSlash.play(context, slashed);
+    if (!mounted) return;
     await showFutureLoadingDialog(
       context: context,
       futureWithProgress: (onProgress) async {
@@ -1176,6 +1180,8 @@ class ChatController extends State<ChatPageWithRoom>
         }
       },
     );
+    // the deleted rows now show the planted sword; let them settle first
+    Future.delayed(const Duration(milliseconds: 1500), () => VibeSlash.clear(slashed));
     setState(() {
       showEmojiPicker = false;
       selectedEvents.clear();

@@ -16,10 +16,10 @@ import 'package:matrix/matrix.dart';
 ///
 /// Starting a call sends a small "call" message into the chat (others see a
 /// card with Join, other Matrix apps see a link), then opens the call.
-/// Tuned to be light: one-to-one calls go phone to phone (peer-to-peer),
-/// 360p video by default (540p at most), the phone's hardware video encoder
-/// (H.264), no audio-level meters or extras, and voice calls never start
-/// the camera.
+/// One-to-one calls go phone to phone (peer-to-peer, encrypted between
+/// the two phones), HD video (720p), full-band Opus voice with loss
+/// protection, your own preview not mirrored, and voice calls never start
+/// the camera. When the caller hangs up the card turns into "call ended".
 abstract class VibeCall {
   static const _key = 'chat.vibe.call';
   static const _channel = MethodChannel('vibe/system');
@@ -45,12 +45,60 @@ abstract class VibeCall {
     final srv = server;
     final id = _id();
     final url = '$srv/$id';
-    await room.sendEvent({
+    final data = {'url': url, 'server': srv, 'room': id, 'video': video};
+    final eventId = await room.sendEvent({
       'msgtype': MessageTypes.Text,
       'body': '${video ? '📹 Video' : '📞 Voice'} call · join: $url',
-      _key: {'url': url, 'server': srv, 'room': id, 'video': video},
+      _key: data,
     });
-    await join(room, srv, id, video: video);
+    await join(room, srv, id, video: video, callEventId: eventId, ownCall: data);
+  }
+
+  /// Calls this phone has already joined and left: their Join is gone.
+  static final done = ValueNotifier<Set<String>>({});
+
+  static bool ended(Event e) => info(e)?['ended'] == true;
+
+  /// Start a call from the chat pane ("voice-call" / "video-call").
+  static Future<void> startFrom(
+    BuildContext context,
+    Room room, {
+    required bool video,
+  }) async {
+    try {
+      await start(room, video: video);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not start the call: $e')),
+        );
+      }
+    }
+  }
+
+  /// The caller hangs up: the call message is edited to "ended" so the
+  /// Join button disappears for everyone.
+  static Future<void> _markEnded(
+    Room room,
+    String eventId,
+    Map<String, Object?> data,
+  ) async {
+    final video = data['video'] == true;
+    final body = '${video ? '📹 Video' : '📞 Voice'} call ended';
+    try {
+      await room.sendEvent({
+        'msgtype': MessageTypes.Text,
+        'body': '* $body',
+        'm.new_content': {
+          'msgtype': MessageTypes.Text,
+          'body': body,
+          _key: {...data, 'ended': true},
+        },
+        'm.relates_to': {'rel_type': 'm.replace', 'event_id': eventId},
+      });
+    } catch (e) {
+      Logs().w('Vibe call: could not mark ended', e);
+    }
   }
 
   static bool _inCall = false;
@@ -60,9 +108,20 @@ abstract class VibeCall {
     String srv,
     String id, {
     required bool video,
+    String? callEventId,
+    Map<String, Object?>? ownCall,
   }) async {
     if (_inCall) return;
     _inCall = true;
+    var left = false;
+    void onLeft() {
+      _inCall = false;
+      if (left) return;
+      left = true;
+      if (callEventId == null) return;
+      done.value = {...done.value, callEventId};
+      if (ownCall != null) _markEnded(room, callEventId, ownCall);
+    }
     stopRinging();
     final me = room.unsafeGetUserFromMemoryOrFallback(room.client.userID!);
     final options = JitsiMeetConferenceOptions(
@@ -77,19 +136,30 @@ abstract class VibeCall {
         'prejoinConfig.enabled': false,
         'disableDeepLinking': true,
         'requireDisplayName': false,
-        // one-to-one: straight between the phones
+        // one-to-one: straight between the phones, encrypted end to end
         'p2p.enabled': true,
-        'p2p.preferredCodec': 'H264',
-        // hardware video encoding, modest resolution
-        'videoQuality.preferredCodec': 'H264',
-        'resolution': 360,
-        'constraints.video.height.ideal': 360,
-        'constraints.video.height.max': 540,
-        'constraints.video.height.min': 180,
-        'channelLastN': 4,
+        'p2p.backToP2PDelay': 0,
+        // HD video, scales down by itself on a weak network
+        'resolution': 720,
+        'constraints.video.height.ideal': 720,
+        'constraints.video.height.max': 720,
+        'constraints.video.height.min': 240,
+        'constraints.video.frameRate.ideal': 30,
         'enableLayerSuspension': true,
+        // your own preview like a camera, not a mirror
+        'doNotFlipLocalVideo': true,
+        // clear voice: full-band Opus, extra copies against packet loss,
+        // no silence gating (it made voice choppy)
+        'audioQuality.opusMaxAverageBitrate': 64000,
+        'audioQuality.stereo': false,
+        'audioQuality.enableOpusDtx': false,
+        'enableOpusRed': true,
+        'disableAP': false,
+        'disableAEC': false,
+        'disableNS': false,
+        'disableAGC': false,
+        'disableHPF': false,
         // fewer things running = smoother and lighter on the battery
-        'disableAudioLevels': true,
         'enableNoAudioDetection': false,
         'enableNoisyMicDetection': false,
         'disableReactions': true,
@@ -130,7 +200,7 @@ abstract class VibeCall {
         'meeting-password.enabled': false,
         'kick-out.enabled': false,
         'pip.enabled': true,
-        'resolution': 360,
+        'resolution': 720,
       },
       userInfo: JitsiMeetUserInfo(displayName: me.calcDisplayname()),
     );
@@ -138,12 +208,13 @@ abstract class VibeCall {
       await JitsiMeet().join(
         options,
         JitsiMeetEventListener(
-          conferenceTerminated: (url, error) => _inCall = false,
-          readyToClose: () => _inCall = false,
+          conferenceTerminated: (url, error) => onLeft(),
+          readyToClose: onLeft,
         ),
       );
     } catch (e) {
       _inCall = false;
+      left = true;
       Logs().w('Vibe call: could not join', e);
       rethrow;
     }
@@ -159,7 +230,9 @@ abstract class VibeCall {
     _sub?.cancel();
     _sub = client.onTimelineEvent.stream.listen((e) {
       final i = info(e);
-      if (i == null || e.senderId == client.userID) return;
+      if (i == null || i['ended'] == true || e.senderId == client.userID) {
+        return;
+      }
       if (!_seen.add(e.eventId)) return;
       if (DateTime.now().difference(e.originServerTs).inSeconds.abs() > 45) {
         return;
@@ -248,7 +321,7 @@ abstract class VibeCall {
                         auto.cancel();
                         stopRinging();
                         Navigator.of(c).pop();
-                        join(room, srv, id, video: video);
+                        join(room, srv, id, video: video, callEventId: e.eventId);
                       },
                       icon: Icon(video ? Icons.videocam : Icons.call),
                       label: const Text('Answer'),
@@ -302,7 +375,8 @@ abstract class VibeCall {
   }
 }
 
-/// The card a call message shows in the chat: who called and "Join".
+/// The card a call message shows in the chat: Join while the call is on,
+/// "call ended" once the caller hangs up (or you have joined and left).
 class VibeCallCard extends StatelessWidget {
   final Event event;
   const VibeCallCard(this.event, {super.key});
@@ -312,43 +386,61 @@ class VibeCallCard extends StatelessWidget {
     final i = VibeCall.info(event)!;
     final video = i['video'] == true;
     final cs = Theme.of(context).colorScheme;
-    final fresh = DateTime.now().difference(event.originServerTs).inHours < 12;
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
-      constraints: const BoxConstraints(maxWidth: 320),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(video ? Icons.videocam : Icons.call, color: const Color(0xFF5865F2)),
-          const SizedBox(width: 10),
-          Flexible(
-            child: Text(
-              video ? 'Video call' : 'Voice call',
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-            ),
+    return ValueListenableBuilder<Set<String>>(
+      valueListenable: VibeCall.done,
+      builder: (context, done, _) {
+        final live = !VibeCall.ended(event) &&
+            !done.contains(event.eventId) &&
+            DateTime.now().difference(event.originServerTs).inHours < 3;
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+          constraints: const BoxConstraints(maxWidth: 320),
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(16),
           ),
-          const SizedBox(width: 12),
-          if (fresh)
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF23A55A),
-                visualDensity: VisualDensity.compact,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                live
+                    ? (video ? Icons.videocam_outlined : Icons.call_outlined)
+                    : (video ? Icons.videocam_off_outlined : Icons.call_end_outlined),
+                color: live ? const Color(0xFF5865F2) : cs.onSurfaceVariant,
               ),
-              onPressed: () => VibeCall.join(
-                event.room,
-                i['server'] as String? ?? VibeCall.server,
-                i['room'] as String? ?? '',
-                video: video,
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  '${video ? 'Video' : 'Voice'} call${live ? '' : ' ended'}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    color: live ? null : cs.onSurfaceVariant,
+                  ),
+                ),
               ),
-              child: const Text('Join'),
-            ),
-        ],
-      ),
+              if (live) ...[
+                const SizedBox(width: 12),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF23A55A),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  onPressed: () => VibeCall.join(
+                    event.room,
+                    i['server'] as String? ?? VibeCall.server,
+                    i['room'] as String? ?? '',
+                    video: video,
+                    callEventId: event.eventId,
+                  ),
+                  child: const Text('Join'),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }

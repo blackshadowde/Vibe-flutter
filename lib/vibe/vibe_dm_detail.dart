@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_sticker.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/events/audio_player.dart';
@@ -187,6 +188,18 @@ class VibeDmDetail extends StatelessWidget {
                   onTap: onOpenChat,
                 ),
               ),
+              if (room.canSendDefaultMessages) ...[
+                VibeHashRow(
+                  label: 'voice-call',
+                  icon: Icons.call_outlined,
+                  onTap: () => VibeCall.startFrom(context, room, video: false),
+                ),
+                VibeHashRow(
+                  label: 'video-call',
+                  icon: Icons.videocam_outlined,
+                  onTap: () => VibeCall.startFrom(context, room, video: true),
+                ),
+              ],
               const VibePaneHeader('INFO'),
               VibeHashRow(
                 label: 'media',

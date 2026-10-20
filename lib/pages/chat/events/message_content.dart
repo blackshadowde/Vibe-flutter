@@ -15,6 +15,7 @@ import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
 import 'package:fluffychat/vibe/vibe_effects.dart';
 import 'package:fluffychat/vibe/vibe_media_viewer.dart';
 import 'package:fluffychat/vibe/vibe_text_size.dart';
+import 'package:fluffychat/vibe/vibe_slash.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -304,13 +305,13 @@ class RedactionWidget extends StatelessWidget {
             snapshot.data?.calcDisplayname() ??
             event.redactedBecause?.senderId.localpart ??
             L10n.of(context).user;
-        return _ButtonContent(
+        // Vibe: the samurai's sword stays where the message was
+        return VibeSwordField(
           label: reason == null
               ? L10n.of(context).redactedBy(redactedBy)
               : L10n.of(context).redactedByBecause(redactedBy, reason),
-          icon: '🗑️',
-          textColor: buttonTextColor.withAlpha(128),
-          onPressed: () => onInfoTab!(event),
+          color: buttonTextColor.withAlpha(150),
+          onTap: onInfoTab == null ? null : () => onInfoTab!(event),
           fontSize: fontSize,
         );
       },

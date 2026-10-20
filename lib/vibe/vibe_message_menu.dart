@@ -13,6 +13,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_message.dart';
 import 'package:fluffychat/vibe/vibe_starred.dart';
 import 'package:fluffychat/widgets/avatar.dart';
+import 'package:fluffychat/vibe/vibe_slash.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -353,10 +354,12 @@ class _Menu extends StatelessWidget {
             item(
               Icons.delete_outline,
               'Hide on this device',
-              () {
+              () async {
                 _close();
-                VibeHidden.hide(event.room.id, event.eventId);
                 controller.clearSelectedEvents();
+                await VibeSlash.play(controller.context, [event.eventId]);
+                VibeHidden.hide(event.room.id, event.eventId);
+                VibeSlash.clear([event.eventId]);
               },
               color: _red,
               subtitle: 'Other people still see it.',

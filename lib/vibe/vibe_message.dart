@@ -22,6 +22,7 @@ import 'package:fluffychat/vibe/vibe_user_sheet.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/vibe/vibe_stable_id.dart';
+import 'package:fluffychat/vibe/vibe_slash.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
@@ -800,6 +801,8 @@ class VibeMessage extends StatelessWidget {
       child: VibeSwipeReply(
         key: ValueKey(VibeStableId.of(event)),
         onReply: onSwipe,
+        child: VibeSlashRow(
+        eventId: event.eventId,
         child: Container(
           constraints: const BoxConstraints(
             maxWidth: FluffyThemes.maxTimelineWidth,
@@ -974,6 +977,7 @@ class VibeMessage extends StatelessWidget {
                 ),
             ],
           ),
+        ),
         ),
       ),
     ),
