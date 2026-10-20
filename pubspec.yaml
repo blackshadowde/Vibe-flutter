@@ -124,6 +124,22 @@ flutter:
           weight: 600
         - asset: assets/fonts/Figtree-Bold.ttf
           weight: 700
+    # Parrot look (JetBrains Mono, OFL, licence next to the files)
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/JetBrainsMono-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/JetBrainsMono-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/JetBrainsMono-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/JetBrainsMono-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/JetBrainsMono-ExtraBold.ttf
+          weight: 800
     # sticker lettering (Google Fonts, OFL / Apache 2.0, licences next to the files)
     - family: PermanentMarker
       fonts:
