@@ -144,8 +144,8 @@ class VibeTextSizePreview extends StatelessWidget {
                       Flexible(
                         child: Text('Perfect, see you at 8 🎲', style: body),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 6, bottom: 3),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 6, bottom: 3),
                         child: Icon(
                           Icons.done_all,
                           size: 18,

@@ -223,7 +223,7 @@ class _IntroPageState extends State<IntroPage>
                           title: Text(s.title),
                           subtitle: Text(s.note),
                           trailing: s.name == current
-                              ? const Icon(
+                              ? Icon(
                                   Icons.check_circle,
                                   size: 22,
                                   color: VibeSettingsStyle.accent,
@@ -305,7 +305,7 @@ class _IntroPageState extends State<IntroPage>
     final field = VibeSettingsStyle.card(context);
     final text = VibeSettingsStyle.text(context);
     final muted = VibeSettingsStyle.text2(context);
-    const blurple = VibeSettingsStyle.accent;
+    final blurple = VibeSettingsStyle.accent;
     const danger = Color(0xFFDA373C);
 
     if (widget.isLoading) {
@@ -315,7 +315,7 @@ class _IntroPageState extends State<IntroPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(color: blurple),
+              CircularProgressIndicator(color: blurple),
               if (widget.loggingInToHomeserver != null) ...[
                 const SizedBox(height: 16),
                 Text(
@@ -344,7 +344,7 @@ class _IntroPageState extends State<IntroPage>
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: blurple, width: 1.4),
+        borderSide: BorderSide(color: blurple, width: 1.4),
       ),
     );
 
@@ -580,7 +580,7 @@ class _IntroPageState extends State<IntroPage>
                         'https://app.element.io/#/forgot_password',
                         mode: LaunchMode.externalApplication,
                       ),
-                      child: const Text(
+                      child: Text(
                         'Forgot?',
                         style: TextStyle(
                           fontSize: 13.5,
@@ -685,7 +685,7 @@ class _IntroPageState extends State<IntroPage>
                           ),
                           TextSpan(
                             text: _creating ? 'Log in' : 'Create an account',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: blurple,
                               fontWeight: FontWeight.w600,
                             ),

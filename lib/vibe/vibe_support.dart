@@ -163,7 +163,7 @@ class VibeSupportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    const blurple = VibeSupport.blurple;
+    final blurple = VibeSupport.blurple;
     return Scaffold(
       appBar: AppBar(title: const Text('Support Vibe')),
       body: ListView(

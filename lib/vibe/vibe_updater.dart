@@ -558,7 +558,7 @@ class _UpdateSheetState extends State<_UpdateSheet> {
                       color: blurple.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(Icons.rocket_launch, color: blurple),
+                    child: Icon(Icons.rocket_launch, color: blurple),
                   ),
                   const SizedBox(width: 14),
                   Expanded(

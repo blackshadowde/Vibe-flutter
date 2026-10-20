@@ -283,7 +283,7 @@ class _ServerRow extends StatelessWidget {
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 160),
                       child: selected
-                          ? const Icon(
+                          ? Icon(
                               Icons.check_circle,
                               key: ValueKey(true),
                               size: 22,

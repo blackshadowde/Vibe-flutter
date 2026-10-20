@@ -144,7 +144,7 @@ abstract class VibeWhatsNew {
                               margin: const EdgeInsets.only(top: 7),
                               width: 6,
                               height: 6,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: _blurple,
                                 shape: BoxShape.circle,
                               ),
@@ -278,7 +278,7 @@ class VibeNoteLine extends StatelessWidget {
               margin: const EdgeInsets.only(top: 7),
               width: 6,
               height: 6,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: _blurple,
                 shape: BoxShape.circle,
               ),
