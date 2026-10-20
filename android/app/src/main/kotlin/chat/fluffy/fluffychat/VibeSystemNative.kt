@@ -33,9 +33,6 @@ object VibeSystemNative {
     /** A call is on screen: leaving the app shrinks it into a floating window. */
     @Volatile var callActive = false
 
-    /** Battery saver caps the screen refresh rate (0 = no cap). */
-    @Volatile var maxHz = 0
-
     fun register(context: Context, engine: FlutterEngine) {
         val app = context.applicationContext
         MethodChannel(engine.dartExecutor.binaryMessenger, CHANNEL)
@@ -82,27 +79,6 @@ object VibeSystemNative {
                         result.success(null)
                     }
                     "pip" -> result.success(MainActivity.current?.enterCallPip() ?: false)
-                    // battery level, charging, phone battery saver (Dart: VibeBattery)
-                    "battery" -> {
-                        try {
-                            val bm = app.getSystemService(Context.BATTERY_SERVICE) as android.os.BatteryManager
-                            val pm = app.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
-                            result.success(
-                                mapOf(
-                                    "level" to bm.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY),
-                                    "charging" to bm.isCharging,
-                                    "powerSave" to pm.isPowerSaveMode,
-                                )
-                            )
-                        } catch (_: Throwable) {
-                            result.success(null)
-                        }
-                    }
-                    "maxRefresh" -> {
-                        maxHz = call.argument<Int>("hz") ?: 0
-                        MainActivity.current?.requestHighRefreshRate()
-                        result.success(null)
-                    }
                     "isSpeaker" -> result.success(isSpeaker(app))
                     "lastExit" -> result.success(lastExit(app))
                     "resetAudio" -> {

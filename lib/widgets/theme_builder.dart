@@ -75,7 +75,7 @@ class ThemeController extends State<ThemeBuilder> {
     });
   }
 
-  /// Vibe, wallpaper colours or Parrot.
+  /// Vibe or wallpaper colours.
   Future<void> setLook(VibeLook look) async {
     final preferences = _sharedPreferences ??=
         await SharedPreferences.getInstance();

@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_battery.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'dart:math' as math;
 
@@ -124,7 +123,6 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
   }
 
   void _fall(String emoji, {required bool mine}) {
-    if (VibeBattery.saving.value) return;
     final box = context.findRenderObject();
     if (box is! RenderBox || !box.attached || !box.hasSize) return;
     final topLeft = box.localToGlobal(Offset.zero);
@@ -152,7 +150,6 @@ class _VibeHeartHostState extends State<VibeHeartHost> {
 
   void _burst({bool fromOther = false}) {
     _lastBurst = DateTime.now();
-    if (VibeBattery.saving.value) return;
     final box = context.findRenderObject();
     if (box is! RenderBox || !box.attached || !box.hasSize) return;
     final size = box.size;

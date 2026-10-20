@@ -52,8 +52,6 @@ class MainActivity : FlutterFragmentActivity() {
                     it.physicalWidth == current.physicalWidth &&
                         it.physicalHeight == current.physicalHeight
                 }
-                // battery saver: at most 60 Hz
-                .filter { VibeSystemNative.maxHz <= 0 || it.refreshRate <= VibeSystemNative.maxHz + 0.5f }
                 .maxByOrNull { it.refreshRate } ?: return
             val params = window.attributes
             params.preferredDisplayModeId = best.modeId
