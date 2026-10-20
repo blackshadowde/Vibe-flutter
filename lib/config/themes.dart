@@ -126,7 +126,7 @@ abstract class FluffyThemes {
     final base = ThemeData(
       visualDensity: VisualDensity.standard,
       useMaterial3: true,
-      fontFamily: 'Figtree',
+      fontFamily: VibePalette.fontFamily,
       brightness: brightness,
       colorScheme: colorScheme,
       dividerColor: dividerColor,
@@ -206,7 +206,7 @@ abstract class FluffyThemes {
           foregroundColor: colorScheme.onSecondaryContainer,
           elevation: 0,
           padding: const EdgeInsets.all(16),
-          textStyle: const TextStyle(fontFamily: 'Figtree', fontSize: 16),
+          textStyle: TextStyle(fontFamily: VibePalette.fontFamily, fontSize: 16),
         ),
       ),
     );

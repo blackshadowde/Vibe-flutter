@@ -128,7 +128,7 @@ class _VibePlexusLayerState extends State<VibePlexusLayer>
                     touch: _touch,
                     line: cs.primary,
                     spark: cs.tertiary,
-                    strength: dark ? 1.0 : 1.25,
+                    strength: dark ? 1.0 : 1.1,
                   ),
                 ),
               ),
@@ -167,7 +167,7 @@ class _PlexusPainter extends CustomPainter {
     final t = time.value;
     final w = size.width, h = size.height;
     final n = (w * h / 20000).clamp(20, 50).round();
-    final reach = (math.min(w, h) * 0.24).clamp(90.0, 150.0);
+    final reach = (math.min(w, h) * 0.28).clamp(110.0, 180.0);
     const margin = 40.0;
     final r = math.Random(42);
 
@@ -182,13 +182,13 @@ class _PlexusPainter extends CustomPainter {
     });
 
     final paint = Paint()
-      ..strokeWidth = 0.7
+      ..strokeWidth = 0.9
       ..isAntiAlias = true;
     for (var i = 0; i < n; i++) {
       for (var j = i + 1; j < n; j++) {
         final d = (pts[i] - pts[j]).distance;
         if (d >= reach) continue;
-        paint.color = line.withValues(alpha: (1 - d / reach) * 0.11 * strength);
+        paint.color = line.withValues(alpha: (1 - d / reach) * 0.32 * strength);
         canvas.drawLine(pts[i], pts[j], paint);
       }
     }
@@ -203,7 +203,7 @@ class _PlexusPainter extends CustomPainter {
         for (final p in pts) {
           final d = (p - tc.at).distance;
           if (d >= rr) continue;
-          paint.color = line.withValues(alpha: (1 - d / rr) * 0.35 * fade);
+          paint.color = line.withValues(alpha: (1 - d / rr) * 0.6 * fade);
           canvas.drawLine(p, tc.at, paint);
         }
       }
@@ -214,8 +214,8 @@ class _PlexusPainter extends CustomPainter {
       final lime = i % 9 == 0;
       final tw = lime ? 0.5 + 0.5 * math.sin(t * 1.6 + i) : 1.0;
       dot.color = (lime ? spark : line)
-          .withValues(alpha: (lime ? 0.45 * tw : 0.28) * strength);
-      canvas.drawCircle(pts[i], lime ? 1.7 : 1.2, dot);
+          .withValues(alpha: ((lime ? 0.85 * tw : 0.6) * strength).clamp(0.0, 1.0));
+      canvas.drawCircle(pts[i], lime ? 2.4 : 1.8, dot);
     }
   }
 
