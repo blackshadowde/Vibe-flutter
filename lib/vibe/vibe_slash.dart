@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:matrix/matrix.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 
@@ -32,6 +33,55 @@ abstract class VibeSlash {
   static void clear(Iterable<String> eventIds) {
     final ids = eventIds.toSet();
     active.value = {...active.value}..removeAll(ids);
+  }
+
+  // ---- the other side: someone else deleted a message for everyone
+
+  /// Recently shown messages, as they were before any deletion (the SDK
+  /// empties a message in place when it is deleted).
+  static final _shown = <String, Map<String, Object?>>{};
+  static final _played = <String>{};
+
+  static void remember(Event e) {
+    if (e.redacted || _shown.containsKey(e.eventId)) return;
+    if (!{EventTypes.Message, EventTypes.Sticker}.contains(e.type)) return;
+    try {
+      _shown[e.eventId] = e.toJson();
+    } catch (_) {
+      return;
+    }
+    if (_shown.length > 300) _shown.remove(_shown.keys.first);
+  }
+
+  /// The message as it was, while the samurai cuts it.
+  static Event original(Event e) {
+    final json = _shown[e.eventId];
+    if (json == null || !e.redacted) return e;
+    try {
+      return Event.fromJson(json, e.room);
+    } catch (_) {
+      return e;
+    }
+  }
+
+  /// A message on screen was just deleted by someone else: play the cut.
+  static void maybePlayRemote(Event e) {
+    if (!e.redacted || _played.contains(e.eventId)) return;
+    if (!_shown.containsKey(e.eventId)) return;
+    final by = e.redactedBecause;
+    if (by == null || by.senderId == e.room.client.userID) return;
+    if (DateTime.now().difference(by.originServerTs).inSeconds.abs() > 20) {
+      return;
+    }
+    _played.add(e.eventId);
+    final id = e.eventId;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      active.value = {...active.value, id};
+      Future<void>.delayed(
+        duration + const Duration(milliseconds: 250),
+        () => clear([id]),
+      );
+    });
   }
 }
 

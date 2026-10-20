@@ -105,6 +105,8 @@ enum AppSettings<T> {
   // via the Worker) or 'builtin' (ntfy, no Google)
   vibePushMode<String>('chat.vibe.push_mode', 'direct'),
   vibeDirectBatteryAsked<bool>('chat.vibe.direct_battery_asked', false),
+  // last time Vibe asked to be let run in the background (ms since epoch)
+  vibeBatteryAskedAt<int>('chat.vibe.battery_asked_at', 0),
   // Privacy: hide online / last seen; who sees my status and local time
   // ('everyone', 'picked' or 'nobody'); picked = comma-separated user ids.
   vibeHidePresence<bool>('chat.vibe.hide_presence', false),

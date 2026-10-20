@@ -34,8 +34,13 @@ abstract class VibeDirect {
         (event) => onEvent(client, event),
       );
     }
-    if (!AppSettings.vibeDirectBatteryAsked.value) {
-      await AppSettings.vibeDirectBatteryAsked.setItem(true);
+    // Stock Android (Pixel) cuts the network of apps that may be "optimised"
+    // when the phone sleeps, so the connection silently stops. Ask until
+    // Vibe is allowed, at most every 3 days.
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (now - AppSettings.vibeBatteryAskedAt.value > 3 * 24 * 3600 * 1000 &&
+        !await VibeNtfy.backgroundAllowed()) {
+      await AppSettings.vibeBatteryAskedAt.setItem(now);
       await VibeNtfy.askBatteryExemption();
     }
   }

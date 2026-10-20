@@ -13,6 +13,11 @@ import 'package:universal_html/html.dart' as html;
 abstract class ForegroundServices {
   static final List<String> runningServices = [];
 
+  /// The running service was started as the long-lived connection
+  /// ("remoteMessaging") rather than a short job ("shortService", which
+  /// Android 14+ stops after about 3 minutes).
+  static bool longLived = false;
+
   static bool get platformSupported =>
       PlatformInfos.isMobile || PlatformInfos.isWeb;
 
@@ -28,6 +33,7 @@ abstract class ForegroundServices {
       html.window.removeEventListener('beforeunload', _beforeUnload);
       return;
     }
+    longLived = false;
     FlutterForegroundTask.stopService();
   }
 
@@ -78,6 +84,7 @@ abstract class ForegroundServices {
           Logs().d('[PushHelper] Foreground service already running');
           return;
         }
+        longLived = false;
         final result = await FlutterForegroundTask.startService(
           serviceTypes: [ForegroundServiceTypes.shortService],
           notificationTitle: 'Vibe',

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_slash.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'dart:ui' as ui;
 
@@ -106,8 +107,14 @@ class Message extends StatelessWidget {
       return StateMessage(event);
     }
 
-    return VibeMessage(
-      event,
+    // Vibe: the samurai also plays when the other person deletes a message
+    // for everyone (the row shows the message until his cut is done)
+    VibeSlash.remember(event);
+    VibeSlash.maybePlayRemote(event);
+    return ValueListenableBuilder<Set<String>>(
+      valueListenable: VibeSlash.active,
+      builder: (context, active, _) => VibeMessage(
+      active.contains(event.eventId) ? VibeSlash.original(event) : event,
       nextEvent: nextEvent,
       previousEvent: previousEvent,
       displayReadMarker: displayReadMarker,
@@ -124,6 +131,7 @@ class Message extends StatelessWidget {
       highlightMarker: highlightMarker,
       bigEmojis: bigEmojis,
       onLongPress: onLongPress,
+    ),
     );
     final client = Matrix.of(context).client;
     final ownMessage = event.senderId == client.userID;

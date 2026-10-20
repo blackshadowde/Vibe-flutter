@@ -306,6 +306,20 @@ class BackgroundPush {
   /// Vibe Direct connection (like Vibgram): Vibe's own Matrix connection
   /// stays open and notifies straight away; Firebase is only a backup.
   Future<void> setupDirectPush() async {
+    // Android 13+: no notifications at all until the app asks (Direct mode
+    // never registered a pusher, so it never asked: new installs stayed
+    // silent)
+    if (PlatformInfos.isAndroid && !isIntegrationTest) {
+      try {
+        await _flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >()
+            ?.requestNotificationsPermission();
+      } catch (e) {
+        Logs().w('[Push] Could not ask for the notification permission', e);
+      }
+    }
     await VibeNtfy.stop();
     await VibeDirect.start(
       clients,

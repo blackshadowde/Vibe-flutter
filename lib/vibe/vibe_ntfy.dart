@@ -65,7 +65,13 @@ abstract class VibeNtfy {
       ForegroundServices.runningServices.add(_serviceName);
     }
     try {
-      if (await FlutterForegroundTask.isRunningService) return;
+      if (await FlutterForegroundTask.isRunningService) {
+        if (ForegroundServices.longLived) return;
+        // A short job (sending files, a background push) holds the service
+        // slot: restart it as the long-lived connection, or Android 14+
+        // would stop it after ~3 minutes and notifications would die.
+        await FlutterForegroundTask.stopService();
+      }
       FlutterForegroundTask.init(
         androidNotificationOptions: AndroidNotificationOptions(
           channelId: 'vibe_connection',
@@ -88,6 +94,7 @@ abstract class VibeNtfy {
           allowWifiLock: true,
         ),
       );
+      ForegroundServices.longLived = true;
       await FlutterForegroundTask.startService(
         serviceTypes: [ForegroundServiceTypes.remoteMessaging],
         notificationTitle: 'Vibe',
@@ -102,6 +109,7 @@ abstract class VibeNtfy {
   static Future<void> _stopService() async {
     ForegroundServices.runningServices.remove(_serviceName);
     if (ForegroundServices.runningServices.isNotEmpty) return;
+    ForegroundServices.longLived = false;
     try {
       await FlutterForegroundTask.stopService();
     } catch (_) {}
@@ -113,6 +121,15 @@ abstract class VibeNtfy {
   static Future<void> releaseKeepAlive() => _stopService();
 
   /// Asks Android not to put Vibe to sleep (needed on many phones).
+  /// Is Vibe allowed to run in the background (not battery-optimised)?
+  static Future<bool> backgroundAllowed() async {
+    try {
+      return await FlutterForegroundTask.isIgnoringBatteryOptimizations;
+    } catch (_) {
+      return true;
+    }
+  }
+
   static Future<void> askBatteryExemption() async {
     try {
       if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {

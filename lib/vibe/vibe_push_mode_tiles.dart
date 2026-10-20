@@ -18,6 +18,7 @@ class VibePushModeTiles extends StatefulWidget {
 
 class _VibePushModeTilesState extends State<VibePushModeTiles> {
   bool _busy = false;
+  int _bgCheck = 0;
 
   Future<void> _set(String mode) async {
     if (_busy || mode == AppSettings.vibePushMode.value) return;
@@ -102,6 +103,34 @@ class _VibePushModeTilesState extends State<VibePushModeTiles> {
               'services. Shows a small permanent notification and uses a '
               'little more battery.',
           Icons.cell_tower,
+        ),
+        // Without this, stock Android (Pixel) stops Vibe's connection while
+        // the phone sleeps and notifications stop coming.
+        FutureBuilder<bool>(
+          key: ValueKey(_bgCheck),
+          future: VibeNtfy.backgroundAllowed(),
+          builder: (context, snap) {
+            final ok = snap.data ?? true;
+            return ListTile(
+              leading: Icon(
+                ok ? Icons.battery_charging_full : Icons.battery_alert,
+                color: ok ? null : theme.colorScheme.error,
+              ),
+              title: const Text('Run in the background'),
+              subtitle: Text(
+                ok
+                    ? 'Allowed: notifications keep coming while the phone sleeps'
+                    : 'Restricted: notifications may stop while the phone '
+                          'sleeps. Tap to allow',
+              ),
+              onTap: ok
+                  ? null
+                  : () async {
+                      await VibeNtfy.askBatteryExemption();
+                      if (mounted) setState(() => _bgCheck++);
+                    },
+            );
+          },
         ),
         ListTile(
             leading: const Icon(Icons.notifications_paused),
