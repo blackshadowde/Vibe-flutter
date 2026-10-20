@@ -37,9 +37,8 @@ abstract class VibePalette {
   /// shades stay exactly as they were.
   static bool get isVibe => effective == VibeLook.vibe;
 
-  /// App font: JetBrains Mono for the Parrot look, Figtree otherwise.
-  static String get fontFamily =>
-      effective == VibeLook.parrot ? 'JetBrainsMono' : 'Figtree';
+  /// App font (the same in every look).
+  static String get fontFamily => 'Figtree';
 
   /// The accent of the current look (buttons, links, ticks, toggles).
   /// Kept up to date by the app (from the active theme).

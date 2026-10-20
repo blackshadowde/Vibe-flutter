@@ -115,22 +115,25 @@ abstract class VibeCall {
       return;
     }
     if (!context.mounted) return;
+    // The call lives above every screen (not as a page), so it can shrink
+    // into a small window inside Vibe while you keep chatting.
+    final overlay = Navigator.of(context, rootNavigator: true).overlay;
+    if (overlay == null) return;
     _inCall = true;
-    try {
-      await Navigator.of(context, rootNavigator: true).push(
-        MaterialPageRoute<void>(
-          fullscreenDialog: true,
-          builder: (_) => _VibeCallScreen(
-            room: room,
-            video: video,
-            url: url,
-            callEventId: callEventId,
-          ),
-        ),
-      );
-    } finally {
-      _inCall = false;
-    }
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (_) => _VibeCallScreen(
+        room: room,
+        video: video,
+        url: url,
+        callEventId: callEventId,
+        onClosed: () {
+          entry.remove();
+          _inCall = false;
+        },
+      ),
+    );
+    overlay.insert(entry);
   }
 
   /// The caller's link is ready: tell the chat (this rings the others).
@@ -375,9 +378,11 @@ class _VibeCallScreen extends StatefulWidget {
   /// Call link to join; null = start a new call.
   final String? url;
   final String? callEventId;
+  final VoidCallback onClosed;
   const _VibeCallScreen({
     required this.room,
     required this.video,
+    required this.onClosed,
     this.url,
     this.callEventId,
   });
@@ -390,8 +395,14 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
   late final WebViewController _web;
   String? _link;
   String? _eventId;
-  bool _joined = false;
   bool _closed = false;
+
+  /// Shrunk into a small window inside Vibe (you can keep chatting).
+  bool _mini = false;
+
+  /// Where the small window sits (its top-left corner), draggable.
+  Offset? _miniAt;
+  final _webKey = GlobalKey();
 
   @override
   void initState() {
@@ -422,14 +433,14 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
     );
   }
 
-  /// Home / app switch during a call: the call floats in a small window.
+  /// Leaving the app (home / app switch) during a call: Android floats the
+  /// call in a picture-in-picture window.
   static void _pipAllowed(bool on) {
     VibeCall._channel.invokeMethod('callActive', {'on': on}).catchError((_) {});
   }
 
-  void _float() {
-    VibeCall._channel.invokeMethod('pip').catchError((_) => false);
-  }
+  void _minimize() => setState(() => _mini = true);
+  void _expand() => setState(() => _mini = false);
 
   String get _name {
     final me = widget.room.client.userID!;
@@ -453,8 +464,32 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
   var st = {};
   var css = document.createElement('style');
   // your own preview like a camera, not a mirror
-  css.textContent = '[class*="mirror"] video, video[class*="mirror"]{transform:none!important}';
+  // and a touch brighter / crisper on screen (faces look less dull)
+  css.textContent = '[class*="mirror"] video, video[class*="mirror"]{transform:none!important}' +
+    'video{filter:brightness(1.07) contrast(1.06) saturate(1.1)}';
   document.head.appendChild(css);
+  // your camera: keep auto exposure / focus / white balance on and lift the
+  // exposure a little (the phone camera app does this; the web view doesn't)
+  var tuned = {};
+  function tune(){
+    document.querySelectorAll('video').forEach(function(v){
+      var s = v.srcObject; if (!s || !s.getVideoTracks) return;
+      s.getVideoTracks().forEach(function(t){
+        if (tuned[t.id] || !t.getCapabilities) return;
+        var c = t.getCapabilities(); if (!c || !c.deviceId) return; // only your own camera
+        tuned[t.id] = true;
+        var adv = {};
+        if (c.exposureMode && c.exposureMode.indexOf('continuous') >= 0) adv.exposureMode = 'continuous';
+        if (c.focusMode && c.focusMode.indexOf('continuous') >= 0) adv.focusMode = 'continuous';
+        if (c.whiteBalanceMode && c.whiteBalanceMode.indexOf('continuous') >= 0) adv.whiteBalanceMode = 'continuous';
+        if (c.exposureCompensation && c.exposureCompensation.max > 0) {
+          var step = c.exposureCompensation.step || 0.1;
+          adv.exposureCompensation = Math.round((c.exposureCompensation.max * 0.3) / step) * step;
+        }
+        t.applyConstraints({advanced: [adv]}).catch(function(){});
+      });
+    });
+  }
   function q(id){ return document.querySelector('[data-testid="'+id+'"]'); }
   function setVal(el, v){
     var s = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
@@ -463,6 +498,7 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
   function post(o){ try { VibeCall.postMessage(JSON.stringify(o)); } catch(e){} }
   var last = '';
   setInterval(function(){
+    tune();
     if (location.href !== last){ last = location.href; post({href:last}); }
     var c = q('home_callName');
     if (cfg.start && c && !st.create){
@@ -502,7 +538,6 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
     }
     final href = msg['href'];
     if (href is String) _maybeAnnounce(href);
-    if (msg['joined'] == true) _joined = true;
     if (msg['left'] == true) _close();
   }
 
@@ -526,7 +561,7 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
   void _close() {
     if (_closed) return;
     _closed = true;
-    if (mounted) Navigator.of(context).maybePop();
+    widget.onClosed();
   }
 
   @override
@@ -546,62 +581,117 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
     super.dispose();
   }
 
-  Future<bool> _confirmLeave() async {
-    if (!_joined || _closed) return true;
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: const Text('Leave the call?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: const Text('Stay'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFDA373C)),
-            onPressed: () => Navigator.pop(c, true),
-            child: const Text('Leave'),
+  @override
+  Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final screen = mq.size;
+    // Android's picture-in-picture window is tiny: always the full call there
+    final pip = screen.shortestSide < 300;
+    final mini = _mini && !pip;
+    final w = widget.video ? 112.0 : 96.0;
+    final h = widget.video ? 168.0 : 96.0;
+    final at = _clamp(
+      _miniAt ?? Offset(screen.width - w - 12, mq.padding.top + 72),
+      screen,
+      mq,
+      w,
+      h,
+    );
+    final rect = mini
+        ? Rect.fromLTWH(at.dx, at.dy, w, h)
+        : Offset.zero & screen;
+    return BackButtonListener(
+      // back shrinks the call instead of leaving it
+      onBackButtonPressed: () async {
+        if (mini || pip) return false;
+        _minimize();
+        return true;
+      },
+      child: Stack(
+        children: [
+          AnimatedPositioned.fromRect(
+            rect: rect,
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOutCubic,
+            child: GestureDetector(
+              onPanUpdate: mini
+                  ? (d) => setState(() => _miniAt = at + d.delta)
+                  : null,
+              onTap: mini ? _expand : null,
+              child: Material(
+                color: Colors.black,
+                elevation: mini ? 8 : 0,
+                borderRadius: BorderRadius.circular(mini ? 16 : 0),
+                clipBehavior: Clip.antiAlias,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Padding(
+                        padding: mini || pip
+                            ? EdgeInsets.zero
+                            : EdgeInsets.only(
+                                top: mq.padding.top,
+                                bottom: mq.padding.bottom,
+                              ),
+                        // taps go to the call only when it's full size
+                        child: AbsorbPointer(
+                          absorbing: mini,
+                          child: WebViewWidget(key: _webKey, controller: _web),
+                        ),
+                      ),
+                    ),
+                    if (!mini && !pip)
+                      Positioned(
+                        top: mq.padding.top + 4,
+                        left: 4,
+                        child: IconButton(
+                          tooltip: 'Keep chatting',
+                          color: Colors.white,
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.black38,
+                          ),
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                          onPressed: _minimize,
+                        ),
+                      ),
+                    if (mini)
+                      Positioned(
+                        right: 4,
+                        bottom: 4,
+                        child: GestureDetector(
+                          onTap: _close,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFDA373C),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.call_end,
+                              size: 17,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
-    return ok == true;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) async {
-        if (didPop) return;
-        final nav = Navigator.of(context);
-        if (_closed || await _confirmLeave()) {
-          _closed = true;
-          nav.pop();
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Positioned.fill(child: WebViewWidget(controller: _web)),
-              // hidden while floating (small window)
-              if (MediaQuery.sizeOf(context).width > 320)
-                Positioned(
-                  top: 4,
-                  left: 4,
-                  child: IconButton(
-                    tooltip: 'Float',
-                    color: Colors.white70,
-                    icon: const Icon(Icons.picture_in_picture_alt_rounded),
-                    onPressed: _float,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
+  /// Keeps the small window on screen (and above the keyboard).
+  static Offset _clamp(Offset o, Size s, MediaQueryData mq, double w, double h) {
+    final maxX = s.width - w - 8;
+    final maxY = s.height - mq.viewInsets.bottom - h - 8;
+    return Offset(
+      o.dx.clamp(8.0, maxX < 8 ? 8.0 : maxX),
+      o.dy.clamp(mq.padding.top + 8, maxY < mq.padding.top + 8 ? mq.padding.top + 8 : maxY),
     );
   }
 }
