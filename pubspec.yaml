@@ -51,7 +51,6 @@ dependencies:
   image: ^4.7.2
   image_picker: ^1.2.3
   intl: any
-  jitsi_meet_flutter_sdk: ^13.2.0
   just_audio: ^0.10.6
   latlong2: ^0.10.1
   local_auth: ^3.0.2
@@ -88,6 +87,8 @@ dependencies:
   video_compress: ^3.1.4
   video_player: ^2.13.0
   wakelock_plus: ^1.7.0
+  webview_flutter: ^4.14.1
+  webview_flutter_android: ^4.14.1
 
 dev_dependencies:
   dart_code_linter: ^4.1.9

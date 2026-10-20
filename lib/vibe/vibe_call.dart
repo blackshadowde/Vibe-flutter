@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:fluffychat/config/setting_keys.dart';
@@ -9,24 +10,31 @@ import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:jitsi_meet_flutter_sdk/jitsi_meet_flutter_sdk.dart';
 import 'package:matrix/matrix.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
-/// Voice and video calls, inside Vibe, on Jitsi Meet (open source).
+/// Voice and video calls inside Vibe, on Element Call (open source,
+/// MatrixRTC + LiveKit), shown full screen in the app.
 ///
-/// Starting a call sends a small "call" message into the chat (others see a
-/// card with Join, other Matrix apps see a link), then opens the call.
-/// One-to-one calls go phone to phone (peer-to-peer, encrypted between
-/// the two phones), HD video (720p), full-band Opus voice with loss
-/// protection, your own preview not mirrored, and voice calls never start
-/// the camera. When the caller hangs up the card turns into "call ended".
+/// Every call is end-to-end encrypted: Element Call makes a fresh call room
+/// with a random key, and the key only lives in the link's "#" part, which
+/// browsers never send to any server. The link travels inside your
+/// (encrypted) chat. Element's call service carries the media, so calls
+/// work whatever your home server supports.
+///
+/// Quality: Element Call sends HD (720p) with simulcast and adapts to the
+/// network; Opus voice with echo cancelling. Vibe shows your own preview
+/// unmirrored, and voice calls switch the camera off before joining.
 abstract class VibeCall {
   static const _key = 'chat.vibe.call';
   static const _channel = MethodChannel('vibe/system');
 
   static String get server {
     final s = AppSettings.vibeCallServer.value.trim();
-    return s.isEmpty ? 'https://meet.ffmuc.net' : s;
+    return s.isEmpty ? 'https://call.element.io' : s;
   }
 
   static Map<String, Object?>? info(Event e) {
@@ -34,46 +42,104 @@ abstract class VibeCall {
     return v is Map ? Map<String, Object?>.from(v) : null;
   }
 
-  static String _id() {
-    const abc = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    final r = Random.secure();
-    return 'vibe-${List.generate(20, (_) => abc[r.nextInt(abc.length)]).join()}';
-  }
-
-  /// Starts a call in [room] and joins it.
-  static Future<void> start(Room room, {required bool video}) async {
-    final srv = server;
-    final id = _id();
-    final url = '$srv/$id';
-    final data = {'url': url, 'server': srv, 'room': id, 'video': video};
-    final eventId = await room.sendEvent({
-      'msgtype': MessageTypes.Text,
-      'body': '${video ? '📹 Video' : '📞 Voice'} call · join: $url',
-      _key: data,
-    });
-    await join(room, srv, id, video: video, callEventId: eventId, ownCall: data);
-  }
-
   /// Calls this phone has already joined and left: their Join is gone.
   static final done = ValueNotifier<Set<String>>({});
 
   static bool ended(Event e) => info(e)?['ended'] == true;
+
+  static bool _inCall = false;
 
   /// Start a call from the chat pane ("voice-call" / "video-call").
   static Future<void> startFrom(
     BuildContext context,
     Room room, {
     required bool video,
+  }) => _open(context, room, video: video);
+
+  /// Voice or video? (kept for older entry points)
+  static Future<void> pickAndStart(BuildContext context, Room room) async {
+    final video = await showVibeSheet<bool>(
+      context: context,
+      useRootNavigator: true,
+      builder: (c) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.call_outlined),
+              title: const Text('Voice call'),
+              onTap: () => Navigator.of(c).pop(false),
+            ),
+            ListTile(
+              leading: const Icon(Icons.videocam_outlined),
+              title: const Text('Video call'),
+              onTap: () => Navigator.of(c).pop(true),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (video == null || !context.mounted) return;
+    await startFrom(context, room, video: video);
+  }
+
+  /// Joins the call behind a call message.
+  static Future<void> join(
+    BuildContext context,
+    Room room,
+    String url, {
+    required bool video,
+    String? callEventId,
+  }) => _open(context, room, video: video, url: url, callEventId: callEventId);
+
+  static Future<void> _open(
+    BuildContext context,
+    Room room, {
+    required bool video,
+    String? url,
+    String? callEventId,
   }) async {
-    try {
-      await start(room, video: video);
-    } catch (e) {
+    if (_inCall) return;
+    stopRinging();
+    final perms = await [
+      Permission.microphone,
+      if (video) Permission.camera,
+    ].request();
+    if (perms[Permission.microphone] != PermissionStatus.granted) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not start the call: $e')),
+          const SnackBar(content: Text('Vibe needs the microphone for calls')),
         );
       }
+      return;
     }
+    if (!context.mounted) return;
+    _inCall = true;
+    try {
+      await Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute<void>(
+          fullscreenDialog: true,
+          builder: (_) => _VibeCallScreen(
+            room: room,
+            video: video,
+            url: url,
+            callEventId: callEventId,
+          ),
+        ),
+      );
+    } finally {
+      _inCall = false;
+    }
+  }
+
+  /// The caller's link is ready: tell the chat (this rings the others).
+  static Future<String?> _announce(Room room, String url, bool video) async {
+    final data = {'url': url, 'server': server, 'video': video, 'e2ee': true};
+    return room.sendEvent({
+      'msgtype': MessageTypes.Text,
+      'body': '${video ? '📹 Video' : '📞 Voice'} call · join: $url',
+      _key: data,
+    });
   }
 
   /// The caller hangs up: the call message is edited to "ended" so the
@@ -81,9 +147,9 @@ abstract class VibeCall {
   static Future<void> _markEnded(
     Room room,
     String eventId,
-    Map<String, Object?> data,
+    String url,
+    bool video,
   ) async {
-    final video = data['video'] == true;
     final body = '${video ? '📹 Video' : '📞 Voice'} call ended';
     try {
       await room.sendEvent({
@@ -92,7 +158,7 @@ abstract class VibeCall {
         'm.new_content': {
           'msgtype': MessageTypes.Text,
           'body': body,
-          _key: {...data, 'ended': true},
+          _key: {'url': url, 'server': server, 'video': video, 'ended': true},
         },
         'm.relates_to': {'rel_type': 'm.replace', 'event_id': eventId},
       });
@@ -101,126 +167,15 @@ abstract class VibeCall {
     }
   }
 
-  static bool _inCall = false;
-
-  static Future<void> join(
-    Room room,
-    String srv,
-    String id, {
-    required bool video,
-    String? callEventId,
-    Map<String, Object?>? ownCall,
-  }) async {
-    if (_inCall) return;
-    _inCall = true;
-    var left = false;
-    void onLeft() {
-      _inCall = false;
-      if (left) return;
-      left = true;
-      if (callEventId == null) return;
-      done.value = {...done.value, callEventId};
-      if (ownCall != null) _markEnded(room, callEventId, ownCall);
-    }
-    stopRinging();
-    final me = room.unsafeGetUserFromMemoryOrFallback(room.client.userID!);
-    final options = JitsiMeetConferenceOptions(
-      serverURL: srv,
-      room: id,
-      configOverrides: {
-        'subject': room.getLocalizedDisplayname(),
-        'startWithAudioMuted': false,
-        'startWithVideoMuted': !video,
-        'startAudioOnly': !video,
-        'prejoinPageEnabled': false,
-        'prejoinConfig.enabled': false,
-        'disableDeepLinking': true,
-        'requireDisplayName': false,
-        // one-to-one: straight between the phones, encrypted end to end
-        'p2p.enabled': true,
-        'p2p.backToP2PDelay': 0,
-        // HD video, scales down by itself on a weak network
-        'resolution': 720,
-        'constraints.video.height.ideal': 720,
-        'constraints.video.height.max': 720,
-        'constraints.video.height.min': 240,
-        'constraints.video.frameRate.ideal': 30,
-        'enableLayerSuspension': true,
-        // your own preview like a camera, not a mirror
-        'doNotFlipLocalVideo': true,
-        // clear voice: full-band Opus, extra copies against packet loss,
-        // no silence gating (it made voice choppy)
-        'audioQuality.opusMaxAverageBitrate': 64000,
-        'audioQuality.stereo': false,
-        'audioQuality.enableOpusDtx': false,
-        'enableOpusRed': true,
-        'disableAP': false,
-        'disableAEC': false,
-        'disableNS': false,
-        'disableAGC': false,
-        'disableHPF': false,
-        // fewer things running = smoother and lighter on the battery
-        'enableNoAudioDetection': false,
-        'enableNoisyMicDetection': false,
-        'disableReactions': true,
-        'disableInviteFunctions': true,
-        'disableModeratorIndicator': true,
-        'toolbarButtons': [
-          'microphone',
-          'camera',
-          'hangup',
-          'toggle-camera',
-          'tileview',
-        ],
-      },
-      featureFlags: {
-        'welcomepage.enabled': false,
-        'prejoinpage.enabled': false,
-        'unsaferoomwarning.enabled': false,
-        'chat.enabled': false,
-        'invite.enabled': false,
-        'add-people.enabled': false,
-        'calendar.enabled': false,
-        'call-integration.enabled': false,
-        'car-mode.enabled': false,
-        'close-captions.enabled': false,
-        'live-streaming.enabled': false,
-        'recording.enabled': false,
-        'ios.recording.enabled': false,
-        'reactions.enabled': false,
-        'raise-hand.enabled': false,
-        'security-options.enabled': false,
-        'lobby-mode.enabled': false,
-        'breakout-rooms.enabled': false,
-        'speakerstats.enabled': false,
-        'help.enabled': false,
-        'settings.enabled': false,
-        'video-share.enabled': false,
-        'server-url-change.enabled': false,
-        'meeting-password.enabled': false,
-        'kick-out.enabled': false,
-        'pip.enabled': true,
-        'resolution': 720,
-      },
-      userInfo: JitsiMeetUserInfo(displayName: me.calcDisplayname()),
-    );
-    try {
-      await JitsiMeet().join(
-        options,
-        JitsiMeetEventListener(
-          conferenceTerminated: (url, error) => onLeft(),
-          readyToClose: onLeft,
-        ),
-      );
-    } catch (e) {
-      _inCall = false;
-      left = true;
-      Logs().w('Vibe call: could not join', e);
-      rethrow;
-    }
+  /// Extra settings for the in-app view only (never in the shared link).
+  static String _inApp(String url) {
+    const extra = 'lang=en&confineToRoom=true&header=none&theme=dark';
+    final h = url.indexOf('#');
+    if (h < 0) return url;
+    return url.indexOf('?', h) >= 0 ? '$url&$extra' : '$url?$extra';
   }
 
-  // ---- incoming calls ------------------------------------------------------
+// ---- incoming calls ------------------------------------------------------
 
   static final Set<String> _seen = {};
   static StreamSubscription? _sub;
@@ -266,9 +221,8 @@ abstract class VibeCall {
 
   static void _ring(BuildContext ctx, Room room, Event e, Map<String, Object?> i) {
     final video = i['video'] == true;
-    final srv = i['server'] as String? ?? server;
-    final id = i['room'] as String?;
-    if (id == null) return;
+    final url = i['url'] as String?;
+    if (url == null) return;
     startRinging();
     // stop by itself after 40 s
     final auto = Timer(const Duration(seconds: 40), () {
@@ -321,7 +275,7 @@ abstract class VibeCall {
                         auto.cancel();
                         stopRinging();
                         Navigator.of(c).pop();
-                        join(room, srv, id, video: video, callEventId: e.eventId);
+                        join(ctx, room, url, video: video, callEventId: e.eventId);
                       },
                       icon: Icon(video ? Icons.videocam : Icons.call),
                       label: const Text('Answer'),
@@ -339,40 +293,6 @@ abstract class VibeCall {
     });
   }
 
-  /// Voice or video? (from the call button in a chat)
-  static Future<void> pickAndStart(BuildContext context, Room room) async {
-    final video = await showVibeSheet<bool>(
-      context: context,
-      useRootNavigator: true,
-      builder: (c) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.call_outlined),
-              title: const Text('Voice call'),
-              onTap: () => Navigator.of(c).pop(false),
-            ),
-            ListTile(
-              leading: const Icon(Icons.videocam_outlined),
-              title: const Text('Video call'),
-              onTap: () => Navigator.of(c).pop(true),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (video == null) return;
-    try {
-      await start(room, video: video);
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not start the call: $e')),
-        );
-      }
-    }
-  }
 }
 
 /// The card a call message shows in the chat: Join while the call is on,
@@ -428,9 +348,9 @@ class VibeCallCard extends StatelessWidget {
                     visualDensity: VisualDensity.compact,
                   ),
                   onPressed: () => VibeCall.join(
+                    context,
                     event.room,
-                    i['server'] as String? ?? VibeCall.server,
-                    i['room'] as String? ?? '',
+                    i['url'] as String? ?? '',
                     video: video,
                     callEventId: event.eventId,
                   ),
@@ -441,6 +361,233 @@ class VibeCallCard extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// The call itself: Element Call, full screen. Vibe fills in the boring
+/// steps (call name, your name, "Join") so it feels like one tap.
+class _VibeCallScreen extends StatefulWidget {
+  final Room room;
+  final bool video;
+
+  /// Call link to join; null = start a new call.
+  final String? url;
+  final String? callEventId;
+  const _VibeCallScreen({
+    required this.room,
+    required this.video,
+    this.url,
+    this.callEventId,
+  });
+
+  @override
+  State<_VibeCallScreen> createState() => _VibeCallScreenState();
+}
+
+class _VibeCallScreenState extends State<_VibeCallScreen> {
+  late final WebViewController _web;
+  String? _link;
+  String? _eventId;
+  bool _joined = false;
+  bool _closed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WakelockPlus.enable();
+    _eventId = widget.callEventId;
+    _web = WebViewController(
+      onPermissionRequest: (r) => r.grant(),
+    )
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(Colors.black)
+      ..addJavaScriptChannel('VibeCall', onMessageReceived: _onMessage)
+      ..setNavigationDelegate(
+        NavigationDelegate(onPageFinished: (_) => _inject()),
+      );
+    final p = _web.platform;
+    if (p is AndroidWebViewController) {
+      p.setMediaPlaybackRequiresUserGesture(false);
+    }
+    final url = widget.url;
+    _web.loadRequest(
+      Uri.parse(
+        url != null && url.isNotEmpty
+            ? VibeCall._inApp(url)
+            : '${VibeCall.server}/?lang=en&theme=dark',
+      ),
+    );
+  }
+
+  String get _name {
+    final me = widget.room.client.userID!;
+    return widget.room.unsafeGetUserFromMemoryOrFallback(me).calcDisplayname();
+  }
+
+  void _inject() {
+    final rnd = Random.secure();
+    final callName =
+        'vibe-${List.generate(10, (_) => rnd.nextInt(36).toRadixString(36)).join()}';
+    final cfg = jsonEncode({
+      'start': widget.url == null,
+      'voice': !widget.video,
+      'name': _name,
+      'callName': callName,
+    });
+    _web.runJavaScript('''
+(function(){
+  if (window.__vibe) return; window.__vibe = true;
+  var cfg = $cfg;
+  var st = {};
+  var css = document.createElement('style');
+  // your own preview like a camera, not a mirror
+  css.textContent = '[class*="mirror"] video, video[class*="mirror"]{transform:none!important}';
+  document.head.appendChild(css);
+  function q(id){ return document.querySelector('[data-testid="'+id+'"]'); }
+  function setVal(el, v){
+    var s = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+    s.call(el, v); el.dispatchEvent(new Event('input', {bubbles:true}));
+  }
+  function post(o){ try { VibeCall.postMessage(JSON.stringify(o)); } catch(e){} }
+  var last = '';
+  setInterval(function(){
+    if (location.href !== last){ last = location.href; post({href:last}); }
+    var c = q('home_callName');
+    if (cfg.start && c && !st.create){
+      st.create = true;
+      setVal(c, cfg.callName);
+      var d = q('home_displayName'); if (d) setVal(d, cfg.name);
+      setTimeout(function(){ var g = q('home_go'); if (g) g.click(); }, 300);
+    }
+    var n = q('joincall_displayName');
+    if (n && !st.auth){
+      st.auth = true; setVal(n, cfg.name);
+      setTimeout(function(){ var g = q('joincall_joincall'); if (g) g.click(); }, 300);
+    }
+    var j = q('lobby_joinCall');
+    if (j && !st.join){
+      st.join = true;
+      var v = q('incall_videomute');
+      var on = v && /stop video/i.test((v.getAttribute('aria-label')||'') + v.textContent);
+      if (cfg.voice && on) v.click();
+      setTimeout(function(){ j.click(); post({joined:true}); }, cfg.voice && on ? 600 : 250);
+    }
+    if (st.join && !st.left && (document.getElementById('feedbackText') ||
+        location.hash.indexOf('roomId=') < 0)){
+      st.left = true; post({left:true});
+    }
+  }, 400);
+})();
+''');
+  }
+
+  void _onMessage(JavaScriptMessage m) {
+    Map<String, Object?> msg;
+    try {
+      msg = Map<String, Object?>.from(jsonDecode(m.message) as Map);
+    } catch (_) {
+      return;
+    }
+    final href = msg['href'];
+    if (href is String) _maybeAnnounce(href);
+    if (msg['joined'] == true) _joined = true;
+    if (msg['left'] == true) _close();
+  }
+
+  /// Caller: the call room exists → post the clean link into the chat.
+  Future<void> _maybeAnnounce(String href) async {
+    if (widget.url != null || _link != null) return;
+    final u = Uri.tryParse(href);
+    if (u == null || !u.path.startsWith('/room')) return;
+    if (!u.fragment.contains('roomId=') || !u.fragment.contains('password=')) {
+      return;
+    }
+    final link = href.split('&lang=').first;
+    _link = link;
+    try {
+      _eventId = await VibeCall._announce(widget.room, link, widget.video);
+    } catch (e) {
+      Logs().w('Vibe call: could not post the call', e);
+    }
+  }
+
+  void _close() {
+    if (_closed) return;
+    _closed = true;
+    if (mounted) Navigator.of(context).maybePop();
+  }
+
+  @override
+  void dispose() {
+    WakelockPlus.disable();
+    final id = _eventId;
+    if (id != null) {
+      VibeCall.done.value = {...VibeCall.done.value, id};
+      final link = _link;
+      if (link != null) {
+        VibeCall._markEnded(widget.room, id, link, widget.video);
+      }
+    }
+    // stop camera and microphone right away
+    _web.loadRequest(Uri.parse('about:blank'));
+    super.dispose();
+  }
+
+  Future<bool> _confirmLeave() async {
+    if (!_joined || _closed) return true;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Leave the call?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text('Stay'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFDA373C)),
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('Leave'),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final nav = Navigator.of(context);
+        if (_closed || await _confirmLeave()) {
+          _closed = true;
+          nav.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Positioned.fill(child: WebViewWidget(controller: _web)),
+              Positioned(
+                top: 4,
+                left: 4,
+                child: IconButton(
+                  tooltip: 'Close',
+                  color: Colors.white70,
+                  icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
