@@ -13,9 +13,11 @@ import 'package:flutter/scheduler.dart';
 /// One layer above everything, never touchable, so screens, sheets and
 /// dialogs slide under it like under glass and it never jumps between
 /// pages. Kept faint (it reads as texture on dark backgrounds and vanishes
-/// over text), redrawn ~30 times a second in its own layer, frozen when the
-/// phone asks for reduced motion. Where you touch, nearby dots link to your
-/// finger for a moment.
+/// over text). Where you touch, nearby dots link to your finger.
+///
+/// Battery: it only moves while you use the app (for 4 s after your last
+/// touch, scroll or key press), at 20 fps, in its own layer; the rest of the
+/// time it is a still picture and costs nothing. Frozen with reduced motion.
 abstract class VibePlexus {
   static final lines = ValueNotifier<bool>(AppSettings.vibeParrotLines.value);
 
@@ -40,6 +42,13 @@ class _VibePlexusLayerState extends State<VibePlexusLayer>
   final _touch = ValueNotifier<_Touch?>(null);
   Duration _last = Duration.zero;
 
+  /// Seconds of drift so far (kept across pauses so nothing jumps).
+  double _base = 0;
+  DateTime _awakeUntil = DateTime.fromMillisecondsSinceEpoch(0);
+  bool _run = false;
+
+  static const _awake = Duration(seconds: 4);
+
   @override
   void initState() {
     super.initState();
@@ -49,10 +58,27 @@ class _VibePlexusLayerState extends State<VibePlexusLayer>
   void _changed() => setState(() {});
 
   void _tick(Duration elapsed) {
-    // ~30 fps is plenty for something this slow
-    if (elapsed - _last < const Duration(milliseconds: 33)) return;
+    // 20 fps is plenty for something this slow
+    if (elapsed - _last < const Duration(milliseconds: 50)) return;
     _last = elapsed;
-    _time.value = elapsed.inMicroseconds / 1e6;
+    _time.value = _base + elapsed.inMicroseconds / 1e6;
+    if (DateTime.now().isAfter(_awakeUntil)) _sleep();
+  }
+
+  void _sleep() {
+    if (!_ticker.isActive) return;
+    _ticker.stop();
+    _base = _time.value;
+  }
+
+  /// Something happened on screen: drift for a few seconds.
+  void _wake() {
+    if (!_run) return;
+    _awakeUntil = DateTime.now().add(_awake);
+    if (!_ticker.isActive) {
+      _last = Duration.zero;
+      _ticker.start();
+    }
   }
 
   @override
@@ -65,6 +91,7 @@ class _VibePlexusLayerState extends State<VibePlexusLayer>
   }
 
   void _onPointer(PointerEvent e) {
+    _wake();
     _touch.value = _Touch(e.position, _time.value);
   }
 
@@ -72,14 +99,13 @@ class _VibePlexusLayerState extends State<VibePlexusLayer>
   Widget build(BuildContext context) {
     final on = VibePalette.effective == VibeLook.parrot && VibePlexus.lines.value;
     final still = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    final run = on && !still;
+    _run = on && !still;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      if (run && !_ticker.isActive) {
-        _last = Duration.zero;
-        _ticker.start();
-      } else if (!run && _ticker.isActive) {
-        _ticker.stop();
+      if (_run) {
+        _wake();
+      } else {
+        _sleep();
       }
     });
     if (!on) return widget.child;
@@ -89,6 +115,7 @@ class _VibePlexusLayerState extends State<VibePlexusLayer>
       behavior: HitTestBehavior.translucent,
       onPointerDown: _onPointer,
       onPointerMove: _onPointer,
+      onPointerSignal: (_) => _wake(),
       child: Stack(
         children: [
           widget.child,
@@ -139,7 +166,7 @@ class _PlexusPainter extends CustomPainter {
     if (size.isEmpty) return;
     final t = time.value;
     final w = size.width, h = size.height;
-    final n = (w * h / 16000).clamp(24, 70).round();
+    final n = (w * h / 20000).clamp(20, 50).round();
     final reach = (math.min(w, h) * 0.24).clamp(90.0, 150.0);
     const margin = 40.0;
     final r = math.Random(42);
