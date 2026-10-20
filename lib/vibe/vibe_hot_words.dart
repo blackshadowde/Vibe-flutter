@@ -2,6 +2,7 @@
 
 import 'dart:math' as math;
 
+import 'package:fluffychat/vibe/vibe_battery.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
@@ -83,7 +84,7 @@ abstract class VibeHotWords {
   }
 
   static void play(BuildContext context, VibeScene scene) {
-    if (_playing) return;
+    if (_playing || VibeBattery.saving.value) return;
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
     if (overlay == null) return;
     _playing = true;

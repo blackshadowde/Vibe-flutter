@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_battery.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_plexus.dart';
 import 'package:fluffychat/config/app_config.dart';
@@ -92,6 +93,7 @@ class FluffyChatApp extends StatelessWidget {
             textScaler: TextScaler.noScaling,
             boldText: false,
           ),
+          child: VibeBatteryHost(
           child: VibePlexusLayer(
           child: AppLockWidget(
           pincode: appLockSettings.pincode,
@@ -108,6 +110,7 @@ class FluffyChatApp extends StatelessWidget {
               ),
             ),
           ),
+        ),
         ),
         ),
         );

@@ -92,6 +92,11 @@ enum AppSettings<T> {
   vibeHaptics<bool>('chat.vibe.haptics', true),
   // Parrot look: the drifting network lines
   vibeParrotLines<bool>('chat.vibe.parrot_lines', true),
+  // Battery saver: manual switch, auto at this battery % (0 = never),
+  // and with the phone's battery saver
+  vibeBatterySaver<bool>('chat.vibe.battery_saver', false),
+  vibeBatteryFollowPhone<bool>('chat.vibe.battery_follow_phone', true),
+  vibeBatteryAutoAt<int>('chat.vibe.battery_auto_at', 0),
   vibeSaveMedia<bool>('chat.vibe.save_media', false),
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),

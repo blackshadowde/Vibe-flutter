@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 
+import 'package:fluffychat/vibe/vibe_battery.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_plexus.dart';
@@ -195,6 +196,8 @@ class SettingsStyleView extends StatelessWidget {
               subtitle: 'Vibrate gently on taps, menus and reactions',
               setting: AppSettings.vibeHaptics,
             ),
+            Divider(color: theme.dividerColor),
+            const VibeBatterySettings(),
           ],
         ),
       ),

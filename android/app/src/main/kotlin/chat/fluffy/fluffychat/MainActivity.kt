@@ -39,7 +39,7 @@ class MainActivity : FlutterFragmentActivity() {
     // Ask Android for the highest refresh rate (90/120 Hz) at the current
     // resolution instead of letting the system pick 60 Hz.
     @Suppress("DEPRECATION")
-    private fun requestHighRefreshRate() {
+    fun requestHighRefreshRate() {
         try {
             val display = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 this.display
@@ -52,6 +52,8 @@ class MainActivity : FlutterFragmentActivity() {
                     it.physicalWidth == current.physicalWidth &&
                         it.physicalHeight == current.physicalHeight
                 }
+                // battery saver: at most 60 Hz
+                .filter { VibeSystemNative.maxHz <= 0 || it.refreshRate <= VibeSystemNative.maxHz + 0.5f }
                 .maxByOrNull { it.refreshRate } ?: return
             val params = window.attributes
             params.preferredDisplayModeId = best.modeId
