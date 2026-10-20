@@ -6,16 +6,16 @@ import 'dart:math' as math;
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 
-/// Deleting a message: a little samurai (straw hat, red headband, katana)
-/// dashes into that message's row, draws, leaps and slashes it in two, and
-/// leaves his sword planted in the grass where the message was.
+/// Deleting a message: a small samurai (straw hat, red headband, big
+/// katana) appears at the end of the message, crouches, and dashes through
+/// it to the start, cutting it away behind him; there he drives his sword
+/// into the ground and walks off, leaving it planted where the message was.
 ///
-/// It all happens inside the message's own row (he grows a bit for the
-/// slash), takes about a second, and is skipped when the phone asks for
-/// reduced motion.
+/// It all happens inside the message's own row, takes about 1.5 s, and is
+/// skipped when the phone asks for reduced motion.
 abstract class VibeSlash {
   static final active = ValueNotifier<Set<String>>({});
-  static const duration = Duration(milliseconds: 1250);
+  static const duration = Duration(milliseconds: 1500);
 
   /// Plays the slash on [eventIds] and completes when the cut is done.
   static Future<void> play(BuildContext context, Iterable<String> eventIds) async {
@@ -49,15 +49,20 @@ class _VibeSlashRowState extends State<VibeSlashRow>
     vsync: this,
     duration: VibeSlash.duration,
   );
-  bool _buzzed = false;
+  bool _slashBuzz = false;
+  bool _plantBuzz = false;
 
   @override
   void initState() {
     super.initState();
     VibeSlash.active.addListener(_check);
     _c.addListener(() {
-      if (!_buzzed && _c.value >= _S.cut) {
-        _buzzed = true;
+      if (!_slashBuzz && _c.value >= _S.crouchEnd) {
+        _slashBuzz = true;
+        VibeHaptics.light();
+      }
+      if (!_plantBuzz && _c.value >= _S.plantHit) {
+        _plantBuzz = true;
         VibeHaptics.heavy();
       }
     });
@@ -67,7 +72,7 @@ class _VibeSlashRowState extends State<VibeSlashRow>
   void _check() {
     final on = VibeSlash.active.value.contains(widget.eventId);
     if (on && !_c.isAnimating && _c.value == 0) {
-      _buzzed = false;
+      _slashBuzz = _plantBuzz = false;
       _c.forward();
     } else if (!on && _c.value != 0) {
       _c.value = 0;
@@ -89,38 +94,79 @@ class _VibeSlashRowState extends State<VibeSlashRow>
       builder: (context, child) {
         final t = _c.value;
         if (t == 0) return child!;
-        // after the cut the message drops a little, tilts and fades away
-        final after = ((t - _S.cut) / 0.22).clamp(0.0, 1.0);
-        final fall = Curves.easeIn.transform(after);
         final ink = Theme.of(context).colorScheme.onSurface;
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Opacity(
-              opacity: 1 - fall,
-              child: Transform.translate(
-                offset: Offset(4 * fall, 8 * fall),
-                child: Transform.rotate(angle: 0.035 * fall, child: child),
-              ),
-            ),
-            Positioned.fill(
-              child: IgnorePointer(
-                child: CustomPaint(painter: _SlashPainter(t, ink)),
-              ),
-            ),
-          ],
+        return LayoutBuilder(
+          builder: (context, box) {
+            final g = _Geo(Size(box.maxWidth, 0), t);
+            // what he has run past is cut away; the rest goes after the plant
+            final fadeAll = 1 - _seg(t, _S.dashEnd, _S.plantHit);
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Opacity(
+                  opacity: fadeAll.clamp(0.0, 1.0),
+                  child: ShaderMask(
+                    blendMode: BlendMode.dstIn,
+                    shaderCallback: (r) {
+                      final f = (g.manX / r.width).clamp(0.0, 1.0);
+                      return LinearGradient(
+                        colors: const [
+                          Colors.white,
+                          Colors.white,
+                          Colors.transparent,
+                          Colors.transparent,
+                        ],
+                        stops: [
+                          0,
+                          (f - 0.01).clamp(0.0, 1.0),
+                          (f + 0.03).clamp(0.0, 1.0),
+                          1,
+                        ],
+                      ).createShader(r);
+                    },
+                    child: child,
+                  ),
+                ),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: CustomPaint(painter: _SlashPainter(t, ink)),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 }
 
+double _seg(double t, double a, double b) => ((t - a) / (b - a)).clamp(0.0, 1.0);
+
 /// Timeline of the move (0..1).
 abstract class _S {
-  static const dashEnd = 0.24; // runs in from the right
-  static const drawEnd = 0.42; // draws the sword overhead
-  static const cut = 0.52; // the slash lands
-  static const exitStart = 0.72; // vanishes, sword stays planted
+  static const crouchEnd = 0.16; // appears at the end, crouches, draws
+  static const dashEnd = 0.52; // dashes through the message to its start
+  static const plantHit = 0.64; // sword driven into the ground
+  static const goneAt = 0.86; // he has walked off
+}
+
+/// Where things are along the row.
+class _Geo {
+  final Size size;
+  final double t;
+  _Geo(this.size, this.t);
+
+  /// The message starts after the avatar; it ends near the right side.
+  double get startX => math.min(58.0, size.width * 0.18);
+  double get endX => size.width * 0.86;
+
+  /// The samurai's x (his feet).
+  double get manX {
+    if (t < _S.crouchEnd) return endX;
+    final d = Curves.easeInOutCubic.transform(_seg(t, _S.crouchEnd, _S.dashEnd));
+    return endX + (startX - endX) * d;
+  }
 }
 
 const _red = Color(0xFFE53935);
@@ -132,189 +178,221 @@ class _SlashPainter extends CustomPainter {
   final Color ink;
   _SlashPainter(this.t, this.ink);
 
-  double _seg(double a, double b) => ((t - a) / (b - a)).clamp(0.0, 1.0);
-
   @override
   void paint(Canvas canvas, Size size) {
-    final h = size.height.clamp(34.0, 64.0);
-    final ground = size.height - 4;
-    final standX = size.width * 0.66;
+    final g = _Geo(size, t);
+    // small, and always fully inside the row (head included)
+    final ground = size.height - 2;
+    final sword = (size.height - 5).clamp(24.0, 58.0);
+    final h = sword / 1.35;
+    final plantX = g.startX - h * 0.15;
+    final cutY = ground - h * 0.42;
 
-    // ---- the slash streak across the message
-    final streak = _seg(_S.drawEnd + 0.04, _S.cut + 0.06);
-    final fade = 1 - _seg(_S.cut + 0.06, _S.exitStart);
-    if (streak > 0 && fade > 0) {
-      final a = Offset(standX - 6, size.height * 0.05);
-      final b = Offset(size.width * 0.08, size.height * 0.95);
-      final end = Offset.lerp(a, b, Curves.easeOutCubic.transform(streak))!;
-      final glow = Paint()
-        ..color = Colors.white.withValues(alpha: 0.35 * fade)
-        ..strokeWidth = 7
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-      final line = Paint()
-        ..color = Colors.white.withValues(alpha: 0.95 * fade)
-        ..strokeWidth = 2
-        ..strokeCap = StrokeCap.round;
-      canvas.drawLine(a, end, glow);
-      canvas.drawLine(a, end, line);
-      // sparks where the blade cut
-      if (t > _S.cut) {
-        final sp = _seg(_S.cut, _S.exitStart);
-        final r = math.Random(7);
-        final p = Paint()..color = const Color(0xFFFFB74D).withValues(alpha: fade);
-        for (var i = 0; i < 9; i++) {
-          final base = Offset.lerp(a, b, r.nextDouble())!;
-          final dir = Offset(r.nextDouble() * 2 - 1, -r.nextDouble());
-          canvas.drawCircle(base + dir * 22 * sp, 1.4 * (1 - sp) + 0.4, p);
-        }
+    // ---- the cut line he leaves behind while dashing
+    final lineFade = 1 - _seg(t, _S.dashEnd, _S.plantHit + 0.04);
+    if (t > _S.crouchEnd && lineFade > 0) {
+      final from = Offset(g.endX + h * 0.4, cutY);
+      final to = Offset(g.manX - h * 0.5, cutY);
+      canvas.drawLine(
+        from,
+        to,
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.3 * lineFade)
+          ..strokeWidth = 6
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+      );
+      canvas.drawLine(
+        from,
+        to,
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.9 * lineFade)
+          ..strokeWidth = 1.6
+          ..strokeCap = StrokeCap.round,
+      );
+      // sparks flying off the blade
+      final r = math.Random(3);
+      final sp = Paint()..color = const Color(0xFFFFB74D).withValues(alpha: lineFade);
+      for (var i = 0; i < 8; i++) {
+        final x = g.manX - h * 0.5 + r.nextDouble() * h * 1.4;
+        if (x > g.endX) continue;
+        final up = r.nextDouble() * h * 0.5 * (1 - lineFade * 0.3);
+        canvas.drawCircle(Offset(x, cutY - up), 1.3, sp);
       }
     }
 
-    // ---- the samurai
-    if (t < _S.exitStart + 0.06) {
-      final dash = Curves.easeOutCubic.transform(_seg(0, _S.dashEnd));
-      final x = size.width + h - (size.width + h - standX) * dash;
-      // leap and grow for the slash, settle back after
-      final leap = math.sin(math.pi * _seg(_S.drawEnd - 0.04, _S.cut + 0.08));
-      final scale = 1 + 0.4 * leap;
-      final vanish = 1 - _seg(_S.exitStart - 0.02, _S.exitStart + 0.06);
+    // ---- the sword: in his hands, then driven into the ground
+    if (t >= _S.dashEnd) {
+      final drive = Curves.easeInCubic.transform(_seg(t, _S.dashEnd + 0.04, _S.plantHit));
+      final lift = math.sin(math.pi * _seg(t, _S.dashEnd, _S.dashEnd + 0.08)) * h * 0.25;
+      final sink = (1 - drive) * h * 0.55 + lift;
       canvas.save();
-      canvas.translate(x, ground - leap * h * 0.25);
-      canvas.scale(scale);
-      _samurai(canvas, h, vanish);
+      canvas.translate(plantX, ground - sink);
+      paintPlantedSword(canvas, sword, ink, grass: _seg(t, _S.goneAt - 0.06, 1.0));
       canvas.restore();
     }
 
-    // ---- the sword left in the ground
-    final plant = _seg(_S.exitStart - 0.04, 0.9);
-    if (plant > 0) {
-      final drop = Curves.easeOutBack.transform(plant);
+    // ---- the samurai
+    final gone = _seg(t, _S.plantHit + 0.06, _S.goneAt);
+    if (gone < 1) {
+      double x = g.manX;
+      if (t >= _S.dashEnd) {
+        // stands beside his sword, then walks off to the left
+        x = plantX + h * 0.32 - gone * h * 1.1;
+      }
+      final appear = _seg(t, 0, 0.06);
       canvas.save();
-      canvas.translate(size.width * 0.12 + h * 0.4, ground);
-      final sh = h * 0.95;
-      // falls in from above and sticks
-      canvas.translate(0, -(1 - drop) * h * 0.8);
-      paintPlantedSword(
-        canvas,
-        sh,
-        ink,
-        opacity: plant.clamp(0.0, 1.0),
-        grass: _seg(0.82, 1.0),
-      );
+      canvas.translate(x, ground);
+      _samurai(canvas, h, sword, (appear * (1 - gone)).clamp(0.0, 1.0), plantX - x);
       canvas.restore();
     }
   }
 
-  /// Stick figure standing at (0,0) = feet, facing left.
-  void _samurai(Canvas canvas, double h, double alpha) {
-    final o = alpha.clamp(0.0, 1.0);
+  /// Stick figure, feet at (0,0), facing left. [swordDx] = where the planted
+  /// sword is, relative to him (for the drive-down pose).
+  void _samurai(Canvas canvas, double h, double sword, double o, double swordDx) {
     final stroke = Paint()
       ..color = ink.withValues(alpha: o)
-      ..strokeWidth = math.max(2.0, h * 0.055)
+      ..strokeWidth = math.max(2.6, h * 0.12)
       ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
-    final headR = h * 0.1;
-    final hip = Offset(0, -h * 0.42);
-    final neck = Offset(-h * 0.02, -h * 0.72);
-    final head = Offset(-h * 0.04, -h * 0.72 - headR * 1.05);
+    final headR = h * 0.13;
 
-    // running legs while dashing, wide stance when cutting
-    final run = t < _S.dashEnd;
-    final phase = math.sin(t * 60);
-    final lFoot = run
-        ? Offset(-h * 0.16 * phase, 0)
-        : Offset(-h * 0.2, 0);
-    final rFoot = run
-        ? Offset(h * 0.16 * phase, 0)
-        : Offset(h * 0.18, 0);
-    canvas.drawLine(hip, lFoot, stroke);
-    canvas.drawLine(hip, rFoot, stroke);
+    final crouch = t < _S.crouchEnd
+        ? Curves.easeOut.transform(_seg(t, 0.04, _S.crouchEnd))
+        : t < _S.dashEnd
+        ? 1.0
+        : 1 - _seg(t, _S.dashEnd, _S.dashEnd + 0.06);
+    final walking = t >= _S.plantHit + 0.06;
+
+    // body: lower hips and a forward lean when crouched / dashing
+    final hip = Offset(h * 0.04 * crouch, -h * (0.42 - 0.12 * crouch));
+    final neck = hip + Offset(-h * (0.04 + 0.2 * crouch), -h * (0.3 - 0.06 * crouch));
+    final head = neck + Offset(-headR * 0.25 * (1 + crouch), -headR * 1.15);
+
+    // legs: wide lunge when dashing, a little stride when walking off
+    Offset lf, rf;
+    if (walking) {
+      final s = math.sin(t * 70) * h * 0.14;
+      lf = Offset(-s, 0);
+      rf = Offset(s, 0);
+    } else {
+      lf = Offset(-h * (0.1 + 0.2 * crouch), 0);
+      rf = Offset(h * (0.1 + 0.2 * crouch), 0);
+    }
+    final knee = Offset.lerp(hip, lf, 0.5)! + Offset(-h * 0.06 * crouch, -h * 0.04 * crouch);
+    canvas.drawPath(
+      Path()
+        ..moveTo(hip.dx, hip.dy)
+        ..lineTo(knee.dx, knee.dy)
+        ..lineTo(lf.dx, lf.dy),
+      stroke,
+    );
+    canvas.drawLine(hip, rf, stroke);
     canvas.drawLine(hip, neck, stroke);
-    canvas.drawCircle(head, headR, stroke..style = PaintingStyle.fill);
-    stroke.style = PaintingStyle.stroke;
 
-    // red headband with tails flying behind
+    // head (filled) + red headband with tails flying back
+    canvas.drawCircle(head, headR, Paint()..color = ink.withValues(alpha: o));
     final band = Paint()
       ..color = _red.withValues(alpha: o)
-      ..strokeWidth = math.max(1.6, h * 0.035)
+      ..strokeWidth = math.max(1.8, h * 0.06)
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
     canvas.drawLine(
-      head + Offset(-headR, -headR * 0.15),
-      head + Offset(headR, -headR * 0.15),
+      head + Offset(-headR, -headR * 0.1),
+      head + Offset(headR, -headR * 0.1),
       band,
     );
-    final wave = math.sin(t * 40) * headR * 0.5;
-    final tail = Path()
-      ..moveTo(head.dx + headR, head.dy - headR * 0.15)
-      ..quadraticBezierTo(
-        head.dx + headR * 2.2,
-        head.dy - headR * 0.6 + wave,
-        head.dx + headR * 3.4,
-        head.dy + wave,
-      );
-    canvas.drawPath(tail, band);
+    final wave = math.sin(t * 45) * headR * 0.5;
+    final trail = 1 + crouch; // longer tails when dashing
+    canvas.drawPath(
+      Path()
+        ..moveTo(head.dx + headR, head.dy - headR * 0.1)
+        ..quadraticBezierTo(
+          head.dx + headR * 2 * trail,
+          head.dy - headR * 0.5 + wave,
+          head.dx + headR * 3 * trail,
+          head.dy + headR * 0.2 + wave,
+        ),
+      band,
+    );
 
     // straw hat (kasa)
     final hat = Path()
-      ..moveTo(head.dx - headR * 2.0, head.dy - headR * 0.45)
-      ..lineTo(head.dx, head.dy - headR * 1.75)
-      ..lineTo(head.dx + headR * 2.0, head.dy - headR * 0.45)
+      ..moveTo(head.dx - headR * 1.9, head.dy - headR * 0.5)
+      ..lineTo(head.dx, head.dy - headR * 1.6)
+      ..lineTo(head.dx + headR * 1.9, head.dy - headR * 0.5)
       ..close();
     canvas.drawPath(hat, Paint()..color = _straw.withValues(alpha: o));
     canvas.drawPath(
       hat,
       Paint()
-        ..color = ink.withValues(alpha: 0.6 * o)
+        ..color = ink.withValues(alpha: 0.7 * o)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1,
+        ..strokeWidth = 1.2,
     );
 
-    // arms + katana: sheathed while running, raised overhead, then the cut
-    final shoulder = neck + Offset(0, h * 0.05);
-    double angle; // blade direction, 0 = pointing left
+    // arms + sword
+    final shoulder = Offset.lerp(neck, hip, 0.15)!;
     if (t < _S.dashEnd) {
-      angle = -2.6; // held low, behind
-    } else if (t < _S.drawEnd) {
-      angle = _lerp(-2.6, -4.4, Curves.easeOut.transform(_seg(_S.dashEnd, _S.drawEnd)));
-    } else if (t < _S.cut) {
-      angle = _lerp(-4.4, -5.9, Curves.easeInCubic.transform(_seg(_S.drawEnd, _S.cut)));
+      // drawn back while crouching, then held level and forward in the dash
+      final level = _seg(t, _S.crouchEnd - 0.05, _S.crouchEnd + 0.04);
+      final angle = -2.5 + (2.5 + 0.12) * Curves.easeOut.transform(level);
+      final dir = Offset(-math.cos(angle), math.sin(angle));
+      final hands = shoulder + dir * h * 0.3;
+      canvas.drawLine(shoulder, hands, stroke);
+      _katana(canvas, hands, dir, h, sword * 0.75, o);
+    } else if (!walking) {
+      // both hands on the hilt of the sword going into the ground
+      final drive = Curves.easeInCubic.transform(_seg(t, _S.dashEnd + 0.04, _S.plantHit));
+      final lift = math.sin(math.pi * _seg(t, _S.dashEnd, _S.dashEnd + 0.08)) * h * 0.25;
+      final sink = (1 - drive) * h * 0.55 + lift;
+      // the hilt of the leaning planted sword (see paintPlantedSword)
+      final hilt = Offset(
+        swordDx - sword * 0.85 * math.sin(0.22),
+        -sink - sword * 0.85 * math.cos(0.22),
+      );
+      canvas.drawLine(shoulder, hilt, stroke);
     } else {
-      angle = -5.9;
+      // walking off, arms swinging
+      final s = math.sin(t * 70) * h * 0.12;
+      canvas.drawLine(shoulder, shoulder + Offset(s, h * 0.22), stroke);
     }
-    final dir = Offset(-math.cos(angle), math.sin(angle));
-    final hands = shoulder + dir * h * 0.26;
-    canvas.drawLine(shoulder, hands, stroke);
-    canvas.drawLine(shoulder + Offset(0, h * 0.02), hands, stroke);
-    _katana(canvas, hands, dir, h, o);
   }
 
-  static double _lerp(double a, double b, double t) => a + (b - a) * t;
-
-  static void _katana(Canvas canvas, Offset hands, Offset dir, double h, double o) {
-    final grip = Paint()
-      ..color = const Color(0xFFF2F2F2).withValues(alpha: o)
-      ..strokeWidth = math.max(2.6, h * 0.07)
-      ..strokeCap = StrokeCap.round;
+  static void _katana(Canvas canvas, Offset hands, Offset dir, double h, double len, double o) {
+    final back = hands - dir * h * 0.14;
+    final guard = hands + dir * h * 0.12;
+    canvas.drawLine(
+      back,
+      guard,
+      Paint()
+        ..color = const Color(0xFFF2F2F2).withValues(alpha: o)
+        ..strokeWidth = math.max(3.0, h * 0.12)
+        ..strokeCap = StrokeCap.round,
+    );
+    final n = Offset(-dir.dy, dir.dx) * h * 0.05;
     final wrap = Paint()
       ..color = const Color(0xFF1E1E1E).withValues(alpha: o)
       ..strokeWidth = 1.2;
-    final back = hands - dir * h * 0.08;
-    final guard = hands + dir * h * 0.08;
-    canvas.drawLine(back, guard, grip);
-    // diamond wrap on the handle, like the reference
-    final n = Offset(-dir.dy, dir.dx) * h * 0.035;
     for (var i = 0; i < 3; i++) {
       final c = Offset.lerp(back, guard, (i + 0.5) / 3)!;
       canvas.drawLine(c - n, c + n, wrap);
     }
-    canvas.drawCircle(guard, math.max(2.2, h * 0.045), Paint()..color = const Color(0xFF2B2B2B).withValues(alpha: o));
-    final blade = Paint()
-      ..color = _steel.withValues(alpha: o)
-      ..strokeWidth = math.max(1.6, h * 0.04)
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(guard, guard + dir * h * 0.62, blade);
+    canvas.drawCircle(
+      guard,
+      math.max(2.4, h * 0.07),
+      Paint()..color = const Color(0xFF2B2B2B).withValues(alpha: o),
+    );
+    canvas.drawLine(
+      guard,
+      guard + dir * len,
+      Paint()
+        ..color = _steel.withValues(alpha: o)
+        ..strokeWidth = math.max(2.0, h * 0.07)
+        ..strokeCap = StrokeCap.round,
+    );
   }
 
   @override
