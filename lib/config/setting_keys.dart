@@ -90,6 +90,8 @@ enum AppSettings<T> {
   hideRoomsInSpaces<bool>('chat.fluffy.hideRoomsInSpaces', false),
   showThumbnailsInTimeline<bool>('chat.fluffy.showThumbnailsInTimeline', true),
   vibeHaptics<bool>('chat.vibe.haptics', true),
+  // Parrot look: the drifting network lines
+  vibeParrotLines<bool>('chat.vibe.parrot_lines', true),
   vibeSaveMedia<bool>('chat.vibe.save_media', false),
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),

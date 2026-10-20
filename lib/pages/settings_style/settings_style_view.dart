@@ -6,6 +6,7 @@
 
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
+import 'package:fluffychat/vibe/vibe_plexus.dart';
 import 'package:fluffychat/widgets/theme_builder.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
@@ -107,6 +108,16 @@ class SettingsStyleView extends StatelessWidget {
                 ],
               ),
             ),
+            if (ThemeController.of(context).look == VibeLook.parrot)
+              ValueListenableBuilder<bool>(
+                valueListenable: VibePlexus.lines,
+                builder: (context, on, _) => SwitchListTile.adaptive(
+                  title: const Text('Network lines'),
+                  subtitle: const Text('Faint drifting lines across the app'),
+                  value: on,
+                  onChanged: VibePlexus.setLines,
+                ),
+              ),
             Divider(color: theme.dividerColor),
             ListTile(
               title: Text(
