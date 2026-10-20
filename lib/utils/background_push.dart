@@ -303,6 +303,35 @@ class BackgroundPush {
     );
   }
 
+  /// After a restart, before the app is opened: listen again (no screen,
+  /// so no permission prompts; the pushers are already on the server).
+  Future<void> startHeadless() async {
+    try {
+      if (VibeDirect.enabled) {
+        await VibeDirect.start(
+          clients,
+          (client, event) => pushHelper(
+            VibeDirect.pushFor(client, event),
+            knownEvent: event,
+            clients: clients,
+            flutterLocalNotificationsPlugin: _flutterLocalNotificationsPlugin,
+          ),
+          headless: true,
+        );
+      } else if (VibeNtfy.enabled) {
+        await VibeNtfy.start(
+          (data) => pushHelper(
+            PushNotification.fromJson(data),
+            clients: clients,
+            flutterLocalNotificationsPlugin: _flutterLocalNotificationsPlugin,
+          ),
+        );
+      }
+    } catch (e, s) {
+      Logs().w('[Push] Could not reconnect after a restart', e, s);
+    }
+  }
+
   /// Vibe Direct connection (like Vibgram): Vibe's own Matrix connection
   /// stays open and notifies straight away; Firebase is only a backup.
   Future<void> setupDirectPush() async {

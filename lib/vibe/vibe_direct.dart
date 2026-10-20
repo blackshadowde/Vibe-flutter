@@ -23,8 +23,9 @@ abstract class VibeDirect {
   /// [onEvent] shows the notification (Vibe's normal notification code).
   static Future<void> start(
     List<Client> clients,
-    void Function(Client client, Event event) onEvent,
-  ) async {
+    void Function(Client client, Event event) onEvent, {
+    bool headless = false,
+  }) async {
     await VibeNtfy.keepAlive();
     for (final client in clients) {
       if (!client.isLogged()) continue;
@@ -38,7 +39,8 @@ abstract class VibeDirect {
     // when the phone sleeps, so the connection silently stops. Ask until
     // Vibe is allowed, at most every 3 days.
     final now = DateTime.now().millisecondsSinceEpoch;
-    if (now - AppSettings.vibeBatteryAskedAt.value > 3 * 24 * 3600 * 1000 &&
+    if (!headless &&
+        now - AppSettings.vibeBatteryAskedAt.value > 3 * 24 * 3600 * 1000 &&
         !await VibeNtfy.backgroundAllowed()) {
       await AppSettings.vibeBatteryAskedAt.setItem(now);
       await VibeNtfy.askBatteryExemption();

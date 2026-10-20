@@ -6,6 +6,7 @@
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:fluffychat/vibe/vibe_ntfy.dart';
 import 'package:collection/collection.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/utils/client_manager.dart';
@@ -73,6 +74,26 @@ void main(List<String> args) async {
   // If the app starts in detached mode, we assume that it is in
   // background fetch mode for processing push notifications. This is
   // currently only supported on Android.
+  // Vibe: started by the phone after a restart / update (VibeBootReceiver):
+  // reconnect for notifications in the background, no screen yet.
+  if (PlatformInfos.isAndroid &&
+      args.contains('vibe-boot') &&
+      (AppSettings.vibePushMode.value == 'direct' ||
+          AppSettings.vibePushMode.value == 'builtin')) {
+    // the always-on service first: Android allows starting it right after
+    // a restart, but only for a short while
+    await VibeNtfy.keepAlive();
+    final clients = await ClientManager.getClients(store: store);
+    for (final client in clients) {
+      client.backgroundSync = true;
+      client.syncPresence = PresenceType.offline;
+    }
+    await BackgroundPush.clientOnly(clients).startHeadless();
+    WidgetsBinding.instance.addObserver(AppStarter(clients, store));
+    Logs().i('Vibe started after a restart: connected for notifications.');
+    return;
+  }
+
   if (PlatformInfos.isAndroid &&
       AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState) {
     await ForegroundServices.startService('background_push');
