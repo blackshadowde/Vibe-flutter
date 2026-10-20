@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
@@ -186,7 +187,9 @@ class _PeekState extends State<_Peek> with SingleTickerProviderStateMixin {
         ? room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)))
         : user.calcDisplayname();
     final pic = room.isDirectChat ? room.avatar : user.avatarUrl;
-    final bubble = dark ? const Color(0xFF2B2D31) : Colors.white;
+    final bubble = !VibePalette.isVibe
+        ? Theme.of(context).colorScheme.surfaceContainerHigh
+        : dark ? const Color(0xFF2B2D31) : Colors.white;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: GestureDetector(

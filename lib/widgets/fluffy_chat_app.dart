@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/routes.dart';
 import 'package:fluffychat/config/setting_keys.dart';
@@ -82,7 +83,10 @@ class FluffyChatApp extends StatelessWidget {
         routerConfig: router,
         // One text size everywhere, like Telegram and Discord: the phone's
         // font size and bold-text settings don't make Vibe bigger or heavier.
-        builder: (context, child) => MediaQuery(
+        builder: (context, child) {
+          // the accent of the current look, for screens with custom colours
+          VibePalette.accent = Theme.of(context).colorScheme.primary;
+          return MediaQuery(
           data: MediaQuery.of(context).copyWith(
             textScaler: TextScaler.noScaling,
             boldText: false,
@@ -103,7 +107,8 @@ class FluffyChatApp extends StatelessWidget {
             ),
           ),
         ),
-        ),
+        );
+        },
       ),
     );
   }

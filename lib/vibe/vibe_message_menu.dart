@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
@@ -18,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
 const Color _red = Color(0xFFF87171);
-const Color _blue = Color(0xFF5865F2);
+Color get _blue => VibePalette.accent;
 
 /// Long-press menu for a message (reactions, preview, actions).
 abstract class VibeMessageMenu {

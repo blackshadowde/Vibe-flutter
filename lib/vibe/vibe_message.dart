@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_effects.dart';
 import 'package:fluffychat/vibe/vibe_emoji_sheet.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
@@ -44,7 +45,7 @@ List<Shadow>? _nameShadows(ThemeData theme) =>
         Shadow(color: Color(0x40000000), blurRadius: 4, offset: Offset(0, 1)),
       ]
     : null;
-const Color _readTickColor = Color(0xFF5865F2);
+Color get _readTickColor => VibePalette.accent;
 
 String vibeTime(DateTime ts) {
   final local = ts.toLocal();
@@ -812,7 +813,7 @@ class VibeMessage extends StatelessWidget {
             children: [
               Material(
                 color: highlightMarker
-                    ? const Color(0xFF5865F2).withAlpha(64)
+                    ? VibePalette.accent.withAlpha(64)
                     : selected
                     ? cs.secondaryContainer.withAlpha(110)
                     : Colors.transparent,

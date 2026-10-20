@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
@@ -7,7 +8,7 @@ import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:flutter/material.dart';
 
-const Color _blurple = Color(0xFF5865F2);
+Color get _blurple => VibePalette.accent;
 
 /// Vibe's emoji picker for reactions: Vibe colours, a search box at the top,
 /// a row of animated favourites, then every emoji by category.

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_modal_action_popup.dart';
@@ -114,7 +115,7 @@ class UserDeviceListItem extends StatelessWidget {
                 : keys.blocked
                 ? Colors.red
                 : keys.verified
-                ? Color(0xFF5865F2)
+                ? VibePalette.accent
                 : Color(0xFF949BA4),
             child: Icon(userDevice.icon),
           ),
@@ -143,7 +144,7 @@ class UserDeviceListItem extends StatelessWidget {
                     color: keys.blocked
                         ? Colors.red
                         : keys.verified
-                        ? Color(0xFF5865F2)
+                        ? VibePalette.accent
                         : Color(0xFF949BA4),
                   ),
                 ),

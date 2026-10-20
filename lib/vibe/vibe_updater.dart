@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_whats_new.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -414,7 +415,7 @@ class _UpdateSheetState extends State<_UpdateSheet> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final mb = r.size > 0 ? ' · ${(r.size / 1e6).toStringAsFixed(0)} MB' : '';
-    const blurple = Color(0xFF5865F2);
+    final blurple = VibePalette.accent;
     final buttonStyle = FilledButton.styleFrom(
       backgroundColor: blurple,
       foregroundColor: Colors.white,

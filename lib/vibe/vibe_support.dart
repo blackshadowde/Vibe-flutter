@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
@@ -15,7 +16,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 abstract class VibeSupport {
   static const upiId = 'ashish.boddu@ybl';
   static const _payeeName = 'Vibe';
-  static const blurple = Color(0xFF5865F2);
+  static Color get blurple => VibePalette.accent;
 
   static const _firstSeenKey = 'chat.vibe.support_first_seen';
   static const _lastAskKey = 'chat.vibe.support_last_ask';

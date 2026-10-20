@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 
@@ -10,16 +11,19 @@ abstract class VibeSettingsStyle {
   static bool _dark(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark;
 
-  static Color page(BuildContext context) =>
-      _dark(context) ? const Color(0xFF1C1B20) : const Color(0xFFFFFFFF);
+  static Color page(BuildContext context) => !VibePalette.isVibe
+      ? Theme.of(context).colorScheme.surface
+      : _dark(context) ? const Color(0xFF1C1B20) : const Color(0xFFFFFFFF);
 
-  static Color card(BuildContext context) =>
-      _dark(context) ? const Color(0xFF26252B) : const Color(0xFFF2F3F5);
+  static Color card(BuildContext context) => !VibePalette.isVibe
+      ? Theme.of(context).colorScheme.surfaceContainer
+      : _dark(context) ? const Color(0xFF26252B) : const Color(0xFFF2F3F5);
 
-  static Color line(BuildContext context) =>
-      _dark(context) ? const Color(0xFF33323A) : const Color(0xFFE1E2E6);
+  static Color line(BuildContext context) => !VibePalette.isVibe
+      ? Theme.of(context).colorScheme.outlineVariant
+      : _dark(context) ? const Color(0xFF33323A) : const Color(0xFFE1E2E6);
 
-  static const Color accent = Color(0xFF5865F2);
+  static Color get accent => VibePalette.accent;
 
   /// Row text inside settings cards. Built on the app's text theme so it
   /// uses the app font (a bare TextStyle here fell back to the system font,
@@ -68,6 +72,8 @@ abstract class VibeSettingsStyle {
       trackColor: WidgetStateProperty.resolveWith(
         (s) => s.contains(WidgetState.selected)
             ? accent
+            : !VibePalette.isVibe
+            ? Theme.of(context).colorScheme.surfaceContainerHighest
             : (dark ? const Color(0xFF4E5058) : const Color(0xFFE3E5E8)),
       ),
       trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
@@ -75,11 +81,13 @@ abstract class VibeSettingsStyle {
     );
   }
 
-  static Color text(BuildContext context) =>
-      _dark(context) ? const Color(0xFFF2F3F5) : const Color(0xFF060607);
+  static Color text(BuildContext context) => !VibePalette.isVibe
+      ? Theme.of(context).colorScheme.onSurface
+      : _dark(context) ? const Color(0xFFF2F3F5) : const Color(0xFF060607);
 
-  static Color text2(BuildContext context) =>
-      _dark(context) ? const Color(0xFFB5BAC1) : const Color(0xFF5C5E66);
+  static Color text2(BuildContext context) => !VibePalette.isVibe
+      ? Theme.of(context).colorScheme.onSurfaceVariant
+      : _dark(context) ? const Color(0xFFB5BAC1) : const Color(0xFF5C5E66);
 }
 
 /// Wraps a settings page: page colour behind everything, header bar in the
@@ -257,6 +265,8 @@ class VibeSwitch extends StatelessWidget {
     final enabled = onChanged != null;
     final track = value
         ? VibeSettingsStyle.accent
+        : !VibePalette.isVibe
+        ? Theme.of(context).colorScheme.surfaceContainerHighest
         : (dark ? const Color(0xFF4E5058) : const Color(0xFFDADCE0));
     final knob = value || dark ? Colors.white : const Color(0xFF80848E);
     return Semantics(

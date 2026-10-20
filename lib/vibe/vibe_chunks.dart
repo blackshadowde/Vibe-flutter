@@ -3,6 +3,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_file_extension.dart';
 import 'package:fluffychat/utils/size_string.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
@@ -304,7 +305,7 @@ class _VibeChunkCardState extends State<VibeChunkCard> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF5865F2),
+                  color: VibePalette.accent,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -386,7 +387,7 @@ class _VibeChunkCardState extends State<VibeChunkCard> {
               width: double.infinity,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF5865F2),
+                  backgroundColor: VibePalette.accent,
                   foregroundColor: Colors.white,
                 ),
                 onPressed: _join,

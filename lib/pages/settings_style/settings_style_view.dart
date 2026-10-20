@@ -5,6 +5,8 @@
 
 
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
+import 'package:fluffychat/vibe/vibe_palette.dart';
+import 'package:fluffychat/widgets/theme_builder.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -58,6 +60,49 @@ class SettingsStyleView extends StatelessWidget {
                     value: ThemeMode.system,
                     label: Text(L10n.of(context).systemTheme),
                     icon: const Icon(Icons.auto_mode_outlined),
+                  ),
+                ],
+              ),
+            ),
+            // Vibe: colours only (backgrounds, accent, buttons); the chat
+            // layout stays the same
+            ListTile(
+              title: Text(
+                'Colours',
+                style: TextStyle(
+                  color: theme.colorScheme.secondary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(
+                VibePalette.wallpaperAvailable
+                    ? 'Wallpaper uses your phone\'s wallpaper colours, like Google Messages'
+                    : 'Wallpaper colours need Android 12 or newer',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: SegmentedButton<VibeLook>(
+                selected: {ThemeController.of(context).look},
+                showSelectedIcon: false,
+                onSelectionChanged: (s) =>
+                    ThemeController.of(context).setLook(s.single),
+                segments: [
+                  const ButtonSegment(
+                    value: VibeLook.vibe,
+                    label: Text('Vibe'),
+                    icon: Icon(Icons.forum_outlined),
+                  ),
+                  ButtonSegment(
+                    value: VibeLook.wallpaper,
+                    label: const Text('Wallpaper'),
+                    icon: const Icon(Icons.wallpaper_outlined),
+                    enabled: VibePalette.wallpaperAvailable,
+                  ),
+                  const ButtonSegment(
+                    value: VibeLook.parrot,
+                    label: Text('Parrot'),
+                    icon: Icon(Icons.terminal_outlined),
                   ),
                 ],
               ),

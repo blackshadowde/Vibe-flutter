@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
@@ -891,7 +892,7 @@ class _InviteBanner extends StatelessWidget {
                   Expanded(
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF5865F2),
+                        backgroundColor: VibePalette.accent,
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () => onAnswer(true),

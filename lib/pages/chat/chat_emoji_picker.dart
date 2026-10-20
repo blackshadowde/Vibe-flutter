@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -60,8 +61,8 @@ class ChatEmojiPicker extends StatelessWidget {
                               iconColor: VibeSettingsStyle.text2(
                                 context,
                               ).withAlpha(150),
-                              iconColorSelected: const Color(0xFF5865F2),
-                              indicatorColor: const Color(0xFF5865F2),
+                              iconColorSelected: VibePalette.accent,
+                              indicatorColor: VibePalette.accent,
                               backgroundColor: VibeSettingsStyle.page(context),
                               dividerColor: VibeSettingsStyle.line(context),
                             ),

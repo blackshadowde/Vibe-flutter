@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -241,7 +242,7 @@ abstract class VibeCall {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(video ? Icons.videocam : Icons.call, size: 40, color: const Color(0xFF5865F2)),
+              Icon(video ? Icons.videocam : Icons.call, size: 40, color: VibePalette.accent),
               const SizedBox(height: 10),
               Text(name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
@@ -327,7 +328,7 @@ class VibeCallCard extends StatelessWidget {
                 live
                     ? (video ? Icons.videocam_outlined : Icons.call_outlined)
                     : (video ? Icons.videocam_off_outlined : Icons.call_end_outlined),
-                color: live ? const Color(0xFF5865F2) : cs.onSurfaceVariant,
+                color: live ? VibePalette.accent : cs.onSurfaceVariant,
               ),
               const SizedBox(width: 10),
               Flexible(

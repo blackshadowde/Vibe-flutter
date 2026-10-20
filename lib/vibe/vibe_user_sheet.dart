@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_dm_finder.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
@@ -155,7 +156,9 @@ class _SheetState extends State<_Sheet> {
     final displayName = widget.displayName;
     final avatarUrl = widget.avatarUrl;
     final muted = cs.onSurfaceVariant;
-    final soft = dark ? const Color(0xFF2B2D31) : const Color(0xFFEBEDEF);
+    final soft = !VibePalette.isVibe
+        ? Theme.of(context).colorScheme.surfaceContainerHigh
+        : dark ? const Color(0xFF2B2D31) : const Color(0xFFEBEDEF);
     final room = _room;
     final mutual = isMe ? 0 : _mutual;
     final label = TextStyle(
@@ -304,7 +307,7 @@ class _SheetState extends State<_Sheet> {
                             icon: const Icon(Icons.chat_bubble, size: 18),
                             label: const Text('Message'),
                             style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF5865F2),
+                              backgroundColor: VibePalette.accent,
                               foregroundColor: Colors.white,
                               padding: EdgeInsets.zero,
                               shape: RoundedRectangleBorder(

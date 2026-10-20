@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:badges/badges.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:fluffychat/widgets/unread_rooms_badge.dart';
@@ -48,7 +49,7 @@ class NaviRailItem extends StatelessWidget {
                   curve: FluffyThemes.animationCurve,
                   child: Material(
                     color: isSelected
-                        ? const Color(0xFF5865F2)
+                        ? VibePalette.accent
                         : Colors.transparent,
                     shape: const CircleBorder(),
                     clipBehavior: Clip.antiAlias,

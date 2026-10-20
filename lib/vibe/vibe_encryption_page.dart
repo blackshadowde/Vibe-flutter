@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -462,4 +463,4 @@ class _Stat extends StatelessWidget {
 Color _encInk(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark
     ? const Color(0xFFC9CFFF)
-    : const Color(0xFF5865F2);
+    : VibePalette.accent;

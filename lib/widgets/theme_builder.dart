@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:collection/collection.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fluffychat/utils/color_value.dart';
@@ -36,6 +37,9 @@ class ThemeController extends State<ThemeBuilder> {
   SharedPreferences? _sharedPreferences;
   ThemeMode? _themeMode;
   Color? _primaryColor;
+  VibeLook _look = VibeLook.vibe;
+
+  VibeLook get look => _look;
 
   ThemeMode get themeMode => _themeMode ?? ThemeMode.system;
 
@@ -50,8 +54,11 @@ class ThemeController extends State<ThemeBuilder> {
 
     final rawThemeMode = preferences.getString(widget.themeModeSettingsKey);
     final rawColor = preferences.getInt(widget.primaryColorSettingsKey);
+    final rawLook = preferences.getString('vibe_look');
 
     setState(() {
+      _look = VibeLook.values.singleWhereOrNull((v) => v.name == rawLook) ??
+          VibeLook.vibe;
       _themeMode = ThemeMode.values.singleWhereOrNull(
         (value) => value.name == rawThemeMode,
       );
@@ -65,6 +72,16 @@ class ThemeController extends State<ThemeBuilder> {
     await preferences.setString(widget.themeModeSettingsKey, newThemeMode.name);
     setState(() {
       _themeMode = newThemeMode;
+    });
+  }
+
+  /// Vibe, wallpaper colours or Parrot.
+  Future<void> setLook(VibeLook look) async {
+    final preferences = _sharedPreferences ??=
+        await SharedPreferences.getInstance();
+    await preferences.setString('vibe_look', look.name);
+    setState(() {
+      _look = look;
     });
   }
 
@@ -95,8 +112,13 @@ class ThemeController extends State<ThemeBuilder> {
     return Provider(
       create: (_) => this,
       child: DynamicColorBuilder(
-        // Vibe: always use the Vibe color, not the phone wallpaper color
-        builder: (_, _) => widget.builder(context, themeMode, primaryColor),
+        // Vibe: the wallpaper colours are only used when that look is on
+        builder: (light, dark) {
+          VibePalette.wallLight = light;
+          VibePalette.wallDark = dark;
+          VibePalette.look = _look;
+          return widget.builder(context, themeMode, primaryColor);
+        },
       ),
     );
   }

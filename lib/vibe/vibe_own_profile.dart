@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
@@ -185,7 +186,7 @@ class _OwnSheetState extends State<_OwnSheet> {
     required bool filled,
     required VoidCallback onTap,
   }) {
-    const blurple = Color(0xFF5865F2);
+    final blurple = VibePalette.accent;
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(20),
       side: filled
@@ -253,7 +254,9 @@ class _OwnSheetState extends State<_OwnSheet> {
   Widget _squareButton(BuildContext context, IconData icon, VoidCallback onTap) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return Material(
-      color: dark ? const Color(0xFF2B2D31) : const Color(0xFFEBEDEF),
+      color: !VibePalette.isVibe
+          ? Theme.of(context).colorScheme.surfaceContainerHigh
+          : dark ? const Color(0xFF2B2D31) : const Color(0xFFEBEDEF),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),

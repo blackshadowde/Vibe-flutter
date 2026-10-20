@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -148,7 +149,7 @@ class VibeTextSizePreview extends StatelessWidget {
                         child: Icon(
                           Icons.done_all,
                           size: 18,
-                          color: Color(0xFF5865F2),
+                          color: VibePalette.accent,
                         ),
                       ),
                     ],

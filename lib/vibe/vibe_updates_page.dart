@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:fluffychat/vibe/vibe_updater.dart';
 import 'package:fluffychat/vibe/vibe_whats_new.dart';
@@ -21,7 +22,7 @@ class VibeUpdatesPage extends StatefulWidget {
 }
 
 class _VibeUpdatesPageState extends State<VibeUpdatesPage> {
-  static const _blurple = Color(0xFF5865F2);
+  static Color get _blurple => VibePalette.accent;
   static const _green = Color(0xFF23A55A);
 
   String _version = '';

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_sticker.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -974,7 +975,7 @@ class _DmSheetState extends State<_DmSheet> {
         final host = Uri.tryParse(url)?.host ?? url;
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: const Color(0xFF5865F2).withAlpha(0x33),
+            backgroundColor: VibePalette.accent.withAlpha(0x33),
             child: const Icon(Icons.link, color: Color(0xFF8C96F6)),
           ),
           title: Text(host, maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -1025,7 +1026,7 @@ class _DmSheetState extends State<_DmSheet> {
             'File';
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: const Color(0xFF5865F2).withAlpha(0x33),
+            backgroundColor: VibePalette.accent.withAlpha(0x33),
             child: Icon(
               e.messageType == MessageTypes.Audio
                   ? Icons.music_note_outlined

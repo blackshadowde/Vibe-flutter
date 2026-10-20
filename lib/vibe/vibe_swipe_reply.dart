@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -105,12 +106,12 @@ class _VibeSwipeReplyState extends State<VibeSwipeReply>
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF5865F2),
+                        color: VibePalette.accent,
                         shape: BoxShape.circle,
                         boxShadow: _armed
                             ? [
                                 BoxShadow(
-                                  color: const Color(0xFF5865F2).withAlpha(120),
+                                  color: VibePalette.accent.withAlpha(120),
                                   blurRadius: 10,
                                 ),
                               ]

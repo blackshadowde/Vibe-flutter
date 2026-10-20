@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -196,7 +197,7 @@ abstract class VibeWhatsNew {
   }
 }
 
-const _blurple = Color(0xFF5865F2);
+Color get _blurple => VibePalette.accent;
 
 /// Vibe X's pop-in: each line springs up from nothing (a little squeeze
 /// past full size), 28 ms after the one before.

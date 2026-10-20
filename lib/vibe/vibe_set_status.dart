@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
@@ -11,7 +12,7 @@ import 'package:matrix/matrix.dart';
 const _statusHint = 'What are you up to?';
 const _bannerColor = Color(0xFF1F2624);
 const _onlineGreen = Color(0xFF23A55A);
-const _blurple = Color(0xFF5865F2);
+Color get _blurple => VibePalette.accent;
 
 /// Discord-style thought bubble: two small dots trailing up-left to the
 /// profile picture, then a rounded bubble. Shows the status, or
@@ -26,7 +27,9 @@ class VibeThoughtBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
-    final fill = dark ? const Color(0xFF2B2D31) : Colors.white;
+    final fill = !VibePalette.isVibe
+        ? Theme.of(context).colorScheme.surfaceContainerHigh
+        : dark ? const Color(0xFF2B2D31) : Colors.white;
     final edge = dark ? const Color(0xFF3F4147) : const Color(0xFFDDDEE1);
     final ink = dark ? const Color(0xFFF2F3F5) : const Color(0xFF2E3035);
     final empty = text == null || text!.trim().isEmpty;
@@ -395,8 +398,13 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final dark = theme.brightness == Brightness.dark;
-    final cardColor = dark ? const Color(0xFF232428) : const Color(0xFFF2F3F5);
-    final fieldColor = dark ? const Color(0xFF1E1F22) : const Color(0xFFEBEDEF);
+    final scheme = Theme.of(context).colorScheme;
+    final cardColor = !VibePalette.isVibe
+        ? scheme.surfaceContainer
+        : dark ? const Color(0xFF232428) : const Color(0xFFF2F3F5);
+    final fieldColor = !VibePalette.isVibe
+        ? scheme.surfaceContainerHighest
+        : dark ? const Color(0xFF1E1F22) : const Color(0xFFEBEDEF);
     final canSave = _text.text.trim().isNotEmpty ||
         _hadStatus ||
         (_name.text.trim().isNotEmpty && _name.text.trim() != _origName);

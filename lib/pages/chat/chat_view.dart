@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_text_sticker.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:ui' as ui;
@@ -311,7 +312,9 @@ class ChatView extends StatelessWidget {
                       ),
                       // Vibe X's "Jump to present" pill
                       child: Material(
-                        color: theme.brightness == Brightness.dark
+                        color: !VibePalette.isVibe
+                            ? theme.colorScheme.surfaceContainerHigh
+                            : theme.brightness == Brightness.dark
                             ? const Color(0xFF2B2D31)
                             : const Color(0xFFEBEDEF),
                         elevation: 3,

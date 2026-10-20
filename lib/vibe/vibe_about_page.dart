@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/vibe/vibe_app_info.dart';
@@ -9,7 +10,7 @@ import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-const _blurple = Color(0xFF5865F2);
+Color get _blurple => VibePalette.accent;
 
 /// About Vibe, laid out like Vibgram's About: logo, name, tagline, version
 /// pill, update status, one blurple button and outlined buttons below.

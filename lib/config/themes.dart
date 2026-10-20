@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +46,9 @@ abstract class FluffyThemes {
     Brightness brightness, [
     Color? seed,
   ]) {
-    // Vibe: Discord palette (no generated accent colours)
-    final colorScheme = brightness == Brightness.dark
+    // Vibe: Discord palette unless another look (wallpaper, Parrot) is on
+    final colorScheme = VibePalette.scheme(brightness) ??
+        (brightness == Brightness.dark
         ? const ColorScheme(
             brightness: Brightness.dark,
             primary: Color(0xFF5865F2),
@@ -116,7 +118,7 @@ abstract class FluffyThemes {
             shadow: Color(0xFF000000),
             scrim: Color(0xFF000000),
             surfaceTint: Color(0x00000000),
-          );
+          ));
     final isColumnMode = FluffyThemes.isColumnMode(context);
     final dividerColor = brightness == Brightness.dark
         ? colorScheme.surfaceContainerHighest
