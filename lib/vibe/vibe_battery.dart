@@ -80,10 +80,14 @@ class _VibeBatteryHostState extends State<VibeBatteryHost> {
 
   @override
   Widget build(BuildContext context) {
-    if (!VibeBattery.saving.value) return widget.child;
+    // Always the same widget shape: switching battery saver must never
+    // rebuild the app underneath (that restarted the Matrix connection and
+    // could stop notifications).
     final mq = MediaQuery.of(context);
     return MediaQuery(
-      data: mq.copyWith(disableAnimations: true),
+      data: VibeBattery.saving.value
+          ? mq.copyWith(disableAnimations: true)
+          : mq,
       child: widget.child,
     );
   }

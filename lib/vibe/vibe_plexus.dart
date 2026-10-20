@@ -108,18 +108,20 @@ class _VibePlexusLayerState extends State<VibePlexusLayer>
         _sleep();
       }
     });
-    if (!on) return widget.child;
     final cs = Theme.of(context).colorScheme;
     final dark = Theme.of(context).brightness == Brightness.dark;
+    // Always the same widget shape (the lines are only added on top):
+    // switching the look must never rebuild the app underneath (that
+    // restarted the Matrix connection and could stop notifications).
     return Listener(
       behavior: HitTestBehavior.translucent,
-      onPointerDown: _onPointer,
-      onPointerMove: _onPointer,
-      onPointerSignal: (_) => _wake(),
+      onPointerDown: on ? _onPointer : null,
+      onPointerMove: on ? _onPointer : null,
+      onPointerSignal: on ? (_) => _wake() : null,
       child: Stack(
         children: [
           widget.child,
-          Positioned.fill(
+          if (on) Positioned.fill(
             child: IgnorePointer(
               child: RepaintBoundary(
                 child: CustomPaint(
