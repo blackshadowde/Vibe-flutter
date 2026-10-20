@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_mute.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_sticker.dart';
@@ -100,11 +101,15 @@ class VibeDmDetail extends StatelessWidget {
                       group && room.canChangeStateEvent(EventTypes.RoomAvatar)
                       ? () => VibeGroupEdit.changePicture(context, room)
                       : null,
-                  child: Avatar(
-                    mxContent: room.avatar,
-                    name: name,
-                    size: 62,
-                    client: room.client,
+                  child: VibeMuteBadge(
+                    room: room,
+                    size: 20,
+                    child: Avatar(
+                      mxContent: room.avatar,
+                      name: name,
+                      size: 62,
+                      client: room.client,
+                    ),
                   ),
                 ),
               ),
@@ -495,12 +500,10 @@ class VibeMuteRow extends StatefulWidget {
   final String what;
   const VibeMuteRow({required this.room, this.what = 'notifications', super.key});
 
-  static bool isMuted(Room room) =>
-      room.pushRuleState != PushRuleState.notify;
+  static bool isMuted(Room room) => VibeMute.isMuted(room);
 
-  static Future<void> setMuted(Room room, bool muted) => room.setPushRuleState(
-    muted ? PushRuleState.dontNotify : PushRuleState.notify,
-  );
+  static Future<void> setMuted(Room room, bool muted) =>
+      VibeMute.set(room, muted);
 
   @override
   State<VibeMuteRow> createState() => _VibeMuteRowState();

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_mute.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -39,7 +40,9 @@ class ChatAppBarTitle extends StatelessWidget {
       children: [
         VibeTypingOverlay(
           room: room,
-          child:Avatar(
+          child: VibeMuteBadge(
+          room: room,
+          child: Avatar(
           mxContent: room.avatar,
           name: name,
           size: 40,
@@ -61,6 +64,7 @@ class ChatAppBarTitle extends StatelessWidget {
                     context.go('/rooms/${room.id}/details');
                   }
                 },
+        ),
         ),
         ),
         const SizedBox(width: 12),

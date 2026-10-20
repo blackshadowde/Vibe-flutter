@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_mute.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
@@ -103,13 +104,10 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                 await VibeSendLater.showList(context, widget.room);
                 break;
               case ChatPopupMenuActions.mute:
-                final muted =
-                    widget.room.pushRuleState != PushRuleState.notify;
+                final muted = VibeMute.isMuted(widget.room);
                 final messenger = ScaffoldMessenger.of(context);
                 try {
-                  await widget.room.setPushRuleState(
-                    muted ? PushRuleState.notify : PushRuleState.dontNotify,
-                  );
+                  await VibeMute.set(widget.room, !muted);
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(muted ? 'Notifications on' : 'Muted'),
@@ -150,13 +148,13 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               child: Row(
                 children: [
                   Icon(
-                    widget.room.pushRuleState == PushRuleState.notify
+                    !VibeMute.isMuted(widget.room)
                         ? Icons.notifications_off_outlined
                         : Icons.notifications_outlined,
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    widget.room.pushRuleState == PushRuleState.notify
+                    !VibeMute.isMuted(widget.room)
                         ? 'Mute notifications'
                         : 'Unmute notifications',
                   ),

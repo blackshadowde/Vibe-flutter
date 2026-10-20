@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_mute.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
@@ -108,7 +109,7 @@ class _Sheet extends StatefulWidget {
 
 class _SheetState extends State<_Sheet> {
   late bool _pinned = widget.room.isFavourite;
-  late bool _muted = widget.room.pushRuleState != PushRuleState.notify;
+  late bool _muted = VibeMute.isMuted(widget.room);
   late bool _archived = VibeArchive.isArchived(widget.room);
   bool _busy = false;
 
@@ -197,11 +198,7 @@ class _SheetState extends State<_Sheet> {
                     () => _muted = !_muted,
                     () => room.isSpace
                         ? VibeCommunities.setMuted(room, _muted)
-                        : room.setPushRuleState(
-                            _muted
-                                ? PushRuleState.dontNotify
-                                : PushRuleState.notify,
-                          ),
+                        : VibeMute.set(room, _muted),
                     _muted ? 'Muted $name' : 'Notifications on for $name',
                   ),
                 ),

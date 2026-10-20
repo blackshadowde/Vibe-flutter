@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_mute.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/vibe/vibe_activity_pill.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
@@ -274,12 +275,15 @@ class _DmTile extends StatelessWidget {
           contentPadding: const EdgeInsets.only(left: 10, right: 0),
           leading: VibeTypingOverlay(
             room: room,
-            child: Avatar(
-              mxContent: room.avatar,
-              name: name,
-              size: 42,
-              client: room.client,
-              presenceUserId: room.directChatMatrixID,
+            child: VibeMuteBadge(
+              room: room,
+              child: Avatar(
+                mxContent: room.avatar,
+                name: name,
+                size: 42,
+                client: room.client,
+                presenceUserId: room.directChatMatrixID,
+              ),
             ),
           ),
           title: Row(
