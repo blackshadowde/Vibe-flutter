@@ -396,6 +396,7 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
   void initState() {
     super.initState();
     WakelockPlus.enable();
+    _pipAllowed(true);
     _eventId = widget.callEventId;
     _web = WebViewController(
       onPermissionRequest: (r) => r.grant(),
@@ -418,6 +419,15 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
             : '${VibeCall.server}/?lang=en&theme=dark',
       ),
     );
+  }
+
+  /// Home / app switch during a call: the call floats in a small window.
+  static void _pipAllowed(bool on) {
+    VibeCall._channel.invokeMethod('callActive', {'on': on}).catchError((_) {});
+  }
+
+  void _float() {
+    VibeCall._channel.invokeMethod('pip').catchError((_) => false);
   }
 
   String get _name {
@@ -521,6 +531,7 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
   @override
   void dispose() {
     WakelockPlus.disable();
+    _pipAllowed(false);
     final id = _eventId;
     if (id != null) {
       VibeCall.done.value = {...VibeCall.done.value, id};
@@ -574,16 +585,18 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
           child: Stack(
             children: [
               Positioned.fill(child: WebViewWidget(controller: _web)),
-              Positioned(
-                top: 4,
-                left: 4,
-                child: IconButton(
-                  tooltip: 'Close',
-                  color: Colors.white70,
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                  onPressed: () => Navigator.of(context).maybePop(),
+              // hidden while floating (small window)
+              if (MediaQuery.sizeOf(context).width > 320)
+                Positioned(
+                  top: 4,
+                  left: 4,
+                  child: IconButton(
+                    tooltip: 'Float',
+                    color: Colors.white70,
+                    icon: const Icon(Icons.picture_in_picture_alt_rounded),
+                    onPressed: _float,
+                  ),
                 ),
-              ),
             ],
           ),
         ),

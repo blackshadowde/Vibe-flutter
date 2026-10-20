@@ -30,6 +30,9 @@ object VibeSystemNative {
 
     private var ringtone: android.media.Ringtone? = null
 
+    /** A call is on screen: leaving the app shrinks it into a floating window. */
+    @Volatile var callActive = false
+
     fun register(context: Context, engine: FlutterEngine) {
         val app = context.applicationContext
         MethodChannel(engine.dartExecutor.binaryMessenger, CHANNEL)
@@ -71,6 +74,11 @@ object VibeSystemNative {
                         }
                         result.success(null)
                     }
+                    "callActive" -> {
+                        callActive = call.argument<Boolean>("on") ?: false
+                        result.success(null)
+                    }
+                    "pip" -> result.success(MainActivity.current?.enterCallPip() ?: false)
                     "isSpeaker" -> result.success(isSpeaker(app))
                     "lastExit" -> result.success(lastExit(app))
                     "resetAudio" -> {

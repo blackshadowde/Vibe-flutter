@@ -12,6 +12,24 @@ class MainActivity : FlutterFragmentActivity() {
         super.attachBaseContext(base)
     }
 
+    /** Floating call window (picture-in-picture) while a call is on. */
+    fun enterCallPip(): Boolean {
+        return try {
+            enterPictureInPictureMode(
+                android.app.PictureInPictureParams.Builder()
+                    .setAspectRatio(android.util.Rational(9, 16))
+                    .build()
+            )
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (VibeSystemNative.callActive) enterCallPip()
+    }
+
     override fun onResume() {
         super.onResume()
         current = this
