@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:collection/collection.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -75,7 +76,7 @@ class ThemeController extends State<ThemeBuilder> {
     });
   }
 
-  /// Vibe or wallpaper colours.
+  /// Vibe, wallpaper colours or glass.
   Future<void> setLook(VibeLook look) async {
     final preferences = _sharedPreferences ??=
         await SharedPreferences.getInstance();
@@ -104,7 +105,19 @@ class ThemeController extends State<ThemeBuilder> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(_loadData);
+    // Glass look: a new wallpaper / palette means new colours
+    VibeGlass.version.addListener(_glassChanged);
     super.initState();
+  }
+
+  void _glassChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    VibeGlass.version.removeListener(_glassChanged);
+    super.dispose();
   }
 
   @override

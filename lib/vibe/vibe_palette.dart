@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:flutter/material.dart';
 
 /// Vibe's looks. Only colours change (backgrounds, accent, buttons); the
@@ -11,6 +12,10 @@ enum VibeLook {
   /// Colours from the phone's wallpaper / system theme (Material You,
   /// Android 12+), like Google Messages.
   wallpaper,
+
+  /// Frosted glass over a wallpaper you pick, like Hyprland's HyDE:
+  /// colours from the picture ("wallbash") or a classic palette.
+  glass,
 }
 
 abstract class VibePalette {
@@ -34,6 +39,9 @@ abstract class VibePalette {
   /// shades stay exactly as they were.
   static bool get isVibe => effective == VibeLook.vibe;
 
+  /// Frosted glass look (see VibeGlass).
+  static bool get isGlass => effective == VibeLook.glass;
+
   /// App font (the same in every look).
   static String get fontFamily => 'Figtree';
 
@@ -51,6 +59,8 @@ abstract class VibePalette {
         final source = (dark ? wallDark : wallLight) ?? wallDark ?? wallLight;
         if (source == null) return null;
         return _fromSeed(source.primary, brightness);
+      case VibeLook.glass:
+        return VibeGlass.scheme;
     }
   }
 

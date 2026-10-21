@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_text_sticker.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
@@ -90,7 +91,10 @@ class ChatView extends StatelessWidget {
             if (scrollUpBannerEventId != null && activeThreadId == null) {
               appbarBottomHeight += ChatAppBarListTile.fixedHeight;
             }
-            return Scaffold(
+            return VibeGlassBackdrop(
+              // Glass look: this chat's own wallpaper, if it has one
+              roomId: controller.room.id,
+              child: Scaffold(
               key: Key('chat_page'),
               extendBodyBehindAppBar: true,
               appBar: AppBar(
@@ -98,6 +102,10 @@ class ChatView extends StatelessWidget {
                 scrolledUnderElevation: 0,
                 surfaceTintColor: Colors.transparent,
                 shape: const Border(),
+                // Glass look: frosted bar over the messages
+                flexibleSpace: VibePalette.isGlass
+                    ? const VibeGlassBlur(child: SizedBox.expand())
+                    : null,
                 actionsIconTheme: IconThemeData(
                   color: controller.selectedEvents.isEmpty
                       ? null
@@ -537,6 +545,7 @@ class ChatView extends StatelessWidget {
                   ),
                 ),
               ),
+            ),
             );
           },
         ),

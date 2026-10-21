@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_palette.dart';
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:fluffychat/vibe/vibe_mute.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
@@ -26,6 +28,7 @@ enum ChatPopupMenuActions {
   leave,
   search,
   mute,
+  wallpaper,
 }
 
 class ChatSettingsPopupMenu extends StatefulWidget {
@@ -103,6 +106,9 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               case ChatPopupMenuActions.scheduled:
                 await VibeSendLater.showList(context, widget.room);
                 break;
+              case ChatPopupMenuActions.wallpaper:
+                await VibeGlassChat.choose(context, widget.room);
+                break;
               case ChatPopupMenuActions.mute:
                 final muted = VibeMute.isMuted(widget.room);
                 final messenger = ScaffoldMessenger.of(context);
@@ -161,6 +167,18 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                 ],
               ),
             ),
+            // Glass look: a wallpaper just for this chat
+            if (VibePalette.isGlass)
+              const PopupMenuItem<ChatPopupMenuActions>(
+                value: ChatPopupMenuActions.wallpaper,
+                child: Row(
+                  children: [
+                    Icon(Icons.wallpaper_outlined),
+                    SizedBox(width: 12),
+                    Text('Chat wallpaper'),
+                  ],
+                ),
+              ),
             PopupMenuItem<ChatPopupMenuActions>(
               value: ChatPopupMenuActions.encryption,
               child: Row(

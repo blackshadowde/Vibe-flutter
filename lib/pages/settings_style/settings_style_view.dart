@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:fluffychat/vibe/vibe_settings_style.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/widgets/theme_builder.dart';
@@ -76,8 +77,10 @@ class SettingsStyleView extends StatelessWidget {
               ),
               subtitle: Text(
                 VibePalette.wallpaperAvailable
-                    ? 'Wallpaper uses your phone\'s wallpaper colours, like Google Messages'
-                    : 'Wallpaper colours need Android 12 or newer',
+                    ? 'Material takes your phone\'s colours, like Google Messages. '
+                          'Glass is frosted panels over a wallpaper'
+                    : 'Material needs Android 12 or newer. '
+                          'Glass is frosted panels over a wallpaper',
               ),
             ),
             Padding(
@@ -95,13 +98,20 @@ class SettingsStyleView extends StatelessWidget {
                   ),
                   ButtonSegment(
                     value: VibeLook.wallpaper,
-                    label: const Text('Wallpaper'),
-                    icon: const Icon(Icons.wallpaper_outlined),
+                    label: const Text('Material'),
+                    icon: const Icon(Icons.palette_outlined),
                     enabled: VibePalette.wallpaperAvailable,
+                  ),
+                  const ButtonSegment(
+                    value: VibeLook.glass,
+                    label: Text('Glass'),
+                    icon: Icon(Icons.blur_on_outlined),
                   ),
                 ],
               ),
             ),
+            if (ThemeController.of(context).look == VibeLook.glass)
+              const VibeGlassSettings(),
             Divider(color: theme.dividerColor),
             ListTile(
               title: Text(

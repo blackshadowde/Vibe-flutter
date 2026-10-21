@@ -5,6 +5,7 @@
 
 import 'dart:async';
 
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/pages/archive/archive.dart';
 import 'package:fluffychat/pages/bootstrap/bootstrap_page.dart';
@@ -528,7 +529,7 @@ abstract class AppRoutes {
   ) => NoTransitionPage(
     key: state.pageKey,
     restorationId: state.pageKey.value,
-    child: child,
+    child: VibeGlassBackdrop(child: child),
   );
 
   static Page defaultPageBuilder(

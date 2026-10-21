@@ -90,6 +90,11 @@ enum AppSettings<T> {
   hideRoomsInSpaces<bool>('chat.fluffy.hideRoomsInSpaces', false),
   showThumbnailsInTimeline<bool>('chat.fluffy.showThumbnailsInTimeline', true),
   vibeHaptics<bool>('chat.vibe.haptics', true),
+  // Glass look: palette ('wallbash' = from the wallpaper), the processed
+  // (blurred) wallpaper file and the colour picked from it
+  vibeGlassPalette<String>('chat.vibe.glass_palette', 'wallbash'),
+  vibeGlassWallpaper<String>('chat.vibe.glass_wallpaper', ''),
+  vibeGlassSeed<int>('chat.vibe.glass_seed', 0xFF7AA2F7),
   vibeSaveMedia<bool>('chat.vibe.save_media', false),
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),

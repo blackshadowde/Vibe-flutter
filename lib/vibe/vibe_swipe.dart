@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:flutter/gestures.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
@@ -310,7 +311,8 @@ class _VibePageRoute<T> extends PageRoute<T>
   _VibePageRoute(VibePage<T> page) : super(settings: page);
 
   @override
-  Widget buildContent(BuildContext context) => (settings as VibePage<T>).child;
+  Widget buildContent(BuildContext context) =>
+      VibeGlassBackdrop(child: (settings as VibePage<T>).child);
 
   @override
   bool get maintainState => true;
@@ -551,6 +553,8 @@ class _SheetPageState extends State<_SheetPage>
                   ),
                   child: Stack(
                     children: [
+                      // Glass look: the wallpaper behind the pane
+                      const Positioned.fill(child: VibeGlassLayer()),
                       Positioned.fill(
                         child: ScrollConfiguration(
                           // half open (or moving): the list stays put

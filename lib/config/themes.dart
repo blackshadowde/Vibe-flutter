@@ -43,10 +43,13 @@ abstract class FluffyThemes {
 
   static ThemeData buildTheme(
     BuildContext context,
-    Brightness brightness, [
+    Brightness requestedBrightness, [
     Color? seed,
   ]) {
-    // Vibe: Discord palette unless another look (wallpaper, Parrot) is on
+    // the Glass look is always dark (light text on the wallpaper)
+    final brightness =
+        VibePalette.isGlass ? Brightness.dark : requestedBrightness;
+    // Vibe: Discord palette unless another look (wallpaper, glass) is on
     final colorScheme = VibePalette.scheme(brightness) ??
         (brightness == Brightness.dark
         ? const ColorScheme(

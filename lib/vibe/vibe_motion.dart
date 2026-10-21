@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
 import 'dart:async';
 
@@ -315,7 +316,15 @@ Future<T?> showVibeSheet<T>({
   return showModalBottomSheet<T>(
   context: context,
   // every pane closes with a swipe down that follows the finger
-  builder: (ctx) => VibeSheetDragClose(child: RepaintBoundary(child: builder(ctx))),
+  builder: (ctx) => VibeSheetDragClose(
+    child: RepaintBoundary(
+      // Glass look: frosted pane
+      child: VibeGlassBlur(
+        radius: const BorderRadius.vertical(top: Radius.circular(28)),
+        child: builder(ctx),
+      ),
+    ),
+  ),
   backgroundColor: backgroundColor,
   clipBehavior: clipBehavior,
   constraints: constraints,
