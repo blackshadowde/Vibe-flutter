@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
@@ -21,9 +24,16 @@ class VibeGlassPalette {
   final String id;
   final String name;
   final Color accent, onAccent, base, mantle, crust, s0, s1, text, sub, tert;
+
+  /// The HyDE theme with this palette's wallpapers (branch and folder in
+  /// github.com/HyDE-Project/hyde-themes), if there is one.
+  final String? hydeBranch;
+  final String? hydeDir;
   const VibeGlassPalette({
     required this.id,
     required this.name,
+    this.hydeBranch,
+    this.hydeDir,
     required this.accent,
     required this.onAccent,
     required this.base,
@@ -48,9 +58,41 @@ abstract class VibeGlass {
   /// Bumped when the wallpaper or palette changes (backgrounds redraw).
   static final version = ValueNotifier<int>(0);
 
-  static const palettes = <VibeGlassPalette>[
-    VibeGlassPalette(
+  static const _t = 'Configs/.config/hyde/themes';
+
+  /// A dark palette around one colour (HyDE themes we only know the
+  /// accent of).
+  static VibeGlassPalette _seeded(
+    String id,
+    String name,
+    Color seed, {
+    String? branch,
+    String? dir,
+  }) {
+    final w = _wallbash(seed);
+    return VibeGlassPalette(
+      id: id,
+      name: name,
+      hydeBranch: branch,
+      hydeDir: dir,
+      accent: w.accent,
+      onAccent: w.onAccent,
+      base: w.base,
+      mantle: w.mantle,
+      crust: w.crust,
+      s0: w.s0,
+      s1: w.s1,
+      text: w.text,
+      sub: w.sub,
+      tert: w.tert,
+    );
+  }
+
+  static final palettes = <VibeGlassPalette>[
+    const VibeGlassPalette(
       id: 'catppuccin',
+      hydeBranch: 'Catppuccin-Mocha',
+      hydeDir: '$_t/Catppuccin Mocha/wallpapers',
       name: 'Catppuccin',
       accent: Color(0xFFCBA6F7),
       onAccent: Color(0xFF1E1E2E),
@@ -63,8 +105,10 @@ abstract class VibeGlass {
       sub: Color(0xFFA6ADC8),
       tert: Color(0xFFA6E3A1),
     ),
-    VibeGlassPalette(
+    const VibeGlassPalette(
       id: 'tokyonight',
+      hydeBranch: 'Tokyo-Night',
+      hydeDir: '$_t/Tokyo Night/wallpapers',
       name: 'Tokyo Night',
       accent: Color(0xFF7AA2F7),
       onAccent: Color(0xFF1A1B26),
@@ -77,8 +121,10 @@ abstract class VibeGlass {
       sub: Color(0xFFA9B1D6),
       tert: Color(0xFF9ECE6A),
     ),
-    VibeGlassPalette(
+    const VibeGlassPalette(
       id: 'rosepine',
+      hydeBranch: 'Rose-Pine',
+      hydeDir: '$_t/Rosé Pine/wallpapers',
       name: 'Rosé Pine',
       accent: Color(0xFFC4A7E7),
       onAccent: Color(0xFF191724),
@@ -91,8 +137,10 @@ abstract class VibeGlass {
       sub: Color(0xFF908CAA),
       tert: Color(0xFF9CCFD8),
     ),
-    VibeGlassPalette(
+    const VibeGlassPalette(
       id: 'gruvbox',
+      hydeBranch: 'Gruvbox-Retro',
+      hydeDir: '$_t/Gruvbox Retro/wallpapers',
       name: 'Gruvbox',
       accent: Color(0xFFFABD2F),
       onAccent: Color(0xFF282828),
@@ -105,8 +153,10 @@ abstract class VibeGlass {
       sub: Color(0xFFBDAE93),
       tert: Color(0xFFB8BB26),
     ),
-    VibeGlassPalette(
+    const VibeGlassPalette(
       id: 'nord',
+      hydeBranch: 'Nordic-Blue',
+      hydeDir: '$_t/Nordic Blue/walls',
       name: 'Nord',
       accent: Color(0xFF88C0D0),
       onAccent: Color(0xFF2E3440),
@@ -119,7 +169,7 @@ abstract class VibeGlass {
       sub: Color(0xFFD8DEE9),
       tert: Color(0xFFA3BE8C),
     ),
-    VibeGlassPalette(
+    const VibeGlassPalette(
       id: 'dracula',
       name: 'Dracula',
       accent: Color(0xFFBD93F9),
@@ -133,6 +183,35 @@ abstract class VibeGlass {
       sub: Color(0xFFBFC2D4),
       tert: Color(0xFF50FA7B),
     ),
+    // the other HyDE themes (accent from each theme's window border)
+    _seeded('latte', 'Catppuccin Latte', const Color(0xFF8839EF),
+        branch: 'Catppuccin-Latte', dir: '$_t/Catppuccin Latte/wallpapers'),
+    _seeded('decay', 'Decay Green', const Color(0xFF90CEAA),
+        branch: 'Decay-Green', dir: '$_t/Decay Green/wallpapers'),
+    _seeded('edgerunner', 'Edge Runner', const Color(0xFFFADA16),
+        branch: 'Edge-Runner', dir: '$_t/Edge Runner/wallpapers'),
+    _seeded('frosted', 'Frosted Glass', const Color(0xFF2770C0),
+        branch: 'Frosted-Glass', dir: '$_t/Frosted Glass/wallpapers'),
+    const VibeGlassPalette(
+      id: 'graphite',
+      name: 'Graphite Mono',
+      hydeBranch: 'Graphite-Mono',
+      hydeDir: '$_t/Graphite Mono/wallpapers',
+      accent: Color(0xFFD9D9D9),
+      onAccent: Color(0xFF1A1A1A),
+      base: Color(0xFF1C1C1C),
+      mantle: Color(0xFF161616),
+      crust: Color(0xFF101010),
+      s0: Color(0xFF2A2A2A),
+      s1: Color(0xFF3A3A3A),
+      text: Color(0xFFEDEDED),
+      sub: Color(0xFFA6A6A6),
+      tert: Color(0xFFBFBFBF),
+    ),
+    _seeded('sakura', 'Material Sakura', const Color(0xFFB4637A),
+        branch: 'Material-Sakura', dir: '$_t/Material Sakura/wallpapers'),
+    _seeded('synthwave', 'Synth Wave', const Color(0xFF03EDF9),
+        branch: 'Synth-Wave', dir: '$_t/Synth Wave/wallpapers'),
   ];
 
   /// 'wallbash' (from the wallpaper) or one of [palettes].
@@ -229,6 +308,12 @@ abstract class VibeGlass {
     final files = await selectFiles(context, type: FileType.image);
     if (files.isEmpty) return false;
     final bytes = await files.first.readAsBytes();
+    await setFromBytes(bytes, roomId: roomId);
+    return true;
+  }
+
+  /// Use [bytes] (a picture) as the app's or a chat's wallpaper.
+  static Future<void> setFromBytes(Uint8List bytes, {String? roomId, String? name}) async {
     final (jpg, seed) = await Isolate.run(() => _process(bytes));
     final dir = Directory('${(await getApplicationSupportDirectory()).path}/vibe_glass');
     await dir.create(recursive: true);
@@ -241,12 +326,60 @@ abstract class VibeGlass {
     if (roomId == null) {
       await AppSettings.vibeGlassWallpaper.setItem(file.path);
       await AppSettings.vibeGlassSeed.setItem(seed);
+      await AppSettings.store.setString(_nameKey, name ?? '');
     } else {
       await AppSettings.store.setString(_chatKey(roomId), file.path);
     }
     _delete(old);
     version.value++;
-    return true;
+  }
+
+  static const _nameKey = 'chat.vibe.glass_wallpaper_name';
+
+  /// Which HyDE wallpaper the app uses (its file name), if it's one.
+  static String get wallpaperName =>
+      AppSettings.store.getString(_nameKey) ?? '';
+
+  // ---- HyDE wallpapers, fetched from HyDE's own GitHub on request ----
+
+  static final Map<String, List<VibeHydeWall>> _walls = {};
+
+  /// The wallpapers of [p]'s HyDE theme (names, previews, downloads).
+  static Future<List<VibeHydeWall>> hydeWalls(VibeGlassPalette p) async {
+    final branch = p.hydeBranch, dir = p.hydeDir;
+    if (branch == null || dir == null) return const [];
+    final hit = _walls[p.id];
+    if (hit != null) return hit;
+    final r = await http.get(
+      Uri.https(
+        'api.github.com',
+        '/repos/HyDE-Project/hyde-themes/contents/$dir',
+        {'ref': branch},
+      ),
+      headers: {'Accept': 'application/vnd.github+json'},
+    );
+    if (r.statusCode != 200) {
+      throw Exception('GitHub said ${r.statusCode}');
+    }
+    final list = <VibeHydeWall>[];
+    for (final f in jsonDecode(r.body) as List) {
+      if (f is! Map) continue;
+      final name = f['name'] as String? ?? '';
+      final url = f['download_url'] as String?;
+      if (url == null || !RegExp(r'\.(png|jpe?g|webp)$', caseSensitive: false).hasMatch(name)) {
+        continue;
+      }
+      list.add(VibeHydeWall(name, url));
+    }
+    _walls[p.id] = list;
+    return list;
+  }
+
+  /// Download a HyDE wallpaper and use it for the whole app.
+  static Future<void> useHyde(VibeHydeWall w) async {
+    final r = await http.get(Uri.parse(w.url));
+    if (r.statusCode != 200) throw Exception('Download failed (${r.statusCode})');
+    await setFromBytes(r.bodyBytes, name: w.name);
   }
 
   /// Remove the app's wallpaper, or a chat's own one (it then shows the
@@ -255,6 +388,7 @@ abstract class VibeGlass {
     final old = pathFor(roomId);
     if (roomId == null) {
       await AppSettings.vibeGlassWallpaper.setItem('');
+      await AppSettings.store.remove(_nameKey);
     } else {
       await AppSettings.store.remove(_chatKey(roomId));
     }
@@ -324,6 +458,28 @@ abstract class VibeGlass {
         0xFF000000 | (c(sumR[best]) << 16) | (c(sumG[best]) << 8) | c(sumB[best]);
     return (jpg, seed);
   }
+}
+
+/// One HyDE wallpaper: its file name and download link. The preview is a
+/// small copy made by the wsrv.nl image service, so browsing doesn't
+/// download full-size pictures.
+class VibeHydeWall {
+  final String name;
+  final String url;
+  const VibeHydeWall(this.name, this.url);
+
+  String get title => name
+      .replaceAll(RegExp(r'\.(png|jpe?g|webp)$', caseSensitive: false), '')
+      .replaceAll(RegExp(r'[_-]+'), ' ')
+      .trim();
+
+  String get preview => Uri.https('wsrv.nl', '/', {
+    'url': url,
+    'w': '180',
+    'h': '320',
+    'fit': 'cover',
+    'output': 'webp',
+  }).toString();
 }
 
 /// The Glass background (wallpaper or a palette gradient). Draws nothing
@@ -504,6 +660,10 @@ class VibeGlassSettings extends StatelessWidget {
               ],
             ),
           ),
+          // the chosen HyDE theme's wallpapers (fetched from HyDE's GitHub
+          // when you open this; only the one you tap is downloaded)
+          if (VibeGlass.palette.hydeBranch != null)
+            _HydeGallery(palette: VibeGlass.palette),
         ],
       );
     },
@@ -546,5 +706,131 @@ abstract class VibeGlassChat {
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Could not use that picture: $e')));
     }
+  }
+}
+
+
+class _HydeGallery extends StatefulWidget {
+  final VibeGlassPalette palette;
+  const _HydeGallery({required this.palette});
+
+  @override
+  State<_HydeGallery> createState() => _HydeGalleryState();
+}
+
+class _HydeGalleryState extends State<_HydeGallery> {
+  late Future<List<VibeHydeWall>> _walls = VibeGlass.hydeWalls(widget.palette);
+
+  @override
+  void didUpdateWidget(_HydeGallery old) {
+    super.didUpdateWidget(old);
+    if (old.palette.id != widget.palette.id) {
+      _walls = VibeGlass.hydeWalls(widget.palette);
+    }
+  }
+
+  Future<void> _use(VibeHydeWall w) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final r = await showFutureLoadingDialog(
+      context: context,
+      future: () => VibeGlass.useHyde(w),
+    );
+    if (r.error != null) {
+      messenger.showSnackBar(SnackBar(content: Text('Could not get that wallpaper: ${r.error}')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final using = VibeGlass.wallpaperName;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+          child: Text(
+            '${widget.palette.name} wallpapers · from HyDE',
+            style: TextStyle(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 172,
+          child: FutureBuilder<List<VibeHydeWall>>(
+            future: _walls,
+            builder: (context, snap) {
+              if (snap.hasError) {
+                return Center(
+                  child: TextButton.icon(
+                    onPressed: () => setState(
+                      () => _walls = VibeGlass.hydeWalls(widget.palette),
+                    ),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Couldn\'t load the wallpapers. Retry'),
+                  ),
+                );
+              }
+              final walls = snap.data;
+              if (walls == null) {
+                return const Center(child: CircularProgressIndicator.adaptive());
+              }
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: walls.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 10),
+                itemBuilder: (context, i) {
+                  final w = walls[i];
+                  final on = w.name == using;
+                  return GestureDetector(
+                    onTap: () => _use(w),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 84,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: on ? theme.colorScheme.primary : Colors.transparent,
+                              width: 2.5,
+                            ),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Image.network(
+                            w.preview,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => ColoredBox(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              child: const Icon(Icons.image_outlined),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        SizedBox(
+                          width: 84,
+                          child: Text(
+                            w.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
   }
 }

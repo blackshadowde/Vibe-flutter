@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 /// The message box cursor, kitty style: when it jumps (tapping elsewhere in
 /// the text, a new line, pasting, deleting a word) a fading trail stretches
