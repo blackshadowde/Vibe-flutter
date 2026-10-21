@@ -125,7 +125,7 @@ class _VibeTrailCursorState extends State<VibeTrailCursor>
     final local = editable.getLocalRectForCaret(TextPosition(offset: sel.extentOffset));
     final topLeft = stack.globalToLocal(editable.localToGlobal(local.topLeft));
     // chunky, like kitty's beam
-    final caret = Rect.fromLTWH(topLeft.dx, topLeft.dy, 4.5, local.height);
+    final caret = Rect.fromLTWH(topLeft.dx, topLeft.dy, 2.5, local.height);
 
     final now = _current;
     _visible = true;
@@ -221,7 +221,7 @@ class _TrailPainter extends CustomPainter {
     final solid = t < 1 || s._blinkOn;
     if (!solid) return;
     canvas.drawRRect(
-      RRect.fromRectAndRadius(head, const Radius.circular(2)),
+      RRect.fromRectAndRadius(head, const Radius.circular(1.5)),
       Paint()..color = color,
     );
   }

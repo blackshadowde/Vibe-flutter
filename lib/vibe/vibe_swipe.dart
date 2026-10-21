@@ -78,8 +78,14 @@ class _SlideOver extends StatelessWidget {
     builder: (context, child) {
       final gesture = route.navigator?.userGestureInProgress == true;
       final v = animation.value.clamp(0.0, 1.0);
-      // Finger: follow it 1:1. Otherwise: the spring.
-      final t = gesture ? v : vibePageSpring.transform(v);
+      // Finger: follow it 1:1. Opening: the spring. Closing: the same
+      // spring mirrored, so the page moves at once (played backwards, the
+      // spring's slow settle made the page sit still before sliding out).
+      final t = gesture
+          ? v
+          : animation.status == AnimationStatus.reverse
+          ? 1 - vibePageSpring.transform(1 - v)
+          : vibePageSpring.transform(v);
       // A soft gradient edge instead of a blurred shadow: a full-screen
       // blur had to be redrawn on every frame of the slide.
       return FractionalTranslation(
@@ -321,7 +327,7 @@ class _VibePageRoute<T> extends PageRoute<T>
   Duration get transitionDuration => vibePageSpring.duration;
 
   @override
-  Duration get reverseTransitionDuration => vibePageSpring.duration;
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
 }
 
 /// A settings page as a pane: it rises to half the screen, then on up to
