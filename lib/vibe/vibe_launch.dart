@@ -2,6 +2,7 @@
 
 import 'dart:math' as math;
 
+import 'package:fluffychat/vibe/vibe_glass.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -103,7 +104,9 @@ class _VibeLaunchState extends State<VibeLaunch>
 
   @override
   Widget build(BuildContext context) {
-    final bg = !VibePalette.isVibe
+    final bg = VibePalette.isGlass
+        ? VibeGlass.palette.base
+        : !VibePalette.isVibe
         ? Theme.of(context).colorScheme.surface
         : Theme.of(context).brightness == Brightness.dark
         ? const Color(0xFF1A191E)
