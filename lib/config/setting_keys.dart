@@ -95,6 +95,8 @@ enum AppSettings<T> {
   vibeGlassPalette<String>('chat.vibe.glass_palette', 'wallbash'),
   vibeGlassWallpaper<String>('chat.vibe.glass_wallpaper', ''),
   vibeGlassSeed<int>('chat.vibe.glass_seed', 0xFF7AA2F7),
+  // Glass look: take the palette from Hypr Launcher when it's installed
+  vibeGlassFollowLauncher<bool>('chat.vibe.glass_follow_launcher', true),
   vibeSaveMedia<bool>('chat.vibe.save_media', false),
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),

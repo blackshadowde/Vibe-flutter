@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:flutter/services.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -396,6 +397,22 @@ abstract class VibeGlass {
     version.value++;
   }
 
+  /// Hypr Launcher shares its theme: with "Follow Hypr Launcher" on, the
+  /// Glass palette matches the launcher's (checked when Vibe comes back).
+  static bool launcherFound = false;
+
+  static Future<void> followLauncher() async {
+    try {
+      final r = await const MethodChannel('vibe/system')
+          .invokeMapMethod<String, Object?>('hyprTheme');
+      final id = r?['palette'];
+      launcherFound = id is String;
+      if (id is! String || !AppSettings.vibeGlassFollowLauncher.value) return;
+      final known = id == 'wallbash' || palettes.any((p) => p.id == id);
+      if (known && id != paletteId) await setPalette(id);
+    } catch (_) {}
+  }
+
   static Future<void> setPalette(String id) async {
     await AppSettings.vibeGlassPalette.setItem(id);
     version.value++;
@@ -636,6 +653,17 @@ class VibeGlassSettings extends StatelessWidget {
                   ),
             onTap: () => _pick(context),
           ),
+          if (VibeGlass.launcherFound)
+            SwitchListTile.adaptive(
+              title: const Text('Follow Hypr Launcher'),
+              subtitle: const Text('Use the palette chosen in the launcher'),
+              value: AppSettings.vibeGlassFollowLauncher.value,
+              onChanged: (v) async {
+                await AppSettings.vibeGlassFollowLauncher.setItem(v);
+                await VibeGlass.followLauncher();
+                VibeGlass.version.value++;
+              },
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
             child: Wrap(

@@ -81,6 +81,23 @@ object VibeSystemNative {
                     "pip" -> result.success(MainActivity.current?.enterCallPip() ?: false)
                     "isSpeaker" -> result.success(isSpeaker(app))
                     "lastExit" -> result.success(lastExit(app))
+                    // Hypr Launcher's theme (Dart: VibeGlass.followLauncher)
+                    "hyprTheme" -> {
+                        try {
+                            app.contentResolver.query(
+                                android.net.Uri.parse("content://app.hypr.theme/current"),
+                                null, null, null, null,
+                            )?.use { c ->
+                                if (c.moveToFirst()) {
+                                    result.success(mapOf("palette" to c.getString(0)))
+                                } else {
+                                    result.success(null)
+                                }
+                            } ?: result.success(null)
+                        } catch (_: Throwable) {
+                            result.success(null)
+                        }
+                    }
                     "resetAudio" -> {
                         try {
                             val am = audio(app)

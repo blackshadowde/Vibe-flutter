@@ -107,8 +107,13 @@ class ThemeController extends State<ThemeBuilder> {
     WidgetsBinding.instance.addPostFrameCallback(_loadData);
     // Glass look: a new wallpaper / palette means new colours
     VibeGlass.version.addListener(_glassChanged);
+    // Hypr Launcher's theme: now and whenever Vibe comes back
+    VibeGlass.followLauncher();
+    _life = AppLifecycleListener(onResume: VibeGlass.followLauncher);
     super.initState();
   }
+
+  AppLifecycleListener? _life;
 
   void _glassChanged() {
     if (mounted) setState(() {});
@@ -117,6 +122,7 @@ class ThemeController extends State<ThemeBuilder> {
   @override
   void dispose() {
     VibeGlass.version.removeListener(_glassChanged);
+    _life?.dispose();
     super.dispose();
   }
 
