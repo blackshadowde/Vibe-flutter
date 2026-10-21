@@ -418,7 +418,7 @@ abstract class VibeGlass {
     final src = img.decodeImage(bytes);
     if (src == null) throw Exception('Not a picture');
     final small = src.width > 720 ? img.copyResize(src, width: 720) : src;
-    final blurred = img.gaussianBlur(small, radius: 14);
+    final blurred = img.gaussianBlur(small, radius: 8);
     final jpg = Uint8List.fromList(img.encodeJpg(blurred, quality: 86));
 
     final tiny = img.copyResize(src, width: 48);
