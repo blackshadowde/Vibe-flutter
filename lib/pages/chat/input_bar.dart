@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_trail_cursor.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -452,10 +453,15 @@ class InputBar extends StatelessWidget {
         data: MediaQuery.of(context).copyWith(
           textScaler: TextScaler.linear(AppSettings.fontSizeFactor.value),
         ),
-        child: TextField(
+        // Vibe: kitty-style cursor with a trail when it jumps
+        child: VibeTrailCursor(
+          controller: controller,
+          focusNode: focusNode,
+          child: TextField(
           controller: controller,
           focusNode: focusNode,
           readOnly: readOnly,
+          cursorColor: Colors.transparent,
           onEditingComplete: () {
             // To not lose focus on iOS:
             // https://github.com/krille-chan/fluffychat/issues/2784
@@ -505,6 +511,7 @@ class InputBar extends StatelessWidget {
             onChanged!(text);
           },
           textCapitalization: TextCapitalization.sentences,
+        ),
         ),
       ),
       optionsViewBuilder: (c, onSelected, s) {
