@@ -72,6 +72,34 @@ jobs:
               "Directory(containerPath ?? (await getTemporaryDirectory()).path)")
           PYEOF
 
+      - name: Vibe app name
+        run: |
+          set -euo pipefail
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Vibe" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleName Vibe" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Print :CFBundleDisplayName" ios/Runner/Info.plist
+
+      # Optional: if this step fails the build still goes on with the old icon.
+      - name: Vibe app icon
+        continue-on-error: true
+        run: |
+          python3 -m pip install --quiet pillow || python3 -m pip install --quiet --break-system-packages pillow
+          python3 - <<'PYEOF'
+          import glob
+          from PIL import Image
+          src = Image.open("vibe-icon.png").convert("RGBA")
+          W, H = src.size
+          c = 400
+          crop = src.crop(((W - c) // 2, (H - c) // 2, (W - c) // 2 + c, (H - c) // 2 + c))
+          for f in glob.glob("ios/Runner/Assets.xcassets/AppIcon.appiconset/*.png"):
+              size = Image.open(f).size
+              bg = Image.new("RGB", size, (255, 255, 255))
+              icon = crop.resize(size, Image.LANCZOS)
+              bg.paste(icon, mask=icon.getchannel("A"))
+              bg.save(f)
+          print("icons replaced")
+          PYEOF
+
       - name: Build (no code signing)
         run: flutter build ios --release --no-codesign
 
