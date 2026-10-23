@@ -28,6 +28,31 @@ jobs:
 
       - run: flutter pub get
 
+      # flutter_contacts crashes at launch on iOS 27 (trap inside register(with:)).
+      # Make its iOS registration a no-op for this CI build only. Nothing in the
+      # repo changes, and the Android workflows are untouched.
+      - name: Disable flutter_contacts iOS registration
+        run: |
+          python3 - <<'PYEOF'
+          import glob, os, re
+          root = os.path.expanduser("~/.pub-cache/hosted/pub.dev")
+          files = glob.glob(f"{root}/flutter_contacts-*/ios/**/*.swift", recursive=True)
+          patched = 0
+          for f in files:
+              s = open(f).read()
+              m = re.search(r"static\s+func\s+register\s*\(\s*with\s+\w+\s*:\s*FlutterPluginRegistrar\s*\)\s*\{", s)
+              if not m:
+                  continue
+              i, depth = m.end(), 1
+              while depth:
+                  depth += {"{": 1, "}": -1}.get(s[i], 0)
+                  i += 1
+              open(f, "w").write(s[:m.end()] + "\n    // disabled for iOS build\n  }" + s[i:])
+              patched += 1
+              print("patched", f)
+          assert patched, "register(with:) not found in flutter_contacts"
+          PYEOF
+
       - name: Build (no code signing)
         run: flutter build ios --release --no-codesign
 
