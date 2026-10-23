@@ -1,0 +1,56 @@
+name: Vibe web (GitHub Pages)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: .tool_versions.yaml
+          cache: true
+
+      # Same toolchain the repo's Dockerfile uses to compile vodozemac for web
+      - name: Rust nightly
+        run: rustup toolchain install nightly --profile minimal --component rust-src --target wasm32-unknown-unknown
+
+      - name: Prepare web (vodozemac + native_imaging)
+        run: ./scripts/prepare-web.sh
+
+      - run: flutter pub get
+
+      - name: Build web
+        run: |
+          flutter build web --release \
+            --dart-define=FLUTTER_WEB_CANVASKIT_URL=canvaskit/ \
+            --base-href "/${{ github.event.repository.name }}/"
+          # single-page app: unknown paths should load the app
+          cp build/web/index.html build/web/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
