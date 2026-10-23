@@ -53,6 +53,25 @@ jobs:
           assert patched, "register(with:) not found in flutter_contacts"
           PYEOF
 
+      # Third-party signers replace the Apple team, which drops the app group
+      # (group.im.fluffychat.app). The app then can't read its keychain/database
+      # key and sits on a white screen. For this CI build only, stop using the
+      # app group. Android builds never run this workflow.
+      - name: Make storage work without the app group
+        run: |
+          python3 - <<'PYEOF'
+          def sub(path, old, new):
+              s = open(path).read()
+              assert old in s, f"{old!r} not found in {path}"
+              open(path, "w").write(s.replace(old, new))
+          d = "lib/utils/matrix_sdk_extensions/flutter_matrix_dart_sdk_database/"
+          sub(d + "cipher.dart",
+              "IOSOptions(groupId: 'group.im.fluffychat.app')", "IOSOptions()")
+          sub(d + "builder.dart",
+              "Directory(containerPath!)",
+              "Directory(containerPath ?? (await getTemporaryDirectory()).path)")
+          PYEOF
+
       - name: Build (no code signing)
         run: flutter build ios --release --no-codesign
 
