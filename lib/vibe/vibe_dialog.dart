@@ -133,11 +133,19 @@ class _DialogPane extends StatelessWidget {
                 if (actions != null && actions.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
-                    child: OverflowBar(
-                      alignment: MainAxisAlignment.end,
-                      spacing: 8,
-                      overflowAlignment: OverflowBarAlignment.end,
-                      children: actions,
+                    // On iOS, AdaptiveDialogAction builds a CupertinoDialogAction,
+                    // which only reacts to taps inside a CupertinoAlertDialog.
+                    // In this pane it ignored every tap (OK / Cancel / Yes / No
+                    // did nothing). Material buttons work anywhere, and on
+                    // Android this changes nothing (already Material).
+                    child: Theme(
+                      data: theme.copyWith(platform: TargetPlatform.android),
+                      child: OverflowBar(
+                        alignment: MainAxisAlignment.end,
+                        spacing: 8,
+                        overflowAlignment: OverflowBarAlignment.end,
+                        children: actions,
+                      ),
                     ),
                   ),
               ],
