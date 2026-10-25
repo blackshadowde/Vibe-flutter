@@ -374,17 +374,17 @@ class VibeHashRow extends StatelessWidget {
         onTap: onTap,
         onLongPress: onLongPress,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
           child: Row(
             children: [
               SizedBox(
                 width: 28,
                 child: icon != null
-                    ? Icon(icon, size: 21, color: iconColor ?? muted)
+                    ? Icon(icon, size: 19, color: iconColor ?? muted)
                     : Text(
                         '#',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 21, color: muted),
+                        style: TextStyle(fontSize: 19, color: muted),
                       ),
               ),
               const SizedBox(width: 14),
@@ -403,7 +403,7 @@ class VibeHashRow extends StatelessWidget {
                         ],
                       ),
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14.5,
                         color: bold ? cs.onSurface : muted,
                         fontWeight: bold ? FontWeight.w800 : FontWeight.w700,
                       ),
@@ -422,7 +422,7 @@ class VibeHashRow extends StatelessWidget {
                                 subtitle!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 13, color: muted),
+                                style: TextStyle(fontSize: 12, color: muted),
                               ),
                             ),
                           ],
