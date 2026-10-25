@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:convert';
 import 'dart:ui';
@@ -427,7 +428,9 @@ class _Emoji extends StatelessWidget {
     return Column(
       mainAxisSize: .min,
       children: <Widget>[
-        Text(emoji.emoji, style: const TextStyle(fontSize: 34)),
+        // Same Noto artwork on every device (the phone's own emoji font looks
+        // different on iPhone and Android, so the two screens didn't match).
+        VibeAnimatedEmoji(emoji.emoji, size: 44),
         const SizedBox(height: 4),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),

@@ -12,17 +12,29 @@ import 'package:matrix/matrix.dart';
 abstract class VibeMute {
   static final changes = ValueNotifier<int>(0);
   static final Map<String, bool> _pending = {};
+  static final Map<String, DateTime> _pendingAt = {};
 
   static bool isMuted(Room room) {
     final real = room.pushRuleState != PushRuleState.notify;
     final want = _pending[room.id];
     if (want == null) return real;
-    if (want == real) _pending.remove(room.id);
+    // A remembered choice only lasts until the server agrees, or 30 s. If it
+    // stayed longer (the mute was changed elsewhere), the chat looked muted
+    // by itself.
+    final at = _pendingAt[room.id];
+    if (want == real ||
+        at == null ||
+        DateTime.now().difference(at) > const Duration(seconds: 30)) {
+      _pending.remove(room.id);
+      _pendingAt.remove(room.id);
+      return real;
+    }
     return want;
   }
 
   static Future<void> set(Room room, bool muted) async {
     _pending[room.id] = muted;
+    _pendingAt[room.id] = DateTime.now();
     changes.value++;
     try {
       await room.setPushRuleState(
@@ -30,6 +42,7 @@ abstract class VibeMute {
       );
     } catch (_) {
       _pending.remove(room.id);
+      _pendingAt.remove(room.id);
       changes.value++;
       rethrow;
     }

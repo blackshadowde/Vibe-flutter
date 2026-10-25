@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:fluffychat/vibe/vibe_glass.dart';
+import 'package:fluffychat/vibe/vibe_stale_keyboard.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_text_sticker.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
@@ -94,7 +95,7 @@ class ChatView extends StatelessWidget {
             return VibeGlassBackdrop(
               // Glass look: this chat's own wallpaper, if it has one
               roomId: controller.room.id,
-              child: Scaffold(
+              child: VibeStaleKeyboardGuard(child: Scaffold(
               key: Key('chat_page'),
               extendBodyBehindAppBar: true,
               appBar: AppBar(
@@ -545,7 +546,7 @@ class ChatView extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
+            )),
             );
           },
         ),

@@ -440,11 +440,8 @@ Future<void> _tryPushHelper(
               l10n.markAsRead,
               semanticAction: SemanticAction.markAsRead,
             ),
-            AndroidNotificationAction(
-              FluffyChatNotificationActions.mute.name,
-              l10n.mute,
-              semanticAction: SemanticAction.mute,
-            ),
+            // No "Mute" button here: it sat right next to Reply / Mark as read
+            // and a stray tap silently muted the chat. Mute is in the chat menu.
           ],
   );
   final iOSAttachmentPath = PlatformInfos.isIOS
