@@ -2,6 +2,7 @@
 
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_name_style.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -179,6 +180,7 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
   final _text = TextEditingController();
   final _name = TextEditingController();
   String _origName = '';
+  VibeNameStyle? _style, _origStyle;
   final _focus = FocusNode();
   String _emoji = '';
   late DateTime? _clearAt; // null = don't clear
@@ -198,7 +200,9 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
     _profile = VibeProfileCache.get(widget.client);
     _profile.then((p) {
       if (!mounted) return;
-      _origName = p.displayName ?? '';
+      final (plainName, nameStyle) = VibeNameStyle.split(p.displayName ?? '');
+      _origName = plainName;
+      _origStyle = _style = nameStyle;
       if (_name.text.isEmpty) setState(() => _name.text = _origName);
     });
     final s = VibeStatus.mine(widget.client);
@@ -343,6 +347,35 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
     if (picked != null && mounted) setState(() => _emoji = picked);
   }
 
+  Widget _swatch(VibeNameStyle? s) {
+    final selected = _style == s;
+    return GestureDetector(
+      onTap: () {
+        VibeHaptics.selection();
+        setState(() => _style = s);
+      },
+      child: Container(
+        width: 34,
+        height: 34,
+        margin: const EdgeInsets.only(right: 10, top: 3, bottom: 3),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: s == null ? Colors.grey.withValues(alpha: 0.3) : null,
+          gradient: s == null
+              ? null
+              : LinearGradient(
+                  colors: [Color(0xFF000000 | s.c1), Color(0xFF000000 | s.c2)],
+                ),
+          border: Border.all(
+            color: selected ? _blurple : Colors.transparent,
+            width: 3,
+          ),
+        ),
+        child: s == null ? const Icon(Icons.block, size: 18) : null,
+      ),
+    );
+  }
+
   Future<void> _save({bool clear = false}) async {
     if (_saving) return;
     final text = _text.text.trim();
@@ -351,12 +384,13 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
     final messenger = ScaffoldMessenger.of(context);
     // the display name (this page is also "Edit profile")
     final newName = _name.text.trim();
-    if (newName.isNotEmpty && newName != _origName) {
+    if (newName.isNotEmpty && (newName != _origName || _style != _origStyle)) {
       try {
         await widget.client.setProfileField(widget.client.userID!, 'displayname', {
-          'displayname': newName,
+          'displayname': VibeNameStyle.compose(newName, _style),
         });
         _origName = newName;
+        _origStyle = _style;
         VibeProfileCache.refresh();
       } catch (_) {
         messenger.showSnackBar(const SnackBar(content: Text('Could not change your name')));
@@ -407,7 +441,8 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
         : dark ? const Color(0xFF1E1F22) : const Color(0xFFEBEDEF);
     final canSave = _text.text.trim().isNotEmpty ||
         _hadStatus ||
-        (_name.text.trim().isNotEmpty && _name.text.trim() != _origName);
+        (_name.text.trim().isNotEmpty &&
+            (_name.text.trim() != _origName || _style != _origStyle));
     final userId = widget.client.userID ?? '';
     final preview = _text.text.trim().isEmpty
         ? null
@@ -555,6 +590,40 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 8),
+                child: Row(
+                  children: [
+                    const Text(
+                      'NAME STYLE',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.6),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: VibeNameText(
+                        VibeNameStyle.compose(
+                          _name.text.trim().isEmpty ? 'Your name' : _name.text.trim(),
+                          _style,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 40,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _swatch(null),
+                    for (final p in VibeNameStyle.presets) _swatch(p),
+                  ],
                 ),
               ),
               const SizedBox(height: 14),

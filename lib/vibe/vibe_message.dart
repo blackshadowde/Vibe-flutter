@@ -24,6 +24,7 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/vibe/vibe_stable_id.dart';
 import 'package:fluffychat/vibe/vibe_slash.dart';
+import 'package:fluffychat/vibe/vibe_name_style.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
@@ -484,7 +485,7 @@ class VibeMessage extends StatelessWidget {
             children: [
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 220),
-                child: Text(
+                child: VibeNameText(
                   displayname,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

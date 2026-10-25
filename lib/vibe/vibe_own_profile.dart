@@ -3,6 +3,7 @@
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_name_style.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_set_status.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
@@ -430,7 +431,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                         ],
                       )
                     else
-                      Text(
+                      VibeNameText(
                         name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
