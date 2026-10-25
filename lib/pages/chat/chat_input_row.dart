@@ -134,7 +134,7 @@ class ChatInputRow extends StatelessWidget {
               : <Widget>[
                   Expanded(
                     child: Container(
-                      margin: const EdgeInsets.fromLTRB(10, 6, 0, 8),
+                      margin: const EdgeInsets.fromLTRB(10, 6, 0, 3),
                       // Vibgram proportions: slimmer pill, so the whole
                       // "# Message | name" hint fits.
                       padding: const EdgeInsets.fromLTRB(6, 4, 2, 4),
@@ -252,7 +252,7 @@ class ChatInputRow extends StatelessWidget {
                   Container(
                     height: 56,
                     width: 56,
-                    margin: const EdgeInsets.only(top: 6, bottom: 8),
+                    margin: const EdgeInsets.only(top: 6, bottom: 3),
                     alignment: Alignment.center,
                     child:
                         PlatformInfos.platformCanRecord &&
