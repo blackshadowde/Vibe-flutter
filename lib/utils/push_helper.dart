@@ -269,11 +269,22 @@ Future<void> _tryPushHelper(
   }
 
   // Vibe: locked chats never show who wrote or what.
-  if (VibeLock.isLocked(event.room.id)) {
+  // Also when the person turned on Notification privacy in settings: then
+  // every notification only says the app name and "New message".
+  final hideContent = AppSettings.vibeHideNotificationContent.value;
+  if (VibeLock.isLocked(event.room.id) || hideContent) {
     await flutterLocalNotificationsPlugin.show(
       id: '${client.clientName}_${notification.roomId}'.hashCode,
-      title: 'Vibe',
-      body: '🔒 New message',
+      title: hideContent ? AppSettings.applicationName.value : 'Vibe',
+      body: hideContent ? 'New message' : '🔒 New message',
+      // tapping opens the chat (not for locked chats, as before)
+      payload: hideContent && !VibeLock.isLocked(event.room.id)
+          ? FluffyChatPushPayload(
+              client.clientName,
+              event.room.id,
+              event.eventId,
+            ).toString()
+          : null,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           AppConfig.pushNotificationsChannelId,

@@ -90,6 +90,8 @@ enum AppSettings<T> {
   hideRoomsInSpaces<bool>('chat.fluffy.hideRoomsInSpaces', false),
   showThumbnailsInTimeline<bool>('chat.fluffy.showThumbnailsInTimeline', true),
   vibeHaptics<bool>('chat.vibe.haptics', true),
+  // Notifications show only the app name and "New message" (no names, text or pictures)
+  vibeHideNotificationContent<bool>('chat.vibe.notification_privacy', false),
   // Glass look: palette ('wallbash' = from the wallpaper), the processed
   // (blurred) wallpaper file and the colour picked from it
   vibeGlassPalette<String>('chat.vibe.glass_palette', 'wallbash'),

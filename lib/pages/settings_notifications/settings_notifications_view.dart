@@ -69,6 +69,12 @@ class SettingsNotificationsView extends StatelessWidget {
                 children: [
                   if (PlatformInfos.isAndroid) const VibePushModeTiles(),
                   if (PlatformInfos.isAndroid) const Divider(),
+                  SettingsSwitchListTile.adaptive(
+                    title: 'Notification privacy',
+                    subtitle:
+                        'Hide names, messages and pictures: notifications only say "New message"',
+                    setting: AppSettings.vibeHideNotificationContent,
+                  ),
                   if (kDebugMode && lastReceivedPush != null)
                     ListTile(
                       title: Text('Last received push notification'),

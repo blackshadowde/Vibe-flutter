@@ -30,10 +30,14 @@ extension LocalNotificationsExtension on MatrixState {
       }
     }
 
-    final title = event.room.getLocalizedDisplayname(
-      MatrixLocals(L10n.of(context)),
-    );
-    final body = await event.calcLocalizedBody(
+    // Notification privacy: only the app name and "New message", no picture.
+    final hide = AppSettings.vibeHideNotificationContent.value;
+    final title = hide
+        ? AppSettings.applicationName.value
+        : event.room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
+    final body = hide
+        ? 'New message'
+        : await event.calcLocalizedBody(
       MatrixLocals(L10n.of(context)),
       withSenderNamePrefix:
           !event.room.isDirectChat ||
@@ -43,7 +47,7 @@ extension LocalNotificationsExtension on MatrixState {
       hideEdit: true,
       removeMarkdown: true,
     );
-    final avatarUrl = event.room.avatar;
+    final avatarUrl = hide ? null : event.room.avatar;
 
     const size = 128;
     const thumbnailMethod = ThumbnailMethod.crop;
