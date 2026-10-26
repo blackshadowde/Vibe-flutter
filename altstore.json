@@ -14,7 +14,16 @@
       "iconURL": "https://raw.githubusercontent.com/blackshadowde/Vibe-flutter/Vibe/vibe-icon.png",
       "tintColor": "#5865F2",
       "category": "social",
-      "versions": [],
+      "versions": [
+        {
+          "version": "3.1.10",
+          "buildVersion": "10",
+          "date": "2026-10-26",
+          "size": 21375231,
+          "localizedDescription": "Vibe 3.1.10",
+          "downloadURL": "https://github.com/blackshadowde/Vibe-flutter/releases/download/ios-v3.1.10/Vibe.ipa"
+        }
+      ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
