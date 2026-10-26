@@ -103,6 +103,9 @@ enum AppSettings<T> {
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),
   vibeLinkPreviews<bool>('chat.vibe.link_previews', true),
+  // status shows the song playing in any music app (Android)
+  vibeNowPlaying<bool>('chat.vibe.now_playing', false),
+  vibeNowPlayingPrev<String>('chat.vibe.now_playing_prev', ''),
   // 'direct' (own connection, like Vibgram - default), 'standard' (Firebase
   // via the Worker) or 'builtin' (ntfy, no Google)
   vibePushMode<String>('chat.vibe.push_mode', 'direct'),

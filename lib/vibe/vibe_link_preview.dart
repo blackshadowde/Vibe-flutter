@@ -60,6 +60,153 @@ class VibeLinkPreview extends StatelessWidget {
     return t.isEmpty ? null : t;
   }
 
+  /// Music links (Spotify, YouTube Music, ...) get a player-style card.
+  static (String, Color)? _music(String url) {
+    final host = Uri.tryParse(url)?.host.toLowerCase() ?? '';
+    bool on(String h) => host == h || host.endsWith('.$h');
+    if (on('open.spotify.com') || on('spotify.link')) {
+      return ('Spotify', const Color(0xFF1DB954));
+    }
+    if (on('music.youtube.com')) return ('YouTube Music', const Color(0xFFFF0033));
+    if (on('music.apple.com')) return ('Apple Music', const Color(0xFFFA243C));
+    if (on('jiosaavn.com')) return ('JioSaavn', const Color(0xFF2BC5B4));
+    if (on('soundcloud.com')) return ('SoundCloud', const Color(0xFFFF5500));
+    if (on('gaana.com')) return ('Gaana', const Color(0xFFE72C30));
+    if (on('wynk.in')) return ('Wynk Music', const Color(0xFFE5112E));
+    if (on('deezer.com') || on('deezer.page.link')) {
+      return ('Deezer', const Color(0xFFA238FF));
+    }
+    if (on('tidal.com')) return ('TIDAL', const Color(0xFF00FFFF));
+    if (on('music.amazon.com') || on('music.amazon.in')) {
+      return ('Amazon Music', const Color(0xFF25D1DA));
+    }
+    if (on('bandcamp.com')) return ('Bandcamp', const Color(0xFF1DA0C3));
+    return null;
+  }
+
+  Widget _musicCard(
+    BuildContext context,
+    String url,
+    (String, Color) music,
+    String? title,
+    String? desc,
+    Uri? image,
+  ) {
+    final cs = Theme.of(context).colorScheme;
+    final (app, brand) = music;
+    void open() => launchUrlString(url, mode: LaunchMode.externalApplication);
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Material(
+          color: Color.alphaBlend(
+            brand.withValues(alpha: 0.10),
+            cs.surfaceContainerHigh,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: open,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      width: 72,
+                      height: 72,
+                      child: image == null
+                          ? ColoredBox(
+                              color: brand.withValues(alpha: 0.25),
+                              child: Icon(Icons.music_note, color: brand),
+                            )
+                          : MxcImage(
+                              client: event.room.client,
+                              uri: image,
+                              width: 72,
+                              height: 72,
+                              fit: BoxFit.cover,
+                              isThumbnail: true,
+                              cacheKey: 'vibe_link_preview_$image',
+                            ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.graphic_eq, size: 14, color: brand),
+                            const SizedBox(width: 4),
+                            Text(
+                              app,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: brand,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (title != null) ...[
+                          const SizedBox(height: 3),
+                          Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                        if (desc != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            desc,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Material(
+                    color: brand,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: open,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Icon(
+                          Icons.play_arrow_rounded,
+                          color: brand.computeLuminance() > 0.5
+                              ? Colors.black
+                              : Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!AppSettings.vibeLinkPreviews.value) return const SizedBox.shrink();
@@ -81,6 +228,10 @@ class VibeLinkPreview extends StatelessWidget {
         final image = VibeLowData.on ? null : p.ogImage;
         if (title == null && desc == null && image == null) {
           return const SizedBox.shrink();
+        }
+        final music = _music(url);
+        if (music != null) {
+          return _musicCard(context, url, music, title, desc, image);
         }
         final theme = Theme.of(context);
         final cs = theme.colorScheme;

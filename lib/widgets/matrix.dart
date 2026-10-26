@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_now_playing.dart';
 import 'package:fluffychat/vibe/vibe_call.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'dart:async';
@@ -220,6 +221,7 @@ class MatrixState extends State<Matrix> {
     }
     // Vibe: ring for calls someone starts in your chats
     VibeCall.watch(c);
+    VibeNowPlaying.start(c);
     onRoomKeyRequestSub[name] ??= c.onRoomKeyRequest.stream.listen((
       RoomKeyRequest request,
     ) async {
@@ -357,6 +359,7 @@ class MatrixState extends State<Matrix> {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // locked chats ask for the fingerprint again after leaving Vibe
     if (state == AppLifecycleState.paused) VibeLock.relock();
+    if (state == AppLifecycleState.resumed) VibeNowPlaying.poke();
     final foreground =
         state != AppLifecycleState.inactive &&
         state != AppLifecycleState.paused;

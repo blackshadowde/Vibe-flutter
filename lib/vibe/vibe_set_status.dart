@@ -5,6 +5,8 @@ import 'package:fluffychat/vibe/vibe_haptics.dart';
 import 'package:fluffychat/vibe/vibe_name_style.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
+import 'package:fluffychat/vibe/vibe_now_playing.dart';
+import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
@@ -731,6 +733,31 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
                   ),
                 ),
               ),
+              if (VibeNowPlaying.supported) ...[
+                const SizedBox(height: 16),
+                Material(
+                  color: fieldColor,
+                  borderRadius: BorderRadius.circular(20),
+                  clipBehavior: Clip.antiAlias,
+                  child: SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                    secondary: const Icon(Icons.headphones_outlined),
+                    title: const Text('Show what I\'m listening to'),
+                    subtitle: const Text(
+                      'Your status shows the song playing in Spotify, YouTube Music or any player, then goes back',
+                    ),
+                    value: AppSettings.vibeNowPlaying.value,
+                    onChanged: (on) async {
+                      if (on && !await VibeNowPlaying.hasAccess()) {
+                        // Android only shares the player with notification access
+                        await VibeNowPlaying.openAccess();
+                      }
+                      await VibeNowPlaying.setEnabled(on);
+                      if (mounted) setState(() {});
+                    },
+                  ),
+                ),
+              ],
               if (_hadStatus) ...[
                 const SizedBox(height: 20),
                 Center(

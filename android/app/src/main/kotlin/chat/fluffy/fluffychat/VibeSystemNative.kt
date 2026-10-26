@@ -74,6 +74,19 @@ object VibeSystemNative {
                         }
                         result.success(null)
                     }
+                    // now playing status (Dart: VibeNowPlaying)
+                    "nowPlaying" -> result.success(VibeNowPlayingListener.current(app))
+                    "hasNotificationAccess" -> result.success(VibeNowPlayingListener.hasAccess(app))
+                    "openNotificationAccess" -> {
+                        try {
+                            app.startActivity(
+                                Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
+                        } catch (_: Throwable) {
+                        }
+                        result.success(null)
+                    }
                     "callActive" -> {
                         callActive = call.argument<Boolean>("on") ?: false
                         result.success(null)

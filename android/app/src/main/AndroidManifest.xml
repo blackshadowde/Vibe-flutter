@@ -136,6 +136,15 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".VibeNowPlayingListener"
+          android:label="Vibe now playing"
+          android:exported="true"
+          android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+          <intent-filter>
+            <action android:name="android.service.notification.NotificationListenerService"/>
+          </intent-filter>
+        </service>
+
         <service android:name=".FcmPushService"
           android:exported="false">
           <intent-filter>
