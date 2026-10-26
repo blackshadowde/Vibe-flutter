@@ -222,9 +222,21 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
         buttons.add(
           VibeButton(
             label: L10n.of(context).compareEmojiMatch,
-            onPressed: () => widget.request.continueVerification(
-              EventTypes.Sas,
-            ),
+            onPressed: () {
+              // The other device already started: just wait for its emoji
+              // (starting a second time would make the emoji differ).
+              if (widget.request.state != KeyVerificationState.askChoice ||
+                  widget.request.lastStep == EventTypes.KeyVerificationStart) {
+                return;
+              }
+              // The emoji are made from both devices' details in a fixed
+              // order: the device that starts the comparison goes first.
+              // The SDK only remembers that for the device that sent the
+              // request, so without this the two screens show different
+              // emoji. (If both start at once, the SDK resets it correctly.)
+              widget.request.startedVerification = true;
+              widget.request.continueVerification(EventTypes.Sas);
+            },
           ),
         );
         buttons.add(
