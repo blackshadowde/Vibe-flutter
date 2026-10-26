@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_strict.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 
@@ -392,6 +393,7 @@ class ChatListController extends State<ChatList>
         // Vibe automatic chat backup, when one is due.
         VibeBackup.maybeAuto(Matrix.of(context).client);
         UpdateNotifier.showUpdateDialog(context);
+        VibeStrict.maybeIntro(context);
       }
 
       // Workaround for system UI overlay style not applied on app start

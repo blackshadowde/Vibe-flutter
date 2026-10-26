@@ -106,6 +106,9 @@ enum AppSettings<T> {
   // status shows the song playing in any music app (Android)
   vibeNowPlaying<bool>('chat.vibe.now_playing', false),
   vibeNowPlayingPrev<String>('chat.vibe.now_playing_prev', ''),
+  // strict encryption: new chats start with it, intro shown once
+  vibeStrictNew<bool>('chat.vibe.strict_new', true),
+  vibeStrictIntro<bool>('chat.vibe.strict_intro', false),
   // 'direct' (own connection, like Vibgram - default), 'standard' (Firebase
   // via the Worker) or 'builtin' (ntfy, no Google)
   vibePushMode<String>('chat.vibe.push_mode', 'direct'),

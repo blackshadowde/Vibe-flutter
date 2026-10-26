@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_strict.dart';
 import 'package:matrix/matrix.dart';
 
 /// Finding (or starting) your one-to-one chat with someone.
@@ -64,7 +65,11 @@ abstract class VibeDmFinder {
       }
       return room.id;
     }
-    return client.startDirectChat(userId, enableEncryption: true);
+    return client.startDirectChat(
+      userId,
+      enableEncryption: true,
+      initialState: VibeStrict.initialState(),
+    );
   }
 
   /// Leave and forget a chat ("Delete chat"). The other person keeps their

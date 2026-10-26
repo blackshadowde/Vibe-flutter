@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:fluffychat/vibe/vibe_strict.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -69,7 +70,9 @@ class _VibeLockButtonState extends State<VibeLockButton> {
       tip = 'Encrypted · some devices aren\'t verified';
     } else {
       color = const Color(0xFF23A55A);
-      tip = 'End-to-end encrypted';
+      tip = VibeStrict.isOn(room)
+          ? 'Strict end-to-end encryption'
+          : 'End-to-end encrypted';
     }
     return Tooltip(
       message: tip,
@@ -91,11 +94,14 @@ class _VibeLockButtonState extends State<VibeLockButton> {
                     color: color.withAlpha(0x26),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    encrypted ? Icons.lock : Icons.lock_open,
-                    size: 17,
-                    color: color,
-                  ),
+                  alignment: Alignment.center,
+                  child: encrypted
+                      ? VibeLockShield(
+                          strict: VibeStrict.isOn(room),
+                          color: color,
+                          size: 18,
+                        )
+                      : Icon(Icons.lock_open, size: 17, color: color),
                 ),
               ),
             ),
