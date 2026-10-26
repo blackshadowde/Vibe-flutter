@@ -3,7 +3,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
+
 import 'package:fluffychat/vibe/vibe_dm_finder.dart';
+import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/pages/new_private_chat/qr_scanner_modal.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
@@ -40,11 +43,47 @@ class _AddContactSheet extends StatefulWidget {
 
 class _AddContactSheetState extends State<_AddContactSheet> {
   final TextEditingController _id = TextEditingController();
+  Timer? _debounce;
+  List<Profile> _found = [];
+  String _query = '';
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _id.dispose();
     super.dispose();
+  }
+
+  /// Names for what's typed: the server's user directory, plus the exact
+  /// ID's profile once it's a full Matrix ID.
+  void _lookup() {
+    _debounce?.cancel();
+    final term = _value;
+    if (term.length < 3) {
+      if (_found.isNotEmpty) setState(() => _found = []);
+      return;
+    }
+    _debounce = Timer(const Duration(milliseconds: 350), () async {
+      if (!mounted) return;
+      final client = Matrix.of(context).client;
+      _query = term;
+      final found = <Profile>[];
+      try {
+        final r = await client.searchUserDirectory(
+          term.startsWith('@') ? term.substring(1) : term,
+          limit: 6,
+        );
+        found.addAll(r.results);
+      } catch (_) {}
+      if (_valid && !found.any((p) => p.userId == term)) {
+        try {
+          final p = await client.getProfileFromUserId(term);
+          found.insert(0, p);
+        } catch (_) {}
+      }
+      if (!mounted || _query != _value) return;
+      setState(() => _found = found);
+    });
   }
 
   String get _value => _id.text.trim();
@@ -55,6 +94,7 @@ class _AddContactSheetState extends State<_AddContactSheet> {
     final text = data?.text?.trim();
     if (text == null || text.isEmpty) return;
     setState(() => _id.text = _extractId(text));
+    _lookup();
   }
 
   static String _extractId(String raw) {
@@ -74,6 +114,7 @@ class _AddContactSheetState extends State<_AddContactSheet> {
           onScan: (data) {
             if (!mounted) return;
             setState(() => _id.text = _extractId(data));
+            _lookup();
           },
         ),
       ),
@@ -112,26 +153,14 @@ class _AddContactSheetState extends State<_AddContactSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 12, 16, 12),
+              padding: const EdgeInsets.fromLTRB(4, 8, 12, 8),
               child: Row(
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: cs.primaryContainer,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      Icons.person_add_alt,
-                      color: cs.onPrimaryContainer,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,13 +170,18 @@ class _AddContactSheetState extends State<_AddContactSheet> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           'Scan QR, paste or type ID',
-                          style: TextStyle(color: cs.onSurfaceVariant),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -156,6 +190,8 @@ class _AddContactSheetState extends State<_AddContactSheet> {
                     color: cs.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(14),
                     child: IconButton(
+                      visualDensity: VisualDensity.compact,
+                      iconSize: 20,
                       icon: const Icon(Icons.content_paste),
                       tooltip: 'Paste',
                       onPressed: _paste,
@@ -166,6 +202,8 @@ class _AddContactSheetState extends State<_AddContactSheet> {
                     color: cs.primary,
                     borderRadius: BorderRadius.circular(14),
                     child: IconButton(
+                      visualDensity: VisualDensity.compact,
+                      iconSize: 20,
                       icon: Icon(Icons.qr_code_scanner, color: cs.onPrimary),
                       tooltip: 'Scan QR',
                       onPressed: _scan,
@@ -176,7 +214,7 @@ class _AddContactSheetState extends State<_AddContactSheet> {
             ),
             Divider(height: 1, color: theme.dividerColor),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 22, 20, 8),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text.rich(
@@ -206,29 +244,72 @@ class _AddContactSheetState extends State<_AddContactSheet> {
                 enableSuggestions: false,
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.go,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  setState(() {});
+                  _lookup();
+                },
                 onSubmitted: (_) => _start(),
-                style: const TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 16),
                 decoration: InputDecoration(
                   hintText: '@username:matrix.org',
                   filled: true,
                   fillColor: cs.surfaceContainerLowest,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 18,
+                    horizontal: 16,
+                    vertical: 13,
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(color: cs.primary.withAlpha(120)),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(color: cs.primary, width: 1.5),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 18),
+            if (_found.isNotEmpty)
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 220),
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                  children: [
+                    for (final p in _found)
+                      ListTile(
+                        dense: true,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        leading: Avatar(
+                          mxContent: p.avatarUrl,
+                          name: p.displayName ?? p.userId.localpart,
+                          size: 36,
+                        ),
+                        title: Text(
+                          p.displayName ?? p.userId.localpart ?? p.userId,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          p.userId,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _id.text = p.userId;
+                            _found = [];
+                          });
+                          _start();
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 14),
             Divider(
               height: 1,
               indent: 20,
@@ -236,7 +317,7 @@ class _AddContactSheetState extends State<_AddContactSheet> {
               color: theme.dividerColor,
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -256,12 +337,12 @@ class _AddContactSheetState extends State<_AddContactSheet> {
                     icon: const Icon(Icons.chat_bubble_outline),
                     label: const Text('Start Chat'),
                     style: FilledButton.styleFrom(
-                      minimumSize: const Size(170, 54),
+                      minimumSize: const Size(140, 46),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       textStyle: const TextStyle(fontFamily: 'Figtree', 
-                        fontSize: 17,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

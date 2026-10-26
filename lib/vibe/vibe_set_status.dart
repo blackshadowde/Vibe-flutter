@@ -435,9 +435,7 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
     final cs = theme.colorScheme;
     final dark = theme.brightness == Brightness.dark;
     final scheme = Theme.of(context).colorScheme;
-    final cardColor = !VibePalette.isVibe
-        ? scheme.surfaceContainer
-        : dark ? const Color(0xFF232428) : const Color(0xFFF2F3F5);
+    final pageColor = theme.scaffoldBackgroundColor;
     final fieldColor = !VibePalette.isVibe
         ? scheme.surfaceContainerHighest
         : dark ? const Color(0xFF1E1F22) : const Color(0xFFEBEDEF);
@@ -490,26 +488,12 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
               ? p!.displayName!
               : (userId.localpart ?? userId);
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+            padding: const EdgeInsets.only(bottom: 32),
             children: [
-              // Preview card
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: dark ? const Color(0xFF2E3035) : const Color(0xFFE3E5E8),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x14000000),
-                      blurRadius: 12,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                clipBehavior: Clip.antiAlias,
+              // Preview, Discord style: full-width banner, round picture
+              // overlapping it, no card around it
+              ColoredBox(
+                color: pageColor,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -526,7 +510,7 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
                               mxc: p?.avatarUrl,
                               name: name,
                               client: widget.client,
-                              ring: cardColor,
+                              ring: pageColor,
                               size: 96,
                             ),
                           ),
@@ -569,7 +553,12 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 22),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+              const SizedBox(height: 6),
               const Padding(
                 padding: EdgeInsets.only(left: 4, bottom: 8),
                 child: Text(
@@ -770,6 +759,9 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
                   ),
                 ),
               ],
+                  ],
+                ),
+              ),
             ],
           );
         },
