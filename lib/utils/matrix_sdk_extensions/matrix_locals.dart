@@ -131,6 +131,9 @@ class MatrixLocals extends MatrixLocalizations {
   String get encryptionNotEnabled => l10n.encryptionNotEnabled;
 
   @override
+  String incomingCallFrom(String senderName) => 'Incoming call from $senderName';
+
+  @override
   String endedTheCall(String senderName) {
     return l10n.endedTheCall(senderName);
   }
