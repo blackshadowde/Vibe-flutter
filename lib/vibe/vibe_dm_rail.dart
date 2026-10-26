@@ -27,6 +27,10 @@ class VibeDmRail extends StatelessWidget {
   /// Long-press your own picture: the hidden archive.
   final VoidCallback? onOwnLongPress;
 
+  /// The "+": opens the start pane (highlighted while it's open).
+  final VoidCallback? onAdd;
+  final bool addSelected;
+
   const VibeDmRail({
     required this.rooms,
     required this.selectedId,
@@ -35,6 +39,8 @@ class VibeDmRail extends StatelessWidget {
     required this.onHome,
     this.onLongPress,
     this.onOwnLongPress,
+    this.onAdd,
+    this.addSelected = false,
     super.key,
   });
 
@@ -92,15 +98,20 @@ class VibeDmRail extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Center(
                           child: Material(
-                            color: theme.colorScheme.surfaceContainerHigh,
+                            color: addSelected
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.surfaceContainerHigh,
                             shape: const CircleBorder(),
                             child: IconButton(
                               icon: Icon(
                                 Icons.add,
-                                color: theme.colorScheme.primary,
+                                color: addSelected
+                                    ? theme.colorScheme.onPrimary
+                                    : theme.colorScheme.primary,
                               ),
                               tooltip: 'New chat or group',
-                              onPressed: () => VibeGroups.showNew(context),
+                              onPressed:
+                                  onAdd ?? () => VibeGroups.showNew(context),
                             ),
                           ),
                         ),

@@ -106,6 +106,7 @@ flutter:
   assets:
     - assets/
     - assets/logo/mini/
+    - assets/start/
     - assets/sounds/
     - assets/vodozemac/
     - assets/fonts/stickers/

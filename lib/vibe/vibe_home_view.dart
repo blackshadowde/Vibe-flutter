@@ -15,6 +15,7 @@ import 'package:fluffychat/vibe/vibe_dm_detail.dart';
 import 'package:fluffychat/vibe/vibe_dm_pane.dart';
 import 'package:fluffychat/vibe/vibe_dm_rail.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
+import 'package:fluffychat/vibe/vibe_start_pane.dart';
 import 'package:fluffychat/vibe/vibe_swipe.dart';
 import 'package:fluffychat/vibe/vibe_user_bar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -33,6 +34,8 @@ class VibeHomeView extends StatefulWidget {
 }
 
 class _VibeHomeViewState extends State<VibeHomeView> {
+  /// The rail's "+" pane (Start something).
+  static const _startId = '+start';
   String? selectedId;
   String? _lastOpenedId;
 
@@ -217,6 +220,8 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                       activeRoomId: controller.activeChat,
                       onSelect: (room) => setState(() => selectedId = room.id),
                       onHome: () => setState(() => selectedId = null),
+                      onAdd: () => setState(() => selectedId = _startId),
+                      addSelected: selectedId == _startId,
                       onOwnLongPress: () => VibeArchive.open(
                         context,
                         client,
@@ -246,7 +251,11 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(24),
                         ),
-                        child: selected == null
+                        child: selectedId == _startId
+                            ? VibeStartPane(
+                                onBack: () => setState(() => selectedId = null),
+                              )
+                            : selected == null
                             ? VibeDmPane(
                                 rooms: rooms,
                                 activeRoomId: controller.activeChat,
