@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:convert';
+
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
@@ -8,9 +10,14 @@ import 'package:fluffychat/vibe/vibe_updater.dart';
 import 'package:fluffychat/vibe/vibe_welcome.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher_string.dart';
 
 Color get _blurple => VibePalette.accent;
+
+/// iPhone: updates come through AltStore / SideStore from this source.
+const _iosSource =
+    'https://raw.githubusercontent.com/blackshadowde/Vibe-flutter/Vibe/altstore.json';
 
 /// About Vibe, laid out like Vibgram's About: logo, name, tagline, version
 /// pill, update status, one blurple button and outlined buttons below.
@@ -33,8 +40,32 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
       if (!mounted) return;
       final clean = v.split(' ').first.split('+').first;
       if (clean.isNotEmpty) setState(() => _version = clean);
+      if (PlatformInfos.isIOS) _checkIos();
     }).catchError((_) {});
   }
+
+  /// The newest iPhone build listed in the AltStore / SideStore source.
+  Future<void> _checkIos() async {
+    try {
+      final res = await http.get(Uri.parse(_iosSource));
+      final json = jsonDecode(res.body) as Map<String, Object?>;
+      final apps = json['apps'] as List;
+      final versions = (apps.first as Map)['versions'] as List;
+      if (versions.isEmpty) return;
+      final latest = (versions.first as Map)['version'] as String;
+      if (!mounted) return;
+      setState(
+        () => _status = VibeUpdater.compare(latest, _version) > 0
+            ? 'Vibe $latest is available in AltStore / SideStore'
+            : "You're on the latest version",
+      );
+    } catch (_) {}
+  }
+
+  void _openStore(String scheme) => launchUrlString(
+    '$scheme://source?url=${Uri.encodeComponent(_iosSource)}',
+    mode: LaunchMode.externalApplication,
+  );
 
   Future<void> _check() async {
     if (_checking) return;
@@ -139,6 +170,19 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
               text: 'Check for updates',
               filled: true,
               onTap: _check,
+            ),
+          ],
+          if (PlatformInfos.isIOS) ...[
+            const SizedBox(height: 10),
+            _AboutButton(
+              text: 'Get updates in SideStore',
+              filled: true,
+              onTap: () => _openStore('sidestore'),
+            ),
+            const SizedBox(height: 10),
+            _AboutButton(
+              text: 'Get updates in AltStore',
+              onTap: () => _openStore('altstore'),
             ),
           ],
           const SizedBox(height: 10),

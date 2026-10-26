@@ -2,9 +2,14 @@ name: Vibe iOS (unsigned IPA)
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish for AltStore / SideStore (GitHub release + update the source)'
+        type: boolean
+        default: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   ios:
@@ -100,8 +105,15 @@ jobs:
           print("icons replaced")
           PYEOF
 
+      # Version = major.minor from pubspec.yaml + this run's number, so every
+      # build is newer than the last and AltStore / SideStore offer it.
       - name: Build (no code signing)
-        run: flutter build ios --release --no-codesign
+        run: |
+          BASE=$(grep -E '^version:' pubspec.yaml | sed -E 's/version: *//; s/\+.*//' | cut -d. -f1-2)
+          VERSION="$BASE.${{ github.run_number }}"
+          echo "VIBE_VERSION=$VERSION" >> "$GITHUB_ENV"
+          flutter build ios --release --no-codesign \
+            --build-name="$VERSION" --build-number="${{ github.run_number }}"
 
       - name: Package unsigned IPA
         run: |
@@ -109,8 +121,45 @@ jobs:
           mkdir -p Payload
           cp -R build/ios/iphoneos/Runner.app Payload/
           zip -qry Vibe-unsigned.ipa Payload
+          cp Vibe-unsigned.ipa Vibe.ipa
 
       - uses: actions/upload-artifact@v4
         with:
           name: vibe-ios-unsigned
           path: Vibe-unsigned.ipa
+
+      # A separate "ios-v..." release (never marked latest, so Android's
+      # in-app updater keeps finding the APK release).
+      - uses: softprops/action-gh-release@v2
+        if: ${{ inputs.publish }}
+        with:
+          tag_name: ios-v${{ env.VIBE_VERSION }}
+          name: Vibe ${{ env.VIBE_VERSION }} for iPhone
+          target_commitish: ${{ github.sha }}
+          make_latest: false
+          files: Vibe.ipa
+          body: |
+            Vibe ${{ env.VIBE_VERSION }} for iPhone (unsigned, for AltStore / SideStore).
+
+            Add the source once and updates show up in AltStore / SideStore:
+            https://raw.githubusercontent.com/blackshadowde/Vibe-flutter/Vibe/altstore.json
+
+      # AltStore / SideStore read this file to find updates.
+      - name: Update the AltStore / SideStore source
+        if: ${{ inputs.publish }}
+        run: |
+          set -euo pipefail
+          SIZE=$(stat -f%z Vibe.ipa)
+          git checkout -- . && git clean -fdq -e Vibe.ipa -e Vibe-unsigned.ipa
+          git pull -q --rebase origin "${GITHUB_REF_NAME}"
+          v="$VIBE_VERSION"
+          jq --arg v "$v" --arg b "${{ github.run_number }}" --arg d "$(date -u +%Y-%m-%d)" --argjson s "$SIZE" \
+            '.apps[0].versions = [{"version": $v, "buildVersion": $b, "date": $d, "size": $s,
+              "localizedDescription": ("Vibe " + $v),
+              "downloadURL": ("https://github.com/blackshadowde/Vibe-flutter/releases/download/ios-v" + $v + "/Vibe.ipa")}]
+              + [.apps[0].versions[] | select(.version != $v)][0:9]' \
+            altstore.json > altstore.tmp && mv altstore.tmp altstore.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add altstore.json
+          git commit -qm "AltStore source: Vibe $v for iPhone" && git push -q origin HEAD:"${GITHUB_REF_NAME}" || echo "source unchanged"
