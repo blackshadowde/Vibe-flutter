@@ -116,7 +116,6 @@ abstract class VibeDmFinder {
     try {
       await client.forgetRoom(id);
     } catch (_) {}
-    client.archivedRooms.removeWhere((r) => r.room.id == id);
     return problem;
   }
 
