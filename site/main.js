@@ -17,11 +17,23 @@
   const blocks = $$('.keytrack i');
   const keyColors = ['#5865F2', '#23A55A', '#EB459E'];
 
-  // tiles start their little loops when they come on screen
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-  }, { threshold: 0.35 });
-  $$('.tile').forEach((t) => io.observe(t));
+  // features: one chapter at a time while the section scrolls past
+  const chapters = $('.chapters');
+  const items = $$('.ch-list li');
+  const scenes = $$('.scene');
+  let current = 0;
+  const onChapters = () => {
+    const r = chapters.getBoundingClientRect();
+    const total = r.height - window.innerHeight;
+    const p = Math.min(Math.max(-r.top / total, 0), 0.999);
+    const i = Math.floor(p * items.length);
+    if (i === current) return;
+    current = i;
+    items.forEach((el, k) => el.classList.toggle('on', k === i));
+    scenes.forEach((el, k) => el.classList.toggle('on', k === i));
+  };
+  window.addEventListener('scroll', onChapters, { passive: true });
+  onChapters();
 
   const typed = $('.typed');
   const link = 'https://open.spotify.com/track/midnight-drive';
@@ -68,11 +80,12 @@
     .to(lines[1], { opacity: 0, y: -20, duration: 0.3 }, 1.7)
     .fromTo(lines[2], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 }, 1.9)
     .to('.ls-shackle', { strokeDashoffset: 1, y: -40, opacity: 0, duration: 0.7 }, 1.9)
-    .to('.ls-body', { attr: { d: shield }, fill: '#23A55A', duration: 0.9 }, 2.0)
+    .to('.ls-body, .ls-green', { attr: { d: shield }, duration: 0.9 }, 2.0)
+    .to('.ls-green', { opacity: 1, duration: 0.7 }, 2.15)
     .to('.ls-hole', { scale: 0, transformOrigin: '50% 50%', duration: 0.4 }, 2.0)
-    .to('.ls-shine', { opacity: 0.2, duration: 0.5 }, 2.6)
+    .to('.ls-shine', { opacity: 0.16, duration: 0.5 }, 2.6)
     .to('.ls-glow', { opacity: 1, duration: 0.6 }, 2.6)
-    .to('.lockshield', { scale: 1.08, duration: 0.6, transformOrigin: '50% 50%' }, 2.6)
+    .to('.lockshield', { scale: 1.04, duration: 0.6, transformOrigin: '50% 50%' }, 2.6)
     .to(lines[2], { opacity: 0, y: -20, duration: 0.3 }, 3.2)
     .fromTo(lines[3], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 }, 3.4)
     .to({}, { duration: 0.4 });
@@ -139,10 +152,7 @@
   });
 
   // gentle rise for big headings and blocks further down
-  $$('.features h2, .privacy h2, .facts li, .download h2, .plat, .support, .tour-head h2, .music-copy').forEach((el) => {
+  $$('.privacy h2, .facts li, .download h2, .plat, .support, .tour-head h2, .music-copy').forEach((el) => {
     gsap.from(el, { y: 50, opacity: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
-  });
-  $$('.tile').forEach((el, i) => {
-    gsap.from(el, { y: 60, opacity: 0, duration: 0.9, delay: (i % 4) * 0.06, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
   });
 })();
