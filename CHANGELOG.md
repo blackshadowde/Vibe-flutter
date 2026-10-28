@@ -38,5 +38,17 @@ Every change in this release, with the commit that made it.
 ### Removed (for now)
 - "Listening to" status (see the Play Protect fix above)
 
+### Security audit (after 3.1.111) ([970d7ed](https://github.com/blackshadowde/Vibe-flutter/commit/970d7edbd))
+- Call links are opened only when they point to a call server (`call.element.io` or your own). Before, a fake call message could open any website inside Vibe with the camera and microphone allowed
+- Link previews are off in encrypted chats (your server would see the link); a switch turns them back on
+- Firebase is no longer built into Android releases (3.1.111 and earlier included it, unused, and it contacted Google at start)
+- The app ID stays `com.vibe.app`, the ID every release has used
+- Unused permissions removed: screen capture and full-screen alerts
+- PRIVACY.md lists every server Vibe contacts and what each one sees
+
+### Reply threads
+- A message with two or more replies opens the whole thread in a pane over the blurred chat, with the chat's own bubbles and text box; swipe a message in the pane to answer that one instead
+- Releases list the APK's SHA-256 and, when the VT_API_KEY secret is set, a VirusTotal report
+
 Vibe started from FluffyChat's code. FluffyChat's own history:
 https://github.com/krille-chan/fluffychat/blob/main/CHANGELOG.md

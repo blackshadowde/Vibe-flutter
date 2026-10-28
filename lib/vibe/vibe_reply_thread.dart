@@ -2,53 +2,72 @@
 
 import 'dart:ui' as ui;
 
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:vibe/l10n/l10n.dart';
-import 'package:vibe/utils/localized_exception_extension.dart';
-import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:vibe/vibe/vibe_haptics.dart';
-import 'package:vibe/vibe/vibe_palette.dart';
-import 'package:vibe/vibe/vibe_pending_files.dart';
+import 'package:vibe/config/themes.dart';
 import 'package:vibe/utils/file_selector.dart';
-import 'package:cross_file/cross_file.dart';
+import 'package:vibe/utils/localized_exception_extension.dart';
+import 'package:vibe/vibe/screens/chat/events/message.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_pending_files.dart';
 
-/// Replying inside a conversation of replies: the messages that reply to
-/// each other float above the blurred chat in their own window, with their
-/// own text box. Send, and the window goes away; the reply lands in the chat.
+/// Reply threads: when a message already has two or more replies, replying
+/// opens the whole thread in a pane over the blurred chat. It looks like the
+/// chat itself (same bubbles, names, avatars and text box); send, and the
+/// pane goes away and the reply lands in the chat.
 abstract class VibeReplyThread {
   static String? _parentId(Event e) =>
       e.inReplyToEventId(includingFallback: false);
 
-  /// True when [event] is part of a reply chain: it answers a message, or a
-  /// message (already loaded) answers it.
-  static bool isChained(Event event, Timeline timeline) =>
-      _parentId(event) != null ||
-      timeline.events.any((e) => _parentId(e) == event.eventId);
-
-  /// The whole conversation [event] belongs to, oldest first.
-  static Future<List<Event>> _chain(Event event, Timeline timeline) async {
+  /// The ids of the reply conversation [event] belongs to, from what's
+  /// loaded: everything it replies to, and everything replying to those.
+  static Set<String> _ids(Event event, Timeline timeline) {
+    final byId = {for (final e in timeline.events) e.eventId: e};
     final ids = <String>{event.eventId};
-    final chain = <Event>[event];
-    // up: what it replies to, and what that replies to...
     var cur = event;
-    for (var i = 0; i < 30; i++) {
-      final parent = await cur.getReplyEvent(timeline);
-      if (parent == null || !ids.add(parent.eventId)) break;
-      chain.add(parent);
+    for (var i = 0; i < 50; i++) {
+      final p = _parentId(cur);
+      if (p == null || !ids.add(p)) break;
+      final parent = byId[p];
+      if (parent == null) break;
       cur = parent;
     }
-    // down: loaded messages replying to anything in the conversation
     var added = true;
     while (added) {
       added = false;
       for (final e in timeline.events) {
         final p = _parentId(e);
-        if (p != null && ids.contains(p) && ids.add(e.eventId)) {
-          chain.add(e);
-          added = true;
-        }
+        if (p != null && ids.contains(p) && ids.add(e.eventId)) added = true;
       }
+    }
+    return ids;
+  }
+
+  /// A thread: the message and at least two replies around it.
+  static bool isThread(Event event, Timeline timeline) =>
+      _ids(event, timeline).length >= 3;
+
+  /// The whole thread, oldest first (parents not loaded yet are fetched).
+  static Future<List<Event>> _chain(Event event, Timeline timeline) async {
+    final ids = _ids(event, timeline);
+    final byId = {for (final e in timeline.events) e.eventId: e};
+    final chain = <Event>[
+      for (final id in ids)
+        if (byId[id] != null) byId[id]!,
+    ];
+    // the oldest message may be further back than what's loaded
+    var top = chain.isEmpty ? event : chain.first;
+    for (final e in chain) {
+      if (e.originServerTs.isBefore(top.originServerTs)) top = e;
+    }
+    for (var i = 0; i < 10; i++) {
+      final parent = await top.getReplyEvent(timeline);
+      if (parent == null || chain.any((e) => e.eventId == parent.eventId)) {
+        break;
+      }
+      chain.add(parent);
+      top = parent;
     }
     chain.removeWhere((e) => e.redacted);
     chain.sort((a, b) => a.originServerTs.compareTo(b.originServerTs));
@@ -60,6 +79,9 @@ abstract class VibeReplyThread {
     required Room room,
     required Timeline timeline,
     required Event replyTo,
+    required Set<String> bigEmojis,
+    required void Function(String eventId) scrollToEventId,
+    required void Function(Event event) showInfo,
     String? threadRootEventId,
     String? threadLastEventId,
   }) async {
@@ -70,12 +92,16 @@ abstract class VibeReplyThread {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Close',
-      barrierColor: Colors.black.withValues(alpha: 0.25),
-      transitionDuration: const Duration(milliseconds: 260),
-      pageBuilder: (ctx, _, _) => _ReplyWindow(
+      barrierColor: Colors.black.withValues(alpha: 0.3),
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (ctx, _, _) => _ThreadPane(
         room: room,
+        timeline: timeline,
         chain: chain,
         replyTo: replyTo,
+        bigEmojis: bigEmojis,
+        scrollToEventId: scrollToEventId,
+        showInfo: showInfo,
         threadRootEventId: threadRootEventId,
         threadLastEventId: threadLastEventId,
       ),
@@ -83,13 +109,16 @@ abstract class VibeReplyThread {
         final t = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
         return BackdropFilter(
           filter: ui.ImageFilter.blur(
-            sigmaX: 14 * anim.value,
-            sigmaY: 14 * anim.value,
+            sigmaX: 16 * anim.value,
+            sigmaY: 16 * anim.value,
           ),
           child: FadeTransition(
             opacity: t,
-            child: ScaleTransition(
-              scale: Tween(begin: 0.94, end: 1.0).animate(t),
+            child: SlideTransition(
+              position: Tween(
+                begin: const Offset(0, 0.06),
+                end: Offset.zero,
+              ).animate(t),
               child: child,
             ),
           ),
@@ -99,39 +128,43 @@ abstract class VibeReplyThread {
   }
 }
 
-class _ReplyWindow extends StatefulWidget {
+class _ThreadPane extends StatefulWidget {
   final Room room;
+  final Timeline timeline;
   final List<Event> chain;
   final Event replyTo;
+  final Set<String> bigEmojis;
+  final void Function(String eventId) scrollToEventId;
+  final void Function(Event event) showInfo;
   final String? threadRootEventId;
   final String? threadLastEventId;
-  const _ReplyWindow({
+  const _ThreadPane({
     required this.room,
+    required this.timeline,
     required this.chain,
     required this.replyTo,
+    required this.bigEmojis,
+    required this.scrollToEventId,
+    required this.showInfo,
     this.threadRootEventId,
     this.threadLastEventId,
   });
 
   @override
-  State<_ReplyWindow> createState() => _ReplyWindowState();
+  State<_ThreadPane> createState() => _ThreadPaneState();
 }
 
-class _ReplyWindowState extends State<_ReplyWindow> {
+class _ThreadPaneState extends State<_ThreadPane> {
   final _text = TextEditingController();
-  final List<XFile> _files = [];
   final _scroll = ScrollController();
+  final List<XFile> _files = [];
+  late Event _target = widget.replyTo;
   bool _sending = false;
 
   @override
   void initState() {
     super.initState();
-    // start at the newest message
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scroll.hasClients) {
-        _scroll.jumpTo(_scroll.position.maxScrollExtent);
-      }
-    });
+    _text.addListener(() => setState(() {}));
   }
 
   @override
@@ -153,30 +186,26 @@ class _ReplyWindowState extends State<_ReplyWindow> {
     setState(() => _sending = true);
     final messenger = ScaffoldMessenger.of(context);
     if (_files.isNotEmpty) {
-      // photos, videos and files go out as replies too; the chat keeps
-      // uploading them after this window closes
+      // the chat keeps uploading after this pane closes
       VibePendingFiles.send(
         Navigator.of(context, rootNavigator: true).context,
         widget.room,
         List.of(_files),
-        inReplyTo: widget.replyTo,
+        inReplyTo: _target,
         threadRootEventId: widget.threadRootEventId,
         threadLastEventId: widget.threadLastEventId,
       );
       _files.clear();
-      if (text.isEmpty) {
-        VibeHaptics.light();
-        Navigator.of(context).pop();
-        return;
-      }
     }
     try {
-      await widget.room.sendTextEvent(
-        text,
-        inReplyTo: widget.replyTo,
-        threadRootEventId: widget.threadRootEventId,
-        threadLastEventId: widget.threadLastEventId,
-      );
+      if (text.isNotEmpty) {
+        await widget.room.sendTextEvent(
+          text,
+          inReplyTo: _target,
+          threadRootEventId: widget.threadRootEventId,
+          threadLastEventId: widget.threadLastEventId,
+        );
+      }
       VibeHaptics.light();
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -185,7 +214,6 @@ class _ReplyWindowState extends State<_ReplyWindow> {
       messenger.showSnackBar(
         SnackBar(content: Text(e.toLocalizedString(context))),
       );
-      Logs().w('Reply from the reply window failed', e);
     }
   }
 
@@ -193,190 +221,216 @@ class _ReplyWindowState extends State<_ReplyWindow> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final me = widget.room.client.userID;
-    final i18n = MatrixLocals(L10n.of(context));
-    return Material(
-      type: MaterialType.transparency,
-      child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.viewInsetsOf(context).bottom,
-          ),
+    final colors = [theme.secondaryBubbleColor, theme.bubbleColor];
+    final chain = widget.chain;
+    // the chat list runs newest first; so does this one
+    final events = chain.reversed.toList();
+    final canSend = _text.text.trim().isNotEmpty || _files.isNotEmpty;
+    final targetName = _target.senderFromMemoryOrFallback.calcDisplayname();
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          8,
+          24,
+          8,
+          8 + MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: Material(
+          color: cs.surface,
+          clipBehavior: Clip.antiAlias,
+          borderRadius: BorderRadius.circular(24),
+          elevation: 12,
           child: Column(
             children: [
+              // header, like the chat's app bar
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 8, 4),
+                padding: const EdgeInsets.fromLTRB(16, 10, 6, 6),
                 child: Row(
                   children: [
+                    Icon(Icons.forum_outlined, color: cs.onSurfaceVariant),
+                    const SizedBox(width: 10),
                     Expanded(
-                      child: Text(
-                        '${widget.chain.length} messages',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              blurRadius: 8,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Thread',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
                             ),
-                          ],
-                        ),
+                          ),
+                          Text(
+                            '${chain.length} messages · '
+                            '${widget.room.getLocalizedDisplayname()}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(
                       tooltip: 'Close',
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.black.withValues(alpha: 0.35),
-                      ),
-                      color: Colors.white,
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
                 ),
               ),
+              Divider(height: 1, color: theme.dividerColor),
               Expanded(
                 child: ListView.builder(
                   controller: _scroll,
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                  itemCount: widget.chain.length,
+                  reverse: true,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: events.length,
                   itemBuilder: (context, i) {
-                    final e = widget.chain[i];
-                    final mine = e.senderId == me;
-                    final focus = e.eventId == widget.replyTo.eventId;
-                    final body = e.calcLocalizedBodyFallback(
-                      i18n,
-                      hideReply: true,
-                      plaintextBody: true,
-                      removeMarkdown: true,
-                    );
-                    final showName =
-                        !mine &&
-                        (i == 0 || widget.chain[i - 1].senderId != e.senderId);
-                    return Align(
-                      alignment: mine
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width * 0.78,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: mine
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            if (showName)
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  12,
-                                  6,
-                                  12,
-                                  2,
-                                ),
-                                child: Text(
-                                  e.senderFromMemoryOrFallback
-                                      .calcDisplayname(i18n: i18n),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                              ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 3),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 9,
-                              ),
-                              decoration: BoxDecoration(
-                                color: mine
-                                    ? VibePalette.accent
-                                    : cs.surfaceContainerHigh,
-                                borderRadius: BorderRadius.circular(20),
-                                border: focus
-                                    ? Border.all(color: Colors.white, width: 2)
-                                    : null,
-                              ),
-                              child: Text(
-                                body,
-                                style: TextStyle(
-                                  fontSize: 15.5,
-                                  color: mine ? Colors.white : cs.onSurface,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    final e = events[i];
+                    return Message(
+                      e,
+                      nextEvent: i + 1 < events.length ? events[i + 1] : null,
+                      previousEvent: i > 0 ? events[i - 1] : null,
+                      bigEmojis: widget.bigEmojis,
+                      timeline: widget.timeline,
+                      colors: colors,
+                      scrollController: _scroll,
+                      highlightMarker: e.eventId == _target.eventId,
+                      // swipe a message here to answer that one instead
+                      onSwipe: () => setState(() => _target = e),
+                      onSelect: (e) => setState(() => _target = e),
+                      onInfoTab: widget.showInfo,
+                      onMention: () {},
+                      onEdit: () {},
+                      scrollToEventId: (id) {
+                        Navigator.of(context).pop();
+                        widget.scrollToEventId(id);
+                      },
+                      singleSelected: false,
+                      enterThread: null,
                     );
                   },
                 ),
               ),
-              if (_files.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: VibePendingFilesStrip(
-                    files: _files,
-                    onRemove: (f) => setState(() => _files.remove(f)),
-                  ),
-                ),
+              // "Replying to …", like the chat's reply bar
               Padding(
-                padding: const EdgeInsets.fromLTRB(4, 4, 12, 10),
+                padding: const EdgeInsets.fromLTRB(18, 6, 12, 0),
                 child: Row(
                   children: [
-                    IconButton(
-                      tooltip: 'Add photo, video or file',
-                      style: IconButton.styleFrom(
-                        backgroundColor: cs.surfaceContainer,
-                      ),
-                      onPressed: _sending ? null : _attach,
-                      icon: const Icon(Icons.add),
-                    ),
-                    const SizedBox(width: 4),
+                    Icon(Icons.reply, size: 16, color: cs.onSurfaceVariant),
+                    const SizedBox(width: 6),
                     Expanded(
-                      child: TextField(
-                        controller: _text,
-                        autofocus: true,
-                        minLines: 1,
-                        maxLines: 5,
-                        textCapitalization: TextCapitalization.sentences,
-                        onSubmitted: (_) => _send(),
-                        decoration: InputDecoration(
-                          hintText: 'Reply',
-                          filled: true,
-                          fillColor: cs.surfaceContainer,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
-                          ),
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'Replying to ',
+                          style: TextStyle(color: cs.onSurfaceVariant),
+                          children: [
+                            TextSpan(
+                              text: targetName,
+                              style: TextStyle(
+                                color: cs.onSurface,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // the chat's text box: + · pill · send
+              Padding(
+                padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(6, 6, 0, 3),
+                        padding: const EdgeInsets.fromLTRB(6, 4, 2, 4),
+                        decoration: BoxDecoration(
+                          color: cs.surfaceContainer,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            VibePendingFilesStrip(
+                              files: _files,
+                              onRemove: (f) =>
+                                  setState(() => _files.remove(f)),
+                            ),
+                            Row(
+                              children: [
+                                Material(
+                                  color: cs.surfaceContainerHighest,
+                                  shape: const CircleBorder(),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: SizedBox(
+                                    width: 44,
+                                    height: 44,
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      tooltip: 'Add photo, video or file',
+                                      icon: const Icon(Icons.add, size: 26),
+                                      onPressed: _sending ? null : _attach,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _text,
+                                    autofocus: true,
+                                    minLines: 1,
+                                    maxLines: 6,
+                                    textCapitalization:
+                                        TextCapitalization.sentences,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Reply in thread',
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    IconButton.filled(
-                      style: IconButton.styleFrom(
-                        backgroundColor: VibePalette.accent,
-                        foregroundColor: Colors.white,
-                        fixedSize: const Size(48, 48),
+                    Container(
+                      height: 56,
+                      width: 56,
+                      margin: const EdgeInsets.only(top: 6, bottom: 3),
+                      alignment: Alignment.center,
+                      child: IconButton(
+                        onPressed: canSend && !_sending ? _send : null,
+                        style: IconButton.styleFrom(
+                          backgroundColor: const Color(0xFFDCE4FF),
+                          foregroundColor: const Color(0xFF226DFD),
+                          fixedSize: const Size(56, 56),
+                        ),
+                        icon: _sending
+                            ? const SizedBox.square(
+                                dimension: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.send_rounded, size: 24),
                       ),
-                      onPressed: _sending ? null : _send,
-                      icon: _sending
-                          ? const SizedBox.square(
-                              dimension: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.arrow_upward_rounded),
                     ),
+                    const SizedBox(width: 6),
                   ],
                 ),
               ),

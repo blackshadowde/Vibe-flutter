@@ -1295,14 +1295,17 @@ class ChatController extends State<ChatPageWithRoom>
   void replyAction({Event? replyTo}) {
     final target = replyTo ?? selectedEvents.first;
     final tl = timeline;
-    // Replying inside a conversation of replies opens it in its own window
-    if (tl != null && editEvent == null && VibeReplyThread.isChained(target, tl)) {
+    // A message with two or more replies: the whole thread opens in a pane
+    if (tl != null && editEvent == null && VibeReplyThread.isThread(target, tl)) {
       setState(selectedEvents.clear);
       VibeReplyThread.show(
         context,
         room: room,
         timeline: tl,
         replyTo: target,
+        bigEmojis: bigEmojis,
+        scrollToEventId: scrollToEventId,
+        showInfo: (e) => showEventInfo(e),
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       );

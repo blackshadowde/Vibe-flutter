@@ -185,6 +185,8 @@ jobs:
             echo "**Updating:** install the new APK over the old one; your chats stay."
             echo
             echo "Free and open source (AGPL-3.0), based on FluffyChat."
+            echo
+            echo "**SHA-256:** \`$(sha256sum "Vibe-${VIBE_VERSION}.apk" | cut -d' ' -f1)\`"
           } > release-body.md
           cat release-body.md
 
@@ -197,6 +199,47 @@ jobs:
           make_latest: true
           files: Vibe-${{ env.VIBE_VERSION }}.apk
           body_path: release-body.md
+
+      # Independent malware check: the APK goes to VirusTotal and the report
+      # link is added to the release notes. Needs the VT_API_KEY secret (a
+      # free VirusTotal account's API key); skipped without it.
+      - name: VirusTotal scan
+        if: ${{ inputs.publish }}
+        continue-on-error: true
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -z "${VT_API_KEY:-}" ]; then
+            echo "::notice::VT_API_KEY secret not set - no VirusTotal scan"
+            exit 0
+          fi
+          APK="Vibe-${VIBE_VERSION}.apk"
+          SHA=$(sha256sum "$APK" | cut -d' ' -f1)
+          # files over 32 MB need their own upload address
+          URL=$(curl -sf -H "x-apikey: $VT_API_KEY" https://www.virustotal.com/api/v3/files/upload_url | jq -r .data)
+          curl -sf -H "x-apikey: $VT_API_KEY" -F "file=@$APK" "$URL" > /dev/null
+          REPORT="https://www.virustotal.com/gui/file/$SHA"
+          # wait for the scan (up to 15 minutes) to put the result in the notes
+          RESULT="scan running, open the report for the result"
+          for i in $(seq 1 30); do
+            sleep 30
+            J=$(curl -sf -H "x-apikey: $VT_API_KEY" "https://www.virustotal.com/api/v3/files/$SHA" || true)
+            [ -z "$J" ] && continue
+            DONE=$(echo "$J" | jq '[.data.attributes.last_analysis_results[]] | length')
+            [ "$DONE" -lt 40 ] && continue
+            BAD=$(echo "$J" | jq '.data.attributes.last_analysis_stats.malicious + .data.attributes.last_analysis_stats.suspicious')
+            RESULT="$BAD / $DONE engines flagged it"
+            break
+          done
+          echo "VirusTotal: $RESULT - $REPORT"
+          gh release view "v${VIBE_VERSION}" -R "$GITHUB_REPOSITORY" --json body -q .body > notes.md
+          {
+            echo
+            echo "**VirusTotal:** $RESULT ([report]($REPORT))"
+          } >> notes.md
+          gh release edit "v${VIBE_VERSION}" -R "$GITHUB_REPOSITORY" --notes-file notes.md
 
   # One release for everyone: once Android is built, start the iPhone build
   # with the same version number (published the same way) and, when
