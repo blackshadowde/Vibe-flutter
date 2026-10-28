@@ -30,8 +30,8 @@ class VibeNotificationsPage extends StatefulWidget {
   const VibeNotificationsPage({super.key});
 
   @override
-  VibeNotificationsPageController createState() =>
-      VibeNotificationsPageController();
+  _VibeNotificationsPageState createState() =>
+      _VibeNotificationsPageState();
 }
 
 class _VibeNotificationsPageState extends State<VibeNotificationsPage> {
@@ -189,16 +189,6 @@ class _VibeNotificationsPageState extends State<VibeNotificationsPage> {
     }
   }
 
-}
-
-enum PushRuleDialogAction { delete }
-
-String prettyJson(Map<String, Object?> json) {
-  const decoder = JsonDecoder();
-  const encoder = JsonEncoder.withIndent('    ');
-  final object = decoder.convert(jsonEncode(json));
-  return encoder.convert(object);
-
   @override
   Widget build(BuildContext context) {
     final pushRules = Matrix.of(context).client.globalPushRules;
@@ -352,4 +342,13 @@ String prettyJson(Map<String, Object?> json) {
       ),
     );
   }
+}
+
+enum PushRuleDialogAction { delete }
+
+String prettyJson(Map<String, Object?> json) {
+  const decoder = JsonDecoder();
+  const encoder = JsonEncoder.withIndent('    ');
+  final object = decoder.convert(jsonEncode(json));
+  return encoder.convert(object);
 }

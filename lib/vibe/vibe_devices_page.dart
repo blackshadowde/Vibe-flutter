@@ -20,7 +20,7 @@ class VibeDevicesPage extends StatefulWidget {
   const VibeDevicesPage({super.key});
 
   @override
-  VibeDevicesPageController createState() => VibeDevicesPageController();
+  _VibeDevicesPageState createState() => _VibeDevicesPageState();
 }
 
 class _VibeDevicesPageState extends State<VibeDevicesPage> {

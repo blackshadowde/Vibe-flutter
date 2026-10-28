@@ -24,7 +24,7 @@ class VibeSecurityPage extends StatefulWidget {
   const VibeSecurityPage({super.key});
 
   @override
-  VibeSecurityPageController createState() => VibeSecurityPageController();
+  _VibeSecurityPageState createState() => _VibeSecurityPageState();
 }
 
 class _VibeSecurityPageState extends State<VibeSecurityPage> {
@@ -379,6 +379,7 @@ class _VibeSecurityPageState extends State<VibeSecurityPage> {
     );
   }
 }
+
 
 extension on ShareKeysWith {
   String localized(L10n l10n) {

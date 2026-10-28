@@ -22,7 +22,7 @@ class VibeStylePage extends StatefulWidget {
   const VibeStylePage({super.key});
 
   @override
-  VibeStylePageController createState() => VibeStylePageController();
+  _VibeStylePageState createState() => _VibeStylePageState();
 }
 
 class _VibeStylePageState extends State<VibeStylePage> {

@@ -18,7 +18,7 @@ class VibeHomeserverPage extends StatefulWidget {
   const VibeHomeserverPage({super.key});
 
   @override
-  VibeHomeserverPageController createState() => VibeHomeserverPageController();
+  _VibeHomeserverPageState createState() => _VibeHomeserverPageState();
 }
 
 class _VibeHomeserverPageState extends State<VibeHomeserverPage> {
@@ -315,6 +315,7 @@ class _VibeHomeserverPageState extends State<VibeHomeserverPage> {
     );
   }
 }
+
 
 extension on Role {
   String localizedString(L10n l10n) {
