@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:vibe/config/setting_keys.dart';
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
@@ -236,6 +237,14 @@ class _VibeSecurityPageState extends State<VibeSecurityPage> {
                         'links are shared in your chats.',
                     setting: AppSettings.vibeLinkPreviews,
                   ),
+                  if (kIsWeb)
+                    SettingsSwitchListTile.adaptive(
+                      title: 'Log out when the browser closes',
+                      subtitle:
+                          'For shared computers: closing the browser signs '
+                          'you out and removes your chats from it.',
+                      setting: AppSettings.vibeWebSessionOnly,
+                    ),
                   const VibePrivacyTiles(),
                   ListTile(
                     trailing: const Icon(Icons.chevron_right_outlined),

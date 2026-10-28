@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_web_session.dart';
 import 'dart:isolate';
 import 'dart:ui';
 
@@ -118,6 +119,7 @@ void main(List<String> args) async {
   }
 
   final clients = await ClientManager.getClients(store: store);
+  await VibeWebSession.check(clients);
 
   // Started in foreground mode.
   Logs().i(

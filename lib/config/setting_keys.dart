@@ -141,6 +141,8 @@ enum AppSettings<T> {
   vibeMemoryCacheMb<int>('chat.vibe.memory_cache_mb', 256),
   // Group tag shown next to my name in groups (room id, '' = none)
   vibeGroupTag<String>('chat.vibe.group_tag', ''),
+  // Web: sign out when the browser closes (shared computers)
+  vibeWebSessionOnly<bool>('chat.vibe.web_session_only', false),
   doubleTapToReact<bool>('chat.vibe.double_tap_to_react', false),
   doubleTapReaction<String>('chat.vibe.double_tap_reaction', '❤️'),
   benchmarksInLogs<bool>('chat.vibe.benchmarks_in_logs', false);
