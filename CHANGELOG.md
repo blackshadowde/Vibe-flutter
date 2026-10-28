@@ -3,5 +3,40 @@
 Vibe's changes are listed on each release:
 https://github.com/blackshadowde/Vibe-flutter/releases
 
+## 2026-10-28
+
+Every change in this release, with the commit that made it.
+
+### Fixed
+- Play Protect blocked installing Vibe. Google blocks any downloaded app that declares a notification listener; Vibe used one only for "Listening to". The listener is removed and the feature is off for now ([4519d56](https://github.com/blackshadowde/Vibe-flutter/commit/4519d56e3))
+- Android back gesture closed the app instead of the open pane: Android's predictive back is turned off for Vibe ([e3ecdb9](https://github.com/blackshadowde/Vibe-flutter/commit/e3ecdb976))
+- Dropped files: the send popup didn't send. They now wait above the text box, upload while Vibe is kept running, retry once, and show the real error if they fail ([e3ecdb9](https://github.com/blackshadowde/Vibe-flutter/commit/e3ecdb976), [9f1bd4c](https://github.com/blackshadowde/Vibe-flutter/commit/9f1bd4c43))
+- Device verification: the device list looked tappable but wasn't. The text now says to accept the request on another device, with a Send again button ([e3ecdb9](https://github.com/blackshadowde/Vibe-flutter/commit/e3ecdb976))
+- iPhone notification extension used FluffyChat's app group and ID, so it couldn't read Vibe's data ([2c779e9](https://github.com/blackshadowde/Vibe-flutter/commit/2c779e9e3))
+
+### Security (fixes taken from FluffyChat after checking its 768 newer commits) ([625b562](https://github.com/blackshadowde/Vibe-flutter/commit/625b56236))
+- Pictures load only from `mxc://` (your Matrix server) and only when signed in, so a message can't make Vibe fetch an outside address
+- The recovery key's copy button copies; it no longer opens the share sheet on phones
+- Resetting your encryption key really resets it, and moves your old message keys into the new backup
+- Notifications arriving while signed out are ignored
+- iPhone notifications close the database when done, so it can't stay locked
+
+### Added
+- Reply window for conversations of replies, with photo, video and file replies ([9f1bd4c](https://github.com/blackshadowde/Vibe-flutter/commit/9f1bd4c43), [2694875](https://github.com/blackshadowde/Vibe-flutter/commit/269487539))
+- Block and unblock from someone's profile ([e3ecdb9](https://github.com/blackshadowde/Vibe-flutter/commit/e3ecdb976))
+- Password and email link to the server's account page when it has one ([e3ecdb9](https://github.com/blackshadowde/Vibe-flutter/commit/e3ecdb976))
+- Member search; permissions as Everyone / Moderators / Admins; admins can delete groups and communities (everyone removed, joining closed, then left and forgotten) ([c8bc320](https://github.com/blackshadowde/Vibe-flutter/commit/c8bc320b5))
+- Share link and QR code for your ID (`get-vibe.github.io/chat.html#@you:server`); mentions shown as pills while typing; role tags and a pickable group tag in groups. The group tag is stored in your own member event in each group (`chat.vibe.tag`), and that update is hidden from the chat ([818c7f0](https://github.com/blackshadowde/Vibe-flutter/commit/818c7f0e4))
+- Web: larger layout in wide windows, Vibe name and colours ([2694875](https://github.com/blackshadowde/Vibe-flutter/commit/269487539)); optional "Log out when the browser closes" ([4bf8158](https://github.com/blackshadowde/Vibe-flutter/commit/4bf8158ec))
+- Help page and Vibe's own homeserver list on get-vibe.github.io ([2c779e9](https://github.com/blackshadowde/Vibe-flutter/commit/2c779e9e3))
+
+### Changed
+- Settings are saved under `chat.vibe.*` instead of `chat.fluffy.*`; old settings are carried over on first start ([2c779e9](https://github.com/blackshadowde/Vibe-flutter/commit/2c779e9e3))
+- All screens moved from `lib/pages` to `lib/vibe/screens`, and 8 screens merged into one file each. Code layout only, no visible change ([3950286](https://github.com/blackshadowde/Vibe-flutter/commit/3950286d1), [0f838ca](https://github.com/blackshadowde/Vibe-flutter/commit/0f838ca20))
+- Releasing: one run builds Android and starts the iPhone build with the same version number, and updates the web app when publishing ([636ab77](https://github.com/blackshadowde/Vibe-flutter/commit/636ab77fc))
+
+### Removed (for now)
+- "Listening to" status (see the Play Protect fix above)
+
 Vibe started from FluffyChat's code. FluffyChat's own history:
 https://github.com/krille-chan/fluffychat/blob/main/CHANGELOG.md
