@@ -23,6 +23,8 @@ setting keys and the `fluffychat_push` notification channel.
 
 Each FluffyChat screen is rewritten in `lib/vibe/`, then the old file is deleted.
 
+- [x] Unused FluffyChat screens removed (old chat list parts, space view, archive list, new-space and add-account pages)
+
 - [ ] Chat screen parts (input bar, event list, message types)
 - [ ] Settings pages
 - [ ] Login and sign-up
