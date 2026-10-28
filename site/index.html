@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/icon.png">
 <link rel="preload" href="assets/figtree.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -30,6 +30,7 @@
     <span>Vibe</span>
   </a>
   <nav aria-label="Sections">
+    <a href="#verified">Scan</a>
     <a href="#strict">Privacy</a>
     <a href="#tour">Tour</a>
     <a href="#features">Features</a>
@@ -52,12 +53,40 @@
       <a class="btn primary" href="#download">Get Vibe</a>
       <a class="btn ghost" href="https://github.com/blackshadowde/Vibe-flutter">View on GitHub</a>
     </div>
+    <a class="trust reveal" href="#verified">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+      <span><b class="vt-ratio">0 / 68</b> antivirus engines flagged Vibe</span>
+      <span class="trust-go">See the scan</span>
+    </a>
   </div>
   <div class="fan" aria-hidden="true">
     <div class="phone side left"><img src="assets/chat.webp" alt="" width="390" height="844"></div>
     <div class="phone side right"><img src="assets/start.webp" alt="" width="390" height="844"></div>
     <div class="phone main"><img src="assets/home.webp" alt="" width="390" height="844"></div>
   </div>
+</section>
+
+<!-- 1b. Scanned in public -->
+<section class="verified" id="verified">
+  <p class="eyebrow">Scanned in public</p>
+  <div class="vt-big"><span class="vt-ratio">0 / 68</span></div>
+  <h2>Zero detections.<br><span class="muted">Every release. Checked by anyone.</span></h2>
+  <p class="lede">Every Vibe APK is uploaded to VirusTotal automatically the moment it's released, and about 70 antivirus engines check it. The result goes straight into the release notes, good or bad. Nothing is hidden.</p>
+  <div class="vt-card">
+    <div class="vt-row"><span class="vt-label">Release</span><b class="vt-version">Vibe 3.1.111</b></div>
+    <div class="vt-row"><span class="vt-label">Result</span><b class="vt-result green">0 of 68 engines flagged it</b></div>
+    <div class="vt-row vt-hash"><span class="vt-label">SHA-256</span><code class="vt-sha">0c9d15513cc828f81b7ebf7d39c42027bb221f5e602927406ac034aef17ef9b8</code></div>
+    <div class="vt-actions">
+      <a class="btn primary vt-report" href="https://www.virustotal.com/gui/file/0c9d15513cc828f81b7ebf7d39c42027bb221f5e602927406ac034aef17ef9b8">Open the VirusTotal report</a>
+      <a class="btn ghost small vt-notes" href="https://github.com/blackshadowde/Vibe-flutter/releases/latest">Release notes</a>
+    </div>
+  </div>
+  <ol class="vt-steps">
+    <li><b>Built in public</b>GitHub builds each APK from the open source code. The build log is public.</li>
+    <li><b>Scanned automatically</b>The release uploads the APK to VirusTotal and writes the result into its notes.</li>
+    <li><b>Same file, provably</b>The SHA-256 above is the fingerprint of the APK you download. VirusTotal shows the fingerprint of the file it scanned: they match.</li>
+    <li><b>Nothing extra inside</b>No notification access, no Firebase, no analytics. Every server Vibe talks to is in the <a href="https://github.com/blackshadowde/Vibe-flutter/blob/Vibe/PRIVACY.md">privacy policy</a>, every change in the <a href="https://github.com/blackshadowde/Vibe-flutter/blob/Vibe/CHANGELOG.md">changelog</a>.</li>
+  </ol>
 </section>
 
 <!-- 2. Strict encryption, scrubbed by scroll -->
@@ -237,17 +266,6 @@
   </ul>
 </section>
 
-<!-- 7b. How every release is checked -->
-<section class="privacy" id="verified">
-  <h2>Checked before you install.<br><span class="muted">Every release, automatically.</span></h2>
-  <ul class="facts">
-    <li><b>Built in public.</b> Every APK is built from the public source code by GitHub, not on someone's laptop. The build log is public too.</li>
-    <li><b>Scanned by about 70 antivirus engines.</b> Each new APK is uploaded to <a href="https://www.virustotal.com">VirusTotal</a> automatically, and the result with a link to the full report is added to the release notes.</li>
-    <li><b>Same file, provably.</b> The release notes list the APK's SHA-256 fingerprint. VirusTotal shows the fingerprint of the file it scanned; when they match, it's the file you download.</li>
-    <li><b>Only what's needed.</b> No Firebase, no analytics, no notification access. Every server Vibe talks to is listed in the <a href="https://github.com/blackshadowde/Vibe-flutter/blob/Vibe/PRIVACY.md">privacy policy</a>, and every change in the <a href="https://github.com/blackshadowde/Vibe-flutter/blob/Vibe/CHANGELOG.md">changelog</a>.</li>
-  </ul>
-</section>
-
 <!-- 8. Download -->
 <section class="download" id="download">
   <h2>Get Vibe.</h2>
@@ -293,6 +311,26 @@
 
 <script src="vendor/gsap.min.js" defer></script>
 <script src="vendor/ScrollTrigger.min.js" defer></script>
-<script src="main.js?v=5" defer></script>
+<script src="main.js?v=6" defer></script>
+<script>
+// The newest release's own VirusTotal line, when it has one.
+fetch('https://api.github.com/repos/blackshadowde/Vibe-flutter/releases/latest')
+  .then(function (r) { return r.ok ? r.json() : null; })
+  .then(function (rel) {
+    if (!rel || !rel.body) return;
+    var vt = rel.body.match(/VirusTotal:\*\*\s*(\d+)\s*\/\s*(\d+)[^(]*\(\[report\]\((https:\/\/www\.virustotal\.com\/gui\/file\/([0-9a-f]{64}))\)/i);
+    if (!vt) return;
+    var bad = +vt[1], all = +vt[2];
+    document.querySelectorAll('.vt-ratio').forEach(function (e) { e.textContent = bad + ' / ' + all; });
+    document.querySelector('.vt-version').textContent = (rel.name || rel.tag_name);
+    var res = document.querySelector('.vt-result');
+    res.textContent = bad + ' of ' + all + ' engines flagged it';
+    res.classList.toggle('green', bad === 0);
+    document.querySelector('.vt-sha').textContent = vt[4];
+    document.querySelector('.vt-report').href = vt[3];
+    document.querySelector('.vt-notes').href = rel.html_url;
+  })
+  .catch(function () {});
+</script>
 </body>
 </html>
