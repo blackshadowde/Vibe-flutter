@@ -95,7 +95,7 @@ abstract class VibeLock {
       SnackBar(
         content: Text(
           locking
-              ? '🔒 Chat locked. Find it under "Locked chats".'
+              ? 'Chat locked. Long-press your picture at the top to find it.'
               : 'Chat unlocked',
         ),
       ),
@@ -122,9 +122,15 @@ abstract class VibeLock {
           children: [
             const Padding(
               padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: Text(
-                '🔒 Locked chats',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              child: Row(
+                children: [
+                  Icon(Icons.lock_outline, size: 22),
+                  SizedBox(width: 10),
+                  Text(
+                    'Locked chats',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ),
             if (rooms.isEmpty)

@@ -11,6 +11,7 @@ import 'package:fluffychat/vibe/vibe_add_contact.dart';
 import 'package:fluffychat/vibe/vibe_chat_actions.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:fluffychat/vibe/vibe_archive.dart';
 import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_status.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
@@ -125,12 +126,15 @@ class _VibeDmPaneState extends State<VibeDmPane> {
               child: Builder(
                 builder: (context) {
                   final rows = <Widget Function()>[
-                    if (VibeLock.locked().isNotEmpty)
+                    if (VibeArchive.archived(client).isNotEmpty)
                       () => _NavTile(
-                        icon: Icons.lock_outline,
-                        label: 'Locked chats',
-                        onTap: () =>
-                            VibeLock.openFolder(context, client, widget.onOpen),
+                        icon: Icons.archive_outlined,
+                        label: 'Archived chats',
+                        onTap: () => VibeArchive.open(
+                          context,
+                          client,
+                          onOpen: widget.onOpen,
+                        ),
                       ),
                     if (invites.isNotEmpty) ...[
                       () => _SectionLabel('INVITES — ${invites.length}'),

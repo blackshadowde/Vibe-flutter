@@ -3,10 +3,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:math' as math;
+
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/vibe/vibe_communities.dart';
 import 'package:fluffychat/vibe/vibe_groups.dart';
+import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:fluffychat/vibe/vibe_lock.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
 import 'package:fluffychat/vibe/vibe_typing_pen.dart';
@@ -72,6 +76,7 @@ class VibeDmRail extends StatelessWidget {
                 client: client,
                 builder: (context, profile) => GestureDetector(
                   onLongPress: onOwnLongPress,
+                  child: _LockFlash(
                   child: Avatar(
                   mxContent: profile?.avatarUrl,
                   name: profile?.displayName ?? client.userID?.localpart,
@@ -81,6 +86,7 @@ class VibeDmRail extends StatelessWidget {
                   presenceBackgroundColor:
                       theme.colorScheme.surfaceContainerLowest,
                   onTap: onHome,
+                ),
                 ),
                 ),
               ),
@@ -297,4 +303,97 @@ class VibeDmRail extends StatelessWidget {
     );
   }
 
+}
+
+/// A chat was just locked: your picture turns into a lock that clicks shut,
+/// then turns back (that's where the locked chats live).
+class _LockFlash extends StatefulWidget {
+  final Widget child;
+  const _LockFlash({required this.child});
+
+  @override
+  State<_LockFlash> createState() => _LockFlashState();
+}
+
+class _LockFlashState extends State<_LockFlash>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1500),
+  );
+  int _count = VibeLock.locked().length;
+
+  @override
+  void initState() {
+    super.initState();
+    VibeLock.changes.addListener(_changed);
+  }
+
+  void _changed() {
+    final n = VibeLock.locked().length;
+    if (n > _count && mounted) {
+      _c.forward(from: 0);
+      Future.delayed(const Duration(milliseconds: 600), VibeHaptics.medium);
+    }
+    _count = n;
+  }
+
+  @override
+  void dispose() {
+    VibeLock.changes.removeListener(_changed);
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return AnimatedBuilder(
+      animation: _c,
+      child: widget.child,
+      builder: (context, child) {
+        final t = _c.value;
+        if (t == 0 || t == 1) return child!;
+        double seg(double a, double b) => ((t - a) / (b - a)).clamp(0.0, 1.0);
+        // picture out, lock in, click shut, hold, lock out, picture back
+        final out = Curves.easeIn.transform(seg(0, 0.18));
+        final back = Curves.easeOutBack.transform(seg(0.8, 1));
+        final pic = t < 0.5 ? 1 - out : back;
+        final lockIn = Curves.easeOutBack.transform(seg(0.12, 0.32));
+        final lockOut = Curves.easeIn.transform(seg(0.7, 0.84));
+        final lock = (lockIn * (1 - lockOut)).clamp(0.0, 1.2);
+        final shut = t >= 0.4;
+        // a little bump when the shackle clicks
+        final bump = 1 + 0.18 * math.sin(seg(0.4, 0.52) * math.pi);
+        return SizedBox(
+          width: 48,
+          height: 48,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              Transform.scale(scale: pic, child: child),
+              if (lock > 0)
+                Transform.scale(
+                  scale: lock * bump,
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: cs.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      shut ? Icons.lock_rounded : Icons.lock_open_rounded,
+                      color: cs.onPrimary,
+                      size: 24,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

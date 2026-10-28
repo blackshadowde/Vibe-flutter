@@ -222,10 +222,11 @@ class _VibeHomeViewState extends State<VibeHomeView> {
                       onHome: () => setState(() => selectedId = null),
                       onAdd: () => setState(() => selectedId = _startId),
                       addSelected: selectedId == _startId,
-                      onOwnLongPress: () => VibeArchive.open(
+                      // long-press your picture: the locked chats
+                      onOwnLongPress: () => VibeLock.openFolder(
                         context,
                         client,
-                        onOpen: (room) {
+                        (room) {
                           _lastOpenedId = room.id;
                           controller.onChatTap(room);
                         },
