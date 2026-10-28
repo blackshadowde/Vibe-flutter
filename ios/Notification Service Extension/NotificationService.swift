@@ -151,7 +151,8 @@ class NotificationService: UNNotificationServiceExtension {
         }
 
         contentHandler(bestAttemptContent)
-
+        // From FluffyChat: an open database here can lock it for the app
+        database.close()
     }
 
     override func serviceExtensionTimeWillExpire() {

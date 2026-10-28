@@ -83,6 +83,10 @@ Future<void> pushHelper(
       flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
     ).timeout(const Duration(seconds: 30));
   } catch (e, s) {
+    if (e.toString() == 'Exception: Client is not logged in.') {
+      Logs().w('Ignore push notification, when not logged in', e);
+      return;
+    }
     if (PlatformInfos.isAndroid &&
         e is! TimeoutException &&
         e is! IOException &&

@@ -43,7 +43,7 @@ class StoreRecoveryKeyView extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.copy_outlined, color: cs.onSurfaceVariant),
-                onPressed: () => VibeShare.share(key, context),
+                onPressed: () => VibeShare.share(key, context, copyOnly: true),
               ),
             ],
           ),
