@@ -66,7 +66,7 @@ h2 { font-size: clamp(40px, 7vw, 96px); font-weight: 900; }
 @media (max-width: 640px) { .nav nav a:not(.pill) { display: none; } }
 
 /* buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 26px; border-radius: 999px; font-weight: 800; font-size: 17px; transition: transform .2s, background .2s; }
+.btn { border: none; font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 26px; border-radius: 999px; font-weight: 800; font-size: 17px; transition: transform .2s, background .2s; }
 .btn:hover { transform: translateY(-2px); }
 .btn.primary { background: var(--blurple); color: #fff; }
 .btn.primary:hover { background: #6A76FF; color: #fff; }
@@ -99,7 +99,7 @@ h2 { font-size: clamp(40px, 7vw, 96px); font-weight: 900; }
 
 /* 2. strict */
 .strict { position: relative; height: 400vh; }
-.strict-stage { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; align-content: center; gap: 28px; padding: 80px var(--pad) 40px; overflow: hidden; }
+.strict-stage { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; align-content: start; gap: 28px; padding: max(88px, 12vh) var(--pad) 40px; overflow: hidden; }
 .lockshield { width: min(26vh, 190px); height: auto; overflow: visible; }
 .ls-glow { opacity: 0; }
 .strict-lines { position: relative; height: 4.6em; width: min(760px, 100%); text-align: center; font-size: clamp(22px, 3vw, 34px); line-height: 1.25; font-weight: 600; color: var(--muted); }

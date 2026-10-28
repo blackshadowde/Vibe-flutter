@@ -35,6 +35,19 @@
   window.addEventListener('scroll', onChapters, { passive: true });
   onChapters();
 
+  // iPhone: copy the source link, and point "Download IPA" at the newest build
+  const SOURCE = 'https://raw.githubusercontent.com/blackshadowde/Vibe-flutter/Vibe/altstore.json';
+  const copyBtn = $('#copy-source');
+  copyBtn?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(SOURCE); copyBtn.textContent = 'Copied'; }
+    catch { window.prompt('Copy this link', SOURCE); }
+    setTimeout(() => (copyBtn.textContent = 'Copy source link'), 2000);
+  });
+  fetch(SOURCE).then((r) => r.json()).then((j) => {
+    const v = j.apps?.[0]?.versions?.[0];
+    if (v?.downloadURL) { const a = $('#ipa'); a.href = v.downloadURL; a.textContent = 'Download IPA ' + v.version; }
+  }).catch(() => {});
+
   const typed = $('.typed');
   const link = 'https://open.spotify.com/track/midnight-drive';
 

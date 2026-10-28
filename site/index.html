@@ -11,7 +11,7 @@
 <meta property="og:image" content="assets/og.png">
 <link rel="icon" href="assets/icon.png">
 <link rel="preload" href="assets/figtree.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -217,9 +217,11 @@
     </article>
     <article class="plat">
       <h3>iPhone</h3>
-      <p>Install with SideStore or AltStore. Updates show up there automatically.</p>
+      <p>Install with <a href="https://sidestore.io">SideStore</a> or <a href="https://altstore.io">AltStore</a> first. Then add Vibe's source on your iPhone, and updates show up there automatically.</p>
       <a class="btn primary" href="sidestore://source?url=https%3A%2F%2Fraw.githubusercontent.com%2Fblackshadowde%2FVibe-flutter%2FVibe%2Faltstore.json">Add to SideStore</a>
       <a class="btn ghost small" href="altstore://source?url=https%3A%2F%2Fraw.githubusercontent.com%2Fblackshadowde%2FVibe-flutter%2FVibe%2Faltstore.json">Add to AltStore</a>
+      <button class="btn ghost small" type="button" id="copy-source">Copy source link</button>
+      <a class="btn ghost small" id="ipa" href="https://github.com/blackshadowde/Vibe-flutter/releases">Download IPA</a>
     </article>
     <article class="plat">
       <h3>Web</h3>
@@ -248,6 +250,6 @@
 
 <script src="vendor/gsap.min.js" defer></script>
 <script src="vendor/ScrollTrigger.min.js" defer></script>
-<script src="main.js" defer></script>
+<script src="main.js?v=3" defer></script>
 </body>
 </html>
