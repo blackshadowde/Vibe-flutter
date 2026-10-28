@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:io';
+
 import 'package:async/async.dart' show Result;
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,8 @@ import 'package:vibe/utils/localized_exception_extension.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/matrix_file_extension.dart';
 import 'package:vibe/utils/platform_infos.dart';
 import 'package:vibe/utils/resize_video.dart';
+import 'package:vibe/utils/start_push_foreground_service.dart';
+import 'package:http/http.dart' show ClientException;
 import 'package:vibe/vibe/vibe_chunks.dart';
 import 'package:vibe/vibe/vibe_low_data.dart';
 
@@ -26,6 +30,28 @@ abstract class VibePendingFiles {
     String? threadLastEventId,
   }) async {
     final messenger = ScaffoldMessenger.of(context);
+    // like the attach sheet: keep Vibe running while the files upload
+    if (ForegroundServices.platformSupported) {
+      await ForegroundServices.startService('send_files');
+    }
+    try {
+      await _sendAll(context, room, files, messenger, threadRootEventId,
+          threadLastEventId);
+    } finally {
+      if (ForegroundServices.platformSupported) {
+        await ForegroundServices.stopService('send_files');
+      }
+    }
+  }
+
+  static Future<void> _sendAll(
+    BuildContext context,
+    Room room,
+    List<XFile> files,
+    ScaffoldMessengerState messenger,
+    String? threadRootEventId,
+    String? threadLastEventId,
+  ) async {
     final config = await Result.capture(room.client.getConfig());
     final serverLimit = config.asValue?.value.mUploadSize;
     for (final x in files) {
@@ -58,18 +84,36 @@ abstract class VibePendingFiles {
           );
           continue;
         }
-        await room.sendFileEvent(
+        Future<void> upload() => room.sendFileEvent(
           file,
           thumbnail: thumbnail,
           shrinkImageMaxDimension: VibeLowData.sendMaxDimension,
           threadRootEventId: threadRootEventId,
           threadLastEventId: threadLastEventId,
         );
+        try {
+          await upload();
+        } catch (e) {
+          // a dropped connection mid-upload: one more try
+          if (e is! IOException && e is! ClientException) rethrow;
+          Logs().w('Dropped file upload failed, trying again', e);
+          await Future<void>.delayed(const Duration(seconds: 2));
+          await upload();
+        }
       } catch (e, s) {
         Logs().w('Unable to send dropped file', e, s);
         if (!context.mounted) return;
+        // the real reason under the friendly one, so a failure can be fixed
         messenger.showSnackBar(
-          SnackBar(content: Text('${x.name}: ${e.toLocalizedString(context)}')),
+          SnackBar(
+            duration: const Duration(seconds: 8),
+            showCloseIcon: true,
+            content: Text(
+              '${x.name}: ${e.toLocalizedString(context)}\n'
+              '${e.runtimeType}: $e',
+              maxLines: 4,
+            ),
+          ),
         );
       }
     }

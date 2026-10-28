@@ -6,6 +6,7 @@
 import 'package:vibe/vibe/vibe_drop.dart';
 import 'package:vibe/vibe/vibe_pending_files.dart';
 import 'package:vibe/vibe/vibe_mention_controller.dart';
+import 'package:vibe/vibe/vibe_reply_thread.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:async';
 import 'dart:io';
@@ -1292,8 +1293,23 @@ class ChatController extends State<ChatPageWithRoom>
   }
 
   void replyAction({Event? replyTo}) {
+    final target = replyTo ?? selectedEvents.first;
+    final tl = timeline;
+    // Replying inside a conversation of replies opens it in its own window
+    if (tl != null && editEvent == null && VibeReplyThread.isChained(target, tl)) {
+      setState(selectedEvents.clear);
+      VibeReplyThread.show(
+        context,
+        room: room,
+        timeline: tl,
+        replyTo: target,
+        threadRootEventId: activeThreadId,
+        threadLastEventId: threadLastEventId,
+      );
+      return;
+    }
     setState(() {
-      replyEvent = replyTo ?? selectedEvents.first;
+      replyEvent = target;
       selectedEvents.clear();
     });
     // Open the keyboard after the reply bar has been laid out, so the two
