@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:vibe/config/setting_keys.dart';
-import 'package:vibe/utils/platform_infos.dart';
 import 'package:vibe/vibe/vibe_status.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
@@ -19,7 +18,10 @@ abstract class VibeNowPlaying {
   static Timer? _timer;
   static bool _busy = false;
 
-  static bool get supported => PlatformInfos.isAndroid;
+  /// Off: reading the music app's notification needs a notification
+  /// listener, and Play Protect blocks installing downloaded apps that have
+  /// one. The Android side stays in place for a later opt-in build.
+  static bool get supported => false;
 
   static Future<bool> hasAccess() async {
     if (!supported) return false;
