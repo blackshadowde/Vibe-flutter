@@ -11,13 +11,23 @@ on:
         description: 'Build number (empty = next one). Vibe release fills this in so iPhone gets the same version as Android.'
         type: string
         default: ''
+      runner:
+        description: 'Mac to build on. If GitHub has no Apple-silicon Mac free (stuck in "Queued"), pick an Intel one.'
+        type: choice
+        options:
+          - macos-15
+          - macos-26
+          - macos-15-intel
+          - macos-26-intel
+        default: macos-15
 
 permissions:
   contents: write
 
 jobs:
   ios:
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner || 'macos-15' }}
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
