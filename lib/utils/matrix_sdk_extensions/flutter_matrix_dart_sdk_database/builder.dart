@@ -63,7 +63,7 @@ Future<Directory?> getFileStorageLocation() async {
       temporaryDirectory = await getTemporaryDirectory();
     }
     return await Directory(
-      join(temporaryDirectory.path, 'fluffychat_download_cache'),
+      join(temporaryDirectory.path, 'vibe_download_cache'),
     ).create(recursive: true);
   } on MissingPlatformDirectoryException catch (_) {
     Logs().w(

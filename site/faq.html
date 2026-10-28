@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibe Help</title>
+<meta name="description" content="Answers to common questions about Vibe: notifications without Google, encryption, finding people and stickers.">
+<meta name="theme-color" content="#0B0C0E">
+<link rel="canonical" href="https://get-vibe.github.io/faq.html">
+<link rel="icon" href="assets/icon.png">
+<style>
+@font-face{font-family:Figtree;src:url(assets/figtree.ttf)}
+:root{--bg:#0B0C0E;--surface:#16171A;--line:#2A2C31;--text:#F2F3F5;--muted:#A3A8B0;--blurple:#8A94FF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Figtree,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--blurple)}
+.top{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:700;font-size:18px}
+h1{font-size:clamp(28px,6vw,40px);margin:32px 0 8px}
+.lead{color:var(--muted);margin:0 0 32px}
+section{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin:0 0 14px;scroll-margin-top:16px}
+section:target{border-color:var(--blurple)}
+h2{font-size:19px;margin:0 0 8px}
+p,li{color:var(--muted);margin:0 0 8px}
+ul{padding-left:20px;margin:0}
+b{color:var(--text)}
+</style>
+</head>
+<body>
+<main>
+<a class="top" href="./"><img src="assets/icon.png" alt="" width="28" height="28">Vibe</a>
+<h1>Help</h1>
+<p class="lead">Quick answers to the questions people ask most.</p>
+
+<section id="push_without_google_services">
+<h2>Can I get notifications without Google?</h2>
+<p>Yes. In <b>Settings → Notifications</b> pick one of the two Google-free ways:</p>
+<ul>
+<li><b>Direct connection</b> (default): Vibe keeps its own connection to your server. No Google involved; allow Vibe to run in the background so Android doesn't stop it.</li>
+<li><b>Built-in, no Google</b>: uses ntfy, an open push service, with no Google.</li>
+</ul>
+</section>
+
+<section id="how_to_use_end_to_end_encryption">
+<h2>How does encryption work?</h2>
+<p>Direct messages and private groups are end-to-end encrypted: only the people in the chat can read them. Set up <b>Chat backup</b> in Settings with a recovery key so you can read old messages on a new device, and verify the devices of people you talk to by comparing emoji.</p>
+<p><b>Strict encryption</b> goes further and rotates keys more often, so one leaked key reveals as little as possible.</p>
+</section>
+
+<section id="how_do_i_find_other_users">
+<h2>How do I find people?</h2>
+<p>Everyone on Matrix has an ID that looks like <b>@name:server.org</b>. Tap the add-contact button and type, paste or scan someone's ID. Vibe also suggests names from your server's user directory as you type. To share your own ID, the new chat screen shows your QR code for others to scan.</p>
+</section>
+
+<section id="how_do_i_get_stickers">
+<h2>How do I get stickers?</h2>
+<p>Stickers and custom emoji come in packs. Open <b>Settings → Chats &amp; storage → Custom emojis and stickers</b> to create a pack from your own pictures or import a pack file. Packs added to a group are available to everyone in it. Packs you don't want in the sticker tray can be hidden.</p>
+</section>
+
+<p class="lead" style="margin-top:28px">Something else? <a href="https://github.com/blackshadowde/Vibe-flutter/issues">Ask on GitHub</a>.</p>
+</main>
+</body>
+</html>

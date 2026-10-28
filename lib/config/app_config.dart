@@ -24,13 +24,13 @@ abstract class AppConfig {
   static const double columnWidth = 360.0;
 
   static const String enablePushTutorial =
-      'https://fluffychat.im/faq/#push_without_google_services';
+      'https://get-vibe.github.io/faq.html#push_without_google_services';
   static const String encryptionTutorial =
-      'https://fluffychat.im/faq/#how_to_use_end_to_end_encryption';
+      'https://get-vibe.github.io/faq.html#how_to_use_end_to_end_encryption';
   static const String startChatTutorial =
-      'https://fluffychat.im/faq/#how_do_i_find_other_users';
+      'https://get-vibe.github.io/faq.html#how_do_i_find_other_users';
   static const String howDoIGetStickersTutorial =
-      'https://fluffychat.im/faq/#how_do_i_get_stickers';
+      'https://get-vibe.github.io/faq.html#how_do_i_get_stickers';
   static const String appId = 'app.vibe.chat';
   static const String appOpenUrlScheme = 'vibe';
   static const String appSsoUrlScheme = 'chat.vibe.auth';
@@ -53,10 +53,8 @@ abstract class AppConfig {
     path: '/blackshadowde/Vibe-flutter/issues/new',
   );
 
-  static final Uri homeserverList = Uri(
-    scheme: 'https',
-    host: 'raw.githubusercontent.com',
-    path: 'krille-chan/fluffychat/refs/heads/main/recommended_homeservers.json',
+  static final Uri homeserverList = Uri.parse(
+    'https://get-vibe.github.io/homeservers.json',
   );
 
   static const String mainIsolatePortName = 'main_isolate';

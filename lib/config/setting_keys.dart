@@ -23,16 +23,16 @@ enum AppSettings<T> {
   textMessageMaxLength<int>('textMessageMaxLength', 16384),
 
   /// Max lines for unselected HTML/text bubbles; 0 = unlimited (no fade).
-  messagePreviewMaxLines<int>('chat.fluffy.message_preview_max_lines', 25),
+  messagePreviewMaxLines<int>('chat.vibe.message_preview_max_lines', 25),
   audioRecordingNumChannels<int>('audioRecordingNumChannels', 1),
   audioRecordingAutoGain<bool>('audioRecordingAutoGain', true),
   audioRecordingEchoCancel<bool>('audioRecordingEchoCancel', false),
   audioRecordingNoiseSuppress<bool>('audioRecordingNoiseSuppress', true),
   audioRecordingBitRate<int>('audioRecordingBitRate', 64000),
   audioRecordingSamplingRate<int>('audioRecordingSamplingRate', 44100),
-  showNoGoogle<bool>('chat.fluffy.show_no_google', false),
-  unifiedPushRegistered<bool>('chat.fluffy.unifiedpush.registered', false),
-  unifiedPushEndpoint<String>('chat.fluffy.unifiedpush.endpoint', ''),
+  showNoGoogle<bool>('chat.vibe.show_no_google', false),
+  unifiedPushRegistered<bool>('chat.vibe.unifiedpush.registered', false),
+  unifiedPushEndpoint<String>('chat.vibe.unifiedpush.endpoint', ''),
   pushNotificationsGatewayUrl<String>(
     'pushNotificationsGatewayUrl',
     _vibeGateway,
@@ -41,54 +41,54 @@ enum AppSettings<T> {
     'pushNotificationsPusherFormat',
     'event_id_only',
   ),
-  renderHtml<bool>('chat.fluffy.renderHtml', true),
-  fontSizeFactor<double>('chat.fluffy.font_size_factor', 1.0),
+  renderHtml<bool>('chat.vibe.renderHtml', true),
+  fontSizeFactor<double>('chat.vibe.font_size_factor', 1.0),
   // Telegram-style chat text size 12–30 (0 = not set yet: use the factor).
   vibeTextSize<int>('chat.vibe.text_size', 0),
-  hideRedactedEvents<bool>('chat.fluffy.hideRedactedEvents', false),
-  hideUnknownEvents<bool>('chat.fluffy.hideUnknownEvents', true),
-  autoplayImages<bool>('chat.fluffy.autoplay_images', true),
-  sendTypingNotifications<bool>('chat.fluffy.send_typing_notifications', true),
-  sendPublicReadReceipts<bool>('chat.fluffy.send_public_read_receipts', true),
-  swipeRightToLeftToReply<bool>('chat.fluffy.swipeRightToLeftToReply', true),
-  sendOnEnter<bool>('chat.fluffy.send_on_enter', false),
-  displayNavigationRail<bool>('chat.fluffy.display_navigation_rail', false),
-  experimentalVoip<bool>('chat.fluffy.experimental_voip', false),
+  hideRedactedEvents<bool>('chat.vibe.hideRedactedEvents', false),
+  hideUnknownEvents<bool>('chat.vibe.hideUnknownEvents', true),
+  autoplayImages<bool>('chat.vibe.autoplay_images', true),
+  sendTypingNotifications<bool>('chat.vibe.send_typing_notifications', true),
+  sendPublicReadReceipts<bool>('chat.vibe.send_public_read_receipts', true),
+  swipeRightToLeftToReply<bool>('chat.vibe.swipeRightToLeftToReply', true),
+  sendOnEnter<bool>('chat.vibe.send_on_enter', false),
+  displayNavigationRail<bool>('chat.vibe.display_navigation_rail', false),
+  experimentalVoip<bool>('chat.vibe.experimental_voip', false),
   // Keys go only to your cross-signed (verified) devices, like Element
   shareKeysWith<String>('chat.vibe.share_keys_with_3', 'crossVerified'),
   noEncryptionWarningShown<bool>(
-    'chat.fluffy.no_encryption_warning_shown',
+    'chat.vibe.no_encryption_warning_shown',
     false,
   ),
-  displayChatDetailsColumn('chat.fluffy.display_chat_details_column', false),
+  displayChatDetailsColumn('chat.vibe.display_chat_details_column', false),
   // AppConfig-mirrored settings
-  applicationName<String>('chat.fluffy.application_name', 'Vibe'),
+  applicationName<String>('chat.vibe.application_name', 'Vibe'),
   defaultHomeserver<String>(
-    'chat.fluffy.default_homeserver',
+    'chat.vibe.default_homeserver',
     'matrix.unredacted.org',
   ),
   // colorSchemeSeed stored as ARGB int
-  colorSchemeSeedInt<int>('chat.fluffy.color_scheme_seed', 0xFF5865F2),
+  colorSchemeSeedInt<int>('chat.vibe.color_scheme_seed', 0xFF5865F2),
   emojiSuggestionLocale<String>('emoji_suggestion_locale', ''),
-  enableSoftLogout<bool>('chat.fluffy.enable_soft_logout', false),
-  enableMatrixNativeOIDC<bool>('chat.fluffy.enable_matrix_native_oidc', false),
-  presetHomeserver<String>('chat.fluffy.preset_homeserver', ''),
-  welcomeText<String>('chat.fluffy.welcome_text', ''),
-  website<String>('chat.fluffy.website_url', 'https://fluffychat.im'),
+  enableSoftLogout<bool>('chat.vibe.enable_soft_logout', false),
+  enableMatrixNativeOIDC<bool>('chat.vibe.enable_matrix_native_oidc', false),
+  presetHomeserver<String>('chat.vibe.preset_homeserver', ''),
+  welcomeText<String>('chat.vibe.welcome_text', ''),
+  website<String>('chat.vibe.website_url', 'https://get-vibe.github.io'),
   logoUrl<String>(
-    'chat.fluffy.logo_url',
-    'https://fluffychat.im/assets/favicon.png',
+    'chat.vibe.logo_url',
+    'https://get-vibe.github.io/assets/icon.png',
   ),
   privacyPolicy<String>(
-    'chat.fluffy.privacy_policy_url',
+    'chat.vibe.privacy_policy_url',
     'https://matrix.org/legal/privacy-notice/',
   ),
-  tos<String>('chat.fluffy.tos_url', 'https://matrix.org/legal/terms-and-conditions/'),
-  sendTimelineEventTimeout<int>('chat.fluffy.send_timeline_event_timeout', 15),
-  webNotificationSound<bool>('chat.fluffy.web_notification_sound', true),
-  chatFilter<String>('chat.fluffy.chat_filter', 'allChats'),
-  hideRoomsInSpaces<bool>('chat.fluffy.hideRoomsInSpaces', false),
-  showThumbnailsInTimeline<bool>('chat.fluffy.showThumbnailsInTimeline', true),
+  tos<String>('chat.vibe.tos_url', 'https://matrix.org/legal/terms-and-conditions/'),
+  sendTimelineEventTimeout<int>('chat.vibe.send_timeline_event_timeout', 15),
+  webNotificationSound<bool>('chat.vibe.web_notification_sound', true),
+  chatFilter<String>('chat.vibe.chat_filter', 'allChats'),
+  hideRoomsInSpaces<bool>('chat.vibe.hideRoomsInSpaces', false),
+  showThumbnailsInTimeline<bool>('chat.vibe.showThumbnailsInTimeline', true),
   vibeHaptics<bool>('chat.vibe.haptics', true),
   // Notifications show only the app name and "New message" (no names, text or pictures)
   vibeHideNotificationContent<bool>('chat.vibe.notification_privacy', false),
@@ -139,9 +139,9 @@ enum AppSettings<T> {
   vibeCacheLimitMb<int>('chat.vibe.cache_limit_mb', 0),
   // Decoded pictures kept in memory while Vibe runs (MB).
   vibeMemoryCacheMb<int>('chat.vibe.memory_cache_mb', 256),
-  doubleTapToReact<bool>('chat.fluffy.double_tap_to_react', false),
-  doubleTapReaction<String>('chat.fluffy.double_tap_reaction', '❤️'),
-  benchmarksInLogs<bool>('chat.fluffy.benchmarks_in_logs', false);
+  doubleTapToReact<bool>('chat.vibe.double_tap_to_react', false),
+  doubleTapReaction<String>('chat.vibe.double_tap_reaction', '❤️'),
+  benchmarksInLogs<bool>('chat.vibe.benchmarks_in_logs', false);
 
   final String key;
   final T defaultValue;
@@ -160,6 +160,24 @@ enum AppSettings<T> {
     if (AppSettings._store != null) return AppSettings.store;
 
     final store = AppSettings._store = await SharedPreferences.getInstance();
+
+    // Settings used to be saved as 'chat.fluffy.*': carry them over once.
+    for (final setting in AppSettings.values) {
+      if (!setting.key.startsWith('chat.vibe.')) continue;
+      final oldKey = 'chat.fluffy.${setting.key.substring(10)}';
+      final oldValue = store.get(oldKey);
+      if (oldValue == null) continue;
+      if (store.get(setting.key) == null) {
+        if (oldValue is bool) await store.setBool(setting.key, oldValue);
+        if (oldValue is int) await store.setInt(setting.key, oldValue);
+        if (oldValue is double) await store.setDouble(setting.key, oldValue);
+        if (oldValue is String) await store.setString(setting.key, oldValue);
+        if (oldValue is List<String>) {
+          await store.setStringList(setting.key, oldValue);
+        }
+      }
+      await store.remove(oldKey);
+    }
 
     // Migrate wrong datatype for fontSizeFactor
     final fontSizeFactorString = Result(
