@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:async';
-
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/utils/localized_exception_extension.dart';
 import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
@@ -14,19 +13,18 @@ import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
-
 import 'package:vibe/utils/platform_infos.dart';
-import 'login_view.dart';
+import 'package:vibe/widgets/layouts/login_scaffold.dart';
 
 class Login extends StatefulWidget {
   final Client client;
   const Login({required this.client, super.key});
 
   @override
-  LoginController createState() => LoginController();
+  _LoginState createState() => _LoginState();
 }
 
-class LoginController extends State<Login> {
+class _LoginState extends State<Login> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String? usernameError;
@@ -263,7 +261,132 @@ class LoginController extends State<Login> {
   }
 
   @override
-  Widget build(BuildContext context) => LoginView(this);
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final homeserver = widget.client.homeserver
+        ?.toString()
+        .replaceFirst('https://', '');
+    final title = homeserver == null
+        ? L10n.of(context).loginWithMatrixId
+        : L10n.of(context).logInTo(homeserver);
+
+    return LoginScaffold(
+      appBar: AppBar(
+        leading: loading ? null : const Center(child: BackButton()),
+        automaticallyImplyLeading: !loading,
+        titleSpacing: !loading ? 0 : null,
+        title: Text(title),
+      ),
+      body: Builder(
+        builder: (context) {
+          return AutofillGroup(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              children: <Widget>[
+                Center(
+                  child: Hero(
+                    tag: 'info-logo',
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(128),
+                      child: Image.asset(
+                        './assets/logo/mini/logo_mini.png',
+                        width: 128,
+                        height: 128,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: TextField(
+                    readOnly: loading,
+                    autocorrect: false,
+                    autofocus: true,
+                    onChanged: checkWellKnownWithCoolDown,
+                    controller: usernameController,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: loading
+                        ? null
+                        : [AutofillHints.username],
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.account_box_outlined),
+                      errorText: usernameError,
+                      errorStyle: const TextStyle(color: Color(0xFFF23F42)),
+                      hintText: '@username:domain',
+                      labelText: L10n.of(context).matrixId,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: TextField(
+                    readOnly: loading,
+                    autocorrect: false,
+                    autofillHints: loading
+                        ? null
+                        : [AutofillHints.password],
+                    controller: passwordController,
+                    textInputAction: TextInputAction.go,
+                    obscureText: !showPassword,
+                    onSubmitted: (_) => login(),
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.lock_outlined),
+                      errorText: passwordError,
+                      errorStyle: const TextStyle(color: Color(0xFFF23F42)),
+                      suffixIcon: IconButton(
+                        onPressed: toggleShowPassword,
+                        icon: Icon(
+                          showPassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: Colors.black,
+                        ),
+                      ),
+                      hintText: '******',
+                      labelText: L10n.of(context).password,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                    ),
+                    onPressed: loading ? null : login,
+                    child: loading
+                        ? const LinearProgressIndicator()
+                        : Text(L10n.of(context).login),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (homeserver != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: TextButton(
+                      onPressed: loading
+                          ? () {}
+                          : passwordForgotten,
+                      style: TextButton.styleFrom(
+                        foregroundColor: theme.colorScheme.error,
+                      ),
+                      child: Text(L10n.of(context).passwordForgotten),
+                    ),
+                  ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 extension on String {
@@ -276,3 +399,4 @@ extension on String {
 
   bool get isPhoneNumber => _phoneRegex.hasMatch(this);
 }
+
