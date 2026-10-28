@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_tap_icon.dart';
 import 'package:fluffychat/vibe/vibe_palette.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
@@ -227,7 +228,8 @@ class _OwnSheetState extends State<_OwnSheet> {
 
   Widget _barItem(IconData icon, String label, VoidCallback onTap) {
     final ink = Theme.of(context).colorScheme.onSurface;
-    return InkWell(
+    return VibeTapArea(
+      child: InkWell(
       borderRadius: BorderRadius.circular(28),
       onTap: onTap,
       child: SizedBox(
@@ -236,7 +238,10 @@ class _OwnSheetState extends State<_OwnSheet> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 20, color: ink),
+            VibeTapIcon(
+              kind: icon == Icons.settings ? VibeTap.spin : VibeTap.pop,
+              child: Icon(icon, size: 20, color: ink),
+            ),
             const SizedBox(height: 3),
             Text(
               label,
@@ -248,6 +253,7 @@ class _OwnSheetState extends State<_OwnSheet> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

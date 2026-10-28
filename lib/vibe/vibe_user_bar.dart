@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_tap_icon.dart';
 import 'package:fluffychat/vibe/vibe_connection.dart';
 import 'package:fluffychat/vibe/vibe_own_profile.dart';
 import 'package:fluffychat/vibe/vibe_profile_cache.dart';
@@ -96,13 +97,18 @@ class VibeUserBar extends StatelessWidget {
                               ),
                               ),
                             ),
-                            IconButton(
-                              // Red dot while an update is waiting.
-                              icon: const VibeUpdateDot(
-                                child: Icon(Icons.settings),
+                            VibeTapArea(
+                              child: IconButton(
+                                // Red dot while an update is waiting.
+                                icon: const VibeUpdateDot(
+                                  child: VibeTapIcon(
+                                    kind: VibeTap.spin,
+                                    child: Icon(Icons.settings),
+                                  ),
+                                ),
+                                color: theme.colorScheme.onSurfaceVariant,
+                                onPressed: () => context.go('/rooms/settings'),
                               ),
-                              color: theme.colorScheme.onSurfaceVariant,
-                              onPressed: () => context.go('/rooms/settings'),
                             ),
                           ],
                         ),

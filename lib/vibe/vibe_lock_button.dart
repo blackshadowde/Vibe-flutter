@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:fluffychat/vibe/vibe_tap_icon.dart';
 import 'package:fluffychat/vibe/vibe_strict.dart';
 import 'package:fluffychat/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +78,7 @@ class _VibeLockButtonState extends State<VibeLockButton> {
     return Tooltip(
       message: tip,
       child: VibePressable(
+        child: VibeTapArea(
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => context.go('/rooms/${room.id}/encryption'),
@@ -95,17 +97,21 @@ class _VibeLockButtonState extends State<VibeLockButton> {
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: encrypted
-                      ? VibeLockShield(
-                          strict: VibeStrict.isOn(room),
-                          color: color,
-                          size: 18,
-                        )
-                      : Icon(Icons.lock_open, size: 17, color: color),
+                  child: VibeTapIcon(
+                    kind: VibeTap.pop,
+                    child: encrypted
+                        ? VibeLockShield(
+                            strict: VibeStrict.isOn(room),
+                            color: color,
+                            size: 18,
+                          )
+                        : Icon(Icons.lock_open, size: 17, color: color),
+                  ),
                 ),
               ),
             ),
           ),
+        ),
         ),
       ),
     );

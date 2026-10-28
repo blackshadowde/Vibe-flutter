@@ -643,6 +643,9 @@ class VibeMessage extends StatelessWidget {
                 textWidthBasis: TextWidthBasis.longestLine,
                 child: VibeChunks.info(displayEvent) != null
                   ? VibeChunkCard(displayEvent)
+                  // just a link: the preview card below stands in for it
+                  : VibeLinkPreview.onlyLink(displayEvent)
+                  ? const SizedBox.shrink()
                   : MessageContent(
                       displayEvent,
                       textColor: cs.onSurface,

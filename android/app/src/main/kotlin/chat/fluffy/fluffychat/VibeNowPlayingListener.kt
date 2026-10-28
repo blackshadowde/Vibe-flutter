@@ -14,7 +14,45 @@ import androidx.core.app.NotificationManagerCompat
  * sessions with an enabled notification listener; it reads nothing else.
  */
 class VibeNowPlayingListener : NotificationListenerService() {
+    /**
+     * Privacy: Vibe never takes any notifications. As soon as Android connects
+     * this listener, Vibe disconnects it again, so no notification is ever
+     * delivered to the app. Reading the music player only needs the access
+     * to be switched on, not the connection.
+     */
+    override fun onListenerConnected() {
+        super.onListenerConnected()
+        try {
+            requestUnbind()
+        } catch (_: Throwable) {
+        }
+    }
+
     companion object {
+        /** Only music apps: no videos, films or other players. */
+        private val musicApps = setOf(
+            "com.spotify.music",
+            "com.google.android.apps.youtube.music",
+            "com.apple.android.music",
+            "com.jio.media.jiobeats",
+            "com.gaana",
+            "com.bsbportal.music",
+            "com.soundcloud.android",
+            "deezer.android.app",
+            "com.aspiro.tidal",
+            "com.amazon.mp3",
+            "com.maxmpz.audioplayer",
+            "in.krosbits.musicolet",
+        )
+
+        private fun isAd(title: String, artist: String): Boolean {
+            val t = title.lowercase()
+            val a = artist.lowercase()
+            return artist.isBlank() || a == "spotify" ||
+                t.contains("advertisement") || a.contains("advertisement") ||
+                t == "spotify" || t.startsWith("ad ·") || t == "ad"
+        }
+
         fun hasAccess(context: Context): Boolean =
             NotificationManagerCompat.getEnabledListenerPackages(context)
                 .contains(context.packageName)
@@ -29,7 +67,7 @@ class VibeNowPlayingListener : NotificationListenerService() {
                 )
                 val c = sessions.firstOrNull {
                     it.playbackState?.state == PlaybackState.STATE_PLAYING &&
-                        it.packageName != context.packageName
+                        it.packageName in musicApps
                 } ?: return null
                 val m = c.metadata ?: return null
                 val title = m.getString(MediaMetadata.METADATA_KEY_TITLE)
@@ -37,6 +75,8 @@ class VibeNowPlayingListener : NotificationListenerService() {
                     ?: return null
                 val artist = m.getString(MediaMetadata.METADATA_KEY_ARTIST)
                     ?: m.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST) ?: ""
+                // adverts between songs are not "listening to"
+                if (isAd(title, artist)) return null
                 val pm = context.packageManager
                 val app = try {
                     pm.getApplicationLabel(pm.getApplicationInfo(c.packageName, 0)).toString()

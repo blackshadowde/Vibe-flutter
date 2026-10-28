@@ -36,6 +36,29 @@ class VibeLinkPreview extends StatelessWidget {
     return m?.group(0);
   }
 
+  /// The message is just one link: the card stands in for the text (the
+  /// link itself shows only while loading or when there's no preview).
+  static bool onlyLink(Event e) {
+    if (!AppSettings.vibeLinkPreviews.value) return false;
+    final url = firstUrl(e);
+    return url != null && e.body.trim() == url;
+  }
+
+  Widget _plainLink(BuildContext context, String url) {
+    final cs = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: () => launchUrlString(url, mode: LaunchMode.externalApplication),
+      child: Text(
+        url,
+        style: TextStyle(
+          color: cs.primary,
+          decoration: TextDecoration.underline,
+          decorationColor: cs.primary,
+        ),
+      ),
+    );
+  }
+
   static Future<PreviewForUrl?> _fetch(Client client, String url, int ts) {
     return _cache.putIfAbsent(url, () async {
       final uri = Uri.parse(url);
@@ -95,107 +118,127 @@ class VibeLinkPreview extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final (app, brand) = music;
     void open() => launchUrlString(url, mode: LaunchMode.externalApplication);
+    final onBrand = brand.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+    // Discord's "Listening to Spotify" card: plain surface, app line on
+    // top, big cover, title and artist, then a play button.
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
+        constraints: const BoxConstraints(maxWidth: 380),
         child: Material(
-          color: Color.alphaBlend(
-            brand.withValues(alpha: 0.10),
-            cs.surfaceContainerHigh,
+          color: cs.surfaceContainerHigh,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.6)),
           ),
-          borderRadius: BorderRadius.circular(12),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: open,
             child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SizedBox(
-                      width: 72,
-                      height: 72,
-                      child: image == null
-                          ? ColoredBox(
-                              color: brand.withValues(alpha: 0.25),
-                              child: Icon(Icons.music_note, color: brand),
-                            )
-                          : MxcImage(
-                              client: event.room.client,
-                              uri: image,
-                              width: 72,
-                              height: 72,
-                              fit: BoxFit.cover,
-                              isThumbnail: true,
-                              cacheKey: 'vibe_link_preview_$image',
-                            ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.graphic_eq, size: 14, color: brand),
-                            const SizedBox(width: 4),
-                            Text(
-                              app,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: brand,
-                              ),
-                            ),
-                          ],
+                  Row(
+                    children: [
+                      Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: brand,
+                          shape: BoxShape.circle,
                         ),
-                        if (title != null) ...[
-                          const SizedBox(height: 3),
-                          Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
+                        child: Icon(Icons.graphic_eq, size: 12, color: onBrand),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Listen on $app',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                            color: cs.onSurfaceVariant,
                           ),
-                        ],
-                        if (desc != null) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            desc,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Material(
-                    color: brand,
-                    shape: const CircleBorder(),
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: open,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Icon(
-                          Icons.play_arrow_rounded,
-                          color: brand.computeLuminance() > 0.5
-                              ? Colors.black
-                              : Colors.white,
                         ),
                       ),
+                      Icon(Icons.open_in_new, size: 16, color: cs.onSurfaceVariant),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          width: 76,
+                          height: 76,
+                          child: image == null
+                              ? ColoredBox(
+                                  color: brand.withValues(alpha: 0.25),
+                                  child: Icon(Icons.music_note, color: brand),
+                                )
+                              : MxcImage(
+                                  client: event.room.client,
+                                  uri: image,
+                                  width: 76,
+                                  height: 76,
+                                  fit: BoxFit.cover,
+                                  isThumbnail: true,
+                                  cacheKey: 'vibe_link_preview_$image',
+                                ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (title != null)
+                              Text(
+                                title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2,
+                                ),
+                              ),
+                            if (desc != null) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                desc,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  height: 1.3,
+                                  color: cs.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: open,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: brand,
+                      foregroundColor: onBrand,
+                      minimumSize: const Size.fromHeight(40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: Text(
+                      'Play on $app',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
                 ],
@@ -221,13 +264,16 @@ class VibeLinkPreview extends StatelessWidget {
       ),
       builder: (context, snap) {
         final p = snap.data;
-        if (p == null) return const SizedBox.shrink();
+        final only = onlyLink(event);
+        if (p == null) {
+          return only ? _plainLink(context, url) : const SizedBox.shrink();
+        }
         final title = _str(p, 'og:title');
         final desc = _str(p, 'og:description');
         final site = _str(p, 'og:site_name') ?? Uri.tryParse(url)?.host;
         final image = VibeLowData.on ? null : p.ogImage;
         if (title == null && desc == null && image == null) {
-          return const SizedBox.shrink();
+          return only ? _plainLink(context, url) : const SizedBox.shrink();
         }
         final music = _music(url);
         if (music != null) {

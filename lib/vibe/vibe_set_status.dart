@@ -733,16 +733,58 @@ class _VibeSetStatusPageState extends State<VibeSetStatusPage> {
                     secondary: const Icon(Icons.headphones_outlined),
                     title: const Text('Show what I\'m listening to'),
                     subtitle: const Text(
-                      'Your status shows the song playing in Spotify, YouTube Music or any player, then goes back',
+                      'Songs from music apps only (Spotify, YouTube Music, JioSaavn…). Never videos, films or ads',
                     ),
                     value: AppSettings.vibeNowPlaying.value,
                     onChanged: (on) async {
-                      if (on && !await VibeNowPlaying.hasAccess()) {
-                        // Android only shares the player with notification access
+                      final access = await VibeNowPlaying.hasAccess();
+                      if (!mounted) return;
+                      Future<bool> ask(String title, String text, String ok) async =>
+                          await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text(title),
+                              content: Text(text),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Not now'),
+                                ),
+                                FilledButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: Text(ok),
+                                ),
+                              ],
+                            ),
+                          ) ??
+                          false;
+                      if (on && !access) {
+                        // Android only shares the player through
+                        // "notification access": say plainly what Vibe does
+                        final go = await ask(
+                          'Allow access to the music player',
+                          'Android calls this "notification access". Vibe only '
+                              'reads the song playing in a music app. It '
+                              'disconnects right away and never receives your '
+                              'notifications. Videos, films and ads are never '
+                              'shown.\n\nYou can turn it off any time here.',
+                          'Continue',
+                        );
+                        if (!go) return;
                         await VibeNowPlaying.openAccess();
                       }
                       await VibeNowPlaying.setEnabled(on);
                       if (mounted) setState(() {});
+                      if (!on && access && mounted) {
+                        // nothing uses it any more: offer to switch it off
+                        final go = await ask(
+                          'Turn off notification access?',
+                          'Vibe no longer needs it. Switch Vibe off on the next '
+                              'screen.',
+                          'Open settings',
+                        );
+                        if (go) await VibeNowPlaying.openAccess();
+                      }
                     },
                   ),
                 ),

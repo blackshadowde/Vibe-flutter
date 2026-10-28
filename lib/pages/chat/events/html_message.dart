@@ -11,7 +11,6 @@ import 'package:fluffychat/utils/code_highlight_theme.dart';
 import 'package:fluffychat/utils/event_checkbox_extension.dart';
 import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
 import 'package:fluffychat/vibe/vibe_low_data.dart';
-import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -231,6 +230,7 @@ class HtmlMessage extends StatelessWidget {
           if (matrixId.sigil == '@') {
             final user = room.unsafeGetUserFromMemoryOrFallback(matrixId);
             return WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
               child: MatrixPill(
                 key: Key('user_pill_$matrixId'),
                 name: user.calcDisplayname(),
@@ -247,7 +247,9 @@ class HtmlMessage extends StatelessWidget {
                 ? this.room.client.getRoomById(matrixId)
                 : this.room.client.getRoomByAlias(matrixId);
             return WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
               child: MatrixPill(
+                prefix: '#',
                 name: room?.getLocalizedDisplayname() ?? matrixId,
                 avatar: room?.avatar,
                 uri: href,
@@ -725,8 +727,12 @@ class MatrixPill extends StatelessWidget {
   final double? fontSize;
   final Color? color;
 
+  /// "@" for people, "#" for chats (shown before the name, Discord style).
+  final String prefix;
+
   const MatrixPill({
     super.key,
+    this.prefix = '@',
     required this.name,
     required this.outerContext,
     this.avatar,
@@ -737,29 +743,27 @@ class MatrixPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      splashColor: Colors.transparent,
-      onTap: UrlLauncher(outerContext, uri).launchUrl,
-      child: Text.rich(
-        TextSpan(
-          children: [
-            WidgetSpan(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 4.0),
-                child: Avatar(mxContent: avatar, name: name, size: 16),
-              ),
+    // Discord-style mention: a soft highlight, no underline, no picture
+    final accent = Theme.of(context).colorScheme.primary;
+    return Material(
+      color: accent.withValues(alpha: 0.18),
+      borderRadius: BorderRadius.circular(4),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(4),
+        onTap: UrlLauncher(outerContext, uri).launchUrl,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: Text(
+            '$prefix$name',
+            style: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Color.lerp(accent, Colors.white, 0.35)
+                  : Color.lerp(accent, Colors.black, 0.15),
+              fontWeight: FontWeight.w600,
+              fontSize: fontSize,
+              height: 1.25,
             ),
-            TextSpan(
-              text: name,
-              style: TextStyle(
-                color: color,
-                decorationColor: color,
-                decoration: TextDecoration.underline,
-                fontSize: fontSize,
-                height: 1.25,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

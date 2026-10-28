@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_tap_icon.dart';
 import 'package:fluffychat/vibe/vibe_mute.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -313,6 +314,7 @@ class _RoundAction extends StatelessWidget {
     final fg = on ? (dark ? const Color(0xFF1A191E) : Colors.white) : ink;
     return VibePressable(
       scale: 0.92,
+      child: VibeTapArea(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
@@ -332,11 +334,13 @@ class _RoundAction extends StatelessWidget {
                   switchInCurve: vibeSpring,
                   transitionBuilder: (child, a) =>
                       ScaleTransition(scale: a, child: child),
-                  child: Icon(
-                    on ? icon : offIcon,
+                  child: VibeTapIcon(
                     key: ValueKey(on),
-                    color: fg,
-                    size: 26,
+                    // the bell rings, everything else pops
+                    kind: icon == Icons.notifications_off
+                        ? VibeTap.ring
+                        : VibeTap.pop,
+                    child: Icon(on ? icon : offIcon, color: fg, size: 26),
                   ),
                 ),
               ),
@@ -356,6 +360,7 @@ class _RoundAction extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
