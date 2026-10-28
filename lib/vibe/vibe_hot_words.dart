@@ -55,16 +55,37 @@ abstract class VibeHotWords {
   ];
 
   static VibeScene? match(String text) {
+    final all = matchAll(text);
+    return all.isEmpty ? null : all.first;
+  }
+
+  /// Every hot word in the text (up to 3, in the rules' order), so
+  /// "good morning, love you, hahaha" plays all three together.
+  static List<VibeScene> matchAll(String text) {
     final t = text.trim();
-    if (t.isEmpty || t.length > 400) return null;
-    for (final (scene, re) in _rules) {
-      if (re.hasMatch(t)) return scene;
-    }
-    return null;
+    if (t.isEmpty || t.length > 400) return const [];
+    return [
+      for (final (scene, re) in _rules)
+        if (re.hasMatch(t)) scene,
+    ].take(3).toList();
   }
 
   static final Set<String> _played = {};
-  static bool _playing = false;
+
+  /// Scenes with a full-screen tint (night sky, sunrise, disco...): only one
+  /// of them tints at a time, the others play on top of it.
+  static const _backdrops = {
+    VibeScene.hug,
+    VibeScene.party,
+    VibeScene.goodNight,
+    VibeScene.sweetDreams,
+    VibeScene.missYou,
+    VibeScene.goodMorning,
+  };
+
+  static OverlayEntry? _entry;
+  static final _stage = GlobalKey<_StageState>();
+  static final List<_Layer> _queue = [];
 
   /// Plays the scene for a text message that was just sent or just arrived, once.
   static void maybePlay(BuildContext context, Event event) {
@@ -74,39 +95,136 @@ abstract class VibeHotWords {
     if (ids.any(_played.contains)) return;
     final fresh = DateTime.now().difference(event.originServerTs).inSeconds.abs() < 30;
     if (!fresh) return;
-    final scene = match(event.body);
-    if (scene == null) return;
+    final scenes = matchAll(event.body);
+    if (scenes.isEmpty) return;
     _played.addAll(ids);
     Future<void>.delayed(const Duration(milliseconds: 520), () {
-      if (context.mounted) play(context, scene);
+      if (context.mounted) playAll(context, scenes);
     });
   }
 
-  static void play(BuildContext context, VibeScene scene) {
-    if (_playing) return;
+  static void play(BuildContext context, VibeScene scene) =>
+      playAll(context, [scene]);
+
+  /// Smart merging: scenes join whatever is already playing instead of
+  /// waiting. Several in one message come in one after another; the same
+  /// scene twice is shown once; only one full-screen tint at a time.
+  static void playAll(BuildContext context, List<VibeScene> scenes) {
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
     if (overlay == null) return;
-    _playing = true;
-    late OverlayEntry entry;
-    entry = OverlayEntry(
+    final active = [...?_stage.currentState?._layers, ..._queue];
+    var tinted = active.any((l) => l.bg);
+    var delay = 0;
+    final add = <_Layer>[];
+    for (final scene in scenes) {
+      if (active.any((l) => l.scene == scene) ||
+          add.any((l) => l.scene == scene)) {
+        continue; // already on screen
+      }
+      if (active.length + add.length >= 4) break; // keep it readable
+      final bg = !tinted && _backdrops.contains(scene);
+      if (bg) tinted = true;
+      add.add(
+        _Layer(
+          scene,
+          bg: bg,
+          // one set of buzzes at a time
+          haptics: active.isEmpty && add.isEmpty,
+          delay: Duration(milliseconds: delay),
+        ),
+      );
+      delay += 450;
+    }
+    if (add.isEmpty) return;
+    final stage = _stage.currentState;
+    if (stage != null) {
+      stage._add(add);
+      return;
+    }
+    _queue.addAll(add);
+    if (_entry != null) return;
+    _entry = OverlayEntry(
       builder: (_) => IgnorePointer(
-        child: _ScenePlayer(
-          scene: scene,
-          onDone: () {
-            entry.remove();
-            _playing = false;
+        child: _Stage(
+          key: _stage,
+          onEmpty: () {
+            _entry?.remove();
+            _entry = null;
           },
         ),
       ),
     );
-    overlay.insert(entry);
+    overlay.insert(_entry!);
   }
 }
 
+class _Layer {
+  _Layer(this.scene, {required this.bg, required this.haptics, required this.delay});
+  final VibeScene scene;
+  final bool bg;
+  final bool haptics;
+  final Duration delay;
+  final Key key = UniqueKey();
+}
+
+/// All scenes playing right now, painted on top of each other.
+class _Stage extends StatefulWidget {
+  const _Stage({required this.onEmpty, super.key});
+  final VoidCallback onEmpty;
+
+  @override
+  State<_Stage> createState() => _StageState();
+}
+
+class _StageState extends State<_Stage> {
+  final List<_Layer> _layers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _layers.addAll(VibeHotWords._queue);
+    VibeHotWords._queue.clear();
+  }
+
+  void _add(List<_Layer> add) => setState(() => _layers.addAll(add));
+
+  void _done(_Layer l) {
+    if (!mounted) return;
+    setState(() => _layers.remove(l));
+    if (_layers.isEmpty) widget.onEmpty();
+  }
+
+  @override
+  Widget build(BuildContext context) => Stack(
+    fit: StackFit.expand,
+    children: [
+      for (final l in _layers)
+        _ScenePlayer(
+          key: l.key,
+          scene: l.scene,
+          bg: l.bg,
+          haptics: l.haptics,
+          delay: l.delay,
+          onDone: () => _done(l),
+        ),
+    ],
+  );
+}
+
 class _ScenePlayer extends StatefulWidget {
-  const _ScenePlayer({required this.scene, required this.onDone});
+  const _ScenePlayer({
+    required this.scene,
+    required this.onDone,
+    this.bg = true,
+    this.haptics = true,
+    this.delay = Duration.zero,
+    super.key,
+  });
   final VibeScene scene;
   final VoidCallback onDone;
+  final bool bg;
+  final bool haptics;
+  final Duration delay;
 
   @override
   State<_ScenePlayer> createState() => _ScenePlayerState();
@@ -122,8 +240,11 @@ class _ScenePlayerState extends State<_ScenePlayer> with SingleTickerProviderSta
   @override
   void initState() {
     super.initState();
-    _haptics();
-    _c.forward().whenComplete(widget.onDone);
+    Future<void>.delayed(widget.delay, () {
+      if (!mounted) return;
+      if (widget.haptics) _haptics();
+      _c.forward().whenComplete(widget.onDone);
+    });
   }
 
   Future<void> _haptics() async {
@@ -194,7 +315,9 @@ class _ScenePlayerState extends State<_ScenePlayer> with SingleTickerProviderSta
 
   @override
   Widget build(BuildContext context) => SizedBox.expand(
-    child: CustomPaint(painter: _ScenePainter(widget.scene, _c, _seed)),
+    child: CustomPaint(
+      painter: _ScenePainter(widget.scene, _c, _seed, bg: widget.bg),
+    ),
   );
 }
 
@@ -234,8 +357,12 @@ Paint _stroke(Color c, double w) => Paint()
 Color _a(Color c, double a) => c.withValues(alpha: (c.a * a.clamp(0.0, 1.0)));
 
 class _ScenePainter extends CustomPainter {
-  _ScenePainter(this.scene, this.anim, this.seed) : super(repaint: anim);
+  _ScenePainter(this.scene, this.anim, this.seed, {this.bg = true})
+      : super(repaint: anim);
   final VibeScene scene;
+
+  /// Paints the full-screen tint (only one merged scene does).
+  final bool bg;
   final Animation<double> anim;
   final int seed;
   final Map<String, TextPainter> _text = {};
@@ -400,7 +527,7 @@ class _ScenePainter extends CustomPainter {
   void _hug(Canvas c, double t, math.Random r, double w, double h) {
     final center = Offset(w / 2, h * 0.45);
     final warm = _fadeInOut(t, 0.2, 0.75);
-    c.drawRect(Offset.zero & Size(w, h), Paint()
+    if (bg) c.drawRect(Offset.zero & Size(w, h), Paint()
       ..shader = RadialGradient(colors: [_a(const Color(0x66FFB74D), warm), _a(const Color(0x33FF8A65), warm), Colors.transparent])
           .createShader(Rect.fromCircle(center: center, radius: math.max(w, h) * 0.75)));
     final close = _smooth(_seg(t, 0.1, 0.45));
@@ -436,7 +563,7 @@ class _ScenePainter extends CustomPainter {
 
   void _party(Canvas c, double t, math.Random r, double w, double h) {
     final on = _fadeInOut(t, 0.12, 0.82);
-    c.drawRect(Offset.zero & Size(w, h), _fill(_a(Colors.black, 0.32 * on)));
+    if (bg) c.drawRect(Offset.zero & Size(w, h), _fill(_a(Colors.black, 0.32 * on)));
     final ball = Offset(w / 2, h * 0.12);
     const beams = [Color(0xFFFF4081), Color(0xFF40C4FF), Color(0xFFFFD740), Color(0xFF69F0AE), Color(0xFFE040FB), Color(0xFFFF6E40)];
     for (var i = 0; i < beams.length; i++) {
@@ -513,7 +640,7 @@ class _ScenePainter extends CustomPainter {
 
   void _goodNight(Canvas c, double t, math.Random r, double w, double h) {
     final night = _fadeInOut(t, 0.18, 0.8);
-    c.drawRect(Offset.zero & Size(w, h), Paint()
+    if (bg) c.drawRect(Offset.zero & Size(w, h), Paint()
       ..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_a(const Color(0xFF0B1033), 0.78 * night), _a(const Color(0xFF1A1F4A), 0.45 * night), Colors.transparent])
           .createShader(Offset.zero & Size(w, h)));
     for (var i = 0; i < 34; i++) {
@@ -543,7 +670,7 @@ class _ScenePainter extends CustomPainter {
 
   void _sweetDreams(Canvas c, double t, math.Random r, double w, double h) {
     final dusk = _fadeInOut(t, 0.16, 0.82);
-    c.drawRect(Offset.zero & Size(w, h), Paint()
+    if (bg) c.drawRect(Offset.zero & Size(w, h), Paint()
       ..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_a(const Color(0xFF2A1B4D), 0.72 * dusk), _a(const Color(0xFF6B3F8F), 0.35 * dusk), Colors.transparent])
           .createShader(Offset.zero & Size(w, h)));
     // moon resting on a cloud, rocking gently
@@ -704,7 +831,7 @@ class _ScenePainter extends CustomPainter {
 
   void _missYou(Canvas c, double t, math.Random r, double w, double h) {
     final tint = _fadeInOut(t, 0.2, 0.8);
-    c.drawRect(Offset.zero & Size(w, h), Paint()
+    if (bg) c.drawRect(Offset.zero & Size(w, h), Paint()
       ..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_a(const Color(0x335C7CFA), tint), _a(const Color(0x22A0B4FF), tint), Colors.transparent])
           .createShader(Offset.zero & Size(w, h)));
     Offset planeAt(double u) {
@@ -745,7 +872,7 @@ class _ScenePainter extends CustomPainter {
 
   void _goodMorning(Canvas c, double t, math.Random r, double w, double h) {
     final warm = _fadeInOut(t, 0.2, 0.8);
-    c.drawRect(Offset.zero & Size(w, h), Paint()
+    if (bg) c.drawRect(Offset.zero & Size(w, h), Paint()
       ..shader = LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, stops: const [0.3, 0.65, 1], colors: [Colors.transparent, _a(const Color(0x33FFB74D), warm), _a(const Color(0x77FF8A65), warm)])
           .createShader(Offset.zero & Size(w, h)));
     final sun = Offset(w / 2, h * 0.78 - _smooth(_seg(t, 0.02, 0.5)) * h * 0.36);
