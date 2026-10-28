@@ -3,6 +3,7 @@
 import 'dart:ui' as ui;
 
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:vibe/config/themes.dart';
@@ -17,6 +18,18 @@ import 'package:vibe/vibe/vibe_pending_files.dart';
 /// chat itself (same bubbles, names, avatars and text box); send, and the
 /// pane goes away and the reply lands in the chat.
 abstract class VibeReplyThread {
+  static Offset? _lastDown;
+  static bool _listening = false;
+
+  /// Where the finger last touched the screen (the message being answered).
+  static void _listen() {
+    if (_listening) return;
+    _listening = true;
+    GestureBinding.instance.pointerRouter.addGlobalRoute((e) {
+      if (e is PointerDownEvent) _lastDown = e.position;
+    });
+  }
+
   static String? _parentId(Event e) =>
       e.inReplyToEventId(includingFallback: false);
 
@@ -93,7 +106,17 @@ abstract class VibeReplyThread {
     String? threadLastEventId,
   }) async {
     VibeHaptics.light();
+    _listen();
     final chain = _loaded(replyTo, timeline);
+    final size = MediaQuery.sizeOf(context);
+    final from = _lastDown;
+    // the pane grows out of the tapped message and shrinks back into it
+    final origin = from == null || size.isEmpty
+        ? Alignment.center
+        : Alignment(
+            (from.dx / size.width * 2 - 1).clamp(-1.0, 1.0),
+            (from.dy / size.height * 2 - 1).clamp(-1.0, 1.0),
+          );
     await Navigator.of(context, rootNavigator: true).push(
       PageRouteBuilder<void>(
         opaque: false,
@@ -133,12 +156,17 @@ abstract class VibeReplyThread {
                   ),
                 ),
               ),
-              SlideTransition(
-                position: Tween(
-                  begin: const Offset(0, 0.12),
-                  end: Offset.zero,
-                ).animate(t),
-                child: FadeTransition(opacity: t, child: child),
+              ScaleTransition(
+                alignment: origin,
+                scale: Tween(begin: 0.6, end: 1.0).animate(t),
+                child: FadeTransition(
+                  opacity: CurvedAnimation(
+                    parent: anim,
+                    curve: const Interval(0, 0.6, curve: Curves.easeOut),
+                    reverseCurve: const Interval(0.3, 1, curve: Curves.easeIn),
+                  ),
+                  child: child,
+                ),
               ),
             ],
           );
@@ -174,7 +202,12 @@ class _ThreadPane extends StatefulWidget {
   State<_ThreadPane> createState() => _ThreadPaneState();
 }
 
-class _ThreadPaneState extends State<_ThreadPane> {
+class _ThreadPaneState extends State<_ThreadPane>
+    with SingleTickerProviderStateMixin {
+  late final _intro = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 650),
+  )..forward();
   final _text = TextEditingController();
   final _scroll = ScrollController();
   final List<XFile> _files = [];
@@ -207,6 +240,7 @@ class _ThreadPaneState extends State<_ThreadPane> {
     _text.dispose();
     _scroll.dispose();
     _focus.dispose();
+    _intro.dispose();
     super.dispose();
   }
 
@@ -334,9 +368,28 @@ class _ThreadPaneState extends State<_ThreadPane> {
                   itemCount: events.length,
                   itemBuilder: (context, i) {
                     final e = events[i];
+                    // each message slides up a moment after the one below
+                    final start = (i * 0.08).clamp(0.0, 0.5);
+                    final t = CurvedAnimation(
+                      parent: _intro,
+                      curve: Interval(
+                        start,
+                        (start + 0.5).clamp(0.0, 1.0),
+                        curve: Curves.easeOutBack,
+                      ),
+                    );
                     return RepaintBoundary(
                       key: ValueKey(e.eventId),
-                      child: Message(
+                      child: AnimatedBuilder(
+                        animation: t,
+                        builder: (context, child) => Opacity(
+                          opacity: t.value.clamp(0.0, 1.0),
+                          child: Transform.translate(
+                            offset: Offset(0, 28 * (1 - t.value)),
+                            child: child,
+                          ),
+                        ),
+                        child: Message(
                       e,
                       nextEvent: i + 1 < events.length ? events[i + 1] : null,
                       previousEvent: i > 0 ? events[i - 1] : null,
@@ -358,6 +411,7 @@ class _ThreadPaneState extends State<_ThreadPane> {
                       singleSelected: false,
                       enterThread: null,
                     ),
+                      ),
                     );
                   },
                 ),

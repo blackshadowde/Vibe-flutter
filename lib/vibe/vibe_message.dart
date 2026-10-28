@@ -999,6 +999,9 @@ class _ReplyCurve extends CustomPainter {
   final Color color;
   const _ReplyCurve(this.color);
 
+  /// How far past its box the line goes: up to the small avatar.
+  static const reach = 7.0;
+
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
@@ -1010,10 +1013,11 @@ class _ReplyCurve extends CustomPainter {
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
     final path = Path()
-      ..moveTo(cx, size.height + 2)
+      ..moveTo(cx, size.height + 4)
       ..lineTo(cx, mid + r)
       ..quadraticBezierTo(cx, mid, cx + r, mid)
-      ..lineTo(size.width, mid);
+      // runs on into the small picture of the person being replied to
+      ..lineTo(size.width + _ReplyCurve.reach, mid);
     canvas.drawPath(path, paint);
   }
 
