@@ -26,7 +26,8 @@ Each FluffyChat screen is rewritten in `lib/vibe/`, then the old file is deleted
 - [x] Unused FluffyChat screens removed (old chat list parts, space view, archive list, new-space and add-account pages)
 
 - [ ] Chat screen parts (input bar, event list, message types)
-- [ ] Settings pages
+- [x] Settings pages: blocked people, password, password recovery, chat, style, notifications, devices, security, homeserver
+- [ ] Custom emoji settings
 - [ ] Login and sign-up
 - [ ] Encryption setup and verification
 - [ ] Notifications (push helper)
