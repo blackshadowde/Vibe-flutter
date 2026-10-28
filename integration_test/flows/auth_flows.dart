@@ -8,12 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../data/environment_constants.dart';
-import '../utils/fluffy_chat_tester.dart';
+import '../utils/vibe_tester.dart';
 
 Future<void> finalLogout(WidgetTester widgetTester) =>
     widgetTester.startFluffyChatTest().then((tester) => tester.logout());
 
-extension AuthFlows on FluffyChatTester {
+extension AuthFlows on VibeTester {
   Future<void> initCryptoIdentity({String username = user1Name}) async {
     final passphrase = userPassphrases[username];
     if (passphrase != null) {

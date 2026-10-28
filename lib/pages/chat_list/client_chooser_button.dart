@@ -13,7 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart' hide Result;
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../../utils/fluffy_share.dart';
+import '../../utils/vibe_share.dart';
 import 'chat_list.dart';
 
 class ClientChooserButton extends StatelessWidget {
@@ -210,7 +210,7 @@ class ClientChooserButton extends StatelessWidget {
           context.go('/rooms/newgroup');
           break;
         case SettingsAction.invite:
-          FluffyShare.shareInviteLink(context);
+          VibeShare.shareInviteLink(context);
           break;
         case SettingsAction.support:
           launchUrlString(

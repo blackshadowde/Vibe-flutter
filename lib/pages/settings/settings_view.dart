@@ -13,7 +13,7 @@ import 'package:vibe/vibe/vibe_updates_page.dart';
 import 'package:async/async.dart';
 import 'package:vibe/config/setting_keys.dart';
 import 'package:vibe/l10n/l10n.dart';
-import 'package:vibe/utils/fluffy_share.dart';
+import 'package:vibe/utils/vibe_share.dart';
 import 'package:vibe/widgets/avatar.dart';
 import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +66,7 @@ class SettingsView extends StatelessWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: () => FluffyShare.share(mxid, context),
+                    onPressed: () => VibeShare.share(mxid, context),
                     child: Text(mxid),
                   ),
                   const SizedBox(height: 8),

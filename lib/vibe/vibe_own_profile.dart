@@ -3,7 +3,7 @@
 import 'package:vibe/vibe/vibe_activity_card.dart';
 import 'package:vibe/vibe/vibe_tap_icon.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
-import 'package:vibe/utils/fluffy_share.dart';
+import 'package:vibe/utils/vibe_share.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:vibe/vibe/vibe_name_style.dart';
 import 'package:vibe/vibe/vibe_profile_cache.dart';
@@ -503,7 +503,7 @@ class _OwnSheetState extends State<_OwnSheet> {
                         icon: Icons.qr_code_2,
                         label: 'Share my Vibe ID',
                         filled: true,
-                        onTap: () => FluffyShare.share(userId, context),
+                        onTap: () => VibeShare.share(userId, context),
                       ),
                     ],
                   ),

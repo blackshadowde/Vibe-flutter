@@ -22,8 +22,8 @@ class UnreadBubble extends StatelessWidget {
               : 14.0
         : 0.0;
     return AnimatedContainer(
-      duration: FluffyThemes.animationDuration,
-      curve: FluffyThemes.animationCurve,
+      duration: VibeThemes.animationDuration,
+      curve: VibeThemes.animationCurve,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 7),
       height: unreadBubbleSize,

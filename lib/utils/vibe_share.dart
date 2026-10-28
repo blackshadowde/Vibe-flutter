@@ -11,7 +11,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../widgets/matrix.dart';
 
-abstract class FluffyShare {
+abstract class VibeShare {
   static Future<void> share(
     String text,
     BuildContext context, {
@@ -43,10 +43,10 @@ abstract class FluffyShare {
     final client = Matrix.of(context).client;
     final ownProfile = await client.fetchOwnProfile();
     if (!context.mounted) return;
-    await FluffyShare.share(
+    await VibeShare.share(
       l10n.inviteText(
         ownProfile.displayName ?? client.userID!,
-        'https://matrix.to/#/${client.userID}?client=im.fluffychat',
+        'https://matrix.to/#/${client.userID}?client=app.vibe.chat',
       ),
       context,
     );

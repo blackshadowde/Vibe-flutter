@@ -707,8 +707,8 @@ class VibeMessage extends StatelessWidget {
                                     Align(
                               alignment: Alignment.bottomLeft,
                               child: AnimatedSize(
-                                duration: FluffyThemes.animationDuration,
-                                curve: FluffyThemes.animationCurve,
+                                duration: VibeThemes.animationDuration,
+                                curve: VibeThemes.animationCurve,
                                 child: showReactionPicker
                                     ? Padding(
                                         padding: const EdgeInsets.all(4.0),
@@ -810,7 +810,7 @@ class VibeMessage extends StatelessWidget {
         eventId: event.eventId,
         child: Container(
           constraints: const BoxConstraints(
-            maxWidth: FluffyThemes.maxTimelineWidth,
+            maxWidth: VibeThemes.maxTimelineWidth,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -892,8 +892,8 @@ class VibeMessage extends StatelessWidget {
               ),
                             if (enterThread != null)
                 AnimatedSize(
-                  duration: FluffyThemes.animationDuration,
-                  curve: FluffyThemes.animationCurve,
+                  duration: VibeThemes.animationDuration,
+                  curve: VibeThemes.animationCurve,
                   alignment: Alignment.bottomCenter,
                   child: threadChildren.isEmpty
                       ? const SizedBox.shrink()
@@ -905,7 +905,7 @@ class VibeMessage extends StatelessWidget {
                           ),
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(
-                              maxWidth: FluffyThemes.columnWidth * 1.5,
+                              maxWidth: VibeThemes.columnWidth * 1.5,
                             ),
                             child: TextButton.icon(
                               style: TextButton.styleFrom(

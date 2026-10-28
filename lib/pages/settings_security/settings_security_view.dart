@@ -37,8 +37,8 @@ class SettingsSecurityView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(L10n.of(context).security),
-        automaticallyImplyLeading: !FluffyThemes.isColumnMode(context),
-        centerTitle: FluffyThemes.isColumnMode(context),
+        automaticallyImplyLeading: !VibeThemes.isColumnMode(context),
+        centerTitle: VibeThemes.isColumnMode(context),
       ),
       body: ListTileTheme(
         iconColor: theme.colorScheme.onSurface,

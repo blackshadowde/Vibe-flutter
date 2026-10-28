@@ -17,7 +17,7 @@ import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/main.dart';
 import 'package:vibe/utils/notification_background_handler.dart';
 import 'package:vibe/utils/push_helper.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
@@ -73,7 +73,7 @@ class BackgroundPush {
           await notificationTap(
             NotificationResponseJson.fromJsonString(message),
             clients: clients,
-            router: FluffyChatApp.router,
+            router: VibeApp.router,
             l10n: l10n,
           );
         } catch (e, s) {
@@ -92,7 +92,7 @@ class BackgroundPush {
             await notificationTap(
               NotificationResponseJson.fromJsonString(message),
               clients: clients,
-              router: FluffyChatApp.router,
+              router: VibeApp.router,
               l10n: l10n,
             );
           } catch (e, s) {
@@ -108,7 +108,7 @@ class BackgroundPush {
         onDidReceiveNotificationResponse: (response) => notificationTap(
           response,
           clients: clients,
-          router: FluffyChatApp.router,
+          router: VibeApp.router,
           l10n: l10n,
         ),
         onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
@@ -235,7 +235,9 @@ class BackgroundPush {
       (pusher) =>
           pusher.appId == thisAppId || // To migrate older app-id format:
           ((pusher.appId == 'chat.fluffy.fluffychat.data_message' ||
-                  pusher.appId == 'chat.fluffy.fluffychat') &&
+                  pusher.appId == 'chat.fluffy.fluffychat' ||
+                  // before Vibe had its own app ID
+                  pusher.appId.startsWith('chat.fluffy.fluffychat.')) &&
               pusher.pushkey == token),
     );
     for (final pusher in legacyPushers) {
@@ -443,7 +445,7 @@ class BackgroundPush {
         notificationTap(
           response,
           clients: clients,
-          router: FluffyChatApp.router,
+          router: VibeApp.router,
           l10n: l10n,
         );
       }

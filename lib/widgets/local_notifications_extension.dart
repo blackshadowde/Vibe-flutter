@@ -96,17 +96,17 @@ extension LocalNotificationsExtension on MatrixState {
           sound: ThemeLinuxSound('message-new-instant'),
           actions: [
             LinuxNotificationAction(
-              key: FluffyChatNotificationActions.markAsRead.name,
+              key: VibeNotificationActions.markAsRead.name,
               label: l10n.markAsRead,
             ),
             LinuxNotificationAction(
-              key: FluffyChatNotificationActions.mute.name,
+              key: VibeNotificationActions.mute.name,
               label: l10n.mute,
             ),
           ],
         ),
       ),
-      payload: FluffyChatPushPayload(
+      payload: VibePushPayload(
         client.clientName,
         event.room.id,
         event.eventId,

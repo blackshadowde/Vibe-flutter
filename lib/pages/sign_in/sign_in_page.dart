@@ -116,8 +116,8 @@ class SignInPage extends StatelessWidget {
               ],
             ),
             bottomNavigationBar: AnimatedSize(
-              duration: FluffyThemes.animationDuration,
-              curve: FluffyThemes.animationCurve,
+              duration: VibeThemes.animationDuration,
+              curve: VibeThemes.animationCurve,
               child: selected == null || !servers.contains(selected)
                   ? const SizedBox.shrink()
                   : SafeArea(

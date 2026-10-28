@@ -4,7 +4,7 @@ import 'package:vibe/vibe/vibe_dialog.dart';
 import 'package:vibe/config/setting_keys.dart';
 import 'package:vibe/utils/platform_infos.dart';
 import 'package:vibe/vibe/vibe_app_info.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
@@ -35,7 +35,7 @@ abstract class VibeCrashReport {
       if (DateTime.now().difference(when) > const Duration(days: 2)) return;
       await Future<void>.delayed(const Duration(seconds: 2));
       final ctx =
-          FluffyChatApp.router.routerDelegate.navigatorKey.currentContext;
+          VibeApp.router.routerDelegate.navigatorKey.currentContext;
       if (ctx == null || !ctx.mounted) return;
       final reason = info['reason'] as String? ?? 'crash';
       final report = [

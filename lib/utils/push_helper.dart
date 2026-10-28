@@ -279,7 +279,7 @@ Future<void> _tryPushHelper(
       body: hideContent ? 'New message' : '🔒 New message',
       // tapping opens the chat (not for locked chats, as before)
       payload: hideContent && !VibeLock.isLocked(event.room.id)
-          ? FluffyChatPushPayload(
+          ? VibePushPayload(
               client.clientName,
               event.room.id,
               event.eventId,
@@ -438,7 +438,7 @@ Future<void> _tryPushHelper(
         ? null
         : <AndroidNotificationAction>[
             AndroidNotificationAction(
-              FluffyChatNotificationActions.reply.name,
+              VibeNotificationActions.reply.name,
               l10n.reply,
               inputs: [
                 AndroidNotificationActionInput(label: l10n.writeAMessage),
@@ -447,7 +447,7 @@ Future<void> _tryPushHelper(
               semanticAction: SemanticAction.reply,
             ),
             AndroidNotificationAction(
-              FluffyChatNotificationActions.markAsRead.name,
+              VibeNotificationActions.markAsRead.name,
               l10n.markAsRead,
               semanticAction: SemanticAction.markAsRead,
             ),
@@ -487,7 +487,7 @@ Future<void> _tryPushHelper(
     title: needsTitleAndBody ? title : null,
     body: needsTitleAndBody ? body : null,
     notificationDetails: platformChannelSpecifics,
-    payload: FluffyChatPushPayload(
+    payload: VibePushPayload(
       client.clientName,
       event.room.id,
       event.eventId,
@@ -555,17 +555,17 @@ Future<void> updateSummaryNotification({
   );
 }
 
-class FluffyChatPushPayload {
+class VibePushPayload {
   final String? clientName, roomId, eventId;
 
-  FluffyChatPushPayload(this.clientName, this.roomId, this.eventId);
+  VibePushPayload(this.clientName, this.roomId, this.eventId);
 
-  factory FluffyChatPushPayload.fromString(String payload) {
+  factory VibePushPayload.fromString(String payload) {
     final parts = payload.split('|');
     if (parts.length != 3) {
-      return FluffyChatPushPayload(null, null, null);
+      return VibePushPayload(null, null, null);
     }
-    return FluffyChatPushPayload(parts.first, parts[1], parts[2]);
+    return VibePushPayload(parts.first, parts[1], parts[2]);
   }
 
   @override

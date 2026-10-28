@@ -2,7 +2,7 @@
 
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/config/setting_keys.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:vibe/vibe/vibe_updater.dart';
@@ -53,7 +53,7 @@ abstract class VibeWhatsNew {
       if (seen == version) return;
       await AppSettings.store.setString(_seenKey, version);
       final ctx =
-          FluffyChatApp.router.routerDelegate.navigatorKey.currentContext;
+          VibeApp.router.routerDelegate.navigatorKey.currentContext;
       if (ctx == null || !ctx.mounted) return;
       await show(ctx, version);
     } catch (_) {}

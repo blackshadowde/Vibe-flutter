@@ -31,7 +31,7 @@ class SpacesNavigationRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final client = Matrix.of(context).client;
-    final coloredMode = !FluffyThemes.isColumnMode(context);
+    final coloredMode = !VibeThemes.isColumnMode(context);
     final theme = Theme.of(context);
     return Material(
       color: coloredMode ? theme.colorScheme.surfaceContainer : null,
@@ -47,9 +47,9 @@ class SpacesNavigationRail extends StatelessWidget {
                 .toList();
 
             return SizedBox(
-              width: FluffyThemes.isColumnMode(context)
-                  ? FluffyThemes.navRailWidth
-                  : FluffyThemes.navRailWidth - 8,
+              width: VibeThemes.isColumnMode(context)
+                  ? VibeThemes.navRailWidth
+                  : VibeThemes.navRailWidth - 8,
               child: Column(
                 children: [
                   Expanded(
@@ -121,7 +121,7 @@ class SpacesNavigationRail extends StatelessWidget {
                       },
                     ),
                   ),
-                  if (FluffyThemes.isColumnMode(context))
+                  if (VibeThemes.isColumnMode(context))
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: StartChatFab(),

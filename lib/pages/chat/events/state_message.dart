@@ -29,8 +29,8 @@ class StateMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AnimatedSize(
-      duration: FluffyThemes.animationDuration,
-      curve: FluffyThemes.animationCurve,
+      duration: VibeThemes.animationDuration,
+      curve: VibeThemes.animationCurve,
       child: isCollapsed
           ? const SizedBox.shrink()
           : Padding(

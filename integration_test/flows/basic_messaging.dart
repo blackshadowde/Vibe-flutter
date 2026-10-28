@@ -6,7 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../utils/fluffy_chat_tester.dart';
+import '../utils/vibe_tester.dart';
 import 'auth_flows.dart';
 import 'chat_flows.dart';
 
@@ -14,7 +14,7 @@ Future<void> basicMessaging(WidgetTester widgetTester) => widgetTester
     .startFluffyChatTest()
     .then((tester) => tester._basicMessaging());
 
-extension on FluffyChatTester {
+extension on VibeTester {
   Future<void> _basicMessaging() async {
     await ensureLoggedIn();
     await ensureGroupChatCreated();

@@ -15,7 +15,7 @@ import 'package:vibe/vibe/vibe_whats_new.dart';
 import 'package:vibe/vibe/vibe_support.dart';
 import 'package:vibe/vibe/vibe_updater.dart';
 import 'package:vibe/widgets/avatar.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
@@ -48,11 +48,11 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
   Client? _client;
 
   String? get _path =>
-      FluffyChatApp.router.routeInformationProvider.value.uri.path;
+      VibeApp.router.routeInformationProvider.value.uri.path;
 
   String? _currentRoomId() {
     final seg =
-        FluffyChatApp.router.routeInformationProvider.value.uri.pathSegments;
+        VibeApp.router.routeInformationProvider.value.uri.pathSegments;
     if (seg.length >= 2 && seg[0] == 'rooms' && seg[1].startsWith('!')) {
       return seg[1];
     }
@@ -218,7 +218,7 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
                           unread: _otherUnread(),
                           onTap: () {
                             _dismiss();
-                            FluffyChatApp.router.go('/rooms/${item.room.id}');
+                            VibeApp.router.go('/rooms/${item.room.id}');
                           },
                         ),
                       ),

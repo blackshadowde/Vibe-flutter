@@ -5,7 +5,7 @@
 
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/pages/chat_access_settings/chat_access_settings_controller.dart';
-import 'package:vibe/utils/fluffy_share.dart';
+import 'package:vibe/utils/vibe_share.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:vibe/widgets/layouts/max_width_body.dart';
 import 'package:flutter/material.dart' hide Visibility;
@@ -218,7 +218,7 @@ class ChatAccessSettingsPageView extends StatelessWidget {
                   subtitle: SelectableText(room.id),
                   trailing: IconButton(
                     icon: const Icon(Icons.copy_outlined),
-                    onPressed: () => FluffyShare.share(room.id, context),
+                    onPressed: () => VibeShare.share(room.id, context),
                   ),
                 ),
                 ListTile(
@@ -268,7 +268,7 @@ class _AliasListTile extends StatelessWidget {
           ? const Icon(Icons.star)
           : const Icon(Icons.link_outlined),
       title: InkWell(
-        onTap: () => FluffyShare.share('https://matrix.to/#/$alias', context),
+        onTap: () => VibeShare.share('https://matrix.to/#/$alias', context),
         child: SelectableText(
           alias,
           style: TextStyle(

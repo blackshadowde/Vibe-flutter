@@ -32,7 +32,7 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
     return SliverAppBar(
       floating: true,
       toolbarHeight: 72,
-      pinned: FluffyThemes.isColumnMode(context),
+      pinned: VibeThemes.isColumnMode(context),
       scrolledUnderElevation: 0,
       backgroundColor: Colors.transparent,
       automaticallyImplyLeading: false,
@@ -75,7 +75,7 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
                             onPressed: controller.cancelSearch,
                             color: theme.colorScheme.onPrimaryContainer,
                           )
-                        : FluffyThemes.isColumnMode(context) ||
+                        : VibeThemes.isColumnMode(context) ||
                               (controller.spaces.isEmpty &&
                                   !AppSettings.displayNavigationRail.value)
                         ? IconButton(

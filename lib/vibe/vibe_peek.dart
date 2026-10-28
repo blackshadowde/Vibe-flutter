@@ -9,7 +9,7 @@ import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:vibe/vibe/vibe_lock.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:vibe/widgets/avatar.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -108,7 +108,7 @@ class VibePeek extends ChangeNotifier {
   void open(String roomId) {
     dismiss(roomId);
     _dismissed.remove(roomId);
-    FluffyChatApp.router.go('/rooms/$roomId');
+    VibeApp.router.go('/rooms/$roomId');
   }
 }
 

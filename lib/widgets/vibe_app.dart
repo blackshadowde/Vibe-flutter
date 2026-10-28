@@ -22,13 +22,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/custom_scroll_behaviour.dart';
 import 'matrix.dart';
 
-class FluffyChatApp extends StatelessWidget {
+class VibeApp extends StatelessWidget {
   final Widget? testWidget;
   final List<Client> clients;
   final ({String? pincode, bool useBiometrics}) appLockSettings;
   final SharedPreferences store;
 
-  const FluffyChatApp({
+  const VibeApp({
     super.key,
     this.testWidget,
     required this.clients,
@@ -50,7 +50,7 @@ class FluffyChatApp extends StatelessWidget {
       // Workaround for content sharings passed to go router:
       if ({
         'content',
-        'sharemedia-im.fluffychat.app',
+        'sharemedia-app.vibe.chat',
       }.contains(state.uri.scheme)) {
         Logs().d('Ignore content sharing handling in go router', state.uri);
         return '/';
@@ -71,8 +71,8 @@ class FluffyChatApp extends StatelessWidget {
         title: AppSettings.applicationName.value,
         debugShowCheckedModeBanner: false,
         themeMode: themeMode,
-        theme: FluffyThemes.buildTheme(context, Brightness.light, primaryColor),
-        darkTheme: FluffyThemes.buildTheme(
+        theme: VibeThemes.buildTheme(context, Brightness.light, primaryColor),
+        darkTheme: VibeThemes.buildTheme(
           context,
           Brightness.dark,
           primaryColor,

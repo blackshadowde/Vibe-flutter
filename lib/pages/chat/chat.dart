@@ -576,7 +576,7 @@ class ChatController extends State<ChatPageWithRoom>
     final eventId = stableId(firstEvent);
     if (!_animated.add(eventId)) return;
     animateInEventId = eventId;
-    await Future.delayed(FluffyThemes.animationDuration);
+    await Future.delayed(VibeThemes.animationDuration);
     if (animateInEventId == eventId) animateInEventId = null;
   }
 
@@ -1331,7 +1331,7 @@ class ChatController extends State<ChatPageWithRoom>
     }
     await scrollController.scrollToIndex(
       eventIndex + 1,
-      duration: FluffyThemes.animationDuration,
+      duration: VibeThemes.animationDuration,
       preferPosition: AutoScrollPosition.middle,
     );
     _updateScrollController();
@@ -1733,12 +1733,12 @@ class ChatController extends State<ChatPageWithRoom>
           ValueListenableBuilder(
             valueListenable: _displayChatDetailsColumn,
             builder: (context, displayChatDetailsColumn, _) =>
-                !FluffyThemes.isThreeColumnMode(context) ||
+                !VibeThemes.isThreeColumnMode(context) ||
                     room.membership != Membership.join ||
                     !displayChatDetailsColumn
                 ? const SizedBox(height: double.infinity, width: 0)
                 : Container(
-                    width: FluffyThemes.columnWidth,
+                    width: VibeThemes.columnWidth,
                     clipBehavior: Clip.hardEdge,
                     decoration: BoxDecoration(
                       border: Border(

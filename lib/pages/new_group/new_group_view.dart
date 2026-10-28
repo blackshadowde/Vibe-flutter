@@ -104,8 +104,8 @@ class NewGroupView extends StatelessWidget {
               onChanged: controller.loading ? null : controller.setPublicGroup,
             ),
             AnimatedSize(
-              duration: FluffyThemes.animationDuration,
-              curve: FluffyThemes.animationCurve,
+              duration: VibeThemes.animationDuration,
+              curve: VibeThemes.animationCurve,
               child: controller.publicGroup
                   ? SwitchListTile.adaptive(
                       contentPadding: const EdgeInsets.symmetric(
@@ -121,8 +121,8 @@ class NewGroupView extends StatelessWidget {
                   : const SizedBox.shrink(),
             ),
             AnimatedSize(
-              duration: FluffyThemes.animationDuration,
-              curve: FluffyThemes.animationCurve,
+              duration: VibeThemes.animationDuration,
+              curve: VibeThemes.animationCurve,
               child: controller.createGroupType == CreateGroupType.space
                   ? const SizedBox.shrink()
                   : SwitchListTile.adaptive(
@@ -142,8 +142,8 @@ class NewGroupView extends StatelessWidget {
                     ),
             ),
             AnimatedSize(
-              duration: FluffyThemes.animationDuration,
-              curve: FluffyThemes.animationCurve,
+              duration: VibeThemes.animationDuration,
+              curve: VibeThemes.animationCurve,
               child: controller.createGroupType == CreateGroupType.space
                   ? ListTile(
                       contentPadding: const EdgeInsets.symmetric(
@@ -176,8 +176,8 @@ class NewGroupView extends StatelessWidget {
               ),
             ),
             AnimatedSize(
-              duration: FluffyThemes.animationDuration,
-              curve: FluffyThemes.animationCurve,
+              duration: VibeThemes.animationDuration,
+              curve: VibeThemes.animationCurve,
               child: error == null
                   ? const SizedBox.shrink()
                   : ListTile(

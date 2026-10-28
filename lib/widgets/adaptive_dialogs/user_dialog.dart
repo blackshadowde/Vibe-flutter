@@ -7,7 +7,7 @@ import 'package:vibe/vibe/vibe_dialog.dart';
 import 'package:vibe/config/themes.dart';
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/utils/date_time_extension.dart';
-import 'package:vibe/utils/fluffy_share.dart';
+import 'package:vibe/utils/vibe_share.dart';
 import 'package:vibe/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
 import 'package:vibe/widgets/adaptive_dialogs/show_text_input_dialog.dart';
 import 'package:vibe/vibe/vibe_dm_finder.dart';
@@ -123,8 +123,8 @@ class UserDialog extends StatelessWidget {
                                           ),
                                           child: AnimatedScale(
                                             duration:
-                                                FluffyThemes.animationDuration,
-                                            curve: FluffyThemes.animationCurve,
+                                                VibeThemes.animationDuration,
+                                            curve: VibeThemes.animationCurve,
                                             scale: hovered
                                                 ? 1.33
                                                 : copied
@@ -239,7 +239,7 @@ class UserDialog extends StatelessWidget {
                   AdaptiveIconTextButton(
                     label: L10n.of(context).share,
                     icon: Icons.adaptive.share,
-                    onTap: () => FluffyShare.share(
+                    onTap: () => VibeShare.share(
                       'https://matrix.to/#/${profile.userId}',
                       context,
                     ),

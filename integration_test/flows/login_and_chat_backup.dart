@@ -8,14 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../data/environment_constants.dart';
-import '../utils/fluffy_chat_tester.dart';
+import '../utils/vibe_tester.dart';
 import 'auth_flows.dart';
 
 Future<void> loginAndChatBackup(WidgetTester widgetTester) => widgetTester
     .startFluffyChatTest()
     .then((tester) => tester._loginAndChatBackup());
 
-extension on FluffyChatTester {
+extension on VibeTester {
   Future<void> _loginAndChatBackup() async {
     // Set up with only recovery key:
     await login();

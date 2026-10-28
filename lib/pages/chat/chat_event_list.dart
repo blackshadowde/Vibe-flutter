@@ -42,7 +42,7 @@ class ChatEventList extends StatelessWidget {
 
     final colors = [theme.secondaryBubbleColor, theme.bubbleColor];
 
-    final horizontalPadding = FluffyThemes.isColumnMode(context) ? 8.0 : 0.0;
+    final horizontalPadding = VibeThemes.isColumnMode(context) ? 8.0 : 0.0;
 
     final hiddenIds = VibeHidden.ids(controller.room.id);
     final events = timeline.events
@@ -78,7 +78,7 @@ class ChatEventList extends StatelessWidget {
             padding: EdgeInsets.only(
               bottom:
                   barHeight ??
-                  (72 + (FluffyThemes.isColumnMode(context) ? 16 : 0)),
+                  (72 + (VibeThemes.isColumnMode(context) ? 16 : 0)),
             ),
             child: list,
           ),

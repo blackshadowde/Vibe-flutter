@@ -6,7 +6,7 @@
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'package:vibe/config/app_config.dart';
 import 'package:vibe/l10n/l10n.dart';
-import 'package:vibe/utils/fluffy_share.dart';
+import 'package:vibe/utils/vibe_share.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/matrix_file_extension.dart';
 import 'package:vibe/widgets/future_loading_dialog.dart';
 import 'package:flutter/foundation.dart';
@@ -75,7 +75,7 @@ class QrCodeViewer extends StatelessWidget {
               backgroundColor: Colors.black.withAlpha(128),
             ),
             icon: Icon(Icons.adaptive.share_outlined),
-            onPressed: () => FluffyShare.share(inviteLink, context),
+            onPressed: () => VibeShare.share(inviteLink, context),
             color: Colors.white,
             tooltip: L10n.of(context).share,
           ),
@@ -113,7 +113,7 @@ class QrCodeViewer extends StatelessWidget {
                 children: [
                   ConstrainedBox(
                     constraints: const BoxConstraints(
-                      maxWidth: FluffyThemes.columnWidth,
+                      maxWidth: VibeThemes.columnWidth,
                     ),
                     child: PrettyQrView.data(
                       data: inviteLink,

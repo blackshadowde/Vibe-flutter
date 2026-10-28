@@ -39,14 +39,14 @@ class NaviRailItem extends StatelessWidget {
       builder: (context, hovered) {
         return SizedBox(
           height: 64,
-          width: FluffyThemes.navRailWidth,
+          width: VibeThemes.navRailWidth,
           child: Stack(
             children: [
               Center(
                 child: AnimatedScale(
                   scale: hovered ? 1.05 : 1.0,
-                  duration: FluffyThemes.animationDuration,
-                  curve: FluffyThemes.animationCurve,
+                  duration: VibeThemes.animationDuration,
+                  curve: VibeThemes.animationCurve,
                   child: Material(
                     color: isSelected
                         ? VibePalette.accent

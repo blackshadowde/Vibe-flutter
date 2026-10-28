@@ -8,7 +8,7 @@ import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/config/setting_keys.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
@@ -197,7 +197,7 @@ abstract class VibeCall {
         return;
       }
       final room = e.room;
-      final ctx = FluffyChatApp.router.routerDelegate.navigatorKey.currentContext;
+      final ctx = VibeApp.router.routerDelegate.navigatorKey.currentContext;
       if (ctx == null || !ctx.mounted || _inCall) return;
       _ring(ctx, room, e, i);
     });

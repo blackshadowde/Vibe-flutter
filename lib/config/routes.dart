@@ -128,7 +128,7 @@ abstract class AppRoutes {
       pageBuilder: (context, state, child) => noTransitionPageBuilder(
         context,
         state,
-        FluffyThemes.isColumnMode(context) &&
+        VibeThemes.isColumnMode(context) &&
                 state.fullPath?.startsWith('/rooms/settings') == false
             ? TwoColumnLayout(
                 mainView: ChatList(
@@ -148,7 +148,7 @@ abstract class AppRoutes {
           pageBuilder: (context, state) => defaultPageBuilder(
             context,
             state,
-            FluffyThemes.isColumnMode(context)
+            VibeThemes.isColumnMode(context)
                 ? const EmptyPage()
                 : ChatList(
                     activeChat: state.pathParameters['roomid'],
@@ -214,7 +214,7 @@ abstract class AppRoutes {
               pageBuilder: (context, state, child) => defaultPageBuilder(
                 context,
                 state,
-                FluffyThemes.isColumnMode(context)
+                VibeThemes.isColumnMode(context)
                     ? TwoColumnLayout(
                         mainView: Settings(key: state.pageKey),
                         sideView: child,
@@ -228,7 +228,7 @@ abstract class AppRoutes {
                   pageBuilder: (context, state) => defaultPageBuilder(
                     context,
                     state,
-                    FluffyThemes.isColumnMode(context)
+                    VibeThemes.isColumnMode(context)
                         ? const EmptyPage()
                         : const Settings(),
                   ),
@@ -543,7 +543,7 @@ abstract class AppRoutes {
       final client = matrix.getClientByName(clientName);
       if (client != null) matrix.setActiveClient(client);
     }
-    return FluffyThemes.isColumnMode(context)
+    return VibeThemes.isColumnMode(context)
         ? noTransitionPageBuilder(context, state, child)
         : VibePage(
             key: state.pageKey,

@@ -7,7 +7,7 @@
   "apps": [
     {
       "name": "Vibe",
-      "bundleIdentifier": "im.fluffychat.app",
+      "bundleIdentifier": "app.vibe.chat",
       "developerName": "blackshadowde",
       "subtitle": "Discord-style encrypted chat on Matrix",
       "localizedDescription": "Vibe: a Discord-style, end-to-end encrypted messenger built on Matrix. Free and open source (AGPL-3.0), based on FluffyChat.",

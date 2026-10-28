@@ -5,7 +5,7 @@
 
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'package:vibe/l10n/l10n.dart';
-import 'package:vibe/utils/fluffy_share.dart';
+import 'package:vibe/utils/vibe_share.dart';
 import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:vibe/widgets/adaptive_dialogs/show_text_input_dialog.dart';
 import 'package:flutter/material.dart';
@@ -167,9 +167,9 @@ class PublicRoomDialog extends StatelessWidget {
                                                   right: 4.0,
                                                 ),
                                                 child: AnimatedScale(
-                                                  duration: FluffyThemes
+                                                  duration: VibeThemes
                                                       .animationDuration,
-                                                  curve: FluffyThemes
+                                                  curve: VibeThemes
                                                       .animationCurve,
                                                   scale: hovered
                                                       ? 1.33
@@ -276,7 +276,7 @@ class PublicRoomDialog extends StatelessWidget {
                       AdaptiveIconTextButton(
                         label: L10n.of(context).share,
                         icon: Icons.adaptive.share,
-                        onTap: () => FluffyShare.share(
+                        onTap: () => VibeShare.share(
                           'https://matrix.to/#/$roomLink',
                           context,
                         ),

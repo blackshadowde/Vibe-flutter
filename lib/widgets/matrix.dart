@@ -20,7 +20,7 @@ import 'package:vibe/utils/notification_background_handler.dart';
 import 'package:vibe/utils/platform_infos.dart';
 import 'package:vibe/utils/uia_request_manager.dart';
 import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:vibe/widgets/future_loading_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -166,7 +166,7 @@ class MatrixState extends State<Matrix> {
                 _registerSubs(_loginClientCandidate!.clientName);
                 setActiveClient(_loginClientCandidate);
                 _loginClientCandidate = null;
-                FluffyChatApp.router.go('/backup');
+                VibeApp.router.go('/backup');
               });
     if (widget.clients.isEmpty) widget.clients.add(candidate);
     return candidate;
@@ -197,7 +197,7 @@ class MatrixState extends State<Matrix> {
   }
 
   String? get activeRoomId {
-    final route = FluffyChatApp.router.routeInformationProvider.value.uri.path;
+    final route = VibeApp.router.routeInformationProvider.value.uri.path;
     if (!route.startsWith('/rooms/')) return null;
     return route.split('/')[2];
   }
@@ -245,14 +245,14 @@ class MatrixState extends State<Matrix> {
                   KeyVerificationState.done,
                   KeyVerificationState.error,
                 }.contains(request.state)) {
-              FluffyChatApp.router.pop('dialog');
+              VibeApp.router.pop('dialog');
             }
             hidPopup = true;
           };
           request.onUpdate = null;
           hidPopup = true;
           await KeyVerificationDialog(request: request).show(
-            FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ??
+            VibeApp.router.routerDelegate.navigatorKey.currentContext ??
                 context,
           );
         });
@@ -268,7 +268,7 @@ class MatrixState extends State<Matrix> {
 
           if (loggedInWithMultipleClients) {
             final snackbarContext =
-                FluffyChatApp
+                VibeApp
                     .router
                     .routerDelegate
                     .navigatorKey
@@ -282,20 +282,20 @@ class MatrixState extends State<Matrix> {
             ).showSnackBar(SnackBar(content: Text(l10n.oneClientLoggedOut)));
             return;
           }
-          FluffyChatApp.router.go('/');
+          VibeApp.router.go('/');
         });
     onUiaRequest[name] ??= c.onUiaRequest.stream.listen(uiaRequestHandler);
     if (PlatformInfos.isWeb || PlatformInfos.isLinux) {
       FlutterLocalNotificationsPlugin().initialize(
         settings: InitializationSettings(
           linux: LinuxInitializationSettings(
-            defaultActionName: FluffyChatNotificationActions.open.name,
+            defaultActionName: VibeNotificationActions.open.name,
           ),
         ),
         onDidReceiveNotificationResponse: (response) => notificationTap(
           response,
           clients: widget.clients,
-          router: FluffyChatApp.router,
+          router: VibeApp.router,
           l10n: null,
         ),
       );
@@ -330,7 +330,7 @@ class MatrixState extends State<Matrix> {
         this,
         onFcmError: (errorMsg, {Uri? link}) async {
           final context =
-              FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ??
+              VibeApp.router.routerDelegate.navigatorKey.currentContext ??
               this.context;
           if (!context.mounted) return;
           final result = await showOkCancelAlertDialog(

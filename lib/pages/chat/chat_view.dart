@@ -53,7 +53,7 @@ class ChatView extends StatelessWidget {
         exceptionContext: ExceptionContext.joinRoom,
       );
     }
-    final bottomSheetPadding = FluffyThemes.isColumnMode(context) ? 16.0 : 8.0;
+    final bottomSheetPadding = VibeThemes.isColumnMode(context) ? 16.0 : 8.0;
     final scrollUpBannerEventId = controller.scrollUpBannerEventId;
 
     final accountConfig = Matrix.of(context).client.applicationAccountConfig;
@@ -134,10 +134,10 @@ class ChatView extends StatelessWidget {
                         tooltip: L10n.of(context).backToMainChat,
                         color: theme.colorScheme.onSecondaryContainer,
                       )
-                    : FluffyThemes.isColumnMode(context)
+                    : VibeThemes.isColumnMode(context)
                     ? null
                     : const Center(child: BackButton()),
-                titleSpacing: FluffyThemes.isColumnMode(context) ? 24 : 0,
+                titleSpacing: VibeThemes.isColumnMode(context) ? 24 : 0,
                 title: ChatAppBarTitle(controller),
                 actions: [
                   if (controller.selectMode) ...[
@@ -451,7 +451,7 @@ class ChatView extends StatelessWidget {
                               child: Container(
                                 margin: EdgeInsets.all(bottomSheetPadding),
                                 constraints: const BoxConstraints(
-                                  maxWidth: FluffyThemes.maxTimelineWidth,
+                                  maxWidth: VibeThemes.maxTimelineWidth,
                                 ),
                                 child: controller.room.isExtinct
                                     ? ElevatedButton.icon(

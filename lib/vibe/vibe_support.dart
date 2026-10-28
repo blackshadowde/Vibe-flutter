@@ -3,7 +3,7 @@
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/vibe/vibe_swipe.dart';
 import 'package:vibe/config/setting_keys.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -74,7 +74,7 @@ abstract class VibeSupport {
       final last = store.getInt(_lastAskKey) ?? 0;
       if (now - last < 30 * day) return; // at most once a month
       final ctx =
-          FluffyChatApp.router.routerDelegate.navigatorKey.currentContext;
+          VibeApp.router.routerDelegate.navigatorKey.currentContext;
       if (ctx == null || !ctx.mounted) return;
       // Don't stack on top of another sheet or dialog (update, what's new).
       if (Navigator.of(ctx, rootNavigator: true).canPop()) return;

@@ -6,7 +6,7 @@
 import 'dart:io';
 
 import 'package:vibe/utils/error_reporter.dart';
-import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/vibe_app.dart';
 import 'package:matrix/matrix.dart';
 
 // Workaround until https://github.com/famedly/matrix-dart-sdk/pull/2360
@@ -19,7 +19,7 @@ Future<void> onSoftLogout(Client client) async {
     rethrow;
   } catch (e, s) {
     final context =
-        FluffyChatApp.router.routerDelegate.navigatorKey.currentContext;
+        VibeApp.router.routerDelegate.navigatorKey.currentContext;
     if (context != null && context.mounted) {
       ErrorReporter(
         context,
