@@ -132,6 +132,19 @@ jobs:
           set -euo pipefail
           mkdir -p Payload
           cp -R build/ios/iphoneos/Runner.app Payload/
+          # The app and its extensions carry this build's version and number,
+          # which AltStore / SideStore check against the source list.
+          for p in Payload/Runner.app/Info.plist Payload/Runner.app/PlugIns/*.appex/Info.plist; do
+            [ -f "$p" ] || continue
+            /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VIBE_BUILD" "$p"
+            /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VIBE_VERSION" "$p"
+          done
+          FOUND=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" Payload/Runner.app/Info.plist)
+          echo "IPA build number: $FOUND (source list: $VIBE_BUILD)"
+          if [ "$FOUND" != "$VIBE_BUILD" ]; then
+            echo "::error::IPA build number $FOUND does not match $VIBE_BUILD"
+            exit 1
+          fi
           zip -qry Vibe-unsigned.ipa Payload
           cp Vibe-unsigned.ipa Vibe.ipa
 
