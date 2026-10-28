@@ -123,8 +123,8 @@ abstract class VibeReplyThread {
         barrierDismissible: true,
         barrierLabel: 'Close',
         barrierColor: Colors.black.withValues(alpha: 0.3),
-        transitionDuration: const Duration(milliseconds: 320),
-        reverseTransitionDuration: const Duration(milliseconds: 220),
+        transitionDuration: const Duration(milliseconds: 300),
+        reverseTransitionDuration: const Duration(milliseconds: 260),
         pageBuilder: (ctx, _, _) => _ThreadPane(
           room: room,
           timeline: timeline,
@@ -150,23 +150,38 @@ abstract class VibeReplyThread {
                   child: FadeTransition(
                     opacity: t,
                     child: BackdropFilter(
-                      filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                      filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: const SizedBox.expand(),
                     ),
                   ),
                 ),
               ),
-              ScaleTransition(
-                alignment: origin,
-                scale: Tween(begin: 0.6, end: 1.0).animate(t),
-                child: FadeTransition(
-                  opacity: CurvedAnimation(
-                    parent: anim,
-                    curve: const Interval(0, 0.6, curve: Curves.easeOut),
-                    reverseCurve: const Interval(0.3, 1, curve: Curves.easeIn),
-                  ),
-                  child: child,
-                ),
+              // Opening: a small grow out of the tapped message with a quick
+              // fade. Closing: the pane slides down whole (never see-through,
+              // so the chat and the pane don't show through each other).
+              AnimatedBuilder(
+                animation: anim,
+                child: RepaintBoundary(child: child),
+                builder: (ctx, child) {
+                  final v = anim.value;
+                  if (anim.status == AnimationStatus.reverse) {
+                    final d = Curves.easeInCubic.transform(1 - v);
+                    return FractionalTranslation(
+                      translation: Offset(0, d),
+                      child: child,
+                    );
+                  }
+                  final grow = Curves.easeOutCubic.transform(v);
+                  final fade = Curves.easeOut.transform((v / 0.35).clamp(0.0, 1.0));
+                  return Opacity(
+                    opacity: fade,
+                    child: Transform.scale(
+                      alignment: origin,
+                      scale: 0.94 + 0.06 * grow,
+                      child: child,
+                    ),
+                  );
+                },
               ),
             ],
           );
@@ -204,10 +219,11 @@ class _ThreadPane extends StatefulWidget {
 
 class _ThreadPaneState extends State<_ThreadPane>
     with SingleTickerProviderStateMixin {
+  // the messages slide up once the pane is in place (not while it moves)
   late final _intro = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 650),
-  )..forward();
+    duration: const Duration(milliseconds: 420),
+  );
   final _text = TextEditingController();
   final _scroll = ScrollController();
   final List<XFile> _files = [];
@@ -224,9 +240,10 @@ class _ThreadPaneState extends State<_ThreadPane>
       final can = _text.text.trim().isNotEmpty;
       if (can != _canSend) setState(() => _canSend = can);
     });
-    // the keyboard comes up after the pane has slid in, not during it
-    Future<void>.delayed(const Duration(milliseconds: 340), () {
-      if (mounted) _focus.requestFocus();
+    // No keyboard on open: it resized the pane while it was still moving.
+    // Tap the text box to type.
+    Future<void>.delayed(const Duration(milliseconds: 160), () {
+      if (mounted) _intro.forward();
     });
     VibeReplyThread._olderParents(_chain, widget.timeline).then((older) {
       if (mounted && older.isNotEmpty) {
@@ -368,27 +385,26 @@ class _ThreadPaneState extends State<_ThreadPane>
                   itemCount: events.length,
                   itemBuilder: (context, i) {
                     final e = events[i];
-                    // each message slides up a moment after the one below
-                    final start = (i * 0.08).clamp(0.0, 0.5);
-                    final t = CurvedAnimation(
-                      parent: _intro,
-                      curve: Interval(
-                        start,
-                        (start + 0.5).clamp(0.0, 1.0),
-                        curve: Curves.easeOutBack,
-                      ),
-                    );
+                    // the newest few slide up one after another; the rest
+                    // (off screen) just appear
+                    final start = i < 6 ? i * 0.09 : 0.0;
                     return RepaintBoundary(
                       key: ValueKey(e.eventId),
                       child: AnimatedBuilder(
-                        animation: t,
-                        builder: (context, child) => Opacity(
-                          opacity: t.value.clamp(0.0, 1.0),
-                          child: Transform.translate(
-                            offset: Offset(0, 28 * (1 - t.value)),
-                            child: child,
-                          ),
-                        ),
+                        animation: _intro,
+                        builder: (context, child) {
+                          if (i >= 6 || _intro.isCompleted) return child!;
+                          final p = ((_intro.value - start) / (1 - 0.45))
+                              .clamp(0.0, 1.0);
+                          final v = Curves.easeOutCubic.transform(p);
+                          return Opacity(
+                            opacity: v,
+                            child: Transform.translate(
+                              offset: Offset(0, 14 * (1 - v)),
+                              child: child,
+                            ),
+                          );
+                        },
                         child: Message(
                       e,
                       nextEvent: i + 1 < events.length ? events[i + 1] : null,
