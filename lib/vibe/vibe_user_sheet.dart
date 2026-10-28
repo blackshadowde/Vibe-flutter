@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_activity_card.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/vibe/vibe_dm_finder.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
@@ -337,6 +338,11 @@ class _SheetState extends State<_Sheet> {
                     style: TextStyle(fontSize: 15, color: cs.onSurface),
                   ),
                 ],
+                if (room != null)
+                  VibeActivityCard(
+                    status: VibeStatus.of(room, userId),
+                    client: room.client,
+                  ),
                 if (_since != null) ...[
                   const SizedBox(height: 18),
                   Text('Member since', style: label),

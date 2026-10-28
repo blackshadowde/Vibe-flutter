@@ -77,13 +77,41 @@ class VibeNowPlayingListener : NotificationListenerService() {
                     ?: m.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST) ?: ""
                 // adverts between songs are not "listening to"
                 if (isAd(title, artist)) return null
+                val album = m.getString(MediaMetadata.METADATA_KEY_ALBUM) ?: ""
+                val duration = m.getLong(MediaMetadata.METADATA_KEY_DURATION)
+                // where the song is now (the player only reports it now and then)
+                val ps = c.playbackState
+                val position = if (ps == null) 0L else
+                    ps.position + ((android.os.SystemClock.elapsedRealtime() -
+                        ps.lastPositionUpdateTime) * ps.playbackSpeed).toLong()
+                // a small cover for the profile card
+                val art = try {
+                    val bmp = m.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+                        ?: m.getBitmap(MediaMetadata.METADATA_KEY_ART)
+                        ?: m.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
+                    if (bmp == null) "" else {
+                        val side = 240
+                        val scaled = android.graphics.Bitmap.createScaledBitmap(bmp, side, side, true)
+                        val out = java.io.ByteArrayOutputStream()
+                        scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 82, out)
+                        android.util.Base64.encodeToString(out.toByteArray(), android.util.Base64.NO_WRAP)
+                    }
+                } catch (_: Throwable) {
+                    ""
+                }
                 val pm = context.packageManager
                 val app = try {
                     pm.getApplicationLabel(pm.getApplicationInfo(c.packageName, 0)).toString()
                 } catch (_: Throwable) {
                     c.packageName
                 }
-                mapOf("title" to title, "artist" to artist, "app" to app, "package" to c.packageName)
+                mapOf(
+                    "title" to title, "artist" to artist, "app" to app,
+                    "package" to c.packageName, "album" to album,
+                    "duration" to duration.toString(),
+                    "position" to position.coerceAtLeast(0L).toString(),
+                    "art" to art,
+                )
             } catch (_: Throwable) {
                 null
             }

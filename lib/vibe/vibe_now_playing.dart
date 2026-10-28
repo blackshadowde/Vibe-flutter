@@ -81,11 +81,19 @@ abstract class VibeNowPlaying {
       final title = np['title'] ?? '';
       final artist = np['artist'] ?? '';
       final text = artist.isEmpty ? title : '$title — $artist';
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final duration = int.tryParse(np['duration'] ?? '') ?? 0;
+      final start = now - (int.tryParse(np['position'] ?? '') ?? 0);
       final mine = VibeStatus.mine(client);
       final ours = mine != null && mine.emoji == emoji && mine.active;
-      final left = (mine?.untilMs ?? 0) - DateTime.now().millisecondsSinceEpoch;
+      final left = (mine?.untilMs ?? 0) - now;
+      final oldStart = mine?.activity?['start'];
+      // jumped ahead or back in the song: the progress bar needs the new start
+      final seeked = oldStart is int && (oldStart - start).abs() > 20000;
       // same song and not about to run out: nothing to send
-      if (ours && mine.text == text && left > 3 * 60 * 1000) return;
+      if (ours && mine.text == text && left > 3 * 60 * 1000 && !seeked) {
+        return;
+      }
       if (!ours) {
         // remember the status you had, to put it back afterwards
         await AppSettings.vibeNowPlayingPrev.setItem(
@@ -101,12 +109,44 @@ abstract class VibeNowPlaying {
           untilMs: DateTime.now()
               .add(const Duration(minutes: 10))
               .millisecondsSinceEpoch,
+          // the profile card: cover, title, artist and a live progress bar
+          activity: {
+            'kind': 'listening',
+            'app': np['app'] ?? '',
+            'title': title,
+            'artist': artist,
+            if ((np['album'] ?? '').isNotEmpty) 'album': np['album'],
+            if (duration > 0) 'duration': duration,
+            'start': start,
+            'cover': ?(await _cover(client, '$title|$artist', np['art'])),
+          },
         ),
       );
     } catch (e, s) {
       Logs().w('Now playing status failed', e, s);
     } finally {
       _busy = false;
+    }
+  }
+
+  static String? _coverKey;
+  static String? _coverUri;
+
+  /// Uploads the song's cover once per song (a small 240 px picture).
+  static Future<String?> _cover(Client client, String key, String? art) async {
+    if (art == null || art.isEmpty) return null;
+    if (_coverKey == key) return _coverUri;
+    try {
+      final uri = await client.uploadContent(
+        base64Decode(art),
+        filename: 'cover.jpg',
+        contentType: 'image/jpeg',
+      );
+      _coverKey = key;
+      _coverUri = uri.toString();
+      return _coverUri;
+    } catch (_) {
+      return null;
     }
   }
 

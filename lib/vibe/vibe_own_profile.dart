@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_activity_card.dart';
 import 'package:vibe/vibe/vibe_tap_icon.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/utils/fluffy_share.dart';
@@ -481,6 +482,14 @@ class _OwnSheetState extends State<_OwnSheet> {
                       ),
                     ),
                   ],
+                ),
+              ),
+              // what you're listening to, Discord style
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: VibeActivityCard(
+                  status: VibeStatus.mine(client),
+                  client: client,
                 ),
               ),
               VibeStagger(

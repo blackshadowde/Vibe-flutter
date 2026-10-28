@@ -28,6 +28,10 @@ class VibeStatus {
   /// use Vibe on more than one device.
   final int updatedMs;
 
+  /// What they're doing right now, shown as a card on their profile
+  /// (e.g. listening: app, title, artist, cover, start, duration).
+  final Map<String, Object?>? activity;
+
   const VibeStatus({
     this.emoji = '',
     this.text = '',
@@ -35,6 +39,7 @@ class VibeStatus {
     this.tzOffsetMin,
     this.tzName,
     this.updatedMs = 0,
+    this.activity,
   });
 
   factory VibeStatus.fromContent(Map<String, Object?> c) => VibeStatus(
@@ -44,6 +49,9 @@ class VibeStatus {
     tzOffsetMin: c['tz_offset'] is int ? c['tz_offset'] as int : null,
     tzName: c['tz_name'] is String ? c['tz_name'] as String : null,
     updatedMs: c['updated'] is int ? c['updated'] as int : 0,
+    activity: c['activity'] is Map
+        ? Map<String, Object?>.from(c['activity'] as Map)
+        : null,
   );
 
   Map<String, Object?> toContent() => {
@@ -53,6 +61,7 @@ class VibeStatus {
     if (tzOffsetMin != null) 'tz_offset': tzOffsetMin,
     if (tzName != null) 'tz_name': tzName,
     if (updatedMs > 0) 'updated': updatedMs,
+    if (activity != null) 'activity': activity,
   };
 
   /// Same status (ignoring the time zone, which every device adds itself).
@@ -142,6 +151,7 @@ class VibeStatus {
       tzOffsetMin: now.timeZoneOffset.inMinutes,
       tzName: now.timeZoneName,
       updatedMs: s.updatedMs,
+      activity: s.activity,
     );
   }
 
@@ -192,6 +202,7 @@ class VibeStatus {
       text: s.text,
       untilMs: s.untilMs,
       updatedMs: DateTime.now().millisecondsSinceEpoch,
+      activity: s.activity,
     );
     await AppSettings.vibeMyStatus.setItem(jsonEncode(stamped.toContent()));
     final content = _withMyZone(stamped).toContent();
@@ -279,6 +290,7 @@ class VibeStatus {
             text: fromChats.text,
             untilMs: fromChats.untilMs,
             updatedMs: fromChats.updatedMs,
+            activity: fromChats.activity,
           ).toContent(),
         ),
       );
