@@ -5,6 +5,9 @@
 
 import 'dart:async';
 
+import 'package:vibe/vibe/vibe_password_page.dart';
+import 'package:vibe/vibe/vibe_recovery_email_page.dart';
+import 'package:vibe/vibe/vibe_blocked_page.dart';
 import 'package:vibe/vibe/vibe_glass.dart';
 import 'package:vibe/config/themes.dart';
 import 'package:vibe/pages/bootstrap/bootstrap_page.dart';
@@ -23,13 +26,10 @@ import 'package:vibe/pages/login/login.dart';
 import 'package:vibe/pages/new_group/new_group.dart';
 import 'package:vibe/pages/new_private_chat/new_private_chat.dart';
 import 'package:vibe/pages/settings/settings.dart';
-import 'package:vibe/pages/settings_3pid/settings_3pid.dart';
 import 'package:vibe/pages/settings_chat/settings_chat.dart';
 import 'package:vibe/pages/settings_emotes/settings_emotes.dart';
 import 'package:vibe/pages/settings_homeserver/settings_homeserver.dart';
-import 'package:vibe/pages/settings_ignore_list/settings_ignore_list.dart';
 import 'package:vibe/pages/settings_notifications/settings_notifications.dart';
-import 'package:vibe/pages/settings_password/settings_password.dart';
 import 'package:vibe/pages/settings_security/settings_security.dart';
 import 'package:vibe/pages/settings_style/settings_style.dart';
 import 'package:vibe/pages/sign_in/sign_in_page.dart';
@@ -315,7 +315,7 @@ abstract class AppRoutes {
                             return defaultPageBuilder(
                               context,
                               state,
-                              const VibeSettingsTheme(child: SettingsPassword()),
+                              const VibeSettingsTheme(child: VibePasswordPage()),
                             );
                           },
                           redirect: loggedOutRedirect,
@@ -327,7 +327,7 @@ abstract class AppRoutes {
                               context,
                               state,
                               VibeSettingsTheme(
-                                child: SettingsIgnoreList(
+                                child: VibeBlockedPage(
                                   initialUserId: state.extra?.toString(),
                                 ),
                               ),
@@ -340,7 +340,7 @@ abstract class AppRoutes {
                           pageBuilder: (context, state) => defaultPageBuilder(
                             context,
                             state,
-                            const VibeSettingsTheme(child: Settings3Pid()),
+                            const VibeSettingsTheme(child: VibeRecoveryEmailPage()),
                           ),
                           redirect: loggedOutRedirect,
                         ),
