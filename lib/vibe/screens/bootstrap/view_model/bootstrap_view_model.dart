@@ -60,6 +60,13 @@ class BootstrapViewModel extends ValueNotifier<BootstrapViewModelState> {
 
   Future<void> retryKeyVerification() async {
     value.noSecretsreceived = false;
+    final old = value.keyVerification;
+    if (old != null && !{KeyVerificationState.done, KeyVerificationState.error}
+        .contains(old.state)) {
+      try {
+        await old.cancel();
+      } catch (_) {}
+    }
     value.keyVerification = await client.userDeviceKeys[client.userID!]!
         .startVerification();
     value.keyVerification?.onUpdate = _onKeyVerificationUpdate;

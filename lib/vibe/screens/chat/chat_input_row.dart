@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_pending_files.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'package:emoji_picker_flutter/locales/default_emoji_set_locale.dart';
 import 'package:vibe/config/setting_keys.dart';
@@ -146,6 +147,10 @@ class ChatInputRow extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                       ReplyDisplay(controller),
+                      VibePendingFilesStrip(
+                        files: controller.pendingFiles,
+                        onRemove: controller.removePendingFile,
+                      ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -257,6 +262,7 @@ class ChatInputRow extends StatelessWidget {
                     child:
                         PlatformInfos.platformCanRecord &&
                             !controller.sendController.text.isNotEmpty &&
+                            controller.pendingFiles.isEmpty &&
                             controller.editEvent == null
                         ? HoverBuilder(
                             builder: (context, hovered) => IconButton(

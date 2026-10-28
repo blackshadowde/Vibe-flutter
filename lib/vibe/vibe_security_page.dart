@@ -19,6 +19,15 @@ import 'package:vibe/utils/platform_infos.dart';
 import 'package:vibe/widgets/layouts/max_width_body.dart';
 import 'package:vibe/widgets/settings_switch_list_tile.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+final _accountPages = Expando<Future<Uri?>>();
+
+/// The server's account page, or null when the server has none.
+Future<Uri?> _accountPage(Client client) => _accountPages[client] ??= client
+    .getAuthMetadata()
+    .then<Uri?>((m) => m.accountManagementUri)
+    .catchError((_) => null);
 
 class VibeSecurityPage extends StatefulWidget {
   const VibeSecurityPage({super.key});
@@ -342,15 +351,41 @@ class _VibeSecurityPageState extends State<VibeSecurityPage> {
                       style: const TextStyle(fontFamily: 'RobotoMono'),
                     ),
                   ),
-                  if (capabilities?.mChangePassword?.enabled != false ||
-                      error != null)
-                    ListTile(
-                      leading: const Icon(Icons.password_outlined),
-                      trailing: const Icon(Icons.chevron_right_outlined),
-                      title: Text(L10n.of(context).changePassword),
-                      onTap: () =>
-                          context.go('/rooms/settings/security/password'),
-                    ),
+                  // Servers with an account page (matrix.org and others
+                  // using Matrix Authentication Service) manage password and
+                  // email there; the in-app pages can't change them.
+                  FutureBuilder<Uri?>(
+                    future: _accountPage(Matrix.of(context).client),
+                    builder: (context, snap) {
+                      final url = snap.data;
+                      if (url != null) {
+                        return ListTile(
+                          leading: const Icon(Icons.password_outlined),
+                          trailing: const Icon(Icons.open_in_new_outlined),
+                          title: const Text('Password and email'),
+                          subtitle: const Text(
+                            'Managed on your server\'s account page',
+                          ),
+                          onTap: () => launchUrl(
+                            url,
+                            mode: LaunchMode.inAppBrowserView,
+                          ),
+                        );
+                      }
+                      if (snap.connectionState != ConnectionState.done ||
+                          (capabilities?.mChangePassword?.enabled == false &&
+                              error == null)) {
+                        return const SizedBox.shrink();
+                      }
+                      return ListTile(
+                        leading: const Icon(Icons.password_outlined),
+                        trailing: const Icon(Icons.chevron_right_outlined),
+                        title: Text(L10n.of(context).changePassword),
+                        onTap: () =>
+                            context.go('/rooms/settings/security/password'),
+                      );
+                    },
+                  ),
                   Divider(color: theme.dividerColor),
                   ListTile(
                     iconColor: Color(0xFF949BA4),

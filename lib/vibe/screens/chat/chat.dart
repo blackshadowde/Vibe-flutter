@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:vibe/vibe/vibe_drop.dart';
+import 'package:vibe/vibe/vibe_pending_files.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:async';
 import 'dart:io';
@@ -152,22 +153,21 @@ class ChatController extends State<ChatPageWithRoom>
   Future<void> onDragDone(DropDoneDetails details) =>
       _sendDropped(details.files);
 
-  /// Files dropped on the chat (desktop, or from another app on Android).
-  Future<void> _sendDropped(List<XFile> files) async {
-    if (mounted) setState(() => dragging = false);
-    if (files.isEmpty || !mounted) return;
+  /// Files dropped on the chat (desktop, or from another app on Android)
+  /// wait above the text box; send sends them with the text.
+  final List<XFile> pendingFiles = [];
 
-    await showVibeDialog(
-      context: context,
-      builder: (c) => SendFileDialog(
-        files: files,
-        room: room,
-        outerContext: context,
-        threadRootEventId: activeThreadId,
-        threadLastEventId: threadLastEventId,
-      ),
-    );
+  Future<void> _sendDropped(List<XFile> files) async {
+    if (!mounted) return;
+    setState(() {
+      dragging = false;
+      pendingFiles.addAll(files);
+    });
+    if (files.isNotEmpty) inputFocus.requestFocus();
   }
+
+  void removePendingFile(XFile file) =>
+      setState(() => pendingFiles.remove(file));
 
   bool get canSaveSelectedEvent =>
       selectedEvents.length == 1 &&
@@ -771,6 +771,18 @@ class ChatController extends State<ChatPageWithRoom>
   Future<void> send() async {
     final proceed = await showTrustUserInRoomDialog(context, room);
     if (!mounted || !proceed) return;
+    if (pendingFiles.isNotEmpty) {
+      final files = List<XFile>.of(pendingFiles);
+      setState(pendingFiles.clear);
+      VibeHaptics.light();
+      VibePendingFiles.send(
+        context,
+        room,
+        files,
+        threadRootEventId: activeThreadId,
+        threadLastEventId: threadLastEventId,
+      );
+    }
     if (sendController.text.trim().isEmpty) return;
     VibeHaptics.light();
     _storeInputTimeoutTimer?.cancel();

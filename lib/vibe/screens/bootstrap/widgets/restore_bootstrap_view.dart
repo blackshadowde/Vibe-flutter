@@ -85,10 +85,19 @@ class RestoreBootstrapView extends StatelessWidget {
                         ? L10n.of(context).waitingForKeys
                         : viewModel.value.noSecretsreceived
                         ? L10n.of(context).noKeysTransmitted
-                        : L10n.of(context).restoreBootstrapDevicesDescription,
+                        : 'A request was sent to your devices below. Open '
+                              'Matrix on one of them, accept it and compare '
+                              'the emoji.',
                     style: const TextStyle(fontSize: 14),
                   ),
                 ),
+                if (!failed)
+                  TextButton(
+                    onPressed: viewModel.value.isLoading
+                        ? null
+                        : viewModel.retryKeyVerification,
+                    child: const Text('Send again'),
+                  ),
               ],
             ),
           ),

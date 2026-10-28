@@ -9,6 +9,7 @@ import 'package:vibe/vibe/vibe_dm_finder.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:vibe/vibe/vibe_status.dart';
 import 'package:vibe/vibe/vibe_sheet_drag.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:vibe/widgets/future_loading_dialog.dart';
 import 'package:vibe/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
@@ -147,6 +148,30 @@ class _SheetState extends State<_Sheet> {
     if (roomId == null || !context.mounted) return;
     Navigator.of(context).pop();
     if (roomId != widget.currentRoomId) widget.router.go('/rooms/$roomId');
+  }
+
+  /// Block (or unblock): their messages and invites stop reaching you.
+  Future<void> _toggleBlock(BuildContext context) async {
+    final blocked = client.ignoredUsers.contains(userId);
+    final ok = await showOkCancelAlertDialog(
+      context: context,
+      title: blocked ? 'Unblock ${widget.displayName}?' : 'Block ${widget.displayName}?',
+      message: blocked
+          ? 'You will see their messages and invites again.'
+          : 'Their messages and invites will no longer reach you, and '
+                'your direct chat with them is closed. You can unblock '
+                'them any time in Settings, Blocked people.',
+      okLabel: blocked ? 'Unblock' : 'Block',
+      cancelLabel: 'Cancel',
+      isDestructive: !blocked,
+    );
+    if (ok != OkCancelResult.ok || !context.mounted) return;
+    await showFutureLoadingDialog(
+      context: context,
+      future: () =>
+          blocked ? client.unignoreUser(userId) : client.ignoreUser(userId),
+    );
+    if (mounted) setState(() {});
   }
 
   @override
@@ -320,6 +345,22 @@ class _SheetState extends State<_Sheet> {
                               ),
                             ),
                           ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Tooltip(
+                        message: client.ignoredUsers.contains(userId)
+                            ? 'Unblock'
+                            : 'Block',
+                        child: _SquareButton(
+                          icon: client.ignoredUsers.contains(userId)
+                              ? Icons.do_not_disturb_off_outlined
+                              : Icons.block,
+                          background: cs.surfaceContainerHighest,
+                          color: client.ignoredUsers.contains(userId)
+                              ? cs.onSurface
+                              : cs.error,
+                          onTap: () => _toggleBlock(context),
                         ),
                       ),
                     ],
