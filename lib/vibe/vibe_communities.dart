@@ -766,6 +766,12 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
                 onTap: () => VibeGroupEdit.privacy(context, space),
               ),
               VibeHashRow(label: 'leave-community', onTap: _leave),
+              if (VibeGroups.canDelete(space))
+                VibeHashRow(
+                  label: 'delete-community',
+                  iconColor: Theme.of(context).colorScheme.error,
+                  onTap: () => VibeGroups.delete(context, space),
+                ),
             ],
           ],
         ),

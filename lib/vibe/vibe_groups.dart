@@ -289,6 +289,93 @@ abstract class VibeGroups {
       }
     }
   }
+
+  /// Admins can delete a group (or community): Matrix has no real delete,
+  /// so everyone is removed, nobody can join any more, and it's forgotten.
+  static bool canDelete(Room room) =>
+      room.ownPowerLevel.level >= 100 && room.canKick;
+
+  static Future<void> delete(BuildContext context, Room room) async {
+    final name = nameOf(context, room);
+    final kind = room.isSpace ? 'community' : 'group';
+    final ok = await showVibeDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete $name?'),
+        content: Text(
+          'Everyone is removed from the $kind and nobody can join it again. '
+          'This can\'t be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    final client = room.client;
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    final nav = Navigator.of(context, rootNavigator: true);
+    showVibeDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) =>
+          const Center(child: CircularProgressIndicator.adaptive()),
+    );
+    var failed = 0;
+    try {
+      try {
+        await room.setJoinRules(JoinRules.invite);
+        await client.setRoomVisibilityOnDirectory(
+          room.id,
+          visibility: sdk.Visibility.private,
+        );
+      } catch (_) {}
+      final people = await room.requestParticipants([
+        Membership.join,
+        Membership.invite,
+        Membership.knock,
+      ]);
+      for (final u in people) {
+        if (u.id == client.userID) continue;
+        try {
+          await room.kick(u.id);
+        } catch (_) {
+          failed++;
+        }
+      }
+      await room.leave();
+      try {
+        await room.forget();
+      } catch (_) {}
+    } catch (e) {
+      nav.pop();
+      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      return;
+    }
+    nav.pop();
+    if (failed > 0) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '$failed people couldn\'t be removed (they have the same role '
+            'as you).',
+          ),
+        ),
+      );
+    }
+    router.go('/rooms');
+  }
 }
 
 
@@ -1348,6 +1435,7 @@ class _Members extends StatefulWidget {
 
 class _MembersState extends State<_Members> {
   List<User>? _users;
+  String _query = '';
 
   @override
   void initState() {
@@ -1378,7 +1466,17 @@ class _MembersState extends State<_Members> {
   Widget build(BuildContext context) {
     final t1 = VibeSettingsStyle.text(context);
     final t2 = VibeSettingsStyle.text2(context);
-    final users = _users;
+    final all = _users;
+    final q = _query.trim().toLowerCase();
+    final users = all == null || q.isEmpty
+        ? all
+        : all
+              .where(
+                (u) =>
+                    u.calcDisplayname().toLowerCase().contains(q) ||
+                    u.id.toLowerCase().contains(q),
+              )
+              .toList();
     final me = widget.room.client.userID;
     return CustomScrollView(
       controller: widget.scroll,
@@ -1386,9 +1484,30 @@ class _MembersState extends State<_Members> {
         SliverToBoxAdapter(
           child: _SheetHeader(
             label: 'members',
-            trailing: users == null ? null : '${users.length}',
+            trailing: all == null ? null : '${all.length}',
           ),
         ),
+        if (all != null && all.length > 1)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: TextField(
+                onChanged: (v) => setState(() => _query = v),
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: 'Search members',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  filled: true,
+                  fillColor: VibeSettingsStyle.card(context),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+          ),
         if (widget.room.canChangePowerLevel || widget.room.canKick)
           SliverToBoxAdapter(
             child: Padding(

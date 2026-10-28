@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' hide Result;
 import 'package:mime/mime.dart';
 import 'package:vibe/utils/localized_exception_extension.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_file_extension.dart';
 import 'package:vibe/utils/platform_infos.dart';
 import 'package:vibe/utils/resize_video.dart';
 import 'package:vibe/vibe/vibe_chunks.dart';

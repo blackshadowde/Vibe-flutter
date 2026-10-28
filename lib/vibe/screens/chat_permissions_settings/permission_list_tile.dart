@@ -24,7 +24,8 @@ class PermissionsListTile extends StatelessWidget {
     required this.canEdit,
   });
 
-  String getLocalizedPowerLevelString(BuildContext context) {
+  /// Null for keys Vibe doesn't explain (they stay as they are, hidden).
+  String? getLocalizedPowerLevelString(BuildContext context) {
     if (category == null) {
       switch (permissionKey) {
         case 'users_default':
@@ -69,23 +70,28 @@ class PermissionsListTile extends StatelessWidget {
           return L10n.of(context).editBlockedServers;
       }
     }
-    return permissionKey;
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final title = getLocalizedPowerLevelString(context);
+    if (title == null) return const SizedBox.shrink();
 
-    final color = permission >= 100
-        ? Colors.orangeAccent
+    // Three simple levels: everyone, moderators, admins.
+    final level = permission >= 100
+        ? 100
         : permission >= 50
+        ? 50
+        : 0;
+    final color = level == 100
+        ? Colors.orangeAccent
+        : level == 50
         ? Colors.blueAccent
         : Colors.greenAccent;
     return ListTile(
-      title: Text(
-        getLocalizedPowerLevelString(context),
-        style: theme.textTheme.titleSmall,
-      ),
+      title: Text(title, style: theme.textTheme.titleSmall),
       trailing: Material(
         color: color.withAlpha(32),
         borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
@@ -93,32 +99,31 @@ class PermissionsListTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
           underline: const SizedBox.shrink(),
-          onChanged: canEdit ? onChanged : null,
-          value: permission,
+          onChanged: canEdit
+              ? (v) {
+                  if (v != null && v != level) onChanged?.call(v);
+                }
+              : null,
+          value: level,
           items: [
             DropdownMenuItem(
-              value: permission < 50 ? permission : 0,
+              value: 0,
               child: Text(
-                L10n.of(context).userLevel(permission < 50 ? permission : 0),
+                permissionKey == 'users_default' ? 'Member' : 'Everyone',
               ),
             ),
             DropdownMenuItem(
-              value: permission < 100 && permission >= 50 ? permission : 50,
+              value: 50,
               child: Text(
-                L10n.of(context).moderatorLevel(
-                  permission < 100 && permission >= 50 ? permission : 50,
-                ),
+                permissionKey == 'users_default' ? 'Moderator' : 'Moderators',
               ),
             ),
             DropdownMenuItem(
-              value: permission >= 100 ? permission : 100,
+              value: 100,
               child: Text(
-                L10n.of(
-                  context,
-                ).adminLevel(permission >= 100 ? permission : 100),
+                permissionKey == 'users_default' ? 'Admin' : 'Admins',
               ),
             ),
-            DropdownMenuItem(value: null, child: Text(L10n.of(context).custom)),
           ],
         ),
       ),

@@ -259,6 +259,12 @@ class VibeDmDetail extends StatelessWidget {
                   label: 'leave-group',
                   onTap: () => VibeGroups.leave(context, room),
                 ),
+                if (VibeGroups.canDelete(room))
+                  VibeHashRow(
+                    label: 'delete-group',
+                    iconColor: Theme.of(context).colorScheme.error,
+                    onTap: () => VibeGroups.delete(context, room),
+                  ),
               ],
               if (other != null && !group)
                 VibeHashRow(

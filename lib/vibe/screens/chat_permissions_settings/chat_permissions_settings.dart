@@ -106,7 +106,10 @@ class _ChatPermissionsSettingsState extends State<ChatPermissionsSettings> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.info_outlined),
-                  subtitle: Text(L10n.of(context).chatPermissionsDescription),
+                  subtitle: const Text(
+                    'Choose who can do each thing in this chat: everyone, '
+                    'moderators and admins, or admins only.',
+                  ),
                 ),
                 Divider(color: theme.dividerColor),
                 ListTile(
