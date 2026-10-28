@@ -7,6 +7,10 @@ on:
         description: 'Publish for AltStore / SideStore (GitHub release + update the source)'
         type: boolean
         default: false
+      number:
+        description: 'Build number (empty = next one). Vibe release fills this in so iPhone gets the same version as Android.'
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -110,10 +114,18 @@ jobs:
       - name: Build (no code signing)
         run: |
           BASE=$(grep -E '^version:' pubspec.yaml | sed -E 's/version: *//; s/\+.*//' | cut -d. -f1-2)
-          VERSION="$BASE.${{ github.run_number }}"
+          N="${{ inputs.number }}"
+          if [ -z "$N" ]; then
+            # newer than every iPhone release so far (and this run's number)
+            LAST=$(git ls-remote --tags origin 'ios-v*' | sed -E 's#.*/ios-v##; s/\^\{\}//' | awk -F. '{print $NF}' | sort -n | tail -1)
+            N=${{ github.run_number }}
+            if [ -n "$LAST" ] && [ "$LAST" -ge "$N" ]; then N=$((LAST + 1)); fi
+          fi
+          VERSION="$BASE.$N"
           echo "VIBE_VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "VIBE_BUILD=$N" >> "$GITHUB_ENV"
           flutter build ios --release --no-codesign \
-            --build-name="$VERSION" --build-number="${{ github.run_number }}"
+            --build-name="$VERSION" --build-number="$N"
 
       - name: Package unsigned IPA
         run: |
@@ -153,7 +165,7 @@ jobs:
           git checkout -- . && git clean -fdq -e Vibe.ipa -e Vibe-unsigned.ipa
           git pull -q --rebase origin "${GITHUB_REF_NAME}"
           v="$VIBE_VERSION"
-          jq --arg v "$v" --arg b "${{ github.run_number }}" --arg d "$(date -u +%Y-%m-%d)" --argjson s "$SIZE" \
+          jq --arg v "$v" --arg b "$VIBE_BUILD" --arg d "$(date -u +%Y-%m-%d)" --argjson s "$SIZE" \
             '.apps[0].versions = [{"version": $v, "buildVersion": $b, "date": $d, "size": $s,
               "localizedDescription": ("Vibe " + $v),
               "downloadURL": ("https://github.com/blackshadowde/Vibe-flutter/releases/download/ios-v" + $v + "/Vibe.ipa")}]

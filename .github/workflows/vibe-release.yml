@@ -7,9 +7,14 @@ on:
         description: 'Publish as a public GitHub Release (download page)'
         type: boolean
         default: false
+      all_platforms:
+        description: 'Also build iPhone (same version) and update the web app'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   release-apk:
@@ -213,3 +218,28 @@ jobs:
           make_latest: true
           files: Vibe-${{ env.VIBE_VERSION }}.apk
           body_path: release-body.md
+
+  # One release for everyone: once Android is built, start the iPhone build
+  # with the same version number (published the same way) and, when
+  # publishing, update the web app.
+  other-platforms:
+    needs: release-apk
+    if: ${{ inputs.all_platforms }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Start iPhone and web builds
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref_name }}
+          PUBLISH: ${{ inputs.publish }}
+          NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          gh workflow run vibe-ios.yml -R "$REPO" --ref "$REF" \
+            -f publish="$PUBLISH" -f number="$NUMBER"
+          echo "iPhone build started (version number $NUMBER, publish: $PUBLISH)"
+          if [ "$PUBLISH" = "true" ]; then
+            gh workflow run vibe-web.yml -R "$REPO" --ref "$REF"
+            echo "Web app update started"
+          fi
