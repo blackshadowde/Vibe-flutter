@@ -7,7 +7,7 @@ licence requires; everything else becomes Vibe's.
 ## Level 1: Vibe's own identity
 
 - [x] Code package `fluffychat` → `vibe` (all `package:` imports)
-- [ ] Android code folder `chat.fluffy.fluffychat` → `app.vibe.chat`
+- [x] Android code folder `chat.fluffy.fluffychat` → `app.vibe.chat`
 - [ ] App IDs and links: `im.fluffychat://` → `vibe://`, push/app IDs → Vibe's
 - [ ] iPhone app ID `im.fluffychat.app` → `app.vibe.chat` (iPhone users reinstall once)
 - [ ] Internal names (`FluffyChatApp`, `fluffy_chat_app.dart`, …) → Vibe

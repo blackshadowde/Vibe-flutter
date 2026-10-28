@@ -1,4 +1,4 @@
-/*package chat.fluffy.fluffychat
+/*package app.vibe.chat
 
 import com.famedly.fcm_shared_isolate.FcmSharedIsolateService
 

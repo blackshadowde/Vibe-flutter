@@ -34,7 +34,7 @@ configurations.all {
 
 
 android {
-    namespace = "chat.fluffy.fluffychat"
+    namespace = "app.vibe.chat"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

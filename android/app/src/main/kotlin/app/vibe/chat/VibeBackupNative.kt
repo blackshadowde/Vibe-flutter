@@ -1,4 +1,4 @@
-package chat.fluffy.fluffychat
+package app.vibe.chat
 
 import android.content.ContentValues
 import android.content.Context
