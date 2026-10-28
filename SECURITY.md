@@ -1,22 +1,8 @@
-<!--
-SPDX-FileCopyrightText: 2019-Present Christian Kußowski
-SPDX-FileCopyrightText: 2019-Present Contributors to FluffyChat
+# Security
 
-SPDX-License-Identifier: AGPL-3.0-or-later
--->
+Found a security problem in Vibe? Please don't open a public issue.
+Report it privately through GitHub:
+https://github.com/blackshadowde/Vibe-flutter/security/advisories/new
 
-# Security Policy
-
-If you believe you have discovered a security vulnerability in this project, **do not open a public issue**.
-
-To report a security issue responsibly, please go to the Security tab or visit:
-
-https://github.com/krille-chan/fluffychat/security/advisories/new
-
-The following information can help us address the issue:
-
-- Clear steps to reproduce the vulnerability
-- The software version you are using
-- The affected platforms
-
-We appreciate your report and will respond as quickly as possible. Please note that this project is maintained by volunteers and is provided without guarantees.
+Vibe's encryption comes from the Matrix Dart SDK and vodozemac. Problems in
+those belong to their projects (famedly/matrix-dart-sdk, matrix-org/vodozemac).

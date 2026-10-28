@@ -11,7 +11,8 @@ licence requires; everything else becomes Vibe's.
 - [x] App IDs and links: `im.fluffychat://` → `vibe://`, push/app IDs → Vibe's
 - [x] iPhone app ID `im.fluffychat.app` → `app.vibe.chat` (iPhone users reinstall once)
 - [x] Internal names (`FluffyChatApp`, `fluffy_chat_app.dart`, …) → Vibe
-- [ ] Old FluffyChat build scripts and leftovers removed
+- [x] Old FluffyChat build scripts and leftovers removed; desktop (Linux, Windows, Mac) named Vibe; Vibe's own privacy, security, contributing and changelog pages
+- [ ] iPhone: FluffyChat's Firebase file (`GoogleService-Info.plist`) and the "FluffyChat Share" folder name (kept for now: removing them needs an iPhone build to test)
 
 Kept on purpose (stored data and Matrix event types; renaming would log people
 out or lose settings): `im.fluffychat.store.clients`, `im.fluffychat.account_config`,

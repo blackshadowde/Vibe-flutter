@@ -24,7 +24,7 @@ jobs:
           flutter-version-file: .tool_versions.yaml
           cache: true
 
-      # Same toolchain the repo's Dockerfile uses to compile vodozemac for web
+      # Toolchain used to compile vodozemac for web
       - name: Rust nightly
         run: rustup toolchain install nightly --profile minimal --component rust-src --target wasm32-unknown-unknown
 
