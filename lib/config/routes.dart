@@ -7,7 +7,6 @@ import 'dart:async';
 
 import 'package:vibe/vibe/vibe_glass.dart';
 import 'package:vibe/config/themes.dart';
-import 'package:vibe/pages/archive/archive.dart';
 import 'package:vibe/pages/bootstrap/bootstrap_page.dart';
 import 'package:vibe/pages/chat/chat.dart';
 import 'package:vibe/pages/chat_access_settings/chat_access_settings_controller.dart';
@@ -156,10 +155,13 @@ abstract class AppRoutes {
                   ),
           ),
           routes: [
+            // Left chats open here; the archive list itself is Vibe's own
+            // (long-press your picture), so the bare path goes home.
             GoRoute(
               path: 'archive',
-              pageBuilder: (context, state) =>
-                  defaultPageBuilder(context, state, const Archive()),
+              redirect: (context, state) => state.uri.path.endsWith('/archive')
+                  ? '/rooms'
+                  : loggedOutRedirect(context, state),
               routes: [
                 GoRoute(
                   path: ':roomid',
@@ -175,7 +177,6 @@ abstract class AppRoutes {
                   redirect: loggedOutRedirect,
                 ),
               ],
-              redirect: loggedOutRedirect,
             ),
             GoRoute(
               path: 'newprivatechat',
@@ -195,18 +196,6 @@ abstract class AppRoutes {
                 context,
                 state,
                 NewGroup(spaceId: state.uri.queryParameters['space_id']),
-              ),
-              redirect: loggedOutRedirect,
-            ),
-            GoRoute(
-              path: 'newspace',
-              pageBuilder: (context, state) => defaultPageBuilder(
-                context,
-                state,
-                NewGroup(
-                  createGroupType: CreateGroupType.space,
-                  spaceId: state.uri.queryParameters['space_id'],
-                ),
               ),
               redirect: loggedOutRedirect,
             ),
@@ -299,44 +288,6 @@ abstract class AppRoutes {
                         ),
                       ],
                       redirect: loggedOutRedirect,
-                    ),
-                    GoRoute(
-                      path: 'addaccount',
-                      redirect: loggedOutRedirect,
-                      pageBuilder: (context, state) => defaultPageBuilder(
-                        context,
-                        state,
-                        const IntroPagePresenter(),
-                      ),
-                      routes: [
-                        GoRoute(
-                          path: 'sign_in',
-                          pageBuilder: (context, state) => defaultPageBuilder(
-                            context,
-                            state,
-                            SignInPage(signUp: false),
-                          ),
-                          redirect: loggedOutRedirect,
-                        ),
-                        GoRoute(
-                          path: 'sign_up',
-                          pageBuilder: (context, state) => defaultPageBuilder(
-                            context,
-                            state,
-                            SignInPage(signUp: true),
-                          ),
-                          redirect: loggedOutRedirect,
-                        ),
-                        GoRoute(
-                          path: 'login',
-                          pageBuilder: (context, state) => defaultPageBuilder(
-                            context,
-                            state,
-                            Login(client: state.extra as Client),
-                          ),
-                          redirect: loggedOutRedirect,
-                        ),
-                      ],
                     ),
                     GoRoute(
                       path: 'homeserver',
