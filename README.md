@@ -5,14 +5,28 @@
 <h1 align="center">Vibe</h1>
 
 <p align="center">
-  <b>A Discord-style, end-to-end encrypted messenger for Android, built on Matrix.</b><br>
-  No phone number. No ads. Open source.
+  <b>A Discord-style, end-to-end encrypted messenger built on Matrix.</b><br>
+  Android · iPhone · Web. No phone number. No ads. Open source.
 </p>
 
 <p align="center">
-  <a href="https://github.com/blackshadowde/Vibe-flutter/releases/latest"><b>⬇ Download the latest APK</b></a>
+  <a href="https://github.com/blackshadowde/Vibe-flutter/releases/latest"><b>⬇ Android APK</b></a>
+  ·
+  <a href="#iphone"><b>iPhone (AltStore / SideStore)</b></a>
   ·
   <a href="#support-vibe">❤ Support Vibe</a>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/hero.png" alt="Vibe: the Discord feel, Matrix privacy. Home and chat screens on two phones." width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/home.png" width="19%" alt="Home: chats rail and direct messages">
+  <img src="docs/screenshots/chat.png" width="19%" alt="Chat with a music link card and the strict encryption shield">
+  <img src="docs/screenshots/start.png" width="19%" alt="Start something: chat, group or community">
+  <img src="docs/screenshots/strict.png" width="19%" alt="Strict encryption introduction">
+  <img src="docs/screenshots/profile.png" width="19%" alt="Edit profile with the listening-to status">
 </p>
 
 ---
@@ -25,17 +39,28 @@ It looks and feels like Discord: a rail of profile pictures on the left, your DM
 
 ## Features
 
+**Privacy first**
+- 🛡 **Strict encryption:** a fresh message key every 10 messages or every hour (Matrix's default is 100 messages or a week), so a leaked key unlocks almost nothing. On for new chats; the lock turns into a shield. Element and other Matrix apps still read the chat.
+- End-to-end encrypted chats, verification and recovery key backup
+- Up to date with the latest Matrix SDK (14.2) and encryption library (vodozemac 0.9)
+
 **Chat**
-- End-to-end encrypted direct messages, with recovery key backup
 - Replies with Discord-style curved lines and swipe-to-reply
 - Animated reactions for every emoji
 - Starred messages, pinned chats, edits and read receipts
 - Media slideshow for every photo and video in a chat
 - Share phone contacts and Matrix contacts
 - Send big files in parts (Vibe to Vibe)
+- 🎵 **Music link cards** for Spotify, YouTube Music, Apple Music, JioSaavn, SoundCloud and more
+- 📞 Encrypted **voice and video calls** inside the app (Element Call)
+
+**Start something**
+- One illustrated screen behind the **+**: start a chat, a group or a community, join with an invite link, or browse public groups and communities
+- Add people by their Matrix ID with name suggestions as you type
 
 **Made for real life**
-- 💭 **Custom status** with "Clear after", e.g. "⚓ On watch · until 4 PM"
+- 💭 **Custom status** with "Clear after", e.g. "📚 Studying · until 4 PM"
+- 🎧 **Listening to:** your status shows the song playing in any music app, like Discord (Android)
 - 🕓 **Their time:** see the other person's local time in a bubble at the top of the chat
 - 🗓 **Send later:** schedule a message for their morning
 - ⏱ **Disappearing messages** per chat, from 1 hour to 90 days
@@ -44,7 +69,7 @@ It looks and feels like Discord: a rail of profile pictures on the left, your DM
 
 **Your choice**
 - 🌐 Pick any Matrix server, or create an account right in the app
-- 🔔 Notifications through Firebase, or **built-in without Google** (ntfy)
+- 🔔 Notifications through a **direct connection** to your server, Firebase, or **built-in without Google** (ntfy)
 - 💾 Keep media on your phone and save photos to your gallery
 - 🎨 Discord-style palette, Figtree font, haptics and 120 Hz animations
 
@@ -55,9 +80,23 @@ It looks and feels like Discord: a rail of profile pictures on the left, your DM
 3. Open the file. If Android asks, allow **Install unknown apps** for your browser.
 4. Sign in with your Matrix account, or tap **Create account**.
 
-To update, install the new APK over the old one. Your chats stay.
+To update, install the new APK over the old one, or tap **Check for updates** in Settings > About. Your chats stay.
 
 Works on 64-bit Android phones (almost every phone from the last 7+ years).
+
+### iPhone
+
+Vibe for iPhone installs with [SideStore](https://sidestore.io) or [AltStore](https://altstore.io), and updates show up there automatically.
+
+1. Add this source in SideStore or AltStore (Sources > +):
+   `https://raw.githubusercontent.com/blackshadowde/Vibe-flutter/Vibe/altstore.json`
+2. Install **Vibe** from the source.
+
+Already have Vibe? Settings > About > **Get updates in SideStore** adds the source in one tap.
+
+### Web
+
+Vibe also runs in the browser: [blackshadowde.github.io/Vibe-flutter](https://blackshadowde.github.io/Vibe-flutter/).
 
 ## Support Vibe
 
@@ -83,6 +122,9 @@ Builds run on GitHub Actions, so no local setup is needed.
 
 - **Vibe build:** debug build for testing (Actions > Vibe build)
 - **Vibe release:** signed APK. Tick **Publish** to create a public GitHub Release.
+- **Vibe iOS (unsigned IPA):** iPhone build. Tick **Publish for AltStore / SideStore** to create an `ios-v…` release and update `altstore.json`.
+- **Vibe web:** builds the web app and deploys it to GitHub Pages.
+- **Vibe check:** code check only, about 3 minutes.
 
 Version numbers are `major.minor` from `pubspec.yaml` plus the build number, e.g. `2.0.41`.
 
@@ -103,4 +145,4 @@ Keep the keystore backed up outside the repository. Without it, installed apps c
 Vibe is a fork of [FluffyChat](https://github.com/krille-chan/fluffychat) by Christian Kußowski and contributors, licensed under **AGPL-3.0-or-later**. Vibe keeps that licence; see `LICENSE`.
 Matrix is an open standard from the [Matrix.org Foundation](https://matrix.org).
 
-<sub>Keywords: Matrix client, Android messenger, Discord style chat, end-to-end encryption, E2EE, private messenger, no phone number, FluffyChat fork, Flutter.</sub>
+<sub>Keywords: Matrix client, Android messenger, iPhone Matrix app, Discord style chat, end-to-end encryption, E2EE, private messenger, no phone number, FluffyChat fork, Flutter.</sub>
