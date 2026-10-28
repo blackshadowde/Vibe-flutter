@@ -38,7 +38,7 @@ Every change in this release, with the commit that made it.
 ### Removed (for now)
 - "Listening to" status (see the Play Protect fix above)
 
-### Security audit (after 3.1.111) ([970d7ed](https://github.com/blackshadowde/Vibe-flutter/commit/970d7edbd))
+### Security audit (after 3.1.111) ([a160dcb](https://github.com/blackshadowde/Vibe-flutter/commit/a160dcbc0))
 - Call links are opened only when they point to a call server (`call.element.io` or your own). Before, a fake call message could open any website inside Vibe with the camera and microphone allowed
 - Link previews are off in encrypted chats (your server would see the link); a switch turns them back on
 - Firebase is no longer built into Android releases (3.1.111 and earlier included it, unused, and it contacted Google at start)
