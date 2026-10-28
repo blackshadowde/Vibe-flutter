@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibe · The Discord feel. Matrix privacy.</title>
+<meta name="description" content="Vibe is a free, open-source Matrix messenger with a Discord-style layout. End-to-end encrypted, strict key rotation, for Android, iPhone and the web.">
+<meta name="theme-color" content="#0B0C0E">
+<meta property="og:title" content="Vibe · The Discord feel. Matrix privacy.">
+<meta property="og:description" content="A free, open-source Matrix messenger with a Discord-style layout. Every chat end-to-end encrypted.">
+<meta property="og:image" content="assets/og.png">
+<link rel="icon" href="assets/icon.png">
+<link rel="preload" href="assets/figtree.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="Vibe home">
+    <img src="assets/icon.png" alt="" width="28" height="28">
+    <span>Vibe</span>
+  </a>
+  <nav aria-label="Sections">
+    <a href="#strict">Privacy</a>
+    <a href="#tour">Tour</a>
+    <a href="#features">Features</a>
+    <a class="pill" href="#download">Download</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- 1. Opening -->
+<section class="hero" id="top">
+  <div class="hero-copy">
+    <p class="eyebrow reveal">Android · iPhone · Web</p>
+    <h1 class="headline">
+      <span class="line"><span>The Discord feel.</span></span>
+      <span class="line"><span class="grad">Matrix privacy.</span></span>
+    </h1>
+    <p class="lede reveal">A free, open-source messenger with the layout you already love. Every chat is end-to-end encrypted, and it talks to Element and every other Matrix app.</p>
+    <div class="cta reveal">
+      <a class="btn primary" href="#download">Get Vibe</a>
+      <a class="btn ghost" href="https://github.com/blackshadowde/Vibe-flutter">View on GitHub</a>
+    </div>
+  </div>
+  <div class="fan" aria-hidden="true">
+    <div class="phone side left"><img src="assets/chat.webp" alt="" width="390" height="844"></div>
+    <div class="phone side right"><img src="assets/start.webp" alt="" width="390" height="844"></div>
+    <div class="phone main"><img src="assets/home.webp" alt="" width="390" height="844"></div>
+  </div>
+</section>
+
+<!-- 2. Strict encryption, scrubbed by scroll -->
+<section class="strict" id="strict">
+  <div class="strict-stage">
+    <svg class="lockshield" viewBox="0 0 200 200" role="img" aria-label="A lock turning into a shield">
+      <defs>
+        <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#23A55A" stop-opacity=".55"/>
+          <stop offset="1" stop-color="#23A55A" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle class="ls-glow" cx="100" cy="104" r="96" fill="url(#glow)"/>
+      <path class="ls-shackle" pathLength="1" d="M70,90 V66 A30,30 0 0 1 130,66 V90" fill="none" stroke="#B5BAC1" stroke-width="14" stroke-linecap="round"/>
+      <path class="ls-body" d="M100,90 C112,90 124,90 136,90 C144,90 150,96 150,104 C150,121 150,139 150,156 C150,164 144,170 136,170 C124,170 112,170 100,170 C88,170 76,170 64,170 C56,170 50,164 50,156 C50,139 50,121 50,104 C50,96 56,90 64,90 C76,90 88,90 100,90 Z" fill="#B5BAC1"/>
+      <circle class="ls-hole" cx="100" cy="128" r="11" fill="#0B0C0E"/>
+      <path class="ls-shine" d="M100,44 L100,166 C80,154 56,134 56,100 L56,60 Z" fill="#fff" opacity="0"/>
+    </svg>
+    <div class="strict-lines" aria-live="polite">
+      <p class="sl"><b>Every chat is end-to-end encrypted.</b> Your server only ever stores scrambled data.</p>
+      <p class="sl">Most Matrix apps keep one message key for <b>100 messages or a week.</b></p>
+      <p class="sl">Vibe swaps it <b class="green">every 10 messages, or every hour.</b></p>
+      <p class="sl">So a leaked key unlocks <b class="green">almost nothing.</b> We call it Strict encryption.</p>
+    </div>
+    <div class="keys" aria-hidden="true">
+      <div class="keytrack"></div>
+      <p class="keylabel">Each block of 10 messages gets a fresh key</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Horizontal tour -->
+<section class="tour" id="tour">
+  <div class="tour-head">
+    <h2>Feels like Discord.<br><span class="muted">Works like Matrix.</span></h2>
+  </div>
+  <div class="tour-track">
+    <figure class="slide">
+      <div class="phone"><img src="assets/home.webp" alt="Home: a rail of chats on the left, direct messages in the middle" loading="lazy" width="390" height="844"></div>
+      <figcaption><b>Your people, in a rail.</b> Chats on the left, messages in the middle, just like the app you already know.</figcaption>
+    </figure>
+    <figure class="slide">
+      <div class="phone"><img src="assets/chat.webp" alt="A chat with a music card and the strict encryption shield" loading="lazy" width="390" height="844"></div>
+      <figcaption><b>Messages without bubbles.</b> Replies, reactions, rich link cards and a shield when strict encryption is on.</figcaption>
+    </figure>
+    <figure class="slide">
+      <div class="phone"><img src="assets/start.webp" alt="Start something: chat, group or community" loading="lazy" width="390" height="844"></div>
+      <figcaption><b>Start something.</b> A chat, a group or a whole community with channels. Or join one with an invite link.</figcaption>
+    </figure>
+    <figure class="slide">
+      <div class="phone"><img src="assets/profile.webp" alt="Edit profile with a listening-to status" loading="lazy" width="390" height="844"></div>
+      <figcaption><b>A status that's alive.</b> Say what you're up to, or let it show the song you're playing.</figcaption>
+    </figure>
+    <figure class="slide">
+      <div class="phone"><img src="assets/strict.webp" alt="The strict encryption introduction" loading="lazy" width="390" height="844"></div>
+      <figcaption><b>Privacy, explained plainly.</b> No jargon. Every protection says what it does and who can turn it on.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 4. Music -->
+<section class="music">
+  <div class="music-copy">
+    <p class="eyebrow">Music</p>
+    <h2>Share a song.<br><span class="muted">Get a card, not a link.</span></h2>
+    <p class="lede">Spotify, YouTube Music, Apple Music, JioSaavn, SoundCloud and more turn into a player card. And your status can show what you're listening to, from music apps only. Never videos, films or ads.</p>
+  </div>
+  <div class="music-demo" aria-hidden="true">
+    <div class="link-typed"><span class="typed"></span><span class="caret"></span></div>
+    <div class="mcard">
+      <div class="mc-top"><span class="mc-dot"></span>Listen on Spotify<span class="mc-open"></span></div>
+      <div class="mc-row">
+        <div class="mc-cover"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#0B2E17" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        <div><div class="mc-title">Midnight Drive</div><div class="mc-sub">Neon Harbor · Song</div></div>
+      </div>
+      <div class="mc-btn"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play on Spotify</div>
+    </div>
+    <div class="status-pill"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#EB459E" stroke-width="2.4" stroke-linecap="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="7" rx="1.5"/><rect x="17" y="14" width="4" height="7" rx="1.5"/></svg>Midnight Drive · Neon Harbor<span class="eq"><i></i><i></i><i></i></span></div>
+  </div>
+</section>
+
+<!-- 5. Hot words -->
+<section class="hot">
+  <p class="eyebrow">Hot words</p>
+  <h2 class="hot-word" aria-label="hahaha"><span>h</span><span>a</span><span>h</span><span>a</span><span>h</span><span>a</span></h2>
+  <p class="lede center">Some words fill the screen when they arrive: laughter, good night, happy birthday, congrats and more. Send two at once and the scenes merge into one.</p>
+  <div class="burst" aria-hidden="true"></div>
+</section>
+
+<!-- 6. Features -->
+<section class="features" id="features">
+  <h2>Made for real life.</h2>
+  <div class="bento">
+    <article class="tile t-lock">
+      <div class="ti"><svg viewBox="0 0 48 48" aria-hidden="true"><path class="shk" d="M16 22v-6a8 8 0 0 1 16 0v6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><rect x="11" y="22" width="26" height="20" rx="5" fill="currentColor"/></svg></div>
+      <h3>Locked chats</h3><p>Hide a chat behind your fingerprint. Long-press your picture to find it.</p>
+    </article>
+    <article class="tile t-later">
+      <div class="ti"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="4"/><path class="hand-m" d="M24 24V12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path class="hand-h" d="M24 24h8" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg></div>
+      <h3>Send later</h3><p>Write it now, it arrives in their morning.</p>
+    </article>
+    <article class="tile t-time wide">
+      <div class="ti two"><span class="clock">9:41 PM</span><span class="arrow">→</span><span class="clock other">11:11 AM</span></div>
+      <h3>Their time, at a glance</h3><p>See the other person's local time under their name, so you never text at 3 AM by accident.</p>
+    </article>
+    <article class="tile t-vanish">
+      <div class="ti"><span class="vanish">see you soon</span></div>
+      <h3>Disappearing messages</h3><p>Per chat, from an hour to 90 days.</p>
+    </article>
+    <article class="tile t-data">
+      <div class="ti"><span class="bars"><i></i><i></i><i></i><i></i></span></div>
+      <h3>Low data mode</h3><p>Photos load when you tap them. Smaller uploads.</p>
+    </article>
+    <article class="tile t-call wide">
+      <div class="ti"><svg viewBox="0 0 48 48" aria-hidden="true"><path class="ring" d="M40 33v5a3 3 0 0 1-3.3 3A30 30 0 0 1 7 11.3 3 3 0 0 1 10 8h5a3 3 0 0 1 3 2.6c.2 1.5.6 3 1.1 4.4a3 3 0 0 1-.7 3.2L16 20.6a24 24 0 0 0 11.4 11.4l2.4-2.4a3 3 0 0 1 3.2-.7c1.4.5 2.9.9 4.4 1.1A3 3 0 0 1 40 33z" fill="currentColor"/></svg></div>
+      <h3>Voice and video calls</h3><p>Encrypted calls right inside the chat, with a floating window when you leave the app.</p>
+    </article>
+    <article class="tile t-drop">
+      <div class="ti"><span class="dropimg"></span><span class="droparea"></span></div>
+      <h3>Drag and drop</h3><p>Drag a screenshot from another app straight into a chat.</p>
+    </article>
+    <article class="tile t-start wide">
+      <img src="assets/art-group.png" alt="" loading="lazy" width="480" height="320">
+      <h3>Groups and communities</h3><p>Channels, invites and public places to join.</p>
+    </article>
+  </div>
+</section>
+
+<!-- 7. Privacy -->
+<section class="privacy">
+  <h2>No phone number.<br>No ads. <span class="muted">No tracking.</span></h2>
+  <ul class="facts">
+    <li><b>Encrypted on your phone.</b> Messages and files are locked before they leave your device.</li>
+    <li><b>No analytics, ever.</b> Vibe doesn't count, profile or sell anything.</li>
+    <li><b>Quiet notifications.</b> They carry only a room and message ID, never your text.</li>
+    <li><b>Your account, your choice.</b> It lives on the Matrix server you pick, not with us.</li>
+  </ul>
+</section>
+
+<!-- 8. Download -->
+<section class="download" id="download">
+  <h2>Get Vibe.</h2>
+  <p class="lede center">Free on every device. Your chats follow you.</p>
+  <div class="platforms">
+    <article class="plat">
+      <h3>Android</h3>
+      <p>Download the APK and open it. Updates arrive inside the app.</p>
+      <a class="btn primary" href="https://github.com/blackshadowde/Vibe-flutter/releases/latest">Download APK</a>
+    </article>
+    <article class="plat">
+      <h3>iPhone</h3>
+      <p>Install with SideStore or AltStore. Updates show up there automatically.</p>
+      <a class="btn primary" href="sidestore://source?url=https%3A%2F%2Fraw.githubusercontent.com%2Fblackshadowde%2FVibe-flutter%2FVibe%2Faltstore.json">Add to SideStore</a>
+      <a class="btn ghost small" href="altstore://source?url=https%3A%2F%2Fraw.githubusercontent.com%2Fblackshadowde%2FVibe-flutter%2FVibe%2Faltstore.json">Add to AltStore</a>
+    </article>
+    <article class="plat">
+      <h3>Web</h3>
+      <p>Open Vibe in your browser. Nothing to install.</p>
+      <a class="btn primary" href="https://blackshadowde.github.io/Vibe-flutter/">Open in browser</a>
+    </article>
+  </div>
+</section>
+
+<!-- 9. Support -->
+<section class="support">
+  <div>
+    <h2>Keep Vibe free.</h2>
+    <p class="lede">No ads and no investors. If Vibe makes your day better, you can help pay for the notification server and development.</p>
+    <p class="upi">UPI: <code>ashish.boddu@ybl</code></p>
+  </div>
+  <img src="assets/upi.png" alt="UPI QR code for donations" width="220" height="220" loading="lazy">
+</section>
+
+</main>
+
+<footer class="foot">
+  <p>Vibe is free software under the GNU AGPL v3, based on <a href="https://github.com/krille-chan/fluffychat">FluffyChat</a>. Matrix is an open standard from the <a href="https://matrix.org">Matrix.org Foundation</a>.</p>
+  <p><a href="https://github.com/blackshadowde/Vibe-flutter">Source code</a> · Figtree font under the <a href="assets/OFL.txt">SIL Open Font License</a></p>
+</footer>
+
+<script src="vendor/gsap.min.js" defer></script>
+<script src="vendor/ScrollTrigger.min.js" defer></script>
+<script src="main.js" defer></script>
+</body>
+</html>
