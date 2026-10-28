@@ -11,7 +11,7 @@
 <meta property="og:image" content="assets/og.png">
 <link rel="icon" href="assets/icon.png">
 <link rel="preload" href="assets/figtree.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -140,6 +140,31 @@
   <h2 class="hot-word" aria-label="hahaha"><span>h</span><span>a</span><span>h</span><span>a</span><span>h</span><span>a</span></h2>
   <p class="lede center">Some words fill the screen when they arrive: laughter, good night, happy birthday, congrats and more. Send two at once and the scenes merge into one.</p>
   <div class="burst" aria-hidden="true"></div>
+  <div class="moods">
+    <figure class="mood m-night">
+      <div class="sky" aria-hidden="true">
+        <svg class="moon" viewBox="0 0 100 100"><path d="M64 14a38 38 0 1 0 22 58A32 32 0 0 1 64 14z" fill="#FEE75C"/></svg>
+        <i class="star" style="left:18%;top:22%"></i><i class="star" style="left:78%;top:16%;animation-delay:.6s"></i><i class="star" style="left:30%;top:70%;animation-delay:1.1s"></i><i class="star" style="left:84%;top:62%;animation-delay:.3s"></i><i class="star" style="left:52%;top:10%;animation-delay:1.5s"></i>
+        <span class="zz">z</span><span class="zz" style="animation-delay:.8s">z</span>
+      </div>
+      <figcaption>good night</figcaption>
+    </figure>
+    <figure class="mood m-morning">
+      <div class="sky" aria-hidden="true">
+        <div class="sun"><i></i></div>
+        <div class="horizon"></div>
+        <svg class="bird" viewBox="0 0 40 16"><path d="M2 12 Q10 2 20 10 Q30 2 38 12" fill="none" stroke="#F2F3F5" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </div>
+      <figcaption>good morning</figcaption>
+    </figure>
+    <figure class="mood m-love">
+      <div class="sky" aria-hidden="true">
+        <svg class="heart" viewBox="0 0 100 90"><path d="M50 86C20 64 4 48 4 28 4 14 15 4 28 4c9 0 17 5 22 13C55 9 63 4 72 4c13 0 24 10 24 24 0 20-16 36-46 58z" fill="#EB459E"/></svg>
+        <i class="mini" style="--x:-70px;--y:-60px"></i><i class="mini" style="--x:70px;--y:-50px;animation-delay:.2s"></i><i class="mini" style="--x:-50px;--y:50px;animation-delay:.35s"></i><i class="mini" style="--x:60px;--y:55px;animation-delay:.5s"></i>
+      </div>
+      <figcaption>love you</figcaption>
+    </figure>
+  </div>
 </section>
 
 <!-- 6. Features: chapters, one scene at a time as you scroll -->
@@ -250,6 +275,6 @@
 
 <script src="vendor/gsap.min.js" defer></script>
 <script src="vendor/ScrollTrigger.min.js" defer></script>
-<script src="main.js?v=3" defer></script>
+<script src="main.js?v=4" defer></script>
 </body>
 </html>

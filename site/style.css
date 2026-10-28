@@ -152,6 +152,39 @@ h2 { font-size: clamp(40px, 7vw, 96px); font-weight: 900; }
 .burst { position: absolute; inset: 0; pointer-events: none; }
 .burst i { position: absolute; font-weight: 900; color: #FEE75C; font-style: normal; }
 
+/* hot word scenes: good night, good morning, love you */
+.moods { display: flex; justify-content: center; gap: clamp(20px, 6vw, 96px); flex-wrap: wrap; margin-top: 72px; }
+.mood { margin: 0; text-align: center; }
+.mood figcaption { margin-top: 14px; font-size: clamp(22px, 2.6vw, 30px); font-weight: 900; letter-spacing: -0.02em; }
+.sky { position: relative; width: clamp(200px, 24vw, 280px); aspect-ratio: 1; border-radius: 50%; overflow: hidden; }
+.m-night .sky { background: radial-gradient(circle at 50% 30%, #2B2F6B, #0E1030 70%); }
+.m-morning .sky { background: linear-gradient(#FFB46B, #FF7E7E 55%, #3A2A55); }
+.m-love .sky { background: radial-gradient(circle, #4A1D3A, #1A0F18 70%); overflow: visible; }
+.moon { position: absolute; width: 42%; left: 29%; top: 26%; }
+.star { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #fff; opacity: .3; }
+.zz { position: absolute; right: 24%; top: 34%; font-weight: 900; color: #C9CDFB; opacity: 0; font-size: 22px; }
+.moods.in .m-night .moon { animation: rise 1.4s cubic-bezier(.2, .8, .2, 1) both; }
+.moods.in .star { animation: twinkle 2s ease-in-out infinite; }
+.moods.in .zz { animation: zz 2.4s ease-out infinite; }
+@keyframes rise { from { transform: translateY(60%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes twinkle { 50% { opacity: 1; transform: scale(1.6); } }
+@keyframes zz { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(30px, -50px) scale(1.2); } }
+.sun { position: absolute; left: 30%; top: 56%; width: 40%; aspect-ratio: 1; border-radius: 50%; background: #FEE75C; box-shadow: 0 0 60px #FFD54F; }
+.horizon { position: absolute; left: 0; right: 0; bottom: 0; height: 30%; background: #2A2140; }
+.bird { position: absolute; width: 18%; left: 20%; top: 24%; opacity: 0; }
+.moods.in .sun { animation: sunrise 2.2s cubic-bezier(.2, .8, .2, 1) both; }
+.moods.in .bird { animation: fly 4s 1s linear infinite; }
+@keyframes sunrise { from { transform: translateY(70%); } to { transform: translateY(-30%); } }
+@keyframes fly { 0% { opacity: 0; transform: translateX(-40px); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(180px) translateY(-20px); } }
+.heart { position: absolute; width: 46%; left: 27%; top: 30%; transform-origin: 50% 60%; }
+.mini { position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; background: #EB459E; transform: rotate(45deg); opacity: 0; }
+.mini::before, .mini::after { content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #EB459E; }
+.mini::before { left: -8px; } .mini::after { top: -8px; }
+.moods.in .heart { animation: beat 1.6s ease-in-out infinite; }
+.moods.in .mini { animation: puff 1.6s ease-out infinite; }
+@keyframes beat { 0%, 40%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 28% { transform: scale(1.05); } }
+@keyframes puff { 0%, 10% { opacity: 0; transform: translate(-50%, -50%) rotate(45deg) scale(.4); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(45deg) scale(.9); } }
+
 /* 6. features: chapters (sticky, one scene at a time) */
 .chapters { position: relative; height: 640vh; }
 .ch-stage { position: sticky; top: 0; height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 5vw, 80px); padding: 80px var(--pad) 40px; overflow: hidden; }

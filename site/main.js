@@ -48,6 +48,12 @@
     if (v?.downloadURL) { const a = $('#ipa'); a.href = v.downloadURL; a.textContent = 'Download IPA ' + v.version; }
   }).catch(() => {});
 
+  // hot word scenes start when they come on screen
+  const moods = $('.moods');
+  new IntersectionObserver((es, o) => {
+    if (es[0].isIntersecting) { moods.classList.add('in'); o.disconnect(); }
+  }, { threshold: 0.3 }).observe(moods);
+
   const typed = $('.typed');
   const link = 'https://open.spotify.com/track/midnight-drive';
 
