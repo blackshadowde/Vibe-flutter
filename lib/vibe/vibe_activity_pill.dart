@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_member_tags.dart';
 import 'dart:async';
 
 import 'package:vibe/l10n/l10n.dart';
@@ -84,6 +85,10 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
         .listen(_onTyping);
     // Keep my time zone + status present in every direct chat.
     VibeStatus.watch(c);
+    // my group tag in groups joined since it was picked
+    Future.delayed(const Duration(seconds: 30), () {
+      if (c.isLogged()) VibeMemberTags.sync(c);
+    });
     VibeDisappearing.start(c);
     VibeSendLater.start(c);
     Future.delayed(const Duration(seconds: 3), () {

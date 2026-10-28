@@ -36,6 +36,7 @@ class UrlLauncher {
     final l10n = L10n.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (url!.toLowerCase().startsWith(AppConfig.deepLinkPrefix) ||
+        url!.startsWith(AppConfig.shareLinkPrefix) ||
         url!.toLowerCase().startsWith(AppConfig.inviteLinkPrefix) ||
         {'#', '@', '!', '+', '\$'}.contains(url![0]) ||
         url!.toLowerCase().startsWith(AppConfig.schemePrefix)) {
@@ -126,10 +127,9 @@ class UrlLauncher {
 
   Future<void> openMatrixToUrl() async {
     final matrix = Matrix.of(context);
-    final url = this.url!.replaceFirst(
-      AppConfig.deepLinkPrefix,
-      AppConfig.inviteLinkPrefix,
-    );
+    final url = this.url!
+        .replaceFirst(AppConfig.deepLinkPrefix, AppConfig.inviteLinkPrefix)
+        .replaceFirst(AppConfig.shareLinkPrefix, AppConfig.inviteLinkPrefix);
 
     // The identifier might be a matrix.to url and needs escaping. Or, it might have multiple
     // identifiers (room id & event id), or it might also have a query part.

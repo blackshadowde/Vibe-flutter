@@ -53,5 +53,18 @@ extension IsStateExtension on Event {
 
   bool get isKnownHiddenStates =>
       {PollEventContent.responseType}.contains(type) ||
-      type.startsWith('m.key.verification.');
+      type.startsWith('m.key.verification.') ||
+      _isSilentMemberUpdate;
+
+  /// A member event that changes nothing people see (e.g. a Vibe group tag):
+  /// still in the group, same name, same picture.
+  bool get _isSilentMemberUpdate {
+    if (type != EventTypes.RoomMember) return false;
+    final prev = prevContent;
+    if (prev == null) return false;
+    return content['membership'] == 'join' &&
+        prev['membership'] == 'join' &&
+        content['displayname'] == prev['displayname'] &&
+        content['avatar_url'] == prev['avatar_url'];
+  }
 }

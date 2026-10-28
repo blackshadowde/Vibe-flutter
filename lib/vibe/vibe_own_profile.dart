@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_member_tags.dart';
 import 'package:vibe/vibe/vibe_activity_card.dart';
 import 'package:vibe/vibe/vibe_tap_icon.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
-import 'package:vibe/utils/vibe_share.dart';
+import 'package:vibe/widgets/qr_code_viewer.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:vibe/vibe/vibe_name_style.dart';
 import 'package:vibe/vibe/vibe_profile_cache.dart';
@@ -503,7 +504,14 @@ class _OwnSheetState extends State<_OwnSheet> {
                         icon: Icons.qr_code_2,
                         label: 'Share my Vibe ID',
                         filled: true,
-                        onTap: () => VibeShare.share(userId, context),
+                        onTap: () => showQrCodeViewer(context, userId),
+                      ),
+                      const SizedBox(height: 10),
+                      _wideButton(
+                        icon: Icons.sell_outlined,
+                        label: 'Group tag',
+                        filled: false,
+                        onTap: () => VibeMemberTags.pick(context, client),
                       ),
                     ],
                   ),

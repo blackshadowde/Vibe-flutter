@@ -139,6 +139,8 @@ enum AppSettings<T> {
   vibeCacheLimitMb<int>('chat.vibe.cache_limit_mb', 0),
   // Decoded pictures kept in memory while Vibe runs (MB).
   vibeMemoryCacheMb<int>('chat.vibe.memory_cache_mb', 256),
+  // Group tag shown next to my name in groups (room id, '' = none)
+  vibeGroupTag<String>('chat.vibe.group_tag', ''),
   doubleTapToReact<bool>('chat.vibe.double_tap_to_react', false),
   doubleTapReaction<String>('chat.vibe.double_tap_reaction', '❤️'),
   benchmarksInLogs<bool>('chat.vibe.benchmarks_in_logs', false);

@@ -34,7 +34,7 @@ class QrCodeViewer extends StatelessWidget {
     final imageResult = await showFutureLoadingDialog(
       context: context,
       future: () {
-        final inviteLink = 'https://matrix.to/#/$content';
+        final inviteLink = _link(content);
         final image = QRImage(inviteLink, size: 256, radius: 1).generate();
         return compute(encodePng, image);
       },
@@ -50,10 +50,16 @@ class QrCodeViewer extends StatelessWidget {
     ).save(context);
   }
 
+  /// People get Vibe's share link (opens Vibe and starts a chat); rooms keep
+  /// the matrix.to link every Matrix app understands.
+  static String _link(String content) => content.startsWith('@')
+      ? AppConfig.shareLink(content)
+      : 'https://matrix.to/#/$content';
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final inviteLink = 'https://matrix.to/#/$content';
+    final inviteLink = _link(content);
     return Scaffold(
       backgroundColor: Colors.black.withAlpha(128),
       extendBodyBehindAppBar: true,
@@ -75,7 +81,12 @@ class QrCodeViewer extends StatelessWidget {
               backgroundColor: Colors.black.withAlpha(128),
             ),
             icon: Icon(Icons.adaptive.share_outlined),
-            onPressed: () => VibeShare.share(inviteLink, context),
+            onPressed: () => VibeShare.share(
+              content.startsWith('@')
+                  ? 'Chat with me on Vibe: $inviteLink'
+                  : inviteLink,
+              context,
+            ),
             color: Colors.white,
             tooltip: L10n.of(context).share,
           ),

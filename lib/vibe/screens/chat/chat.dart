@@ -5,6 +5,7 @@
 
 import 'package:vibe/vibe/vibe_drop.dart';
 import 'package:vibe/vibe/vibe_pending_files.dart';
+import 'package:vibe/vibe/vibe_mention_controller.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:async';
 import 'dart:io';
@@ -729,7 +730,7 @@ class ChatController extends State<ChatPageWithRoom>
     super.dispose();
   }
 
-  TextEditingController sendController = TextEditingController();
+  TextEditingController sendController = VibeMentionController();
 
   void setSendingClient(Client c) {
     // first cancel typing with the old sending client

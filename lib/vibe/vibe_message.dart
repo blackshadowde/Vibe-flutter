@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_member_tags.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/vibe/vibe_effects.dart';
 import 'package:vibe/vibe/vibe_emoji_sheet.dart';
@@ -498,6 +499,7 @@ class VibeMessage extends StatelessWidget {
                   ),
                 ),
               ),
+              ...VibeMemberTags.chips(event.room, snapshot.data ?? sender),
               // Encrypted is the normal case (shown once in the chat
               // header); only warn when a chat is NOT encrypted.
               if (!event.room.encrypted)

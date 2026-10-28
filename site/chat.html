@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat on Vibe</title>
+<meta name="description" content="Someone invited you to chat on Vibe, a free and private Matrix messenger.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0B0C0E">
+<meta property="og:title" content="Chat with me on Vibe">
+<meta property="og:description" content="A free, private Matrix messenger. Tap to start chatting.">
+<meta property="og:image" content="https://get-vibe.github.io/assets/og.png">
+<link rel="icon" href="assets/icon.png">
+<style>
+@font-face{font-family:Figtree;src:url(assets/figtree.ttf)}
+:root{--bg:#0B0C0E;--surface:#16171A;--line:#2A2C31;--text:#F2F3F5;--muted:#A3A8B0;--blurple:#5865F2}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--text);font:16px/1.5 Figtree,system-ui,sans-serif;padding:24px 16px}
+.card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:32px 24px;text-align:center}
+.card img{width:72px;height:72px;border-radius:20px}
+h1{font-size:24px;margin:16px 0 4px}
+.id{color:var(--muted);word-break:break-all;margin:0 0 24px}
+a.btn{display:block;padding:14px;border-radius:16px;text-decoration:none;font-weight:700;margin-top:10px}
+.primary{background:var(--blurple);color:#fff}
+.secondary{background:#1E1F23;color:var(--text);border:1px solid var(--line)}
+.small{font-size:13px;color:var(--muted);margin-top:18px}
+.small a{color:var(--muted)}
+</style>
+</head>
+<body>
+<main class="card">
+  <img src="assets/icon.png" alt="">
+  <h1 id="title">Chat on Vibe</h1>
+  <p class="id" id="id"></p>
+  <a class="btn primary" id="open" href="#">Open in Vibe</a>
+  <a class="btn secondary" id="get" href="./#download">Get Vibe</a>
+  <p class="small">Use a different Matrix app? <a id="other" href="https://matrix.to">Open it there</a></p>
+</main>
+<script>
+(function () {
+  var id = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
+  var valid = /^[@#!][^\s:]+:[^\s]+$/.test(id);
+  var ua = navigator.userAgent;
+  var android = /Android/i.test(ua);
+  var get = android
+    ? 'https://github.com/blackshadowde/Vibe-flutter/releases/latest'
+    : './#download';
+  document.getElementById('get').href = get;
+  if (!valid) {
+    document.getElementById('title').textContent = 'This link looks broken';
+    document.getElementById('open').style.display = 'none';
+    return;
+  }
+  document.getElementById('id').textContent = id;
+  if (id[0] === '@') document.getElementById('title').textContent = 'Chat with ' + id.slice(1).split(':')[0];
+  var app = 'vibe://chat/' + id.replace('#', '%23');
+  // Android: open Vibe if it's installed, otherwise go to the download.
+  var open = android
+    ? 'intent://chat/' + id.replace('#', '%23') + '#Intent;scheme=vibe;package=app.vibe.chat;S.browser_fallback_url=' + encodeURIComponent(get) + ';end'
+    : app;
+  document.getElementById('open').href = open;
+  document.getElementById('other').href = 'https://matrix.to/#/' + id;
+})();
+</script>
+</body>
+</html>

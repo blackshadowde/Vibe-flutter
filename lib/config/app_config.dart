@@ -16,6 +16,9 @@ abstract class AppConfig {
 
   static const String inviteLinkPrefix = 'https://matrix.to/#/';
   static const String deepLinkPrefix = 'vibe://chat/';
+  // Vibe's own share link: opens Vibe (or offers to get it) and starts a chat.
+  static const String shareLinkPrefix = 'https://get-vibe.github.io/chat.html#';
+  static String shareLink(String id) => '$shareLinkPrefix$id';
   static const String schemePrefix = 'matrix:';
   static const String pushNotificationsChannelId = 'fluffychat_push';
   static const String pushNotificationsAppId = 'app.vibe.chat';
