@@ -10,9 +10,9 @@ import 'package:vibe/widgets/adaptive_dialogs/show_modal_action_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
-import '../../utils/date_time_extension.dart';
-import '../../utils/matrix_sdk_extensions/device_extension.dart';
-import '../../widgets/matrix.dart';
+import 'package:vibe/utils/date_time_extension.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/device_extension.dart';
+import 'package:vibe/widgets/matrix.dart';
 
 enum UserDeviceListItemAction { rename, remove, verify, block, unblock }
 

@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: 2019-Present Christian Kußowski
-// SPDX-FileCopyrightText: 2019-Present Contributors to FluffyChat
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
@@ -18,11 +15,20 @@ import 'package:vibe/vibe/vibe_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'settings_chat.dart';
 
-class SettingsChatView extends StatelessWidget {
-  final SettingsChatController controller;
-  const SettingsChatView(this.controller, {super.key});
+/// Chat settings: low data, media, status bubble, sending, reactions and
+/// custom emoji.
+class VibeChatSettingsPage extends StatefulWidget {
+  const VibeChatSettingsPage({super.key});
+
+  @override
+  State<VibeChatSettingsPage> createState() => _VibeChatSettingsPageState();
+}
+
+class _VibeChatSettingsPageState extends State<VibeChatSettingsPage> {
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +52,7 @@ class SettingsChatView extends StatelessWidget {
                     'autoplay, photos you send are smaller and nothing is '
                     'saved to the gallery automatically.',
                 setting: AppSettings.vibeLowData,
-                onChanged: (_) => controller.updateState(),
+                onChanged: (_) => _refresh(),
               ),
               SettingsSwitchListTile.adaptive(
                 title: L10n.of(context).formattedMessages,
@@ -84,7 +90,7 @@ class SettingsChatView extends StatelessWidget {
                     final ok = await VibeMediaSaver.requestPermission();
                     if (!ok) {
                       await AppSettings.vibeSaveMedia.setItem(false);
-                      controller.updateState();
+                      _refresh();
                     }
                   },
                 ),
@@ -98,7 +104,7 @@ class SettingsChatView extends StatelessWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   await VibeStoragePage.open(context);
-                  controller.updateState();
+                  _refresh();
                 },
               ),
               SettingsSwitchListTile.adaptive(
@@ -124,7 +130,7 @@ class SettingsChatView extends StatelessWidget {
                 title: L10n.of(context).doubleTapToReact,
                 subtitle: L10n.of(context).doubleTapToReactDescription,
                 setting: AppSettings.doubleTapToReact,
-                onChanged: (_) => controller.updateState(),
+                onChanged: (_) => _refresh(),
               ),
               if (AppSettings.doubleTapToReact.value)
                 ListTile(
@@ -180,7 +186,7 @@ class SettingsChatView extends StatelessWidget {
                     );
                     if (emoji != null) {
                       await AppSettings.doubleTapReaction.setItem(emoji);
-                      controller.updateState();
+                      _refresh();
                     }
                   },
                 ),

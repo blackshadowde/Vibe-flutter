@@ -5,6 +5,12 @@
 
 import 'dart:async';
 
+import 'package:vibe/vibe/vibe_devices_page.dart';
+import 'package:vibe/vibe/vibe_homeserver_page.dart';
+import 'package:vibe/vibe/vibe_notifications_page.dart';
+import 'package:vibe/vibe/vibe_security_page.dart';
+import 'package:vibe/vibe/vibe_style_page.dart';
+import 'package:vibe/vibe/vibe_chat_settings_page.dart';
 import 'package:vibe/vibe/vibe_password_page.dart';
 import 'package:vibe/vibe/vibe_recovery_email_page.dart';
 import 'package:vibe/vibe/vibe_blocked_page.dart';
@@ -19,19 +25,13 @@ import 'package:vibe/pages/chat_list/chat_list.dart';
 import 'package:vibe/pages/chat_members/chat_members.dart';
 import 'package:vibe/pages/chat_permissions_settings/chat_permissions_settings.dart';
 import 'package:vibe/pages/chat_search/chat_search_page.dart';
-import 'package:vibe/pages/device_settings/device_settings.dart';
 import 'package:vibe/pages/intro/intro_page_presenter.dart';
 import 'package:vibe/pages/invitation_selection/invitation_selection.dart';
 import 'package:vibe/pages/login/login.dart';
 import 'package:vibe/pages/new_group/new_group.dart';
 import 'package:vibe/pages/new_private_chat/new_private_chat.dart';
 import 'package:vibe/pages/settings/settings.dart';
-import 'package:vibe/pages/settings_chat/settings_chat.dart';
 import 'package:vibe/pages/settings_emotes/settings_emotes.dart';
-import 'package:vibe/pages/settings_homeserver/settings_homeserver.dart';
-import 'package:vibe/pages/settings_notifications/settings_notifications.dart';
-import 'package:vibe/pages/settings_security/settings_security.dart';
-import 'package:vibe/pages/settings_style/settings_style.dart';
 import 'package:vibe/pages/sign_in/sign_in_page.dart';
 import 'package:vibe/widgets/config_viewer.dart';
 import 'package:vibe/widgets/layouts/empty_page.dart';
@@ -244,7 +244,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const VibeSettingsTheme(child: SettingsNotifications()),
+                        const VibeSettingsTheme(child: VibeNotificationsPage()),
                       ),
                       redirect: loggedOutRedirect,
                     ),
@@ -253,7 +253,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const VibeSettingsTheme(child: SettingsStyle()),
+                        const VibeSettingsTheme(child: VibeStylePage()),
                       ),
                       redirect: loggedOutRedirect,
                     ),
@@ -262,7 +262,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const VibeSettingsTheme(child: DevicesSettings()),
+                        const VibeSettingsTheme(child: VibeDevicesPage()),
                       ),
                       redirect: loggedOutRedirect,
                     ),
@@ -271,7 +271,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const VibeSettingsTheme(child: SettingsChat()),
+                        const VibeSettingsTheme(child: VibeChatSettingsPage()),
                       ),
                       routes: [
                         GoRoute(
@@ -295,7 +295,7 @@ abstract class AppRoutes {
                         return defaultPageBuilder(
                           context,
                           state,
-                          const VibeSettingsTheme(child: SettingsHomeserver()),
+                          const VibeSettingsTheme(child: VibeHomeserverPage()),
                         );
                       },
                       redirect: loggedOutRedirect,
@@ -306,7 +306,7 @@ abstract class AppRoutes {
                       pageBuilder: (context, state) => defaultPageBuilder(
                         context,
                         state,
-                        const VibeSettingsTheme(child: SettingsSecurity()),
+                        const VibeSettingsTheme(child: VibeSecurityPage()),
                       ),
                       routes: [
                         GoRoute(

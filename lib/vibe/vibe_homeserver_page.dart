@@ -1,28 +1,58 @@
-// SPDX-FileCopyrightText: 2019-Present Christian Kußowski
-// SPDX-FileCopyrightText: 2019-Present Contributors to FluffyChat
-//
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:convert';
-
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:matrix/matrix.dart';
+import 'package:vibe/widgets/matrix.dart';
 import 'package:vibe/vibe/vibe_settings_style.dart';
 import 'package:vibe/config/app_config.dart';
 import 'package:vibe/config/themes.dart';
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/utils/localized_exception_extension.dart';
 import 'package:vibe/widgets/layouts/max_width_body.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:matrix/matrix.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../../widgets/matrix.dart';
-import 'settings_homeserver.dart';
+class VibeHomeserverPage extends StatefulWidget {
+  const VibeHomeserverPage({super.key});
 
-class SettingsHomeserverView extends StatelessWidget {
-  final SettingsHomeserverController controller;
+  @override
+  VibeHomeserverPageController createState() => VibeHomeserverPageController();
+}
 
-  const SettingsHomeserverView(this.controller, {super.key});
+class _VibeHomeserverPageState extends State<VibeHomeserverPage> {
+  Future<({String name, String version, Uri federationBaseUrl})>
+  fetchServerInfo() async {
+    final client = Matrix.of(context).client;
+    final domain = client.userID!.domain!;
+    final httpClient = client.httpClient;
+    var federationBaseUrl = Uri(host: domain, port: 8448, scheme: 'https');
+    try {
+      final serverWellKnownResult = await httpClient.get(
+        Uri.https(domain, '/.well-known/matrix/server'),
+      );
+      final serverWellKnown = jsonDecode(serverWellKnownResult.body);
+      federationBaseUrl = Uri.https(serverWellKnown['m.server']);
+    } catch (e, s) {
+      Logs().w(
+        'Unable to fetch federation base uri. Use $federationBaseUrl',
+        e,
+        s,
+      );
+    }
+
+    final serverVersionResult = await http.get(
+      federationBaseUrl.resolveUri(Uri(path: '/_matrix/federation/v1/version')),
+    );
+    final {
+      'server': {'name': String name, 'version': String version},
+    } = Map<String, Map<String, dynamic>>.from(
+      jsonDecode(serverVersionResult.body),
+    );
+
+    return (name: name, version: version, federationBaseUrl: federationBaseUrl);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +153,7 @@ class SettingsHomeserverView extends StatelessWidget {
                 },
               ),
               FutureBuilder(
-                future: controller.fetchServerInfo(),
+                future: fetchServerInfo(),
                 builder: (context, snapshot) {
                   final error = snapshot.error;
                   if (error != null) {
