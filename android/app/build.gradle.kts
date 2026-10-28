@@ -70,7 +70,9 @@ android {
     }
 
     defaultConfig {
-        applicationId = "app.vibe.chat"
+        // The installed app's identity. Releases have always shipped as
+        // com.vibe.app; changing it would install a second app and lose chats.
+        applicationId = "com.vibe.app"
         // Vibe supports Android 10+
         minSdk = maxOf(29, flutter.minSdkVersion)
         targetSdk = flutter.targetSdkVersion

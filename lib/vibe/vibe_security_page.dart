@@ -237,6 +237,13 @@ class _VibeSecurityPageState extends State<VibeSecurityPage> {
                         'links are shared in your chats.',
                     setting: AppSettings.vibeLinkPreviews,
                   ),
+                  SettingsSwitchListTile.adaptive(
+                    title: 'Link previews in encrypted chats',
+                    subtitle:
+                        'Off: your server never sees links from encrypted '
+                        'chats. On: it fetches them for the preview card.',
+                    setting: AppSettings.vibeLinkPreviewsEncrypted,
+                  ),
                   if (kIsWeb)
                     SettingsSwitchListTile.adaptive(
                       title: 'Log out when the browser closes',

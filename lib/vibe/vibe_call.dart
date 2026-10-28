@@ -38,6 +38,26 @@ abstract class VibeCall {
     return s.isEmpty ? 'https://call.element.io' : s;
   }
 
+  /// Hosts Vibe's call window may open: Element Call and your own call
+  /// server. Anything else in a call message is ignored (a fake "call"
+  /// could otherwise open any website with the camera and microphone on).
+  static Set<String> get _hosts => {
+    'call.element.io',
+    if (Uri.tryParse(server)?.host case final String h when h.isNotEmpty) h,
+  };
+
+  static bool allowedHost(String host) => _hosts.contains(host.toLowerCase());
+
+  /// A real Element Call link: https, an allowed host, a call room with a
+  /// password (end-to-end encrypted).
+  static bool safeUrl(String? url) {
+    final u = url == null ? null : Uri.tryParse(url);
+    if (u == null || u.scheme != 'https' || !allowedHost(u.host)) return false;
+    return u.path.startsWith('/room') &&
+        u.fragment.contains('roomId=') &&
+        u.fragment.contains('password=');
+  }
+
   static Map<String, Object?>? info(Event e) {
     final v = e.content[_key];
     return v is Map ? Map<String, Object?>.from(v) : null;
@@ -102,6 +122,17 @@ abstract class VibeCall {
   }) async {
     if (_inCall) return;
     stopRinging();
+    if (url != null && !safeUrl(url)) {
+      Logs().w('Vibe call: refused a call link to an unknown website');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('This call link doesn\'t point to a call server'),
+          ),
+        );
+      }
+      return;
+    }
     final perms = await [
       Permission.microphone,
       if (video) Permission.camera,
@@ -226,7 +257,7 @@ abstract class VibeCall {
   static void _ring(BuildContext ctx, Room room, Event e, Map<String, Object?> i) {
     final video = i['video'] == true;
     final url = i['url'] as String?;
-    if (url == null) return;
+    if (url == null || !safeUrl(url)) return;
     startRinging();
     // stop by itself after 40 s
     final auto = Timer(const Duration(seconds: 40), () {
@@ -411,13 +442,35 @@ class _VibeCallScreenState extends State<_VibeCallScreen> {
     _pipAllowed(true);
     _eventId = widget.callEventId;
     _web = WebViewController(
-      onPermissionRequest: (r) => r.grant(),
+      // camera and microphone only, and only for the call server's page
+      onPermissionRequest: (r) {
+        final ok = r.types.every(
+          (t) =>
+              t == WebViewPermissionResourceType.camera ||
+              t == WebViewPermissionResourceType.microphone,
+        );
+        ok ? r.grant() : r.deny();
+      },
     )
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.black)
       ..addJavaScriptChannel('VibeCall', onMessageReceived: _onMessage)
       ..setNavigationDelegate(
-        NavigationDelegate(onPageFinished: (_) => _inject()),
+        NavigationDelegate(
+          onPageFinished: (_) => _inject(),
+          // stay on the call server: other links open in the browser
+          onNavigationRequest: (req) {
+            if (!req.isMainFrame) return NavigationDecision.navigate;
+            final u = Uri.tryParse(req.url);
+            if (u != null &&
+                (u.scheme == 'about' ||
+                    u.scheme == 'blob' ||
+                    (u.scheme == 'https' && VibeCall.allowedHost(u.host)))) {
+              return NavigationDecision.navigate;
+            }
+            return NavigationDecision.prevent;
+          },
+        ),
       );
     final p = _web.platform;
     if (p is AndroidWebViewController) {

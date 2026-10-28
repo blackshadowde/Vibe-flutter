@@ -97,27 +97,9 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - name: Push notifications (Firebase)
-        env:
-          GSJ: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          set -euo pipefail
-          if [ -z "${GSJ:-}" ]; then
-            echo "::warning::GOOGLE_SERVICES_JSON secret is not set - building WITHOUT push notifications"
-            exit 0
-          fi
-          # accept the raw JSON file contents or a base64 of it
-          if printf '%s' "$GSJ" | python3 -c 'import sys,json; json.load(sys.stdin)' 2>/dev/null; then
-            printf '%s' "$GSJ" > android/app/google-services.json
-          else
-            printf '%s' "$GSJ" | base64 -d > android/app/google-services.json
-          fi
-          PKG=$(python3 -c 'import json; print(json.load(open("android/app/google-services.json"))["client"][0]["client_info"]["android_client_info"]["package_name"])')
-          echo "Firebase package name: $PKG"
-          sed -i -E "s/applicationId = \"[^\"]*\"/applicationId = \"$PKG\"/" android/app/build.gradle.kts
-          grep -n "applicationId" android/app/build.gradle.kts
-          ./scripts/add-firebase-messaging.sh
-          echo "Push notifications: ENABLED ($PKG)"
+      # No Firebase / Google services in Vibe: notifications come over Vibe's
+      # own connection or ntfy, so nothing from Google is built in.
+
 
       - name: Release signing key
         env:
@@ -149,11 +131,8 @@ jobs:
           }
 
       - name: Build release APK
-        env:
-          VIBE_PUSH_GATEWAY: ${{ vars.VIBE_PUSH_GATEWAY }}
         run: |
           EXTRA=""
-          if [ -n "$VIBE_PUSH_GATEWAY" ]; then EXTRA="--dart-define=VIBE_PUSH_GATEWAY=$VIBE_PUSH_GATEWAY"; fi
           # Version = major.minor from pubspec.yaml + this run's number,
           # e.g. 1.1.37 (build code 37). Every release gets a new number.
           BASE=$(grep -E '^version:' pubspec.yaml | sed -E 's/version: *//; s/\+.*//' | cut -d. -f1-2)

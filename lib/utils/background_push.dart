@@ -380,7 +380,8 @@ class BackgroundPush {
       if (thisAppId.length > 64) thisAppId = thisAppId.substring(0, 64);
       final pushers = await client.getPushers() ?? [];
       for (final p in pushers) {
-        if (p.data.url.toString() != gateway) continue;
+        final url = p.data.url.toString();
+        if (url != gateway && url != vibeLegacyGateway) continue;
         if (p.appId != thisAppId) continue;
         await client.deletePusher(p);
         Logs().i('[Push] Removed Firebase pusher for ${client.deviceID}');

@@ -12,12 +12,15 @@ import 'package:http/http.dart' as http;
 import 'package:matrix/matrix_api_lite/utils/logs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Push gateway (your Cloudflare Worker). Forks: set the GitHub repository
-/// variable VIBE_PUSH_GATEWAY and the release workflow bakes it in.
-const String _vibeGatewayFromBuild = String.fromEnvironment('VIBE_PUSH_GATEWAY');
-const String _vibeGateway = _vibeGatewayFromBuild == ''
-    ? 'https://summer-brook-a863.ashishboddu940.workers.dev/_matrix/push/v1/notify'
-    : _vibeGatewayFromBuild;
+/// Push gateway for Firebase pushes. Vibe no longer uses one (Android has its
+/// own connection or ntfy), so it's empty unless a build sets
+/// VIBE_PUSH_GATEWAY.
+const String _vibeGateway = String.fromEnvironment('VIBE_PUSH_GATEWAY');
+
+/// The gateway older Vibe versions registered; only used to remove those
+/// registrations from the Matrix server.
+const String vibeLegacyGateway =
+    'https://summer-brook-a863.ashishboddu940.workers.dev/_matrix/push/v1/notify';
 
 enum AppSettings<T> {
   textMessageMaxLength<int>('textMessageMaxLength', 16384),
@@ -103,6 +106,8 @@ enum AppSettings<T> {
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),
   vibeLinkPreviews<bool>('chat.vibe.link_previews', true),
+  // in encrypted chats the server would see the link: off unless chosen
+  vibeLinkPreviewsEncrypted<bool>('chat.vibe.link_previews_encrypted', false),
   // status shows the song playing in any music app (Android)
   vibeNowPlaying<bool>('chat.vibe.now_playing', false),
   vibeNowPlayingPrev<String>('chat.vibe.now_playing_prev', ''),

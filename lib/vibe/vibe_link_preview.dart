@@ -38,8 +38,14 @@ class VibeLinkPreview extends StatelessWidget {
 
   /// The message is just one link: the card stands in for the text (the
   /// link itself shows only while loading or when there's no preview).
+  /// Previews are fetched by the server, which would then see links sent
+  /// in encrypted chats: there they're off unless you switch them on.
+  static bool enabledFor(Room room) =>
+      AppSettings.vibeLinkPreviews.value &&
+      (!room.encrypted || AppSettings.vibeLinkPreviewsEncrypted.value);
+
   static bool onlyLink(Event e) {
-    if (!AppSettings.vibeLinkPreviews.value) return false;
+    if (!enabledFor(e.room)) return false;
     final url = firstUrl(e);
     return url != null && e.body.trim() == url;
   }
@@ -252,7 +258,7 @@ class VibeLinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!AppSettings.vibeLinkPreviews.value) return const SizedBox.shrink();
+    if (!enabledFor(event.room)) return const SizedBox.shrink();
     final url = firstUrl(event);
     if (url == null) return const SizedBox.shrink();
 
