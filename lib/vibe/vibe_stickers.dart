@@ -3,7 +3,7 @@
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
-import 'package:fluffychat/config/setting_keys.dart';
+import 'package:vibe/config/setting_keys.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 

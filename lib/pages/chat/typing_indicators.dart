@@ -5,9 +5,9 @@
 
 import 'dart:math' as math;
 
-import 'package:fluffychat/pages/chat/chat.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/matrix.dart';
+import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 
 /// Typing indicator at the bottom of the timeline, like Vibgram: a small

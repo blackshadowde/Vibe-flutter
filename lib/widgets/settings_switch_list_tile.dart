@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/vibe/vibe_settings_style.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/vibe/vibe_settings_style.dart';
 import 'package:flutter/material.dart';
 
 class SettingsSwitchListTile extends StatefulWidget {

@@ -3,9 +3,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/vibe/vibe_text_size.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/vibe/vibe_text_size.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

@@ -2,13 +2,13 @@
 
 import 'dart:convert';
 
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/vibe/vibe_dialog.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/vibe/vibe_app_info.dart';
-import 'package:fluffychat/vibe/vibe_updater.dart';
-import 'package:fluffychat/vibe/vibe_welcome.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_dialog.dart';
+import 'package:vibe/utils/platform_infos.dart';
+import 'package:vibe/vibe/vibe_app_info.dart';
+import 'package:vibe/vibe/vibe_updater.dart';
+import 'package:vibe/vibe/vibe_welcome.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher_string.dart';

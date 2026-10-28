@@ -3,22 +3,22 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_dialog.dart';
+import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat_list/unread_bubble.dart';
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/utils/stream_extension.dart';
-import 'package:fluffychat/utils/string_color.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
-import 'package:fluffychat/widgets/hover_builder.dart';
-import 'package:fluffychat/widgets/matrix.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/chat_list/unread_bubble.dart';
+import 'package:vibe/utils/localized_exception_extension.dart';
+import 'package:vibe/utils/stream_extension.dart';
+import 'package:vibe/utils/string_color.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
+import 'package:vibe/widgets/hover_builder.dart';
+import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart' as sdk;

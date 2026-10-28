@@ -5,12 +5,12 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/vibe/vibe_dm_finder.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:fluffychat/pages/new_private_chat/qr_scanner_modal.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
-import 'package:fluffychat/widgets/matrix.dart';
+import 'package:vibe/vibe/vibe_dm_finder.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
+import 'package:vibe/pages/new_private_chat/qr_scanner_modal.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
+import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';

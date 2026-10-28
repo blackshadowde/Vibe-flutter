@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/vibe/vibe_direct.dart';
-import 'package:fluffychat/vibe/vibe_ntfy.dart';
-import 'package:fluffychat/widgets/matrix.dart';
-import 'package:fluffychat/vibe/vibe_hide_service.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/vibe/vibe_direct.dart';
+import 'package:vibe/vibe/vibe_ntfy.dart';
+import 'package:vibe/widgets/matrix.dart';
+import 'package:vibe/vibe/vibe_hide_service.dart';
 import 'package:flutter/material.dart';
 
 /// Settings > Notifications: Direct connection (like Vibgram, default) or

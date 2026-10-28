@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_sticker.dart';
-import 'package:fluffychat/vibe/vibe_dialog.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/pages/chat/events/video_player.dart';
-import 'package:fluffychat/pages/image_viewer/image_viewer.dart';
-import 'package:fluffychat/utils/date_time_extension.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
-import 'package:fluffychat/vibe/vibe_media_saver.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:fluffychat/vibe/vibe_stable_id.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:vibe/vibe/vibe_sticker.dart';
+import 'package:vibe/vibe/vibe_dialog.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/pages/chat/events/video_player.dart';
+import 'package:vibe/pages/image_viewer/image_viewer.dart';
+import 'package:vibe/utils/date_time_extension.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/event_extension.dart';
+import 'package:vibe/vibe/vibe_media_saver.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
+import 'package:vibe/vibe/vibe_stable_id.dart';
+import 'package:vibe/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';

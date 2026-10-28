@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/vibe/vibe_activity_pill.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/vibe/vibe_activity_pill.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:matrix/matrix.dart';

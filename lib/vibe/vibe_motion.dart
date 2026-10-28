@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_glass.dart';
-import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
+import 'package:vibe/vibe/vibe_glass.dart';
+import 'package:vibe/vibe/vibe_sheet_drag.dart';
 import 'dart:async';
 
-import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 

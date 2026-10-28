@@ -6,13 +6,13 @@
 import 'dart:isolate';
 import 'dart:ui';
 
-import 'package:fluffychat/vibe/vibe_ntfy.dart';
+import 'package:vibe/vibe/vibe_ntfy.dart';
 import 'package:collection/collection.dart';
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/utils/client_manager.dart';
-import 'package:fluffychat/utils/notification_background_handler.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/utils/start_push_foreground_service.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/utils/client_manager.dart';
+import 'package:vibe/utils/notification_background_handler.dart';
+import 'package:vibe/utils/platform_infos.dart';
+import 'package:vibe/utils/start_push_foreground_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

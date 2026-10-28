@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_glass.dart';
+import 'package:vibe/vibe/vibe_glass.dart';
 import 'package:flutter/material.dart';
 
 /// Vibe's looks. Only colours change (backgrounds, accent, buttons); the

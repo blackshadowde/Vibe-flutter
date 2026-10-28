@@ -3,14 +3,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/bootstrap/view_model/bootstrap_view_model.dart';
-import 'package:fluffychat/pages/key_verification/key_verification_dialog.dart';
-import 'package:fluffychat/utils/date_time_extension.dart';
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/device_extension.dart';
-import 'package:fluffychat/vibe/vibe_security_ui.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/bootstrap/view_model/bootstrap_view_model.dart';
+import 'package:vibe/pages/key_verification/key_verification_dialog.dart';
+import 'package:vibe/utils/date_time_extension.dart';
+import 'package:vibe/utils/localized_exception_extension.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/device_extension.dart';
+import 'package:vibe/vibe/vibe_security_ui.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/encryption/utils/key_verification.dart';
 import 'package:matrix/matrix.dart';

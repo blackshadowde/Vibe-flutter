@@ -3,15 +3,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/sign_in/view_model/model/public_homeserver_data.dart';
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/utils/sign_in_flows/oidc_login.dart';
-import 'package:fluffychat/utils/sign_in_flows/sso_login.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
-import 'package:fluffychat/widgets/matrix.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/sign_in/view_model/model/public_homeserver_data.dart';
+import 'package:vibe/utils/localized_exception_extension.dart';
+import 'package:vibe/utils/platform_infos.dart';
+import 'package:vibe/utils/sign_in_flows/oidc_login.dart';
+import 'package:vibe/utils/sign_in_flows/sso_login.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
+import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

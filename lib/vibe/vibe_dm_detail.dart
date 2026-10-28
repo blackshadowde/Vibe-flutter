@@ -3,24 +3,24 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_mute.dart';
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/vibe/vibe_call.dart';
-import 'package:fluffychat/vibe/vibe_sticker.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat/events/audio_player.dart';
-import 'package:fluffychat/utils/date_time_extension.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/vibe/vibe_groups.dart';
-import 'package:fluffychat/vibe/vibe_media_viewer.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:fluffychat/vibe/vibe_starred.dart';
-import 'package:fluffychat/vibe/vibe_status.dart';
-import 'package:fluffychat/vibe/vibe_user_sheet.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
-import 'package:fluffychat/widgets/presence_builder.dart';
+import 'package:vibe/vibe/vibe_mute.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_call.dart';
+import 'package:vibe/vibe/vibe_sticker.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/chat/events/audio_player.dart';
+import 'package:vibe/utils/date_time_extension.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/event_extension.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/vibe/vibe_groups.dart';
+import 'package:vibe/vibe/vibe_media_viewer.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
+import 'package:vibe/vibe/vibe_starred.dart';
+import 'package:vibe/vibe/vibe_status.dart';
+import 'package:vibe/vibe/vibe_user_sheet.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/mxc_image.dart';
+import 'package:vibe/widgets/presence_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';

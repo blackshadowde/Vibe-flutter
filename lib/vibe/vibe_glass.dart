@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:flutter/services.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
@@ -11,9 +11,9 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/utils/file_selector.dart';
-import 'package:fluffychat/vibe/vibe_palette.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/utils/file_selector.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:matrix/matrix.dart';

@@ -3,25 +3,25 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_now_playing.dart';
-import 'package:fluffychat/vibe/vibe_call.dart';
-import 'package:fluffychat/vibe/vibe_lock.dart';
+import 'package:vibe/vibe/vibe_now_playing.dart';
+import 'package:vibe/vibe/vibe_call.dart';
+import 'package:vibe/vibe/vibe_lock.dart';
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
-import 'package:fluffychat/vibe/vibe_privacy.dart';
-import 'package:fluffychat/vibe/vibe_direct.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/client_manager.dart';
-import 'package:fluffychat/utils/init_with_restore.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_file_extension.dart';
-import 'package:fluffychat/utils/notification_background_handler.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/utils/uia_request_manager.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
-import 'package:fluffychat/widgets/fluffy_chat_app.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:vibe/vibe/vibe_privacy.dart';
+import 'package:vibe/vibe/vibe_direct.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/client_manager.dart';
+import 'package:vibe/utils/init_with_restore.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_file_extension.dart';
+import 'package:vibe/utils/notification_background_handler.dart';
+import 'package:vibe/utils/platform_infos.dart';
+import 'package:vibe/utils/uia_request_manager.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
+import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';

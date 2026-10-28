@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/themes.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/config/themes.dart';
 import 'package:flutter/material.dart';
 
 Future<T?> showScaffoldDialog<T>({

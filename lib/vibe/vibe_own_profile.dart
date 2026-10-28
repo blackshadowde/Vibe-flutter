@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_tap_icon.dart';
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/utils/fluffy_share.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:fluffychat/vibe/vibe_name_style.dart';
-import 'package:fluffychat/vibe/vibe_profile_cache.dart';
-import 'package:fluffychat/vibe/vibe_set_status.dart';
-import 'package:fluffychat/vibe/vibe_status.dart';
-import 'package:fluffychat/vibe/vibe_sheet_drag.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:vibe/vibe/vibe_tap_icon.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/utils/fluffy_share.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
+import 'package:vibe/vibe/vibe_name_style.dart';
+import 'package:vibe/vibe/vibe_profile_cache.dart';
+import 'package:vibe/vibe/vibe_set_status.dart';
+import 'package:vibe/vibe/vibe_status.dart';
+import 'package:vibe/vibe/vibe_sheet_drag.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
+import 'package:vibe/widgets/mxc_image.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_dialog.dart';
+import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:async';
 
-import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 
-import 'package:fluffychat/vibe/vibe_glass.dart';
+import 'package:vibe/vibe/vibe_glass.dart';
 import 'package:flutter/gestures.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 
 /// State for the "drag the chat in with your finger" gesture on the home

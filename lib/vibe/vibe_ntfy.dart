@@ -4,8 +4,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/utils/start_push_foreground_service.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/utils/start_push_foreground_service.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';

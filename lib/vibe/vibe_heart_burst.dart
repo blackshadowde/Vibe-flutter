@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';

@@ -7,12 +7,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:async/async.dart';
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/utils/error_reporter.dart';
-import 'package:fluffychat/utils/file_description.dart';
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/utils/url_launcher.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/utils/error_reporter.dart';
+import 'package:vibe/utils/file_description.dart';
+import 'package:vibe/utils/localized_exception_extension.dart';
+import 'package:vibe/utils/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';

@@ -3,19 +3,19 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_call.dart';
-import 'package:fluffychat/vibe/vibe_sticker.dart';
+import 'package:vibe/vibe/vibe_call.dart';
+import 'package:vibe/vibe/vibe_sticker.dart';
 import 'dart:math';
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat/events/poll.dart';
-import 'package:fluffychat/pages/chat/events/video_player.dart';
-import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
-import 'package:fluffychat/vibe/vibe_effects.dart';
-import 'package:fluffychat/vibe/vibe_media_viewer.dart';
-import 'package:fluffychat/vibe/vibe_text_size.dart';
-import 'package:fluffychat/vibe/vibe_slash.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/chat/events/poll.dart';
+import 'package:vibe/pages/chat/events/video_player.dart';
+import 'package:vibe/vibe/vibe_animated_emoji.dart';
+import 'package:vibe/vibe/vibe_effects.dart';
+import 'package:vibe/vibe/vibe_media_viewer.dart';
+import 'package:vibe/vibe/vibe_text_size.dart';
+import 'package:vibe/vibe/vibe_slash.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

@@ -2,8 +2,8 @@
 
 import 'dart:math' as math;
 
-import 'package:fluffychat/vibe/vibe_glass.dart';
-import 'package:fluffychat/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_glass.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 

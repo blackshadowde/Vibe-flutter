@@ -3,25 +3,25 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_slash.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_slash.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
 import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
-import 'package:fluffychat/utils/date_time_extension.dart';
-import 'package:fluffychat/utils/file_description.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/utils/string_color.dart';
-import 'package:fluffychat/vibe/vibe_message.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/matrix.dart';
-import 'package:fluffychat/widgets/member_actions_popup_menu_button.dart';
-import 'package:fluffychat/vibe/vibe_stable_id.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/adaptive_bottom_sheet.dart';
+import 'package:vibe/utils/date_time_extension.dart';
+import 'package:vibe/utils/file_description.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/utils/string_color.dart';
+import 'package:vibe/vibe/vibe_message.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/matrix.dart';
+import 'package:vibe/widgets/member_actions_popup_menu_button.dart';
+import 'package:vibe/vibe/vibe_stable_id.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';

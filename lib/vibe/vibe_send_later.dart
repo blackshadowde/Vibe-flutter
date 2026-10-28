@@ -3,11 +3,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/pages/chat/chat.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/vibe/vibe_status.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_status.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

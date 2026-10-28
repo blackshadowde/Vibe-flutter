@@ -4,12 +4,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:collection/collection.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/custom_http_client.dart';
-import 'package:fluffychat/utils/custom_image_resizer.dart';
-import 'package:fluffychat/utils/init_with_restore.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/custom_http_client.dart';
+import 'package:vibe/utils/custom_image_resizer.dart';
+import 'package:vibe/utils/init_with_restore.dart';
+import 'package:vibe/utils/platform_infos.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_vodozemac/flutter_vodozemac.dart' as vod;

@@ -6,7 +6,7 @@
 import 'dart:convert';
 
 import 'package:async/async.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:vibe/utils/platform_infos.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix_api_lite/utils/logs.dart';

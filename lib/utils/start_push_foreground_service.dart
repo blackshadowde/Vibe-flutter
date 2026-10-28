@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:vibe/utils/platform_infos.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:matrix/matrix_api_lite/utils/logs.dart';

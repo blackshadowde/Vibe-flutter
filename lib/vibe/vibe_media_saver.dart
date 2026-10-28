@@ -2,8 +2,8 @@
 
 import 'dart:io';
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';

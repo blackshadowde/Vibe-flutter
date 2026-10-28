@@ -2,21 +2,21 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/vibe/vibe_lock.dart';
-import 'package:fluffychat/vibe/vibe_disappearing.dart';
-import 'package:fluffychat/vibe/vibe_media_saver.dart';
-import 'package:fluffychat/vibe/vibe_send_later.dart';
-import 'package:fluffychat/vibe/vibe_status.dart';
-import 'package:fluffychat/vibe/vibe_typing_pen.dart';
-import 'package:fluffychat/vibe/vibe_whats_new.dart';
-import 'package:fluffychat/vibe/vibe_support.dart';
-import 'package:fluffychat/vibe/vibe_updater.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/fluffy_chat_app.dart';
-import 'package:fluffychat/widgets/matrix.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_lock.dart';
+import 'package:vibe/vibe/vibe_disappearing.dart';
+import 'package:vibe/vibe/vibe_media_saver.dart';
+import 'package:vibe/vibe/vibe_send_later.dart';
+import 'package:vibe/vibe/vibe_status.dart';
+import 'package:vibe/vibe/vibe_typing_pen.dart';
+import 'package:vibe/vibe/vibe_whats_new.dart';
+import 'package:vibe/vibe/vibe_support.dart';
+import 'package:vibe/vibe/vibe_updater.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

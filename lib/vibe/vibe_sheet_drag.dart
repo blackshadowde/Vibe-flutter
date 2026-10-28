@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 
 /// Every pane / page that slides up closes with a swipe down that follows

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-name: fluffychat
+name: vibe
 description: Vibe - a Discord-style Matrix messenger.
 publish_to: none
 # On version bump please also increase:

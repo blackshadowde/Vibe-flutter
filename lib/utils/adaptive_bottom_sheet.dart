@@ -5,9 +5,9 @@
 
 import 'dart:math';
 
-import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/themes.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/config/themes.dart';
 import 'package:flutter/material.dart';
 
 Future<T?> showAdaptiveBottomSheet<T>({

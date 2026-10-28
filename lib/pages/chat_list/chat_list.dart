@@ -3,28 +3,28 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_strict.dart';
-import 'package:fluffychat/vibe/vibe_dialog.dart';
+import 'package:vibe/vibe/vibe_strict.dart';
+import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:fluffychat/vibe/vibe_backup.dart';
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat_list/chat_list_view.dart';
-import 'package:fluffychat/utils/error_reporter.dart';
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/utils/show_scaffold_dialog.dart';
-import 'package:fluffychat/utils/show_update_snackbar.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_modal_action_popup.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_text_input_dialog.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
-import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
+import 'package:vibe/vibe/vibe_backup.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/chat_list/chat_list_view.dart';
+import 'package:vibe/utils/error_reporter.dart';
+import 'package:vibe/utils/localized_exception_extension.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/utils/platform_infos.dart';
+import 'package:vibe/utils/show_scaffold_dialog.dart';
+import 'package:vibe/utils/show_update_snackbar.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_modal_action_popup.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_text_input_dialog.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
+import 'package:vibe/widgets/share_scaffold_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_shortcuts_new/flutter_shortcuts_new.dart';

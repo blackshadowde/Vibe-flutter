@@ -3,12 +3,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_dialog.dart';
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/pages/chat/events/video_player.dart';
-import 'package:fluffychat/pages/chat_search/search_footer.dart';
-import 'package:fluffychat/pages/image_viewer/image_viewer.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:vibe/vibe/vibe_dialog.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/pages/chat/events/video_player.dart';
+import 'package:vibe/pages/chat_search/search_footer.dart';
+import 'package:vibe/pages/image_viewer/image_viewer.dart';
+import 'package:vibe/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';

@@ -3,11 +3,11 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_file_extension.dart';
-import 'package:fluffychat/utils/size_string.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_file_extension.dart';
+import 'package:vibe/utils/size_string.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

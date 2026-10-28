@@ -12,12 +12,12 @@ import 'dart:isolate';
 import 'dart:ui';
 
 //<GOOGLE_SERVICES>import 'package:fcm_shared_isolate/fcm_shared_isolate.dart';
-import 'package:fluffychat/vibe/vibe_direct.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/main.dart';
-import 'package:fluffychat/utils/notification_background_handler.dart';
-import 'package:fluffychat/utils/push_helper.dart';
-import 'package:fluffychat/widgets/fluffy_chat_app.dart';
+import 'package:vibe/vibe/vibe_direct.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/main.dart';
+import 'package:vibe/utils/notification_background_handler.dart';
+import 'package:vibe/utils/push_helper.dart';
+import 'package:vibe/widgets/fluffy_chat_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
@@ -25,7 +25,7 @@ import 'package:matrix/matrix.dart';
 import 'package:unifiedpush/unifiedpush.dart';
 import 'package:unifiedpush_ui/unifiedpush_ui.dart';
 
-import 'package:fluffychat/vibe/vibe_ntfy.dart';
+import 'package:vibe/vibe/vibe_ntfy.dart';
 
 import '../config/app_config.dart';
 import '../config/setting_keys.dart';

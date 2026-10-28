@@ -2,8 +2,8 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/vibe/vibe_ntfy.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/vibe/vibe_ntfy.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:matrix/matrix.dart';
 

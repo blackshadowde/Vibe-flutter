@@ -2,9 +2,9 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/vibe/vibe_tap_icon.dart';
-import 'package:fluffychat/vibe/vibe_strict.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:vibe/vibe/vibe_tap_icon.dart';
+import 'package:vibe/vibe/vibe_strict.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';

@@ -3,9 +3,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/widgets/member_actions_popup_menu_button.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/widgets/member_actions_popup_menu_button.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

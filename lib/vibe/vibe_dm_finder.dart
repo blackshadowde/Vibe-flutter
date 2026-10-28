@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_strict.dart';
+import 'package:vibe/vibe/vibe_strict.dart';
 import 'package:matrix/matrix.dart';
 
 /// Finding (or starting) your one-to-one chat with someone.

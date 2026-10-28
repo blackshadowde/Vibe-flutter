@@ -3,10 +3,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:badges/badges.dart';
-import 'package:fluffychat/widgets/hover_builder.dart';
-import 'package:fluffychat/widgets/unread_rooms_badge.dart';
+import 'package:vibe/widgets/hover_builder.dart';
+import 'package:vibe/widgets/unread_rooms_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

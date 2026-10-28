@@ -3,17 +3,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/routes.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/widgets/app_lock.dart';
-import 'package:fluffychat/vibe/vibe_launch.dart';
-import 'package:fluffychat/vibe/vibe_activity_pill.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/widgets/theme_builder.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/config/routes.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/widgets/app_lock.dart';
+import 'package:vibe/vibe/vibe_launch.dart';
+import 'package:vibe/vibe/vibe_activity_pill.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/widgets/theme_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';

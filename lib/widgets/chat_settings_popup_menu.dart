@@ -3,17 +3,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/vibe/vibe_glass.dart';
-import 'package:fluffychat/vibe/vibe_mute.dart';
-import 'package:fluffychat/vibe/vibe_dialog.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_glass.dart';
+import 'package:vibe/vibe/vibe_mute.dart';
+import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:async';
 
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/vibe/vibe_disappearing.dart';
-import 'package:fluffychat/vibe/vibe_send_later.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/vibe/vibe_disappearing.dart';
+import 'package:vibe/vibe/vibe_send_later.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';

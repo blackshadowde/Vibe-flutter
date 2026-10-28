@@ -4,16 +4,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:typed_data';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
-import 'package:fluffychat/vibe/vibe_stickers.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
+import 'package:vibe/vibe/vibe_stickers.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/matrix.dart';
+import 'package:vibe/config/app_config.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';

@@ -5,20 +5,20 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/pages/chat_list/chat_list.dart';
-import 'package:fluffychat/utils/stream_extension.dart';
-import 'package:fluffychat/vibe/vibe_archive.dart';
-import 'package:fluffychat/vibe/vibe_chat_actions.dart';
-import 'package:fluffychat/vibe/vibe_communities.dart';
-import 'package:fluffychat/vibe/vibe_lock.dart';
-import 'package:fluffychat/vibe/vibe_dm_detail.dart';
-import 'package:fluffychat/vibe/vibe_dm_pane.dart';
-import 'package:fluffychat/vibe/vibe_dm_rail.dart';
-import 'package:fluffychat/vibe/vibe_groups.dart';
-import 'package:fluffychat/vibe/vibe_start_pane.dart';
-import 'package:fluffychat/vibe/vibe_swipe.dart';
-import 'package:fluffychat/vibe/vibe_user_bar.dart';
-import 'package:fluffychat/widgets/matrix.dart';
+import 'package:vibe/pages/chat_list/chat_list.dart';
+import 'package:vibe/utils/stream_extension.dart';
+import 'package:vibe/vibe/vibe_archive.dart';
+import 'package:vibe/vibe/vibe_chat_actions.dart';
+import 'package:vibe/vibe/vibe_communities.dart';
+import 'package:vibe/vibe/vibe_lock.dart';
+import 'package:vibe/vibe/vibe_dm_detail.dart';
+import 'package:vibe/vibe/vibe_dm_pane.dart';
+import 'package:vibe/vibe/vibe_dm_rail.dart';
+import 'package:vibe/vibe/vibe_groups.dart';
+import 'package:vibe/vibe/vibe_start_pane.dart';
+import 'package:vibe/vibe/vibe_swipe.dart';
+import 'package:vibe/vibe/vibe_user_bar.dart';
+import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:go_router/go_router.dart';

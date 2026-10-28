@@ -2,14 +2,14 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/vibe/vibe_lock.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/fluffy_chat_app.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_lock.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/fluffy_chat_app.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

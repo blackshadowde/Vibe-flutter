@@ -4,15 +4,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:collection/collection.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/code_highlight_theme.dart';
-import 'package:fluffychat/utils/event_checkbox_extension.dart';
-import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
-import 'package:fluffychat/vibe/vibe_low_data.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/code_highlight_theme.dart';
+import 'package:vibe/utils/event_checkbox_extension.dart';
+import 'package:vibe/vibe/vibe_animated_emoji.dart';
+import 'package:vibe/vibe/vibe_low_data.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
+import 'package:vibe/widgets/mxc_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';

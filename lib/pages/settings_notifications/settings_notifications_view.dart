@@ -3,17 +3,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_settings_style.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/settings_notifications/push_rule_extensions.dart';
-import 'package:fluffychat/utils/background_push.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/utils/push_helper.dart';
-import 'package:fluffychat/vibe/vibe_push_mode_tiles.dart';
-import 'package:fluffychat/widgets/layouts/max_width_body.dart';
-import 'package:fluffychat/widgets/settings_switch_list_tile.dart';
+import 'package:vibe/vibe/vibe_settings_style.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/settings_notifications/push_rule_extensions.dart';
+import 'package:vibe/utils/background_push.dart';
+import 'package:vibe/utils/platform_infos.dart';
+import 'package:vibe/utils/push_helper.dart';
+import 'package:vibe/vibe/vibe_push_mode_tiles.dart';
+import 'package:vibe/widgets/layouts/max_width_body.dart';
+import 'package:vibe/widgets/settings_switch_list_tile.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';

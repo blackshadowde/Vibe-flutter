@@ -3,10 +3,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat/chat.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:flutter/material.dart';
 
 /// "Replying to **name**  (x)" header shown inside the input pill.

@@ -5,8 +5,8 @@
 
 import 'dart:io';
 
-import 'package:fluffychat/utils/error_reporter.dart';
-import 'package:fluffychat/widgets/fluffy_chat_app.dart';
+import 'package:vibe/utils/error_reporter.dart';
+import 'package:vibe/widgets/fluffy_chat_app.dart';
 import 'package:matrix/matrix.dart';
 
 // Workaround until https://github.com/famedly/matrix-dart-sdk/pull/2360

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:matrix/matrix.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 
 /// Deleting a message: a small samurai (straw hat, red headband, big

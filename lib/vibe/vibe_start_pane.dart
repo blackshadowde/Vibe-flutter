@@ -3,16 +3,16 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:fluffychat/vibe/vibe_add_contact.dart';
-import 'package:fluffychat/vibe/vibe_communities.dart';
-import 'package:fluffychat/vibe/vibe_dm_finder.dart';
-import 'package:fluffychat/vibe/vibe_groups.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
-import 'package:fluffychat/vibe/vibe_public_rooms.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/matrix.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:vibe/vibe/vibe_add_contact.dart';
+import 'package:vibe/vibe/vibe_communities.dart';
+import 'package:vibe/vibe/vibe_dm_finder.dart';
+import 'package:vibe/vibe/vibe_groups.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
+import 'package:vibe/vibe/vibe_public_rooms.dart';
+import 'package:vibe/widgets/avatar.dart';
+import 'package:vibe/widgets/matrix.dart';
+import 'package:vibe/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';

@@ -5,8 +5,8 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/widgets/app_lock.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/widgets/app_lock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';

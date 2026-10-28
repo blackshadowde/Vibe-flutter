@@ -3,32 +3,32 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_glass.dart';
-import 'package:fluffychat/vibe/vibe_stale_keyboard.dart';
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/vibe/vibe_text_sticker.dart';
-import 'package:fluffychat/vibe/vibe_dialog.dart';
+import 'package:vibe/vibe/vibe_glass.dart';
+import 'package:vibe/vibe/vibe_stale_keyboard.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_text_sticker.dart';
+import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:ui' as ui;
 
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat/chat.dart';
-import 'package:fluffychat/pages/chat/chat_app_bar_list_tile.dart';
-import 'package:fluffychat/pages/chat/chat_app_bar_title.dart';
-import 'package:fluffychat/pages/chat/chat_event_list.dart';
-import 'package:fluffychat/pages/chat/pinned_events.dart';
-import 'package:fluffychat/utils/account_config.dart';
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/vibe/vibe_peek.dart';
-import 'package:fluffychat/vibe/vibe_lock_button.dart';
-import 'package:fluffychat/vibe/vibe_starred.dart';
-import 'package:fluffychat/vibe/vibe_status.dart';
-import 'package:fluffychat/widgets/chat_settings_popup_menu.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
-import 'package:fluffychat/widgets/matrix.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/pages/chat/chat_app_bar_list_tile.dart';
+import 'package:vibe/pages/chat/chat_app_bar_title.dart';
+import 'package:vibe/pages/chat/chat_event_list.dart';
+import 'package:vibe/pages/chat/pinned_events.dart';
+import 'package:vibe/utils/account_config.dart';
+import 'package:vibe/utils/localized_exception_extension.dart';
+import 'package:vibe/vibe/vibe_peek.dart';
+import 'package:vibe/vibe/vibe_lock_button.dart';
+import 'package:vibe/vibe/vibe_starred.dart';
+import 'package:vibe/vibe/vibe_status.dart';
+import 'package:vibe/widgets/chat_settings_popup_menu.dart';
+import 'package:vibe/widgets/future_loading_dialog.dart';
+import 'package:vibe/widgets/matrix.dart';
+import 'package:vibe/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

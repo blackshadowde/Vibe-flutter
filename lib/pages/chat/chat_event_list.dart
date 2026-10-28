@@ -3,22 +3,22 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_date_pill.dart';
+import 'package:vibe/vibe/vibe_date_pill.dart';
 import 'package:collection/collection.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/chat/chat.dart';
-import 'package:fluffychat/pages/chat/encrpytion_info.dart';
-import 'package:fluffychat/pages/chat/events/message.dart';
-import 'package:fluffychat/pages/chat/seen_by_row.dart';
-import 'package:fluffychat/pages/chat/typing_indicators.dart';
-import 'package:fluffychat/utils/account_config.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/vibe/vibe_entrance.dart';
-import 'package:fluffychat/vibe/vibe_message.dart';
-import 'package:fluffychat/vibe/vibe_message_menu.dart';
-import 'package:fluffychat/vibe/vibe_starred.dart';
+import 'package:vibe/config/themes.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/pages/chat/encrpytion_info.dart';
+import 'package:vibe/pages/chat/events/message.dart';
+import 'package:vibe/pages/chat/seen_by_row.dart';
+import 'package:vibe/pages/chat/typing_indicators.dart';
+import 'package:vibe/utils/account_config.dart';
+import 'package:vibe/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
+import 'package:vibe/utils/platform_infos.dart';
+import 'package:vibe/vibe/vibe_entrance.dart';
+import 'package:vibe/vibe/vibe_message.dart';
+import 'package:vibe/vibe/vibe_message_menu.dart';
+import 'package:vibe/vibe/vibe_starred.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix_api_lite/model/event_types.dart';

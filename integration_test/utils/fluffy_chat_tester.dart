@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/main.dart' as app;
+import 'package:vibe/main.dart' as app;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 

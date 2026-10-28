@@ -2,7 +2,7 @@
 
 import 'dart:math' as math;
 
-import 'package:fluffychat/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 

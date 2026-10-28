@@ -2,13 +2,13 @@
 
 import 'dart:math' as math;
 
-import 'package:fluffychat/pages/chat/chat.dart';
-import 'package:fluffychat/vibe/vibe_animated_emoji.dart';
-import 'package:fluffychat/vibe/vibe_haptics.dart';
-import 'package:fluffychat/vibe/vibe_low_data.dart';
-import 'package:fluffychat/vibe/vibe_send_later.dart';
-import 'package:fluffychat/vibe/vibe_settings_style.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/vibe/vibe_animated_emoji.dart';
+import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_low_data.dart';
+import 'package:vibe/vibe/vibe_send_later.dart';
+import 'package:vibe/vibe/vibe_settings_style.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 // ignore: implementation_imports

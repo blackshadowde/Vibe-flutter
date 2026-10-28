@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/vibe/vibe_palette.dart';
-import 'package:fluffychat/vibe/vibe_whats_new.dart';
+import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_whats_new.dart';
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/widgets/fluffy_chat_app.dart';
-import 'package:fluffychat/vibe/vibe_motion.dart';
+import 'package:vibe/config/setting_keys.dart';
+import 'package:vibe/utils/platform_infos.dart';
+import 'package:vibe/widgets/fluffy_chat_app.dart';
+import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;

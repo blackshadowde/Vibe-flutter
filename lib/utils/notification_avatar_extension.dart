@@ -6,7 +6,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:fluffychat/utils/client_download_content_extension.dart';
+import 'package:vibe/utils/client_download_content_extension.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path/path.dart' as path;
 

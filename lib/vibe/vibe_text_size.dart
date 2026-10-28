@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:fluffychat/config/setting_keys.dart';
+import 'package:vibe/config/setting_keys.dart';
 
 /// Chat text size, the Telegram way: a size from 12 to 30 (default 16)
 /// that sets the size of message text. Names (16) and times (12) stay the

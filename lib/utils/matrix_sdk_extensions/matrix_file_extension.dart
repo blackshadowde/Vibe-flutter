@@ -4,8 +4,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:file_picker/file_picker.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/utils/size_string.dart';
+import 'package:vibe/l10n/l10n.dart';
+import 'package:vibe/utils/size_string.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:share_plus/share_plus.dart';
