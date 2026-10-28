@@ -28,6 +28,7 @@ abstract class VibePendingFiles {
     List<XFile> files, {
     String? threadRootEventId,
     String? threadLastEventId,
+    Event? inReplyTo,
   }) async {
     final messenger = ScaffoldMessenger.of(context);
     // like the attach sheet: keep Vibe running while the files upload
@@ -36,7 +37,7 @@ abstract class VibePendingFiles {
     }
     try {
       await _sendAll(context, room, files, messenger, threadRootEventId,
-          threadLastEventId);
+          threadLastEventId, inReplyTo);
     } finally {
       if (ForegroundServices.platformSupported) {
         await ForegroundServices.stopService('send_files');
@@ -51,6 +52,7 @@ abstract class VibePendingFiles {
     ScaffoldMessengerState messenger,
     String? threadRootEventId,
     String? threadLastEventId,
+    Event? inReplyTo,
   ) async {
     final config = await Result.capture(room.client.getConfig());
     final serverLimit = config.asValue?.value.mUploadSize;
@@ -86,6 +88,7 @@ abstract class VibePendingFiles {
         }
         Future<void> upload() => room.sendFileEvent(
           file,
+          inReplyTo: inReplyTo,
           thumbnail: thumbnail,
           shrinkImageMaxDimension: VibeLowData.sendMaxDimension,
           threadRootEventId: threadRootEventId,

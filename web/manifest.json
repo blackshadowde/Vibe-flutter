@@ -1,12 +1,11 @@
 {
-    "name": "FluffyChat",
-    "short_name": "FluffyChat",
+    "name": "Vibe",
+    "short_name": "Vibe",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#FFFFFF",
-    "theme_color": "#41a2bc",
-    "description": "The cutest messenger in the Matrix network",
-    "orientation": "portrait-primary",
+    "background_color": "#0B0C0E",
+    "theme_color": "#5865F2",
+    "description": "Discord-style, end-to-end encrypted Matrix messenger",
     "prefer_related_applications": false,
     "icons": [
         {

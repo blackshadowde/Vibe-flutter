@@ -13,6 +13,7 @@ import 'package:vibe/widgets/app_lock.dart';
 import 'package:vibe/vibe/vibe_launch.dart';
 import 'package:vibe/vibe/vibe_activity_pill.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_web_scale.dart';
 import 'package:vibe/widgets/theme_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -91,6 +92,7 @@ class VibeApp extends StatelessWidget {
             textScaler: TextScaler.noScaling,
             boldText: false,
           ),
+          child: VibeWebScale(
           child: AppLockWidget(
           pincode: appLockSettings.pincode,
           useBiometrics: appLockSettings.useBiometrics,
@@ -106,6 +108,7 @@ class VibeApp extends StatelessWidget {
               ),
             ),
           ),
+        ),
         ),
         );
         },

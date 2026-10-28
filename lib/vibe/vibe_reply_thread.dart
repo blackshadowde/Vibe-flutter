@@ -9,6 +9,9 @@ import 'package:vibe/utils/localized_exception_extension.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_pending_files.dart';
+import 'package:vibe/utils/file_selector.dart';
+import 'package:cross_file/cross_file.dart';
 
 /// Replying inside a conversation of replies: the messages that reply to
 /// each other float above the blurred chat in their own window, with their
@@ -116,6 +119,7 @@ class _ReplyWindow extends StatefulWidget {
 
 class _ReplyWindowState extends State<_ReplyWindow> {
   final _text = TextEditingController();
+  final List<XFile> _files = [];
   final _scroll = ScrollController();
   bool _sending = false;
 
@@ -137,11 +141,35 @@ class _ReplyWindowState extends State<_ReplyWindow> {
     super.dispose();
   }
 
+  Future<void> _attach() async {
+    final picked = await selectFiles(context, allowMultiple: true);
+    if (picked.isEmpty || !mounted) return;
+    setState(() => _files.addAll(picked));
+  }
+
   Future<void> _send() async {
     final text = _text.text.trim();
-    if (text.isEmpty || _sending) return;
+    if ((text.isEmpty && _files.isEmpty) || _sending) return;
     setState(() => _sending = true);
     final messenger = ScaffoldMessenger.of(context);
+    if (_files.isNotEmpty) {
+      // photos, videos and files go out as replies too; the chat keeps
+      // uploading them after this window closes
+      VibePendingFiles.send(
+        Navigator.of(context, rootNavigator: true).context,
+        widget.room,
+        List.of(_files),
+        inReplyTo: widget.replyTo,
+        threadRootEventId: widget.threadRootEventId,
+        threadLastEventId: widget.threadLastEventId,
+      );
+      _files.clear();
+      if (text.isEmpty) {
+        VibeHaptics.light();
+        Navigator.of(context).pop();
+        return;
+      }
+    }
     try {
       await widget.room.sendTextEvent(
         text,
@@ -287,10 +315,27 @@ class _ReplyWindowState extends State<_ReplyWindow> {
                   },
                 ),
               ),
+              if (_files.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: VibePendingFilesStrip(
+                    files: _files,
+                    onRemove: (f) => setState(() => _files.remove(f)),
+                  ),
+                ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+                padding: const EdgeInsets.fromLTRB(4, 4, 12, 10),
                 child: Row(
                   children: [
+                    IconButton(
+                      tooltip: 'Add photo, video or file',
+                      style: IconButton.styleFrom(
+                        backgroundColor: cs.surfaceContainer,
+                      ),
+                      onPressed: _sending ? null : _attach,
+                      icon: const Icon(Icons.add),
+                    ),
+                    const SizedBox(width: 4),
                     Expanded(
                       child: TextField(
                         controller: _text,
