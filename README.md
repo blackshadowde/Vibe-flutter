@@ -14,6 +14,8 @@
   ·
   <a href="#iphone"><b>iPhone (AltStore / SideStore)</b></a>
   ·
+  <a href="https://get-vibe.github.io"><b>Website</b></a>
+  ·
   <a href="#support-vibe">❤ Support Vibe</a>
 </p>
 

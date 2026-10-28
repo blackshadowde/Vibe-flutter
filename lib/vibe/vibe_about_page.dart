@@ -187,6 +187,14 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
           ],
           const SizedBox(height: 10),
           _AboutButton(
+            text: 'Website',
+            onTap: () => launchUrlString(
+              'https://get-vibe.github.io',
+              mode: LaunchMode.externalApplication,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _AboutButton(
             text: 'Source code on GitHub',
             onTap: () => launchUrlString(
               VibeAppInfo.githubUrl,
