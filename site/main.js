@@ -134,7 +134,6 @@
 
   // 4. music: the link types, then becomes a card, then the status lights up
   gsap.set('.mcard', { opacity: 0, scale: 0.9, y: 20 });
-  gsap.set('.status-pill', { opacity: 0, x: -20 });
   ScrollTrigger.create({
     trigger: '.music', start: 'top 65%', once: true,
     onEnter: () => {
@@ -142,8 +141,7 @@
       const o = { n: 0 };
       tl.to(o, { n: link.length, duration: 1.1, ease: 'none', onUpdate: () => (typed.textContent = link.slice(0, Math.round(o.n))) })
         .to('.link-typed', { opacity: 0, height: 0, duration: 0.4, ease: 'power2.in' }, '+=0.35')
-        .to('.mcard', { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: 'back.out(1.6)' }, '-=0.1')
-        .to('.status-pill', { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' }, '-=0.2');
+        .to('.mcard', { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: 'back.out(1.6)' }, '-=0.1');
     },
   });
 

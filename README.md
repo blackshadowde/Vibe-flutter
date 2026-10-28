@@ -62,7 +62,6 @@ It looks and feels like Discord: a rail of profile pictures on the left, your DM
 
 **Made for real life**
 - 💭 **Custom status** with "Clear after", e.g. "📚 Studying · until 4 PM"
-- 🎧 **Listening to:** your status shows the song playing in any music app, like Discord (Android)
 - 🕓 **Their time:** see the other person's local time in a bubble at the top of the chat
 - 🗓 **Send later:** schedule a message for their morning
 - ⏱ **Disappearing messages** per chat, from 1 hour to 90 days
@@ -71,7 +70,7 @@ It looks and feels like Discord: a rail of profile pictures on the left, your DM
 
 **Your choice**
 - 🌐 Pick any Matrix server, or create an account right in the app
-- 🔔 Notifications through a **direct connection** to your server, Firebase, or **built-in without Google** (ntfy)
+- 🔔 Notifications through a **direct connection** to your server, or **built-in without Google** (ntfy). No Firebase
 - 💾 Keep media on your phone and save photos to your gallery
 - 🎨 Discord-style palette, Figtree font, haptics and 120 Hz animations
 
@@ -102,7 +101,7 @@ Vibe also runs in the browser: [blackshadowde.github.io/Vibe-flutter](https://bl
 
 ## Support Vibe
 
-Vibe is free, with no ads and no tracking. If you'd like to help pay for the notification server and development:
+Vibe is free, with no ads and no tracking. If you'd like to help pay for its development:
 
 <p align="center">
   <img src="docs/donate-upi.png" width="220" alt="UPI QR code for donations"><br>
@@ -117,6 +116,17 @@ Thank you! ❤
 - Vibe has no analytics and no ads.
 - Push notifications only carry a room and event ID, never message text.
 - Your account lives on the Matrix server you choose.
+
+Every server Vibe talks to, and what it sees, is listed in [PRIVACY.md](PRIVACY.md).
+
+## How every release is checked
+
+1. **Built in public:** GitHub Actions builds each APK from this repository's source; the build log is public.
+2. **Scanned automatically:** the release workflow uploads the APK to [VirusTotal](https://www.virustotal.com) (about 70 antivirus engines) and adds the result and report link to the release notes.
+3. **Fingerprint you can check:** the release notes list the APK's SHA-256. VirusTotal's report shows the SHA-256 of the file it scanned; when they match, it's the same file.
+4. **Every change listed:** [CHANGELOG.md](CHANGELOG.md) lists each change with the commit that made it.
+
+To check a download yourself: `sha256sum Vibe-x.y.z.apk` (or `certutil -hashfile Vibe-x.y.z.apk SHA256` on Windows) and compare with the release notes.
 
 ## For developers
 
@@ -136,9 +146,7 @@ Release secrets (Settings > Secrets and variables > Actions):
 | --- | --- |
 | `ANDROID_KEYSTORE_BASE64` | base64 of the signing keystore |
 | `ANDROID_KEYSTORE_PASSWORD` | keystore password |
-| `GOOGLE_SERVICES_JSON` | Firebase `google-services.json` (enables push) |
-
-Optional repository variable `VIBE_PUSH_GATEWAY`: your own push gateway URL (for forks).
+| `VT_API_KEY` | VirusTotal API key (optional): scans each release and adds the report to its notes |
 
 Keep the keystore backed up outside the repository. Without it, installed apps can't be updated.
 

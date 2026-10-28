@@ -48,30 +48,37 @@ abstract class VibeReplyThread {
   static bool isThread(Event event, Timeline timeline) =>
       _ids(event, timeline).length >= 3;
 
-  /// The whole thread, oldest first (parents not loaded yet are fetched).
-  static Future<List<Event>> _chain(Event event, Timeline timeline) async {
+  /// The thread from what's loaded, oldest first (instant).
+  static List<Event> _loaded(Event event, Timeline timeline) {
     final ids = _ids(event, timeline);
-    final byId = {for (final e in timeline.events) e.eventId: e};
-    final chain = <Event>[
-      for (final id in ids)
-        if (byId[id] != null) byId[id]!,
-    ];
-    // the oldest message may be further back than what's loaded
-    var top = chain.isEmpty ? event : chain.first;
-    for (final e in chain) {
-      if (e.originServerTs.isBefore(top.originServerTs)) top = e;
-    }
-    for (var i = 0; i < 10; i++) {
-      final parent = await top.getReplyEvent(timeline);
-      if (parent == null || chain.any((e) => e.eventId == parent.eventId)) {
-        break;
-      }
-      chain.add(parent);
-      top = parent;
-    }
-    chain.removeWhere((e) => e.redacted);
+    final chain = timeline.events
+        .where((e) => ids.contains(e.eventId) && !e.redacted)
+        .toList();
+    if (!chain.any((e) => e.eventId == event.eventId)) chain.add(event);
     chain.sort((a, b) => a.originServerTs.compareTo(b.originServerTs));
     return chain;
+  }
+
+  /// Older messages of the thread that aren't loaded in the chat yet.
+  static Future<List<Event>> _olderParents(
+    List<Event> chain,
+    Timeline timeline,
+  ) async {
+    final found = <Event>[];
+    if (chain.isEmpty) return found;
+    var top = chain.first;
+    for (var i = 0; i < 10; i++) {
+      final parent = await top.getReplyEvent(timeline);
+      if (parent == null ||
+          parent.redacted ||
+          chain.any((e) => e.eventId == parent.eventId) ||
+          found.any((e) => e.eventId == parent.eventId)) {
+        break;
+      }
+      found.insert(0, parent);
+      top = parent;
+    }
+    return found;
   }
 
   static Future<void> show(
@@ -86,44 +93,57 @@ abstract class VibeReplyThread {
     String? threadLastEventId,
   }) async {
     VibeHaptics.light();
-    final chain = await _chain(replyTo, timeline);
-    if (!context.mounted) return;
-    await showGeneralDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Close',
-      barrierColor: Colors.black.withValues(alpha: 0.3),
-      transitionDuration: const Duration(milliseconds: 280),
-      pageBuilder: (ctx, _, _) => _ThreadPane(
-        room: room,
-        timeline: timeline,
-        chain: chain,
-        replyTo: replyTo,
-        bigEmojis: bigEmojis,
-        scrollToEventId: scrollToEventId,
-        showInfo: showInfo,
-        threadRootEventId: threadRootEventId,
-        threadLastEventId: threadLastEventId,
+    final chain = _loaded(replyTo, timeline);
+    await Navigator.of(context, rootNavigator: true).push(
+      PageRouteBuilder<void>(
+        opaque: false,
+        barrierDismissible: true,
+        barrierLabel: 'Close',
+        barrierColor: Colors.black.withValues(alpha: 0.3),
+        transitionDuration: const Duration(milliseconds: 320),
+        reverseTransitionDuration: const Duration(milliseconds: 220),
+        pageBuilder: (ctx, _, _) => _ThreadPane(
+          room: room,
+          timeline: timeline,
+          chain: chain,
+          replyTo: replyTo,
+          bigEmojis: bigEmojis,
+          scrollToEventId: scrollToEventId,
+          showInfo: showInfo,
+          threadRootEventId: threadRootEventId,
+          threadLastEventId: threadLastEventId,
+        ),
+        transitionsBuilder: (ctx, anim, _, child) {
+          final t = CurvedAnimation(
+            parent: anim,
+            curve: Curves.easeOutQuart,
+            reverseCurve: Curves.easeInCubic,
+          );
+          return Stack(
+            children: [
+              // a fixed blur that fades in: cheaper than animating the blur
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: FadeTransition(
+                    opacity: t,
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                      child: const SizedBox.expand(),
+                    ),
+                  ),
+                ),
+              ),
+              SlideTransition(
+                position: Tween(
+                  begin: const Offset(0, 0.12),
+                  end: Offset.zero,
+                ).animate(t),
+                child: FadeTransition(opacity: t, child: child),
+              ),
+            ],
+          );
+        },
       ),
-      transitionBuilder: (ctx, anim, _, child) {
-        final t = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
-        return BackdropFilter(
-          filter: ui.ImageFilter.blur(
-            sigmaX: 16 * anim.value,
-            sigmaY: 16 * anim.value,
-          ),
-          child: FadeTransition(
-            opacity: t,
-            child: SlideTransition(
-              position: Tween(
-                begin: const Offset(0, 0.06),
-                end: Offset.zero,
-              ).animate(t),
-              child: child,
-            ),
-          ),
-        );
-      },
     );
   }
 }
@@ -158,19 +178,35 @@ class _ThreadPaneState extends State<_ThreadPane> {
   final _text = TextEditingController();
   final _scroll = ScrollController();
   final List<XFile> _files = [];
+  final _focus = FocusNode();
   late Event _target = widget.replyTo;
+  late List<Event> _chain = widget.chain;
   bool _sending = false;
+  bool _canSend = false;
 
   @override
   void initState() {
     super.initState();
-    _text.addListener(() => setState(() {}));
+    _text.addListener(() {
+      final can = _text.text.trim().isNotEmpty;
+      if (can != _canSend) setState(() => _canSend = can);
+    });
+    // the keyboard comes up after the pane has slid in, not during it
+    Future<void>.delayed(const Duration(milliseconds: 340), () {
+      if (mounted) _focus.requestFocus();
+    });
+    VibeReplyThread._olderParents(_chain, widget.timeline).then((older) {
+      if (mounted && older.isNotEmpty) {
+        setState(() => _chain = [...older, ..._chain]);
+      }
+    });
   }
 
   @override
   void dispose() {
     _text.dispose();
     _scroll.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
@@ -222,10 +258,10 @@ class _ThreadPaneState extends State<_ThreadPane> {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final colors = [theme.secondaryBubbleColor, theme.bubbleColor];
-    final chain = widget.chain;
+    final chain = _chain;
     // the chat list runs newest first; so does this one
     final events = chain.reversed.toList();
-    final canSend = _text.text.trim().isNotEmpty || _files.isNotEmpty;
+    final canSend = _canSend || _files.isNotEmpty;
     final targetName = _target.senderFromMemoryOrFallback.calcDisplayname();
     return SafeArea(
       child: Padding(
@@ -242,8 +278,15 @@ class _ThreadPaneState extends State<_ThreadPane> {
           elevation: 12,
           child: Column(
             children: [
-              // header, like the chat's app bar
-              Padding(
+              // header, like the chat's app bar; drag it down to close
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onVerticalDragEnd: (d) {
+                  if ((d.primaryVelocity ?? 0) > 250) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 10, 6, 6),
                 child: Row(
                   children: [
@@ -281,6 +324,7 @@ class _ThreadPaneState extends State<_ThreadPane> {
                   ],
                 ),
               ),
+              ),
               Divider(height: 1, color: theme.dividerColor),
               Expanded(
                 child: ListView.builder(
@@ -290,7 +334,9 @@ class _ThreadPaneState extends State<_ThreadPane> {
                   itemCount: events.length,
                   itemBuilder: (context, i) {
                     final e = events[i];
-                    return Message(
+                    return RepaintBoundary(
+                      key: ValueKey(e.eventId),
+                      child: Message(
                       e,
                       nextEvent: i + 1 < events.length ? events[i + 1] : null,
                       previousEvent: i > 0 ? events[i - 1] : null,
@@ -311,6 +357,7 @@ class _ThreadPaneState extends State<_ThreadPane> {
                       },
                       singleSelected: false,
                       enterThread: null,
+                    ),
                     );
                   },
                 ),
@@ -386,7 +433,7 @@ class _ThreadPaneState extends State<_ThreadPane> {
                                 Expanded(
                                   child: TextField(
                                     controller: _text,
-                                    autofocus: true,
+                                    focusNode: _focus,
                                     minLines: 1,
                                     maxLines: 6,
                                     textCapitalization:

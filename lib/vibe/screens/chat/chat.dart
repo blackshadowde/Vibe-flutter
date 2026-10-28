@@ -1292,25 +1292,39 @@ class ChatController extends State<ChatPageWithRoom>
     setState(() => selectedEvents.clear());
   }
 
+  /// Opens [event]'s reply thread in a pane, when it has one (a message
+  /// with two or more replies). False when there's no thread.
+  bool openReplyThread(Event event) {
+    final tl = timeline;
+    if (tl == null || editEvent != null || !VibeReplyThread.isThread(event, tl)) {
+      return false;
+    }
+    if (selectedEvents.isNotEmpty) setState(selectedEvents.clear);
+    VibeReplyThread.show(
+      context,
+      room: room,
+      timeline: tl,
+      replyTo: event,
+      bigEmojis: bigEmojis,
+      scrollToEventId: scrollToEventId,
+      showInfo: (e) => showEventInfo(e),
+      threadRootEventId: activeThreadId,
+      threadLastEventId: threadLastEventId,
+    );
+    return true;
+  }
+
+  /// Tapping the quoted message above a reply: its thread when there is one,
+  /// otherwise jump to the original message as before.
+  void onReplyQuoteTap(Event reply, String quotedEventId) {
+    if (openReplyThread(reply)) return;
+    scrollToEventId(quotedEventId);
+  }
+
   void replyAction({Event? replyTo}) {
     final target = replyTo ?? selectedEvents.first;
-    final tl = timeline;
     // A message with two or more replies: the whole thread opens in a pane
-    if (tl != null && editEvent == null && VibeReplyThread.isThread(target, tl)) {
-      setState(selectedEvents.clear);
-      VibeReplyThread.show(
-        context,
-        room: room,
-        timeline: tl,
-        replyTo: target,
-        bigEmojis: bigEmojis,
-        scrollToEventId: scrollToEventId,
-        showInfo: (e) => showEventInfo(e),
-        threadRootEventId: activeThreadId,
-        threadLastEventId: threadLastEventId,
-      );
-      return;
-    }
+    if (openReplyThread(target)) return;
     setState(() {
       replyEvent = target;
       selectedEvents.clear();

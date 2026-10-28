@@ -212,7 +212,8 @@ class ChatEventList extends StatelessWidget {
                       onSelect: controller.onSelectMessage,
                       onLongPress: (e) =>
                           VibeMessageMenu.show(context, controller, e),
-                      scrollToEventId: controller.scrollToEventId,
+                      scrollToEventId: (id) =>
+                          controller.onReplyQuoteTap(event, id),
                       longPressSelect: controller.selectedEvents.isNotEmpty,
                       selected: controller.selectedEvents.any(
                         (e) => e.eventId == event.eventId,
