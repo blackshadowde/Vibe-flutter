@@ -8,7 +8,7 @@ import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/vibe/vibe_call.dart';
 import 'package:vibe/vibe/vibe_sticker.dart';
 import 'package:vibe/l10n/l10n.dart';
-import 'package:vibe/pages/chat/events/audio_player.dart';
+import 'package:vibe/vibe/screens/chat/events/audio_player.dart';
 import 'package:vibe/utils/date_time_extension.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';

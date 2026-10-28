@@ -5,7 +5,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/vibe/screens/chat/chat.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';

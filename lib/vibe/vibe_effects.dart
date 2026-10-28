@@ -2,7 +2,7 @@
 
 import 'dart:math' as math;
 
-import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/vibe/screens/chat/chat.dart';
 import 'package:vibe/vibe/vibe_animated_emoji.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:vibe/vibe/vibe_low_data.dart';

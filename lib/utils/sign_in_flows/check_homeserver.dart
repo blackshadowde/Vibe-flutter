@@ -5,7 +5,7 @@
 
 import 'package:vibe/config/setting_keys.dart';
 import 'package:vibe/l10n/l10n.dart';
-import 'package:vibe/pages/sign_in/view_model/model/public_homeserver_data.dart';
+import 'package:vibe/vibe/screens/sign_in/view_model/model/public_homeserver_data.dart';
 import 'package:vibe/utils/localized_exception_extension.dart';
 import 'package:vibe/utils/platform_infos.dart';
 import 'package:vibe/utils/sign_in_flows/oidc_login.dart';

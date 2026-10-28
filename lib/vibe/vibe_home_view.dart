@@ -5,7 +5,7 @@
 
 import 'dart:async';
 
-import 'package:vibe/pages/chat_list/chat_list.dart';
+import 'package:vibe/vibe/screens/chat_list/chat_list.dart';
 import 'package:vibe/utils/stream_extension.dart';
 import 'package:vibe/vibe/vibe_archive.dart';
 import 'package:vibe/vibe/vibe_chat_actions.dart';

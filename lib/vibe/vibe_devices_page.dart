@@ -3,7 +3,7 @@
 import 'package:async/async.dart' show Result;
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:vibe/l10n/l10n.dart';
-import 'package:vibe/pages/key_verification/key_verification_dialog.dart';
+import 'package:vibe/vibe/screens/key_verification/key_verification_dialog.dart';
 import 'package:vibe/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:vibe/widgets/adaptive_dialogs/show_text_input_dialog.dart';
 import 'package:vibe/widgets/future_loading_dialog.dart';

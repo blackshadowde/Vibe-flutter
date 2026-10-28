@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import 'package:vibe/pages/chat_list/chat_list.dart';
+import 'package:vibe/vibe/screens/chat_list/chat_list.dart';
 import 'package:vibe/widgets/chat_settings_popup_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

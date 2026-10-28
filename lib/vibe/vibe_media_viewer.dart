@@ -3,8 +3,8 @@
 import 'package:vibe/vibe/vibe_sticker.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
-import 'package:vibe/pages/chat/events/video_player.dart';
-import 'package:vibe/pages/image_viewer/image_viewer.dart';
+import 'package:vibe/vibe/screens/chat/events/video_player.dart';
+import 'package:vibe/vibe/screens/image_viewer/image_viewer.dart';
 import 'package:vibe/utils/date_time_extension.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:vibe/vibe/vibe_media_saver.dart';

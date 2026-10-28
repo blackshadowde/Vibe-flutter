@@ -35,7 +35,7 @@ import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../config/setting_keys.dart';
-import '../pages/key_verification/key_verification_dialog.dart';
+import 'package:vibe/vibe/screens/key_verification/key_verification_dialog.dart';
 import '../utils/account_bundles.dart';
 import '../utils/background_push.dart';
 import 'local_notifications_extension.dart';

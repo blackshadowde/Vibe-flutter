@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:vibe/config/setting_keys.dart';
-import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/vibe/screens/chat/chat.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:vibe/vibe/vibe_status.dart';
 import 'package:vibe/vibe/vibe_motion.dart';

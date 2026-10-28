@@ -8,7 +8,7 @@ import 'dart:async';
 import 'package:vibe/vibe/vibe_dm_finder.dart';
 import 'package:vibe/widgets/avatar.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
-import 'package:vibe/pages/new_private_chat/qr_scanner_modal.dart';
+import 'package:vibe/vibe/screens/new_private_chat/qr_scanner_modal.dart';
 import 'package:vibe/widgets/future_loading_dialog.dart';
 import 'package:vibe/widgets/matrix.dart';
 import 'package:flutter/material.dart';

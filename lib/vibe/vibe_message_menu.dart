@@ -9,7 +9,7 @@ import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:vibe/vibe/vibe_animated_emoji.dart';
 import 'package:vibe/vibe/vibe_emoji_sheet.dart';
 import 'package:vibe/l10n/l10n.dart';
-import 'package:vibe/pages/chat/chat.dart';
+import 'package:vibe/vibe/screens/chat/chat.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:vibe/vibe/vibe_message.dart';
 import 'package:vibe/vibe/vibe_starred.dart';
