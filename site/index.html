@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/icon.png">
 <link rel="preload" href="assets/figtree.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -274,7 +274,17 @@
     <article class="plat">
       <h3>Android</h3>
       <p>Download the APK and open it. Updates arrive inside the app.</p>
-      <a class="btn primary" href="https://github.com/blackshadowde/Vibe-flutter/releases/latest">Download APK</a>
+      <a class="btn primary" id="apk-toggle" href="https://github.com/blackshadowde/Vibe-flutter/releases/latest" aria-expanded="false" aria-controls="apk-panel">Download APK</a>
+      <div class="apk-panel" id="apk-panel" hidden>
+        <div class="apk-head">
+          <b class="apk-version">Vibe</b>
+          <span class="apk-meta"></span>
+        </div>
+        <div class="apk-notes"></div>
+        <a class="btn primary apk-get" href="https://github.com/blackshadowde/Vibe-flutter/releases/latest">Download</a>
+        <p class="apk-small">Open the file once it's downloaded. If Android asks, allow "Install unknown apps" for your browser. Updating? Install it over the old one; your chats stay.</p>
+        <a class="apk-all" href="https://github.com/blackshadowde/Vibe-flutter/releases">All versions on GitHub</a>
+      </div>
     </article>
     <article class="plat">
       <h3>iPhone</h3>
@@ -313,24 +323,81 @@
 <script src="vendor/ScrollTrigger.min.js" defer></script>
 <script src="main.js?v=6" defer></script>
 <script>
-// The newest release's own VirusTotal line, when it has one.
-fetch('https://api.github.com/repos/blackshadowde/Vibe-flutter/releases/latest')
-  .then(function (r) { return r.ok ? r.json() : null; })
-  .then(function (rel) {
-    if (!rel || !rel.body) return;
-    var vt = rel.body.match(/VirusTotal:\*\*\s*(\d+)\s*\/\s*(\d+)[^(]*\(\[report\]\((https:\/\/www\.virustotal\.com\/gui\/file\/([0-9a-f]{64}))\)/i);
-    if (!vt) return;
-    var bad = +vt[1], all = +vt[2];
-    document.querySelectorAll('.vt-ratio').forEach(function (e) { e.textContent = bad + ' / ' + all; });
-    document.querySelector('.vt-version').textContent = (rel.name || rel.tag_name);
-    var res = document.querySelector('.vt-result');
-    res.textContent = bad + ' of ' + all + ' engines flagged it';
-    res.classList.toggle('green', bad === 0);
-    document.querySelector('.vt-sha').textContent = vt[4];
-    document.querySelector('.vt-report').href = vt[3];
-    document.querySelector('.vt-notes').href = rel.html_url;
-  })
-  .catch(function () {});
+// The newest release, read once: its download, notes and VirusTotal result.
+(function () {
+  function esc(t) {
+    return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  // small, safe Markdown: escaped first, then **bold**, `code`, https links
+  function inline(t) {
+    return esc(t)
+      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener">$1</a>');
+  }
+  function notesHtml(body) {
+    // only "What's new": the part before the --- line
+    var part = body.split(/\n-{3,}\s*\n/)[0];
+    var out = [], list = false;
+    part.split(/\r?\n/).forEach(function (line) {
+      line = line.trim();
+      if (!line || /^## /.test(line)) return;
+      if (/^[-*] /.test(line)) {
+        if (!list) { out.push('<ul>'); list = true; }
+        out.push('<li>' + inline(line.slice(2)) + '</li>');
+        return;
+      }
+      if (list) { out.push('</ul>'); list = false; }
+      if (/^#{3,} /.test(line)) out.push('<h4>' + inline(line.replace(/^#+ /, '')) + '</h4>');
+      else out.push('<p>' + inline(line) + '</p>');
+    });
+    if (list) out.push('</ul>');
+    return out.join('');
+  }
+  function mb(n) { return (n / 1048576).toFixed(1) + ' MB'; }
+
+  var toggle = document.getElementById('apk-toggle');
+  var panel = document.getElementById('apk-panel');
+  var ready = false;
+  toggle.addEventListener('click', function (e) {
+    if (!ready) return; // no data: the link opens GitHub as before
+    e.preventDefault();
+    var open = panel.hidden;
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? 'Hide details' : 'Download APK';
+  });
+
+  fetch('https://api.github.com/repos/blackshadowde/Vibe-flutter/releases/latest')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rel) {
+      if (!rel) return;
+      var body = rel.body || '';
+      var apk = (rel.assets || []).filter(function (a) { return /\.apk$/i.test(a.name); })[0];
+      if (apk) {
+        panel.querySelector('.apk-version').textContent = rel.name || rel.tag_name;
+        var date = new Date(rel.published_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+        panel.querySelector('.apk-meta').textContent = date + ' · ' + mb(apk.size);
+        panel.querySelector('.apk-notes').innerHTML = notesHtml(body);
+        var get = panel.querySelector('.apk-get');
+        get.href = apk.browser_download_url;
+        get.textContent = 'Download ' + apk.name;
+        ready = true;
+      }
+      var vt = body.match(/VirusTotal:\*\*\s*(\d+)\s*\/\s*(\d+)[^(]*\(\[report\]\((https:\/\/www\.virustotal\.com\/gui\/file\/([0-9a-f]{64}))\)/i);
+      if (!vt) return;
+      var bad = +vt[1], all = +vt[2];
+      document.querySelectorAll('.vt-ratio').forEach(function (e) { e.textContent = bad + ' / ' + all; });
+      document.querySelector('.vt-version').textContent = (rel.name || rel.tag_name);
+      var res = document.querySelector('.vt-result');
+      res.textContent = bad + ' of ' + all + ' engines flagged it';
+      res.classList.toggle('green', bad === 0);
+      document.querySelector('.vt-sha').textContent = vt[4];
+      document.querySelector('.vt-report').href = vt[3];
+      document.querySelector('.vt-notes').href = rel.html_url;
+    })
+    .catch(function () {});
+})();
 </script>
 </body>
 </html>

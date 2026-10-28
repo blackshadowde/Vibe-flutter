@@ -162,7 +162,7 @@ jobs:
           if [ -n "$PREV" ] && git diff --quiet "$PREV" HEAD -- RELEASE_NOTES.md; then
             git log "$PREV"..HEAD --no-merges --pretty=%s \
               | sed -E 's/^Vibe:? *//' \
-              | grep -viE '^(merge|bump|wip|ci|revert|.*import fix$)' \
+              | grep -viE '^(merge|bump|wip|ci|revert|altstore source|.*import fix$)' \
               | sed -E 's/^(.)/\U\1/; s/^/- /' \
               | head -30 > RELEASE_NOTES.md || true
           fi
