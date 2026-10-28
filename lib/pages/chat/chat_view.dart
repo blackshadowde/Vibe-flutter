@@ -539,7 +539,20 @@ class ChatView extends StatelessWidget {
                           Container(
                             color: theme.scaffoldBackgroundColor.withAlpha(230),
                             alignment: Alignment.center,
-                            child: const Icon(Icons.upload_outlined, size: 100),
+                            child: const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.upload_outlined, size: 100),
+                                SizedBox(height: 12),
+                                Text(
+                                  'Drop to send',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                       ],
                     ),

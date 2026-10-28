@@ -30,6 +30,12 @@ class MainActivity : FlutterFragmentActivity() {
         if (VibeSystemNative.callActive) enterCallPip()
     }
 
+    override fun onPostCreate(savedInstanceState: android.os.Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        // photos and videos dragged in from other apps
+        VibeDropNative.attach(this)
+    }
+
     override fun onResume() {
         super.onResume()
         current = this
@@ -117,6 +123,7 @@ class MainActivity : FlutterFragmentActivity() {
             VibeUpdater.register(context, eng)
             VibeBackupNative.register(context, eng)
             VibeSystemNative.register(context, eng)
+            VibeDropNative.register(eng)
             engine = eng
             return eng
         }

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:fluffychat/vibe/vibe_drop.dart';
 import 'package:fluffychat/vibe/vibe_dialog.dart';
 import 'dart:async';
 import 'dart:io';
@@ -148,14 +149,18 @@ class ChatController extends State<ChatPageWithRoom>
 
   void onDragExited(_) => setState(() => dragging = false);
 
-  Future<void> onDragDone(DropDoneDetails details) async {
-    setState(() => dragging = false);
-    if (details.files.isEmpty) return;
+  Future<void> onDragDone(DropDoneDetails details) =>
+      _sendDropped(details.files);
+
+  /// Files dropped on the chat (desktop, or from another app on Android).
+  Future<void> _sendDropped(List<XFile> files) async {
+    if (mounted) setState(() => dragging = false);
+    if (files.isEmpty || !mounted) return;
 
     await showVibeDialog(
       context: context,
       builder: (c) => SendFileDialog(
-        files: details.files,
+        files: files,
         room: room,
         outerContext: context,
         threadRootEventId: activeThreadId,
@@ -421,6 +426,14 @@ class ChatController extends State<ChatPageWithRoom>
   void initState() {
     // the chat sliding in gets a light tap (closing has none)
     VibeHaptics.light();
+    // photos and videos dragged in from other apps (Android)
+    VibeDrop.attach(
+      this,
+      hover: (on) {
+        if (mounted && dragging != on) setState(() => dragging = on);
+      },
+      drop: _sendDropped,
+    );
     // The send / mic button follows the text box whatever changes it (typing,
     // a sticker clearing it, a draft coming back), not only typing.
     sendController.addListener(_syncInputEmpty);
@@ -698,6 +711,7 @@ class ChatController extends State<ChatPageWithRoom>
 
   @override
   void dispose() {
+    VibeDrop.detach(this);
     timeline?.cancelSubscriptions();
     timeline = null;
     _storeInputTimeoutTimer?.cancel();
