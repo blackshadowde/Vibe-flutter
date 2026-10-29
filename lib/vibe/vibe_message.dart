@@ -342,6 +342,7 @@ class VibeMessage extends StatelessWidget {
   final void Function(Event) onInfoTab;
   final void Function(String) scrollToEventId;
   final void Function() onSwipe;
+  final void Function()? onQuote;
   final void Function() onMention;
   final void Function(String eventId)? enterThread;
   final bool longPressSelect;
@@ -362,6 +363,7 @@ class VibeMessage extends StatelessWidget {
     required this.onInfoTab,
     required this.scrollToEventId,
     required this.onSwipe,
+    this.onQuote,
     required this.onMention,
     required this.enterThread,
     required this.longPressSelect,
@@ -814,6 +816,14 @@ class VibeMessage extends StatelessWidget {
       child: VibeSwipeReply(
         key: ValueKey(VibeStableId.of(event)),
         onReply: onSwipe,
+        // swipe and hold quotes part of a text message
+        onQuote: {
+          MessageTypes.Text,
+          MessageTypes.Notice,
+          MessageTypes.Emote,
+        }.contains(event.messageType)
+            ? onQuote
+            : null,
         child: VibeSlashRow(
         eventId: event.eventId,
         child: Container(

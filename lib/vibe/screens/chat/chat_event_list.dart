@@ -202,6 +202,7 @@ class ChatEventList extends StatelessWidget {
                       bigEmojis: controller.bigEmojis,
                       animateIn: false,
                       onSwipe: () => controller.replyAction(replyTo: event),
+                      onQuote: () => controller.quotePartAction(event),
                       onInfoTab: controller.showEventInfo,
                       onMention: () => controller.sendController.text +=
                           '${event.senderFromMemoryOrFallback.mention} ',

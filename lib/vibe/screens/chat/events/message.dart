@@ -42,6 +42,8 @@ class Message extends StatelessWidget {
   final void Function(Event) onInfoTab;
   final void Function(String) scrollToEventId;
   final void Function() onSwipe;
+  /// Swipe and hold: quote part of the message.
+  final void Function()? onQuote;
   final void Function() onMention;
   final void Function() onEdit;
   final void Function(String eventId)? enterThread;
@@ -72,6 +74,7 @@ class Message extends StatelessWidget {
     required this.onInfoTab,
     required this.scrollToEventId,
     required this.onSwipe,
+    this.onQuote,
     this.selected = false,
     required this.onEdit,
     required this.singleSelected,
@@ -126,6 +129,7 @@ class Message extends StatelessWidget {
       onInfoTab: onInfoTab,
       scrollToEventId: scrollToEventId,
       onSwipe: onSwipe,
+      onQuote: onQuote,
       onMention: onMention,
       enterThread: this.enterThread,
       longPressSelect: longPressSelect,
