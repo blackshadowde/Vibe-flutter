@@ -85,6 +85,10 @@ To update, install the new APK over the old one, or tap **Check for updates** in
 
 Works on 64-bit Android phones (almost every phone from the last 7+ years).
 
+### Obtainium (automatic updates from GitHub)
+
+[Obtainium](https://obtainium.imranr.dev) installs Vibe directly from this repository's releases and updates it: in Obtainium tap **Add app** and enter `https://github.com/blackshadowde/Vibe-flutter`, or open [obtainium://add/https://github.com/blackshadowde/Vibe-flutter](obtainium://add/https://github.com/blackshadowde/Vibe-flutter) on your phone.
+
 ### iPhone
 
 Vibe for iPhone installs with [SideStore](https://sidestore.io) or [AltStore](https://altstore.io), and updates show up there automatically.
