@@ -17,3 +17,6 @@ those belong to their projects (famedly/matrix-dart-sdk, matrix-org/vodozemac).
   fingerprint on the VirusTotal report.
 - Vibe asks for no notification access, has no Firebase and no analytics.
   PRIVACY.md lists every server it contacts.
+
+Every finding from the automatic MobSF scan, and what was done about it:
+[docs/SECURITY_SCAN_NOTES.md](docs/SECURITY_SCAN_NOTES.md).
