@@ -78,15 +78,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
-            <!-- App can open https://matrix.to urls -->
-            <intent-filter>
-               <action android:name="android.intent.action.VIEW" />
-               <category android:name="android.intent.category.DEFAULT" />
-               <category android:name="android.intent.category.BROWSABLE" />
-               <data
-                   android:scheme="https"
-                   android:host="matrix.to"/>
-            </intent-filter>
+            <!-- No https://matrix.to link handler: only matrix.org could
+                 verify it (assetlinks.json), Android 12+ opens those links
+                 in the browser anyway, and security scanners flag it.
+                 matrix: and vibe:// links still open Vibe. -->
 
             <!-- App can open matrix: uris -->
             <intent-filter>
@@ -147,7 +142,9 @@
         <!-- From flutter_local_notifications package for notification actions -->
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
         <!-- Vibe: reconnect for notifications after a restart / update -->
-        <receiver android:name=".VibeBootReceiver" android:exported="true">
+        <!-- Not exported: boot and update broadcasts come from Android
+             itself, which reaches non-exported receivers; other apps can't. -->
+        <receiver android:name=".VibeBootReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
@@ -173,5 +170,14 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="fluffychat_push" />
+        <!-- Library parts Vibe doesn't need, removed so no other app can
+             reach them: Google Assistant shortcut trampoline, and the
+             profile installer receiver (only used over adb). -->
+        <activity android:name="androidx.core.google.shortcuts.TrampolineActivity" tools:node="remove" />
+        <receiver android:name="androidx.profileinstaller.ProfileInstallReceiver" tools:node="remove" />
+        <!-- The foreground-task plugin's restart receiver: only Android sends
+             it boot broadcasts, so it needn't be open to other apps. -->
+        <receiver android:name="com.pravera.flutter_foreground_task.service.RebootReceiver"
+            android:exported="false" tools:replace="android:exported" />
     </application>
 </manifest>

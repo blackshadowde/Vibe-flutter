@@ -125,6 +125,7 @@ Every server Vibe talks to, and what it sees, is listed in [PRIVACY.md](PRIVACY.
 2. **Scanned automatically:** the release workflow uploads the APK to [VirusTotal](https://www.virustotal.com) (about 70 antivirus engines) and adds the result and report link to the release notes.
 3. **Fingerprint you can check:** the release notes list the APK's SHA-256. VirusTotal's report shows the SHA-256 of the file it scanned; when they match, it's the same file.
 4. **Every change listed:** [CHANGELOG.md](CHANGELOG.md) lists each change with the commit that made it.
+5. **Security scans** (the *Vibe security scans* workflow, on every change and weekly): [MobSF](https://github.com/MobSF/Mobile-Security-Framework-MobSF) checks the APK against the OWASP mobile standard (MASVS) and finds **0 of 432 known trackers**; OSV-Scanner checks every library for known security holes; CodeQL checks the build workflows. Each run's page lists the findings, with the full MobSF report (PDF) under Artifacts.
 
 To check a download yourself: `sha256sum Vibe-x.y.z.apk` (or `certutil -hashfile Vibe-x.y.z.apk SHA256` on Windows) and compare with the release notes.
 
