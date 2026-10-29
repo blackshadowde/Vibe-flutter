@@ -120,6 +120,13 @@ jobs:
           # where each code finding is: the library / file it comes from
           echo "::notice title=MobSF report keys::$(jq -r 'keys | join(",")' mobsf.json 2>/dev/null | cut -c1-900)"
           echo "::notice title=MobSF code_analysis keys::$(jq -r '.code_analysis | if type=="object" then keys | join(",") else type end' mobsf.json 2>/dev/null | cut -c1-900)"
+          echo "::notice title=MobSF first code finding::$(jq -c '.code_analysis.findings | to_entries | .[0]' mobsf.json 2>/dev/null | cut -c1-900)"
+          echo "::notice title=MobSF code finding count::$(jq -r '.code_analysis.findings | length' mobsf.json 2>/dev/null)"
+          jq -r '.appsec.high[]? | "\(.section) | \(.title) | \(.description | .[0:300])"' mobsf.json 2>/dev/null \
+            | while read -r l; do echo "::warning title=MobSF high detail::$l"; done
+          echo "::notice title=MobSF trackers::$(jq -c '.trackers | {detected: .detected_trackers, total: .total_trackers}' mobsf.json 2>/dev/null)"
+          echo "::notice title=MobSF malware permissions::$(jq -c '.malware_permissions | {top: .top_malware_permissions, other: .other_abused_permissions}' mobsf.json 2>/dev/null | cut -c1-900)"
+          echo "::notice title=MobSF secrets::$(jq -c '.secrets | length' mobsf.json 2>/dev/null)"
           jq -r '(.code_analysis.findings // .code_analysis // {})
                  | if type=="object" then to_entries[] else empty end
                  | select((.value | type) == "object" and (.value | has("metadata")))
