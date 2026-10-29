@@ -1,0 +1,27 @@
+name: Pull back a release
+
+# Deletes a GitHub release and its tag (for a release that must be redone).
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to remove, e.g. v3.1.116 (ios-v… for the iPhone one)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  remove:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete release and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          id=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .id)
+          gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/${id}"
+          gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/tags/${TAG}"
+          echo "::notice::Removed release and tag ${TAG}"
