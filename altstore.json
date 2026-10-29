@@ -16,6 +16,14 @@
       "category": "social",
       "versions": [
         {
+          "version": "3.1.117",
+          "buildVersion": "117",
+          "date": "2026-10-29",
+          "size": 21395801,
+          "localizedDescription": "Vibe 3.1.117",
+          "downloadURL": "https://github.com/blackshadowde/Vibe-flutter/releases/download/ios-v3.1.117/Vibe.ipa"
+        },
+        {
           "version": "3.1.115",
           "buildVersion": "115",
           "date": "2026-10-29",
