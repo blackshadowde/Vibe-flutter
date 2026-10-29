@@ -5,6 +5,9 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 
 ## 2026-10-29
 
+### Added
+- Quote part of a message: long-press a text message, tap Quote part, pick the words and answer just those (shown as a quote in every Matrix app). New features get a short "New" highlight the first few times ([9953651](https://github.com/blackshadowde/Vibe-flutter/commit/995365198))
+
 ### Changed
 - Thread pane is now a tree: a line down the side, answers to an older message indented under it, no repeated reply line ([534aac3](https://github.com/blackshadowde/Vibe-flutter/commit/534aac3ae))
 - Settings > Chats & storage: switch to turn off the text stickers shown above the text box while typing ([534aac3](https://github.com/blackshadowde/Vibe-flutter/commit/534aac3ae))
