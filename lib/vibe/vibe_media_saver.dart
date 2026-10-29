@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:vibe/vibe/vibe_updater.dart';
 
 /// Settings > Chat > "Save media to gallery": photos and videos you RECEIVE
 /// are saved to the phone's gallery automatically, so they survive the
@@ -20,7 +21,10 @@ abstract class VibeMediaSaver {
   static const _maxBytes = 60 * 1000 * 1000;
 
   /// Ask for gallery permission when the user turns the setting on.
+  /// The Google Play build has no photo-library permission: Android 10+ lets
+  /// an app add photos and videos to the gallery without one.
   static Future<bool> requestPermission() async {
+    if (VibeUpdater.fromPlay) return true;
     final p = await PhotoManager.requestPermissionExtend();
     return p.hasAccess;
   }
@@ -60,8 +64,7 @@ abstract class VibeMediaSaver {
         ..showSnackBar(SnackBar(content: Text(text)));
     }
 
-    final perm = await PhotoManager.requestPermissionExtend();
-    if (!perm.hasAccess) {
+    if (!await requestPermission()) {
       say('Allow Vibe to add photos in your phone settings, then try again');
       return;
     }
@@ -79,8 +82,7 @@ abstract class VibeMediaSaver {
   }
 
   static Future<void> _save(Event e) async {
-    final perm = await PhotoManager.requestPermissionExtend();
-    if (!perm.hasAccess) return;
+    if (!await requestPermission()) return;
     final file = await e.downloadAndDecryptAttachment();
     var name = file.name;
     if (name.isEmpty) name = 'vibe_${e.originServerTs.millisecondsSinceEpoch}';

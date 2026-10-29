@@ -9,23 +9,28 @@ Actions → **Vibe for Google Play (app bundle)** → Run. Download the `.aab`
 under the run's **Artifacts** and upload it in the Play Console.
 
 The Play build is the same app as the GitHub APK (same package `com.vibe.app`,
-same signing key) except: no built-in updater and no "install apps"
-permission. Play does the updating.
+same signing key) except: no built-in updater, no "install apps" permission
+(Play does the updating) and no photo-library permission (Play allows that
+only for gallery-type apps, so the attach sheet opens the system photo picker
+instead of its own gallery grid).
 
 ## Store listing
 
-**App name** (max 30): `Vibe – Matrix Chat`
+**App name** (max 30): `Vibe – Secure Chat`
 
 Google Play's metadata policy doesn't allow other companies' brand names in
-the listing, so it never mentions Discord (or Telegram, WhatsApp...).
+the listing, so it never mentions Discord (or Telegram, WhatsApp...). "Matrix"
+is a trademark of The Matrix.org Foundation, so it isn't in the app name
+either; the description only says Vibe *works with* the Matrix protocol, which
+the Foundation's trademark policy allows. No Matrix logo anywhere.
 
 **Short description** (max 80):
-`Encrypted chat on Matrix with servers and channels. No ads, no tracking.`
+`Encrypted chat with servers and channels. No ads, no tracking.`
 
 **Full description** (max 4000):
 
 ```
-Vibe is a free, open-source messenger with a server-and-channel layout, built on Matrix, the open standard for secure chat. Talk to anyone on Element, FluffyChat or any other Matrix app.
+Vibe is a free, open-source messenger with a server-and-channel layout. It works with the Matrix protocol, the open standard for secure chat, so you can talk to people on other Matrix apps too. Vibe is an independent app, not made by or affiliated with The Matrix.org Foundation.
 
 PRIVATE BY DESIGN
 • End-to-end encryption for direct messages and private groups
@@ -64,7 +69,22 @@ PNG or JPEG).
 
 - **Privacy policy:** https://github.com/blackshadowde/Vibe-flutter/blob/Vibe/PRIVACY.md
 - **Account deletion** (required, Vibe can create Matrix accounts):
-  https://get-vibe.github.io/delete-account.html
+  https://get-vibe.github.io/delete-account.html (in the app: Settings →
+  Security & sign-in → Delete account)
+- **Terms of use** (user-content policy): https://get-vibe.github.io/terms.html.
+  The sign-in screen says "By continuing you agree to the Terms".
+- **Child safety standards** (only required for Social/Dating/anonymous chat
+  apps; Vibe is Communication, but the page exists anyway):
+  https://get-vibe.github.io/terms.html#child-safety
+
+## User content (chat apps)
+
+| Requirement | Where in Vibe |
+| --- | --- |
+| Report a message | Long-press it → **Report** (goes to the user's server admins) |
+| Report / block a user | Their profile → **Report** / **Block** |
+| Moderation | Group admins and moderators remove messages and members; server admins act on reports |
+| Terms that ban abuse, illegal content and CSAM | terms.html, agreed to on the sign-in screen |
 
 ## App access
 
@@ -100,7 +120,8 @@ declare it:
 | Foreground service: **remoteMessaging** | "Vibe can keep its own connection to the user's Matrix server so messages arrive without Google's push service. The user turns this on in Settings → Notifications; a permanent notification shows while it runs." Play may ask for a short screen recording. |
 | Foreground service: **shortService** | "Finishes sending a file the user just sent if they leave the app." |
 | **Ignore battery optimisations** | Requested so the direct connection keeps delivering messages; real-time chat is the core feature. Expect questions; if Play refuses, the Play build can skip this request. |
-| Camera, microphone, contacts, location, photos | Each is asked for only when the user uses that feature (calls, voice messages, sharing a contact or location, sending photos). |
+| Camera, microphone, contacts, location | Each is asked for only when the user uses that feature (calls, voice messages, sharing a contact or location). |
+| Photos and videos | **No permission** in the Play build: sending uses the system photo picker; saving to the gallery needs no permission on Android 10+. Answer "No" if Play asks about READ_MEDIA_IMAGES / READ_MEDIA_VIDEO. |
 
 ## Content rating
 

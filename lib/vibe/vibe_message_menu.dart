@@ -353,6 +353,14 @@ class _Menu extends StatelessWidget {
                 () => _withSelection(controller.redactEventsAction),
                 color: _red,
               ),
+            if (event.senderId != event.room.client.userID)
+              item(
+                Icons.flag_outlined,
+                'Report',
+                () => _withSelection(controller.reportEventAction),
+                color: _red,
+                subtitle: 'Sends it to your server\'s admins.',
+              ),
             item(
               Icons.delete_outline,
               'Hide on this device',

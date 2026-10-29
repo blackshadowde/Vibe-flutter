@@ -128,7 +128,7 @@ jobs:
             exit 1
           }
 
-      - name: Play version (no updater, no "install apps" permission)
+      - name: Play version (no updater, no "install apps" or photo-library permission)
         run: |
           set -euo pipefail
           M=android/app/src/main/AndroidManifest.xml
@@ -136,6 +136,13 @@ jobs:
           sed -i '/android.permission.REQUEST_INSTALL_PACKAGES/d' "$M"
           if grep -q 'REQUEST_INSTALL_PACKAGES' "$M"; then echo "::error::permission still there"; exit 1; fi
           echo "removed REQUEST_INSTALL_PACKAGES"
+          # Play allows full photo-library access only for gallery-type apps;
+          # the Play build uses the system photo picker instead.
+          for P in READ_MEDIA_IMAGES READ_MEDIA_VIDEO; do
+            sed -i "/android.permission.$P\"/d" "$M"
+            if grep -q "$P" "$M"; then echo "::error::$P still there"; exit 1; fi
+          done
+          echo "removed READ_MEDIA_IMAGES and READ_MEDIA_VIDEO"
 
       - name: Build app bundle
         run: |

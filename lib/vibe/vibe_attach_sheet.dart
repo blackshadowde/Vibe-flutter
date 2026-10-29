@@ -12,7 +12,9 @@ import 'package:cross_file/cross_file.dart';
 import 'package:vibe/vibe/screens/chat/chat.dart';
 import 'package:vibe/vibe/screens/chat/send_file_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:vibe/vibe/vibe_updater.dart';
 
 /// "+" attachment sheet: gallery grid + Photos / Contacts / Files / Location.
 abstract class VibeAttachSheet {
@@ -72,6 +74,9 @@ class _AttachSheetState extends State<_AttachSheet> {
   }
 
   Future<void> _init() async {
+    // Google Play build: no photo-library permission, so no inline gallery;
+    // the system photo picker is used instead.
+    if (VibeUpdater.fromPlay) return;
     try {
       final perm = await PhotoManager.requestPermissionExtend();
       if (!perm.hasAccess) {
@@ -117,12 +122,22 @@ class _AttachSheetState extends State<_AttachSheet> {
   }
 
   Future<void> _sendSelected() async {
-    final c = widget.controller;
     final files = <XFile>[];
     for (final a in _assets.where((a) => _selected.contains(a.id))) {
       final f = await a.originFile;
       if (f != null) files.add(XFile(f.path));
     }
+    await _openSend(files);
+  }
+
+  /// System photo picker (needs no permission).
+  Future<void> _pickSystem() async {
+    final files = await ImagePicker().pickMultipleMedia();
+    await _openSend(files);
+  }
+
+  Future<void> _openSend(List<XFile> files) async {
+    final c = widget.controller;
     if (files.isEmpty) return;
     if (!mounted) return;
     Navigator.of(context).pop();
@@ -184,8 +199,24 @@ class _AttachSheetState extends State<_AttachSheet> {
               mainAxisSpacing: 4,
               crossAxisSpacing: 4,
             ),
-            itemCount: _assets.length + 1,
+            itemCount: VibeUpdater.fromPlay ? 2 : _assets.length + 1,
             itemBuilder: (context, i) {
+              if (VibeUpdater.fromPlay && i == 1) {
+                return InkWell(
+                  onTap: _pickSystem,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: cs.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      Icons.photo_library,
+                      size: 40,
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                );
+              }
               if (i == 0) {
                 return InkWell(
                   onTap: () {
@@ -325,7 +356,9 @@ class _AttachSheetState extends State<_AttachSheet> {
                           icon: Icons.photo_library,
                           label: 'Photos',
                           active: true,
-                          onTap: () => _scroll.animateTo(
+                          onTap: VibeUpdater.fromPlay
+                              ? _pickSystem
+                              : () => _scroll.animateTo(
                             0,
                             duration: const Duration(milliseconds: 250),
                             curve: Curves.easeOut,

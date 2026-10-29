@@ -696,6 +696,35 @@ class _IntroPageState extends State<IntroPage>
                     ),
                   ),
                 ),
+                // Google Play's user-content policy: users agree to the terms
+                // (no abuse, no illegal content) before they can chat.
+                Center(
+                  child: GestureDetector(
+                    onTap: () => launchUrlString(
+                      'https://get-vibe.github.io/terms.html',
+                      mode: LaunchMode.externalApplication,
+                    ),
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'By continuing you agree to the ',
+                            style: TextStyle(color: muted),
+                          ),
+                          TextSpan(
+                            text: 'Terms',
+                            style: TextStyle(
+                              color: blurple,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 12.5),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 18),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
