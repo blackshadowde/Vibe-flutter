@@ -143,7 +143,21 @@ class _PagedEventsState extends State<_PagedEvents>
   @override
   void initState() {
     super.initState();
+    _local();
     _more();
+  }
+
+  /// Media, links and files already on the phone (from the chat) show at
+  /// once; the server is only asked for older history after that.
+  Future<void> _local() async {
+    try {
+      final local = await widget.room.client.database.getEventList(
+        widget.room,
+        limit: 3000,
+      );
+      if (!mounted || events.isNotEmpty) return;
+      setState(() => events.addAll(local.where(widget.searchFunc)));
+    } catch (_) {}
   }
 
   Future<void> _more() async {
@@ -153,11 +167,15 @@ class _PagedEventsState extends State<_PagedEvents>
       final result = await widget.room.searchEvents(
         searchFunc: widget.searchFunc,
         nextBatch: nextBatch,
+        // smaller pages: each "Load more" downloads and decrypts less
+        limit: 300,
       );
       if (!mounted) return;
       setState(() {
         isLoading = false;
-        events.addAll(result.events);
+        // the local ones may already be shown
+        final known = events.map((e) => e.eventId).toSet();
+        events.addAll(result.events.where((e) => known.add(e.eventId)));
         nextBatch = result.nextBatch;
         endReached = result.nextBatch == null;
         searchedUntil = result.searchedUntil;
