@@ -1,0 +1,115 @@
+name: Vibe security scans
+
+# Independent checks, kept apart from the release so they can never block or
+# change it. Results: the run's summary page, the files under "Artifacts",
+# and (CodeQL) the repository's Security tab.
+on:
+  workflow_dispatch:
+  push:
+    branches: [Vibe]
+  schedule:
+    - cron: '17 3 * * 1' # every Monday
+
+permissions:
+  contents: read
+
+jobs:
+  # GitHub's code scanner. It reads the release workflows for injection and
+  # permission mistakes. (CodeQL has no Dart support, so the app code itself
+  # is covered by the MobSF scan of the built APK below.)
+  codeql:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: actions
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: actions
+
+  # Known security holes in the libraries Vibe uses (pubspec.lock), from the
+  # OSV database (Google, open data).
+  dependencies:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+      - name: OSV-Scanner
+        run: |
+          go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest
+          OSV="$(go env GOPATH)/bin/osv-scanner"
+          "$OSV" --version
+          set +e
+          "$OSV" scan source --lockfile=pubspec.lock --format=markdown > osv.md
+          CODE=$?
+          set -e
+          {
+            echo "## Dependencies (OSV-Scanner)"
+            echo
+            if [ "$CODE" = 0 ]; then echo "No known vulnerabilities in pubspec.lock."; else cat osv.md; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat osv.md || true
+          # 1 = vulnerabilities found (shown above); anything else is a tool error
+          if [ "$CODE" != 0 ] && [ "$CODE" != 1 ]; then exit "$CODE"; fi
+
+  # MobSF (Mobile Security Framework, OWASP MASVS checks) on the newest
+  # released APK: permissions, code, network and storage issues.
+  mobsf:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Newest release APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download -R "$GITHUB_REPOSITORY" -p '*.apk' -D apk
+          ls -la apk
+      - name: Start MobSF
+        run: |
+          docker run -d --name mobsf -p 8000:8000 \
+            -e MOBSF_API_KEY=vibe-ci-key \
+            opensecurity/mobile-security-framework-mobsf:latest
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:8000/ > /dev/null && break
+            sleep 5
+          done
+          curl -sf http://localhost:8000/ > /dev/null
+      - name: Scan
+        run: |
+          set -euo pipefail
+          K="Authorization: vibe-ci-key"
+          APK=$(ls apk/*.apk | head -1)
+          UP=$(curl -sf -H "$K" -F "file=@$APK" http://localhost:8000/api/v1/upload)
+          HASH=$(echo "$UP" | jq -r .hash)
+          curl -sf -H "$K" --max-time 1800 -d "hash=$HASH" http://localhost:8000/api/v1/scan > /dev/null
+          curl -sf -H "$K" -d "hash=$HASH" http://localhost:8000/api/v1/report_json > mobsf.json
+          curl -sf -H "$K" -d "hash=$HASH" http://localhost:8000/api/v1/download_pdf > mobsf.pdf || true
+          curl -sf -H "$K" -d "hash=$HASH" http://localhost:8000/api/v1/scorecard > scorecard.json || true
+          {
+            echo "## MobSF: $(basename "$APK")"
+            echo
+            echo "Security score: $(jq -r '.security_score // "n/a"' scorecard.json 2>/dev/null) / 100"
+            echo
+            for lvl in high warning info secure hotspot; do
+              n=$(jq -r --arg l "$lvl" '.[$l] // [] | length' scorecard.json 2>/dev/null || echo "?")
+              echo "- $lvl: $n"
+            done
+            echo
+            echo "The full report (PDF and JSON) is under Artifacts on this run."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobsf-report
+          path: |
+            mobsf.json
+            mobsf.pdf
+            scorecard.json
+          if-no-files-found: ignore
