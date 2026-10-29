@@ -351,6 +351,7 @@ class VibeMessage extends StatelessWidget {
   final bool highlightMarker;
   final Set<String> bigEmojis;
   final void Function(Event)? onLongPress;
+  final bool threadView;
 
   const VibeMessage(
     this.event, {
@@ -370,6 +371,7 @@ class VibeMessage extends StatelessWidget {
     required this.highlightMarker,
     required this.bigEmojis,
     this.onLongPress,
+    this.threadView = false,
     super.key,
   });
 
@@ -391,9 +393,12 @@ class VibeMessage extends StatelessWidget {
     bool hasReply(Event? e) =>
         e != null && e.inReplyToEventId(includingFallback: false) != null;
     // A reply always starts a new visual group (avatar + header + reply line).
-    final replying = hasReply(event);
-    final first = replying || !sameGroup(nextEvent);
-    final last = hasReply(previousEvent) || !sameGroup(previousEvent);
+    // In the thread pane the tree lines show who answers whom, so no reply
+    // line, and every message is its own row (avatar + name).
+    final replying = !threadView && hasReply(event);
+    final first = threadView || replying || !sameGroup(nextEvent);
+    final last =
+        threadView || hasReply(previousEvent) || !sameGroup(previousEvent);
 
     final displayEvent = event.getDisplayEvent(timeline);
     final sender = event.senderFromMemoryOrFallback;

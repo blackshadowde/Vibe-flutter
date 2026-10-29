@@ -413,6 +413,17 @@ class _ThreadPaneState extends State<_ThreadPane>
                   },
                   itemBuilder: (context, i) {
                     final e = events[i];
+                    // Tree: the first message at the top (0), answers to the
+                    // message just above (1), answers to an older one
+                    // indented under it (2).
+                    final older = i + 1 < events.length ? events[i + 1] : null;
+                    final parent = VibeReplyThread._parentId(e);
+                    final depth = older == null
+                        ? 0
+                        : parent == null || parent == older.eventId ||
+                                !events.any((x) => x.eventId == parent)
+                            ? 1
+                            : 2;
                     // the newest few slide up one after another; the rest
                     // (off screen) just appear
                     final start = i < 6 ? i * 0.09 : 0.0;
@@ -437,7 +448,11 @@ class _ThreadPaneState extends State<_ThreadPane>
                         },
                         child: _SlideIn(
                           play: isNew,
-                          child: Message(
+                          child: _TreeRow(
+                            depth: depth,
+                            color: theme.dividerColor,
+                            accent: cs.primary,
+                            child: Message(
                       e,
                       nextEvent: i + 1 < events.length ? events[i + 1] : null,
                       previousEvent: i > 0 ? events[i - 1] : null,
@@ -458,7 +473,9 @@ class _ThreadPaneState extends State<_ThreadPane>
                       },
                       singleSelected: false,
                       enterThread: null,
+                      threadView: true,
                     ),
+                          ),
                         ),
                       ),
                     );
@@ -639,4 +656,71 @@ class _SlideInState extends State<_SlideIn>
       );
     },
   );
+}
+
+/// Slack/Reddit-style thread line: a line down the side for every answer,
+/// and a curve into answers to an older message (indented one more step).
+class _TreeRow extends StatelessWidget {
+  final int depth;
+  final Color color;
+  final Color accent;
+  final Widget child;
+  const _TreeRow({
+    required this.depth,
+    required this.color,
+    required this.accent,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (depth == 0) return child;
+    return Stack(
+      children: [
+        Positioned(
+          left: 12,
+          top: 0,
+          bottom: 0,
+          child: Container(width: 2, color: color),
+        ),
+        if (depth == 2)
+          Positioned(
+            left: 34,
+            top: 0,
+            child: CustomPaint(
+              size: const Size(12, 26),
+              painter: _CurvePainter(accent),
+            ),
+          ),
+        Padding(
+          padding: EdgeInsets.only(left: depth == 2 ? 44 : 22),
+          child: child,
+        ),
+      ],
+    );
+  }
+}
+
+/// The small curve from the line into an indented answer.
+class _CurvePainter extends CustomPainter {
+  final Color color;
+  const _CurvePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final path = Path()
+      ..moveTo(1, 0)
+      ..lineTo(1, size.height - 10)
+      ..quadraticBezierTo(1, size.height - 1, 10, size.height - 1)
+      ..lineTo(size.width, size.height - 1);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CurvePainter old) => old.color != color;
 }

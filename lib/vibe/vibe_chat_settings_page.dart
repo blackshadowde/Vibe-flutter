@@ -209,6 +209,13 @@ class _VibeChatSettingsPageState extends State<VibeChatSettingsPage> {
                   child: Icon(Icons.chevron_right_outlined),
                 ),
               ),
+              SettingsSwitchListTile.adaptive(
+                title: 'Text stickers while typing',
+                subtitle:
+                    'Short messages appear as stickers above the text box. '
+                    'Tap one to send it as a sticker.',
+                setting: AppSettings.vibeTextStickers,
+              ),
             ],
           ),
         ),

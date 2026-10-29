@@ -105,6 +105,8 @@ enum AppSettings<T> {
   vibeSaveMedia<bool>('chat.vibe.save_media', false),
   vibeStatusBubble<bool>('chat.vibe.status_bubble', true),
   vibeLowData<bool>('chat.vibe.low_data', false),
+  // Hike-style text stickers above the text box while typing
+  vibeTextStickers<bool>('chat.vibe.text_stickers', true),
   vibeLinkPreviews<bool>('chat.vibe.link_previews', true),
   // in encrypted chats the server would see the link: off unless chosen
   vibeLinkPreviewsEncrypted<bool>('chat.vibe.link_previews_encrypted', false),

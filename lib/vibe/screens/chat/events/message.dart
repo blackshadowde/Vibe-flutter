@@ -58,6 +58,8 @@ class Message extends StatelessWidget {
   final bool isCollapsed;
   final Set<String> bigEmojis;
   final void Function(Event)? onLongPress;
+  /// Shown in the thread pane: no reply line above it, always its own row.
+  final bool threadView;
 
   const Message(
     this.event, {
@@ -84,6 +86,7 @@ class Message extends StatelessWidget {
     required this.enterThread,
     this.isCollapsed = false,
     this.onLongPress,
+    this.threadView = false,
     super.key,
   });
 
@@ -132,6 +135,7 @@ class Message extends StatelessWidget {
       highlightMarker: highlightMarker,
       bigEmojis: bigEmojis,
       onLongPress: onLongPress,
+      threadView: threadView,
     ),
     );
     final client = Matrix.of(context).client;

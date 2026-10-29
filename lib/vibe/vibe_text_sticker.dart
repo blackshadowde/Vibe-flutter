@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/config/setting_keys.dart';
 import 'package:vibe/vibe/vibe_stickers.dart';
 import 'dart:math' as math;
 import 'dart:typed_data';
@@ -38,7 +39,9 @@ class VibeTextStickerBar extends StatelessWidget {
         valueListenable: controller.sendController,
         builder: (context, v, _) {
           final text = v.text.trim();
-          final show = _fits(text) && controller.editEvent == null;
+          final show = AppSettings.vibeTextStickers.value &&
+              _fits(text) &&
+              controller.editEvent == null;
           return AnimatedSize(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
