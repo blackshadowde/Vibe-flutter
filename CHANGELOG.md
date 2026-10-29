@@ -5,6 +5,9 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 
 ## 2026-10-29
 
+### Changed
+- Thread pane stays open after you send: your reply rises from the text box into the thread with the chat's status dots (encrypting, sent, delivered, read), and new replies appear live ([8b4e008](https://github.com/blackshadowde/Vibe-flutter/commit/8b4e008e6))
+
 ### Fixed
 - Server rail: with many chats, the + for a new chat or group was stuck under the profile bar. It now scrolls above it ([741b415](https://github.com/blackshadowde/Vibe-flutter/commit/741b415da))
 - Dropping a photo or video from another app on Android failed with "Cannot open file". A desktop drag-and-drop library caught the drop before Vibe's own handler; it's now switched off on Android ([3c67951](https://github.com/blackshadowde/Vibe-flutter/commit/3c67951e6))
