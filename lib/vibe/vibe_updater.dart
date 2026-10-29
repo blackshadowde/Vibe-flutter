@@ -63,6 +63,22 @@ class VibeRelease {
 /// downloads the APK with Android's download manager and opens the system
 /// installer. Native side: android/.../VibeUpdater.kt.
 abstract class VibeUpdater {
+  /// Google Play build (`--dart-define=VIBE_STORE=play`): Play does the
+  /// updating, so Vibe never downloads or installs an APK itself.
+  static const fromPlay = String.fromEnvironment('VIBE_STORE') == 'play';
+  static const _playUrl = 'market://details?id=com.vibe.app';
+  static const _playWeb = 'https://play.google.com/store/apps/details?id=com.vibe.app';
+
+  /// Opens Vibe's page in the Play Store (the browser if Play isn't there).
+  static Future<void> openPlay() async {
+    try {
+      if (await launchUrlString(_playUrl, mode: LaunchMode.externalApplication)) {
+        return;
+      }
+    } catch (_) {}
+    await launchUrlString(_playWeb, mode: LaunchMode.externalApplication);
+  }
+
   static const _repo = 'blackshadowde/Vibe-flutter';
   static const _api = 'https://api.github.com/repos/$_repo/releases/latest';
   static const _channel = MethodChannel('vibe/updater');
@@ -221,7 +237,7 @@ abstract class VibeUpdater {
 
   /// Quiet check on app start: at most every 6 hours, respects "Later".
   static Future<void> maybeCheck() async {
-    if (!PlatformInfos.isAndroid || _busy) return;
+    if (fromPlay || !PlatformInfos.isAndroid || _busy) return;
     await load();
     final store = AppSettings.store;
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -275,7 +291,7 @@ abstract class VibeUpdater {
 
   /// Opens the download / install sheet for [r].
   static Future<void> install(BuildContext context, VibeRelease r) =>
-      _show(context, r);
+      fromPlay ? openPlay() : _show(context, r);
 
   static Future<void> _show(BuildContext context, VibeRelease r) =>
       showVibeSheet<void>(

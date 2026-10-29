@@ -68,6 +68,8 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
   );
 
   Future<void> _check() async {
+    // Play build: updates come from the Play Store
+    if (VibeUpdater.fromPlay) return VibeUpdater.openPlay();
     if (_checking) return;
     setState(() {
       _checking = true;
