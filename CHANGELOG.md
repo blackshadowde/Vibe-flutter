@@ -6,6 +6,7 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 ## 2026-10-29
 
 ### Fixed
+- Server rail: with many chats, the + for a new chat or group was stuck under the profile bar. It now scrolls above it ([741b415](https://github.com/blackshadowde/Vibe-flutter/commit/741b415da))
 - Dropping a photo or video from another app on Android failed with "Cannot open file". A desktop drag-and-drop library caught the drop before Vibe's own handler; it's now switched off on Android ([3c67951](https://github.com/blackshadowde/Vibe-flutter/commit/3c67951e6))
 
 ### Google Play policies ([fc55515](https://github.com/blackshadowde/Vibe-flutter/commit/fc55515e2))
