@@ -6,7 +6,7 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 ## 2026-10-29
 
 ### Changed
-- Thread pane stays open after you send: your reply rises from the text box into the thread with the chat's status dots (encrypting, sent, delivered, read), and new replies appear live ([8b4e008](https://github.com/blackshadowde/Vibe-flutter/commit/8b4e008e6))
+- Thread pane stays open after you send: your reply rises from the text box into the thread with the chat's status dots (encrypting, sent, delivered, read), and new replies appear live ([d0d4acf](https://github.com/blackshadowde/Vibe-flutter/commit/d0d4acf86))
 
 ### Fixed
 - Server rail: with many chats, the + for a new chat or group was stuck under the profile bar. It now scrolls above it ([741b415](https://github.com/blackshadowde/Vibe-flutter/commit/741b415da))
