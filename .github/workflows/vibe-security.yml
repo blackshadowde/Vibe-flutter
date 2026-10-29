@@ -118,9 +118,13 @@ jobs:
               | while read -r t; do echo "::warning title=MobSF $lvl::$t"; done
           done
           # where each code finding is: the library / file it comes from
-          jq -r '(.code_analysis.findings // {}) | to_entries[]
+          echo "::notice title=MobSF report keys::$(jq -r 'keys | join(",")' mobsf.json 2>/dev/null | cut -c1-900)"
+          echo "::notice title=MobSF code_analysis keys::$(jq -r '.code_analysis | if type=="object" then keys | join(",") else type end' mobsf.json 2>/dev/null | cut -c1-900)"
+          jq -r '(.code_analysis.findings // .code_analysis // {})
+                 | if type=="object" then to_entries[] else empty end
+                 | select((.value | type) == "object" and (.value | has("metadata")))
                  | select((.value.metadata.severity // "") | test("high|warning"; "i"))
-                 | "\(.value.metadata.severity) | \(.key) | \(.value.metadata.description // "" | .[0:120]) | \((.value.files // {}) | keys | .[0:6] | join(" , "))"' mobsf.json 2>/dev/null \
+                 | "\(.value.metadata.severity) | \(.key) | \((.value.files // {}) | keys | .[0:8] | join(" , "))"' mobsf.json 2>/dev/null \
             | while read -r l; do echo "::warning title=MobSF code::$l"; done
           {
             echo "## MobSF: $(basename "$APK")"
