@@ -117,6 +117,11 @@ jobs:
             jq -r --arg l "$lvl" '.[$l] // [] | .[] | (.title // .) | tostring' scorecard.json 2>/dev/null \
               | while read -r t; do echo "::warning title=MobSF $lvl::$t"; done
           done
+          # where each code finding is: the library / file it comes from
+          jq -r '(.code_analysis.findings // {}) | to_entries[]
+                 | select((.value.metadata.severity // "") | test("high|warning"; "i"))
+                 | "\(.value.metadata.severity) | \(.key) | \(.value.metadata.description // "" | .[0:120]) | \((.value.files // {}) | keys | .[0:6] | join(" , "))"' mobsf.json 2>/dev/null \
+            | while read -r l; do echo "::warning title=MobSF code::$l"; done
           {
             echo "## MobSF: $(basename "$APK")"
             echo
