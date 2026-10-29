@@ -25,12 +25,26 @@ jobs:
       actions: read
     steps:
       - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@v4
         with:
           languages: actions
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@v4
         with:
           category: actions
+          output: sarif
+      - name: List CodeQL findings on this run
+        run: |
+          N=0
+          for f in sarif/*.sarif; do
+            [ -f "$f" ] || continue
+            while IFS=$'\t' read -r rule file line msg; do
+              [ -z "$rule" ] && continue
+              N=$((N + 1))
+              echo "::warning file=$file,line=$line,title=CodeQL $rule::$msg"
+            done < <(jq -r '.runs[].results[]? | [.ruleId, (.locations[0].physicalLocation.artifactLocation.uri // "?"), (.locations[0].physicalLocation.region.startLine // 1), (.message.text | gsub("\n"; " "))] | @tsv' "$f")
+          done
+          echo "::notice title=CodeQL::$N finding(s) in the workflows"
+          echo "## CodeQL: $N finding(s)" >> "$GITHUB_STEP_SUMMARY"
 
   # Known security holes in the libraries Vibe uses (pubspec.lock), from the
   # OSV database (Google, open data).
@@ -50,7 +64,12 @@ jobs:
           set +e
           "$OSV" scan source --lockfile=pubspec.lock --format=markdown > osv.md
           CODE=$?
+          "$OSV" scan source --lockfile=pubspec.lock --format=json > osv.json 2>/dev/null
           set -e
+          # one line per vulnerable library, readable on the run page
+          jq -r '.results[]?.packages[]? | "\(.package.name) \(.package.version): \([.vulnerabilities[]?.id] | join(", "))"' osv.json 2>/dev/null \
+            | while read -r l; do echo "::warning title=Vulnerable dependency::$l"; done
+          echo "::notice title=OSV-Scanner::exit $CODE (0 = nothing known, 1 = see warnings)"
           {
             echo "## Dependencies (OSV-Scanner)"
             echo
@@ -92,6 +111,12 @@ jobs:
           curl -sf -H "$K" -d "hash=$HASH" http://localhost:8000/api/v1/report_json > mobsf.json
           curl -sf -H "$K" -d "hash=$HASH" http://localhost:8000/api/v1/download_pdf > mobsf.pdf || true
           curl -sf -H "$K" -d "hash=$HASH" http://localhost:8000/api/v1/scorecard > scorecard.json || true
+          SCORE=$(jq -r '.security_score // "n/a"' scorecard.json 2>/dev/null || echo n/a)
+          echo "::notice title=MobSF::$(basename "$APK") security score $SCORE / 100"
+          for lvl in high warning; do
+            jq -r --arg l "$lvl" '.[$l] // [] | .[] | (.title // .) | tostring' scorecard.json 2>/dev/null \
+              | while read -r t; do echo "::warning title=MobSF $lvl::$t"; done
+          done
           {
             echo "## MobSF: $(basename "$APK")"
             echo
