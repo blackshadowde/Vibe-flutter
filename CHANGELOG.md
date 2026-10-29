@@ -15,6 +15,7 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 - Thread pane stays open after you send: your reply rises from the text box into the thread with the chat's status dots (encrypting, sent, delivered, read), and new replies appear live ([d0d4acf](https://github.com/blackshadowde/Vibe-flutter/commit/d0d4acf86))
 
 ### Fixed
+- Quote part: the reply line shows the quoted words, and picking words is easier (tap the first and last word or slide across) ([a112210](https://github.com/blackshadowde/Vibe-flutter/commit/a11221018))
 - Media, links, files and voice messages in a chat's details open instantly: what's already on the phone shows first, older items load after ([a972b2c](https://github.com/blackshadowde/Vibe-flutter/commit/a972b2c29))
 - Server rail: with many chats, the + for a new chat or group was stuck under the profile bar. It now scrolls above it ([741b415](https://github.com/blackshadowde/Vibe-flutter/commit/741b415da))
 - Dropping a photo or video from another app on Android failed with "Cannot open file". A desktop drag-and-drop library caught the drop before Vibe's own handler; it's now switched off on Android ([3c67951](https://github.com/blackshadowde/Vibe-flutter/commit/3c67951e6))
