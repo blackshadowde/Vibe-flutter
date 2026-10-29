@@ -79,6 +79,18 @@ jobs:
           # 1 = vulnerabilities found (shown above); anything else is a tool error
           if [ "$CODE" != 0 ] && [ "$CODE" != 1 ]; then exit "$CODE"; fi
 
+  # The licence of every Dart package, checked against Vibe's AGPL-3.0.
+  licenses:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: .tool_versions.yaml
+          cache: true
+      - run: flutter pub get
+      - run: python3 scripts/license_check.py
+
   # MobSF (Mobile Security Framework, OWASP MASVS checks) on the newest
   # released APK: permissions, code, network and storage issues.
   mobsf:

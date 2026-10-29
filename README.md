@@ -157,7 +157,12 @@ Keep the keystore backed up outside the repository. Without it, installed apps c
 
 ## Credits and licence
 
-Vibe is a fork of [FluffyChat](https://github.com/krille-chan/fluffychat) by Christian Kußowski and contributors, licensed under **AGPL-3.0-or-later**. Vibe keeps that licence; see `LICENSE`.
+Vibe is a modified version of [FluffyChat](https://github.com/krille-chan/fluffychat) by Christian Kußowski and contributors, licensed under **AGPL-3.0-or-later**. Vibe keeps that licence (see `LICENSE`) and FluffyChat's copyright notices. Vibe's changes, from October 2026 onwards, are in this repository's history and [CHANGELOG.md](CHANGELOG.md).
+
+Bundled third-party material: the Figtree typeface and the sticker fonts Bangers, Caveat Brush, Lobster and Pacifico (SIL Open Font License 1.1), Luckiest Guy and Permanent Marker (Apache 2.0), FluffyChat's call and notification sounds, and Matrix's verification emoji list (Apache 2.0). Every library's licence is listed in the app under About → Open-source licences.
+
 Matrix is an open standard from the [Matrix.org Foundation](https://matrix.org).
+
+Vibe is an independent project. It is not affiliated with, endorsed by or sponsored by Discord Inc.; "Discord" is a trademark of Discord Inc. and is used here only to describe the layout style. Other names (Matrix, Element, Spotify and so on) belong to their owners.
 
 <sub>Keywords: Matrix client, Android messenger, iPhone Matrix app, Discord style chat, end-to-end encryption, E2EE, private messenger, no phone number, FluffyChat fork, Flutter.</sub>

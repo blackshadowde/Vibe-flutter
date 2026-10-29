@@ -210,6 +210,18 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
           ),
           const SizedBox(height: 10),
           _AboutButton(
+            text: 'Open-source licences',
+            onTap: () => showLicensePage(
+              context: context,
+              applicationName: 'Vibe',
+              applicationLegalese:
+                  'Vibe is free software under the GNU AGPL v3 or later, '
+                  'a modified version of FluffyChat by Christian Kußowski '
+                  'and contributors. Not affiliated with Discord Inc.',
+            ),
+          ),
+          const SizedBox(height: 10),
+          _AboutButton(
             text: 'How Vibe keeps you safe',
             onTap: () => showVibeDialog<void>(
               context: context,
@@ -327,6 +339,13 @@ class VibeCreditsSheet extends StatelessWidget {
       'https://github.com/erikdkennedy/figtree',
     ],
     [
+      'Sticker fonts',
+      'Text stickers',
+      'Bangers, Caveat Brush, Lobster, Pacifico: SIL OFL 1.1 · '
+          'Luckiest Guy, Permanent Marker: Apache 2.0',
+      'https://fonts.google.com',
+    ],
+    [
       'Ringtone and sounds',
       'Call and notification sounds',
       'Pixabay',
@@ -382,7 +401,9 @@ class VibeCreditsSheet extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(4, 18, 4, 0),
             child: Text(
               'Vibe is free software under the GNU AGPL v3, like FluffyChat. '
-              'It is not made by or affiliated with Discord. Tap a card to open its page.',
+              'It is not made by or affiliated with Discord Inc.; Discord is '
+              'a trademark of Discord Inc. Tap a card to open its page. '
+              'Every library\'s licence: About, Open-source licences.',
               style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
             ),
           ),

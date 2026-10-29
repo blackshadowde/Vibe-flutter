@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:vibe/vibe/vibe_web_session.dart';
+import 'package:vibe/vibe/vibe_licenses.dart';
 import 'dart:isolate';
 import 'dart:ui';
 
@@ -34,6 +35,7 @@ bool _vodozemacInitialized = false;
 bool isIntegrationTest = false;
 
 void main(List<String> args) async {
+  VibeLicenses.register();
   isIntegrationTest = args.singleOrNull == 'integration_test';
   if (PlatformInfos.isAndroid) {
     final port = mainIsolateReceivePort = ReceivePort();

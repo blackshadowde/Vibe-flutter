@@ -110,6 +110,7 @@ flutter:
     - assets/sounds/
     - assets/vodozemac/
     - assets/fonts/stickers/
+    - assets/fonts/Figtree-OFL.txt
   fonts:
     # Figtree (SIL Open Font License, assets/fonts/Figtree-OFL.txt)
     - family: Figtree

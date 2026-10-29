@@ -16,13 +16,16 @@ permission. Play does the updating.
 
 **App name** (max 30): `Vibe – Matrix Chat`
 
+Google Play's metadata policy doesn't allow other companies' brand names in
+the listing, so it never mentions Discord (or Telegram, WhatsApp...).
+
 **Short description** (max 80):
-`Discord-style chat on Matrix. End-to-end encrypted. No ads, no tracking.`
+`Encrypted chat on Matrix with servers and channels. No ads, no tracking.`
 
 **Full description** (max 4000):
 
 ```
-Vibe is a free, open-source messenger with a Discord-style layout, built on Matrix, the open standard for secure chat. Talk to anyone on Element, FluffyChat or any other Matrix app.
+Vibe is a free, open-source messenger with a server-and-channel layout, built on Matrix, the open standard for secure chat. Talk to anyone on Element, FluffyChat or any other Matrix app.
 
 PRIVATE BY DESIGN
 • End-to-end encryption for direct messages and private groups
@@ -32,7 +35,7 @@ PRIVATE BY DESIGN
 • Vibe has no servers of its own: your account lives on the Matrix server you choose
 
 FEELS LIKE HOME
-• Server rail, direct-message panes and communities, like Discord
+• Server rail, direct-message panes and communities
 • Reply threads, reactions, stickers, custom emoji and big-emoji messages
 • Voice and video calls
 • Music links turn into player cards
