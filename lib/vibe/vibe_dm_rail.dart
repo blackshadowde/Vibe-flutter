@@ -96,7 +96,10 @@ class VibeDmRail extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  // The profile bar (VibeUserBar, 6 + 76 + 10) floats over
+                  // the bottom of the rail: leave room so the + scrolls
+                  // above it when the rail is full.
+                  padding: const EdgeInsets.only(bottom: 100),
                   itemCount: list.length + 1,
                   itemBuilder: (context, i) {
                     if (i == list.length) {
