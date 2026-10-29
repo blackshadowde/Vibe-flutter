@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/config/setting_keys.dart';
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/utils/client_download_content_extension.dart';
@@ -37,7 +38,7 @@ extension LocalNotificationsExtension on MatrixState {
         : event.room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
     final body = hide
         ? 'New message'
-        : await event.calcLocalizedBody(
+        : await event.vibeBody(
       MatrixLocals(L10n.of(context)),
       withSenderNamePrefix:
           !event.room.isDirectChat ||

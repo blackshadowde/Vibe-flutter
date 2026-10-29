@@ -406,7 +406,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} criptithe deireadh go deireadh gníomhachtaithe",
+    "activatedEndToEndEncryption": "{username} criptithe deireadh go deireadh gníomhachtaithe",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -420,7 +420,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 Ghlac {username} leis an gcuireadh",
+    "acceptedTheInvitation": "Ghlac {username} leis an gcuireadh",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -463,7 +463,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 thug {username} cuireadh do {targetName}",
+    "invitedUser": "thug {username} cuireadh do {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -714,7 +714,7 @@
         "type": "String",
         "placeholder": {}
     },
-    "createdTheChat": "💬 chruthaigh {username} an comhrá",
+    "createdTheChat": "chruthaigh {username} an comhrá",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -1038,7 +1038,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Níor aimsíodh aon straoiseoga. 😕",
+    "noEmotesFound": "Níor aimsíodh aon straoiseoga.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1053,7 +1053,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Teachtaireacht nua in FluffyChat",
+    "newMessageInFluffyChat": "Teachtaireacht nua in FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -1110,7 +1110,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 chiceáil {username} {targetName}",
+    "kicked": "chiceáil {username} {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -1122,7 +1122,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 chiceáil {username} agus chuir sé cosc ar {targetName}",
+    "kickedAndBanned": "chiceáil {username} agus chuir sé cosc ar {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -1134,7 +1134,7 @@
             }
         }
     },
-    "joinedTheChat": "Tháinig 👋 {username} isteach sa chomhrá",
+    "joinedTheChat": "Tháinig {username} isteach sa chomhrá",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -1329,7 +1329,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "userLeftTheChat": "🚪 D'fhág {username} an comhrá",
+    "userLeftTheChat": "D'fhág {username} an comhrá",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1417,7 +1417,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 sheol {username} físeán",
+    "sentAVideo": "sheol {username} físeán",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1426,7 +1426,7 @@
             }
         }
     },
-    "sentASticker": "😊 sheol {username} greamán",
+    "sentASticker": "sheol {username} greamán",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1435,7 +1435,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ sheol {username} pictiúr",
+    "sentAPicture": "sheol {username} pictiúr",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1655,7 +1655,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAnAudio": "🎤 sheol {username} fuaim",
+    "sentAnAudio": "sheol {username} fuaim",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1664,7 +1664,7 @@
             }
         }
     },
-    "sentAFile": "📁 sheol {username} comhad",
+    "sentAFile": "sheol {username} comhad",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1715,12 +1715,12 @@
     "sender": "Seoltóir",
     "noOneCanJoin": "Ní féidir le duine ar bith páirt a ghlacadh",
     "noOtherDevicesFound": "Níor aimsíodh aon ghléas eile",
-    "inviteGroupChat": "📨 Cuireadh chuig comhrá grúpa",
+    "inviteGroupChat": "Cuireadh chuig comhrá grúpa",
     "knocking": "Cnagadh",
     "addChatOrSubSpace": "Cuir comhrá nó fo-spás leis",
     "thisDevice": "An gléas seo:",
     "formattedMessages": "Teachtaireachtaí formáidithe",
-    "verifyOtherDevice": "🔐 Fíoraigh gléas eile",
+    "verifyOtherDevice": "Fíoraigh gléas eile",
     "commandHint_ignore": "Déan neamhaird d'aitheantas na maitríse sonraithe",
     "completedKeyVerification": "{sender} fíorú eochair críochnaithe",
     "@completedKeyVerification": {
@@ -1764,7 +1764,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Thug {user} cuireadh duit",
+    "youInvitedBy": "Thug {user} cuireadh duit",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1779,9 +1779,9 @@
     "newPassword": "Pasfhocal nua",
     "sendReadReceipts": "Seol admhálacha léite",
     "formattedMessagesDescription": "Taispeáin ábhar saibhir teachtaireachta cosúil le téacs trom ag baint úsáide as marcáil síos.",
-    "verifyOtherUser": "🔐 Fíoraigh úsáideoir eile",
+    "verifyOtherUser": "Fíoraigh úsáideoir eile",
     "jump": "Léim",
-    "reportErrorDescription": "😭 Ó, a mhac go deo. Chuaigh rud éigin mícheart. Más mian leat, is féidir leat an fabht seo a thuairisciú do na forbróirí.",
+    "reportErrorDescription": "Ó, a mhac go deo. Chuaigh rud éigin mícheart. Más mian leat, is féidir leat an fabht seo a thuairisciú do na forbróirí.",
     "invalidInput": "Ionchur neamhbhailí!",
     "kickUserDescription": "Ciceáiltear an t-úsáideoir as an gcomhrá ach níl cosc air. I gcomhráite poiblí, is féidir leis an úsáideoir teacht ar ais ag am ar bith.",
     "commandHint_sendraw": "Seol json amh",
@@ -1826,11 +1826,11 @@
         }
     },
     "unread": "Neamhléite",
-    "noChatsFoundHere": "Níor aimsíodh aon chomhrá anseo fós. Cuir tús le comhrá nua le duine éigin tríd an gcnaipe thíos a úsáid. ⤵️",
+    "noChatsFoundHere": "Níor aimsíodh aon chomhrá anseo fós. Cuir tús le comhrá nua le duine éigin tríd an gcnaipe thíos a úsáid.",
     "messageInfo": "Eolas teachtaireachta",
     "unsupportedAndroidVersionLong": "Éilíonn an ghné seo leagan Android níos nuaí. Seiceáil le haghaidh nuashonruithe nó tacaíocht Lineage OS.",
     "experimentalVideoCalls": "Glaonna físe turgnamhacha",
-    "youKicked": "👞 Chiceáil tú {user}",
+    "youKicked": "Chiceáil tú {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1938,9 +1938,9 @@
             }
         }
     },
-    "verifyOtherUserDescription": "Má fhíoraíonn tú úsáideoir eile, is féidir leat a bheith cinnte go bhfuil a fhios agat cé leis a bhfuil tú ag scríobh i ndáiríre. 💪\n\nNuair a thosaíonn tú fíorú, feicfidh tú féin agus an t-úsáideoir eile aníos san aip. Ansin feicfidh tú sraith emojis nó uimhreacha a chaithfidh tú a chur i gcomparáid lena chéile.\n\nIs é an bealach is fearr chun é seo a dhéanamh ná bualadh le chéile nó glao físe a thosú. 👭",
+    "verifyOtherUserDescription": "Má fhíoraíonn tú úsáideoir eile, is féidir leat a bheith cinnte go bhfuil a fhios agat cé leis a bhfuil tú ag scríobh i ndáiríre.\n\nNuair a thosaíonn tú fíorú, feicfidh tú féin agus an t-úsáideoir eile aníos san aip. Ansin feicfidh tú sraith emojis nó uimhreacha a chaithfidh tú a chur i gcomparáid lena chéile.\n\nIs é an bealach is fearr chun é seo a dhéanamh ná bualadh le chéile nó glao físe a thosú.",
     "sendTypingNotificationsDescription": "Is féidir le rannpháirtithe eile i gcomhrá a fheiceáil nuair atá teachtaireacht nua á clóscríobh agat.",
-    "verifyOtherDeviceDescription": "Nuair a fhíoraíonn tú gléas eile, is féidir leis na gléasanna sin eochracha a mhalartú, do shlándáil fhoriomlán a mhéadú. 💪 Nuair a thosaíonn tú fíorú, beidh preabfhuinneog le feiceáil san aip ar an dá ghléas. Ansin feicfidh tú sraith emojis nó uimhreacha a chaithfidh tú a chur i gcomparáid lena chéile. Is fearr an dá ghléas a bheith áisiúil sula dtosaíonn tú ar an bhfíorú. 🤳",
+    "verifyOtherDeviceDescription": "Nuair a fhíoraíonn tú gléas eile, is féidir leis na gléasanna sin eochracha a mhalartú, do shlándáil fhoriomlán a mhéadú. Nuair a thosaíonn tú fíorú, beidh preabfhuinneog le feiceáil san aip ar an dá ghléas. Ansin feicfidh tú sraith emojis nó uimhreacha a chaithfidh tú a chur i gcomparáid lena chéile. Is fearr an dá ghléas a bheith áisiúil sula dtosaíonn tú ar an bhfíorú.",
     "acceptedKeyVerification": "{sender} glacadh le fíorú eochair",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2020,7 +2020,7 @@
     },
     "user": "Úsáideoir",
     "databaseMigrationTitle": "Tá an bunachar sonraí optamaithe",
-    "hasKnocked": "🚪 Tá {user} tar éis cnagadh",
+    "hasKnocked": "Tá {user} tar éis cnagadh",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2108,7 +2108,7 @@
             }
         }
     },
-    "updateInstalled": "🎉 Nuashonraigh {version} suiteáilte!",
+    "updateInstalled": "Nuashonraigh {version} suiteáilte!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2122,7 +2122,7 @@
     "noChatDescriptionYet": "Níl aon chur síos ar an gcomhrá cruthaithe fós.",
     "shareInviteLink": "Roinn an nasc cuireadh",
     "passwordRecoverySettings": "Socruithe athshlánaithe pasfhocal",
-    "youKickedAndBanned": "🙅 Chiceáil tú agus chuir tú cosc ar {user}",
+    "youKickedAndBanned": "Chiceáil tú agus chuir tú cosc ar {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -2154,7 +2154,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Thug tú cuireadh do {user}",
+    "youInvitedUser": "Thug tú cuireadh do {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -2237,7 +2237,7 @@
     "sendReadReceiptsDescription": "Is féidir le rannpháirtithe eile i gcomhrá a fheiceáil nuair a bhíonn teachtaireacht léite agat.",
     "doesNotSeemToBeAValidHomeserver": "Ní cosúil gur freastalaí baile comhoiriúnach é. URL mícheart?",
     "youJoinedTheChat": "Chuaigh tú isteach sa chomhrá",
-    "youAcceptedTheInvitation": "👍 Ghlac tú leis an gcuireadh",
+    "youAcceptedTheInvitation": "Ghlac tú leis an gcuireadh",
     "accessAndVisibility": "Rochtain agus infheictheacht",
     "accessAndVisibilityDescription": "Cé a bhfuil cead aige páirt a ghlacadh sa chomhrá seo agus conas is féidir an comhrá a aimsiú.",
     "calls": "Glaonna",
@@ -2329,7 +2329,7 @@
     "notificationRuleJitsiDescription": "Cuireann sé seo in iúl don úsáideoir faoi imeachtaí giuirléidí Jitsi.",
     "notificationRuleServerAcl": "Seachtaigh Freastalaí ACL Imeachtaí",
     "more": "Tuilleadh",
-    "newChatRequest": "📩 Iarratas comhrá nua",
+    "newChatRequest": "Iarratas comhrá nua",
     "shareKeysWith": "Roinn na heochracha le...",
     "allDevices": "Gach gléasanna",
     "crossVerifiedDevicesIfEnabled": "Gléasanna trasfhíoraithe má tá siad cumasaithe",
@@ -2372,7 +2372,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - Teachtaireacht ghutha ó {sender}",
+    "sentVoiceMessage": "{duration} - Teachtaireacht ghutha ó {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

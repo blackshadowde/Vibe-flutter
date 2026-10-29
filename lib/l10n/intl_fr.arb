@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} a accepté l'invitation",
+    "acceptedTheInvitation": "{username} a accepté l'invitation",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} a activé le chiffrement de bout en bout",
+    "activatedEndToEndEncryption": "{username} a activé le chiffrement de bout en bout",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -504,7 +504,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} a créé la discussion",
+    "createdTheChat": "{username} a créé la discussion",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -798,7 +798,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} a invité {targetName}",
+    "invitedUser": "{username} a invité {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -832,7 +832,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} a rejoint la discussion",
+    "joinedTheChat": "{username} a rejoint la discussion",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -846,7 +846,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} a expulsé {targetName}",
+    "kicked": "{username} a expulsé {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -858,7 +858,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} a expulsé et banni {targetName}",
+    "kickedAndBanned": "{username} a expulsé et banni {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -972,7 +972,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Nouveau message dans FluffyChat",
+    "newMessageInFluffyChat": "Nouveau message dans FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -997,7 +997,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Aucune émoticône trouvée. 😕",
+    "noEmotesFound": "Aucune émoticône trouvée.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1305,7 +1305,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} a envoyé un fichier",
+    "sentAFile": "{username} a envoyé un fichier",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1314,7 +1314,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} a envoyé un fichier audio",
+    "sentAnAudio": "{username} a envoyé un fichier audio",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1323,7 +1323,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} a envoyé une image",
+    "sentAPicture": "{username} a envoyé une image",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1332,7 +1332,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} a envoyé un autocollant",
+    "sentASticker": "{username} a envoyé un autocollant",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1341,7 +1341,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} a envoyé une vidéo",
+    "sentAVideo": "{username} a envoyé une vidéo",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1546,7 +1546,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} a quitté la discussion",
+    "userLeftTheChat": "{username} a quitté la discussion",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1756,7 +1756,7 @@
             }
         }
     },
-    "youAcceptedTheInvitation": "👍 Vous avez accepté l'invitation",
+    "youAcceptedTheInvitation": "Vous avez accepté l'invitation",
     "youBannedUser": "Vous avez banni {user}",
     "@youBannedUser": {
         "placeholders": {
@@ -1765,7 +1765,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Vous avez été invité par {user}",
+    "youInvitedBy": "Vous avez été invité par {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1773,7 +1773,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Vous avez invité {user}",
+    "youInvitedUser": "Vous avez invité {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1781,7 +1781,7 @@
             }
         }
     },
-    "youKicked": "👞 Vous avez dégagé {user}",
+    "youKicked": "Vous avez dégagé {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1789,7 +1789,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Vous avez dégagé et banni {user}",
+    "youKickedAndBanned": "Vous avez dégagé et banni {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1939,7 +1939,7 @@
     "thisDevice": "Cet appareil :",
     "sendReadReceipts": "Envoyer des accusés de réception",
     "sendTypingNotificationsDescription": "Les autres participants à une discussion peuvent voir que vous êtes en train de taper un nouveau message.",
-    "verifyOtherDevice": "🔐 Vérifier l'autre appareil",
+    "verifyOtherDevice": "Vérifier l'autre appareil",
     "formattedMessagesDescription": "Affichez le contenu formaté des messages comme du texte en gras à l'aide de markdown.",
     "incomingMessages": "Messages entrants",
     "acceptedKeyVerification": "{sender} a accepté la vérification de clé",
@@ -1951,10 +1951,10 @@
             }
         }
     },
-    "inviteGroupChat": "📨 Inviter à une discussion de groupe",
+    "inviteGroupChat": "Inviter à une discussion de groupe",
     "jump": "Sauter",
     "passwordRecoverySettings": "Paramètres de récupération de mot de passe",
-    "hasKnocked": "🚪 {user} a frappé",
+    "hasKnocked": "{user} a frappé",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2058,10 +2058,10 @@
     },
     "sendReadReceiptsDescription": "Les autres participants à une discussion peuvent voir si vous avez lu un message.",
     "formattedMessages": "Messages formatés",
-    "verifyOtherUser": "🔐 Vérifier l'autre utilisateur/trice",
+    "verifyOtherUser": "Vérifier l'autre utilisateur/trice",
     "searchMore": "Rechercher davantage...",
-    "verifyOtherUserDescription": "Si vous vérifiez un autre utilisateur/trice, vous pouvez être sûr de savoir à qui vous écrivez réellement. 💪\n\nLorsque vous lancez une vérification, vous et l'autre utilisateur/trice verrez une fenêtre contextuelle dans l'application. Vous y verrez alors une série d'émoticônes ou de chiffres que vous devrez comparer.\n\nLa meilleure façon de procéder est de se rencontrer ou de lancer un appel vidéo. 👭",
-    "verifyOtherDeviceDescription": "Lorsque vous vérifiez un autre appareil, ces appareils peuvent échanger des clés, ce qui augmente votre sécurité globale. 💪 Lorsque vous lancez une vérification, une fenêtre contextuelle s'affiche dans l'application sur les deux appareils. Vous y verrez alors une série d'émoticônes ou de chiffres que vous devrez comparer. Il est préférable d'avoir les deux appareils à portée de main avant de lancer la vérification. 🤳",
+    "verifyOtherUserDescription": "Si vous vérifiez un autre utilisateur/trice, vous pouvez être sûr de savoir à qui vous écrivez réellement.\n\nLorsque vous lancez une vérification, vous et l'autre utilisateur/trice verrez une fenêtre contextuelle dans l'application. Vous y verrez alors une série d'émoticônes ou de chiffres que vous devrez comparer.\n\nLa meilleure façon de procéder est de se rencontrer ou de lancer un appel vidéo.",
+    "verifyOtherDeviceDescription": "Lorsque vous vérifiez un autre appareil, ces appareils peuvent échanger des clés, ce qui augmente votre sécurité globale. Lorsque vous lancez une vérification, une fenêtre contextuelle s'affiche dans l'application sur les deux appareils. Vous y verrez alors une série d'émoticônes ou de chiffres que vous devrez comparer. Il est préférable d'avoir les deux appareils à portée de main avant de lancer la vérification.",
     "completedKeyVerification": "{sender} a terminé la vérification de clé",
     "@completedKeyVerification": {
         "type": "String",
@@ -2103,7 +2103,7 @@
     "databaseMigrationTitle": "La base de données est optimisée",
     "leaveEmptyToClearStatus": "Laisser vide pour effacer votre statut.",
     "select": "Sélectionner",
-    "reportErrorDescription": "😭 Oh non. Quelque chose s'est mal passé. Si vous le souhaitez, vous pouvez signaler ce bogue aux développeurs.",
+    "reportErrorDescription": "Oh non. Quelque chose s'est mal passé. Si vous le souhaitez, vous pouvez signaler ce bogue aux développeurs.",
     "report": "signaler",
     "wrongPinEntered": "Mauvais code PIN saisi ! Veuillez réessayer dans {seconds} secondes...",
     "@wrongPinEntered": {
@@ -2170,7 +2170,7 @@
             }
         }
     },
-    "noChatsFoundHere": "Aucune discussion trouvée. Utilisez le bouton ci-dessous pour commencer une nouvelle discussion. ⤵️",
+    "noChatsFoundHere": "Aucune discussion trouvée. Utilisez le bouton ci-dessous pour commencer une nouvelle discussion.",
     "aboutHomeserver": "À propos de {homeserver}",
     "@aboutHomeserver": {
         "type": "String",
@@ -2225,7 +2225,7 @@
             }
         }
     },
-    "updateInstalled": "🎉 La mise à niveau {version} est installée !",
+    "updateInstalled": "La mise à niveau {version} est installée !",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2342,7 +2342,7 @@
     "notificationRuleEncryptedDescription": "Notifies l'utilisateur/trice à propos des messages dans les salons chiffrés.",
     "answerOption": "Réponse possible",
     "notificationRuleRoomOneToOne": "Salon en Duo",
-    "sentVoiceMessage": "🎙️ {duration} - Message vocal de {sender}",
+    "sentVoiceMessage": "{duration} - Message vocal de {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {
@@ -2411,7 +2411,7 @@
     },
     "removeAdminRights": "Révoquer les droits administrateurs/trices",
     "removeFromSpaceDescription": "La discussion sera retirée de l'espace mais apparaitra toujours dans votre liste de discussion.",
-    "newChatRequest": "📩 Nouvelle demande de discussion",
+    "newChatRequest": "Nouvelle demande de discussion",
     "boldText": "Gras",
     "owner": "Propriétaire",
     "powerLevel": "Niveau de droits",

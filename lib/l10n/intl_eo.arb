@@ -975,7 +975,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Neniuj mienetoj troviĝis. 😕",
+    "noEmotesFound": "Neniuj mienetoj troviĝis.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}

@@ -938,7 +938,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Нема емотија. 😕",
+    "noEmotesFound": "Нема емотија.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}

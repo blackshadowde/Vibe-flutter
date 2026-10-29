@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} aceptó la invitación",
+    "acceptedTheInvitation": "{username} aceptó la invitación",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} activó el cifrado de extremo a extremo",
+    "activatedEndToEndEncryption": "{username} activó el cifrado de extremo a extremo",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -380,7 +380,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬{username} creó el chat",
+    "createdTheChat": "{username} creó el chat",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -605,7 +605,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩{username} invitó a {targetName}",
+    "invitedUser": "{username} invitó a {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -639,7 +639,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋{username} se unió al chat",
+    "joinedTheChat": "{username} se unió al chat",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -653,7 +653,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞{username} echó a {targetName}",
+    "kicked": "{username} echó a {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -665,7 +665,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅{username} echó y vetó a {targetName}",
+    "kickedAndBanned": "{username} echó y vetó a {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -779,7 +779,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Ningún emote encontrado. 😕",
+    "noEmotesFound": "Ningún emote encontrado.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1716,7 +1716,7 @@
     "commandHint_markasgroup": "Marcar como grupo",
     "youRejectedTheInvitation": "Rechazaste la invitación",
     "users": "Usuarios",
-    "youInvitedBy": "📩 Has sido invitado por {user}",
+    "youInvitedBy": "Has sido invitado por {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1724,7 +1724,7 @@
             }
         }
     },
-    "youAcceptedTheInvitation": "👍 Aceptaste la invitación",
+    "youAcceptedTheInvitation": "Aceptaste la invitación",
     "commandHint_cuddle": "Enviar un abrazo",
     "supposedMxid": "Esto debería ser {mxid}",
     "@supposedMxid": {
@@ -1786,7 +1786,7 @@
     },
     "user": "Usuario",
     "tryAgain": "Inténtelo de nuevo",
-    "youKickedAndBanned": "🙅 Usted expulsó y prohibió el acceso a {user}",
+    "youKickedAndBanned": "Usted expulsó y prohibió el acceso a {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1839,7 +1839,7 @@
         }
     },
     "confirmEventUnpin": "¿Seguro que quiere desfijar permanentemente el evento?",
-    "youInvitedUser": "📩 Usted invitó a {user}",
+    "youInvitedUser": "Usted invitó a {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1868,7 +1868,7 @@
     },
     "noChatDescriptionYet": "No se ha creado una descripción del chat aún.",
     "chatDescriptionHasBeenChanged": "Se ha cambiado la descripción del chat",
-    "youKicked": "👞 Usted expulsó a {user}",
+    "youKicked": "Usted expulsó a {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1920,7 +1920,7 @@
         }
     },
     "commandHint_googly": "Enviar unos ojos saltones",
-    "noChatsFoundHere": "No se han encontrado chats. Inicia un nuevo chat usando el botón de abajo. ⤵️",
+    "noChatsFoundHere": "No se han encontrado chats. Inicia un nuevo chat usando el botón de abajo.",
     "space": "Espacio",
     "block": "Bloquear",
     "blockListDescription": "Puedes bloquear usuarios que te estén molestando. No podrás recibir mensajes ni invitaciones de chat de los usuarios de tu lista de bloqueo.",
@@ -1951,7 +1951,7 @@
     "placeCall": "Llamar",
     "disableEncryptionWarning": "Por motivos de seguridad no es posible deshabilitar el cifrado en un chat si ha sido habilitado previamente.",
     "setColorTheme": "Poner tema de color:",
-    "inviteGroupChat": "📨 Invitar a grupo",
+    "inviteGroupChat": "Invitar a grupo",
     "invalidInput": "¡Entrada no válida!",
     "wrongPinEntered": "¡Pin erróneo! Vuelve a intenrarlo en {seconds} segundos...",
     "@wrongPinEntered": {
@@ -1963,9 +1963,9 @@
         }
     },
     "thisDevice": "Este dispositivo:",
-    "verifyOtherDevice": "🔐 Verificar otro dispositivo",
+    "verifyOtherDevice": "Verificar otro dispositivo",
     "chatPermissionsDescription": "Definir el nivel necesario para ciertas acciones en este chat. Los niveles 0, 50 y 100 habitualmente representan usuarios, moderadores y administradores, pero se puede establecer cualquier escala.",
-    "updateInstalled": "¡🎉 Actualización {version} instalada!",
+    "updateInstalled": "¡ Actualización {version} instalada!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2112,7 +2112,7 @@
     },
     "compress": "Comprimir",
     "pleaseFillOut": "Por favor, rellenar",
-    "newChatRequest": "📩 Nueva petición de chat",
+    "newChatRequest": "Nueva petición de chat",
     "unbanUserDescription": "El usuario podrá entrar al chat de nuevo si lo intenta.",
     "roomUpgradeDescription": "El chat se volverá a crear con la nueva versión de sala. Todos los participantes serán notificados de que tienen que cambiarse al nuevo chat. Puedes encontrar más información sobre versiones de salas en https://spec.matrix.org/latest/rooms/",
     "makeAdminDescription": "Una vez hagas que este usuario sea admin, puede que no puedas deshacerlo porque tendrá los mismos permisos que tú.",
@@ -2225,8 +2225,8 @@
     "sendReadReceipts": "Mandar recibos de lectura",
     "sendTypingNotificationsDescription": "Otros participantes en un chat pueden ver cuándo estás escribiendo un mensaje.",
     "sendReadReceiptsDescription": "Otros participantes en un chat pueden ver cuándo has leído un mensaje.",
-    "verifyOtherUserDescription": "Si verificas a otro usuario, puedes estar seguro de a quién estás escribiendo realmente. 💪\n\nCuando empiezas una verificación, tú y el otro usuario veréis una ventana emergente en la app. En ella veréis una serie de emojiso números que tenéis que comparar.\n\nLa mejor forma de hacer esto es quedar o una videollamada. 👭",
-    "verifyOtherDeviceDescription": "Cuando verificas otro dispositivo, esos dispositivos pueden intercambiar claves, incrementando tu seguridad global. 💪 Cuando inicias una verificación, aparece una ventana en la app en ambos dispositivos. En ella, verás una serie de emojis o números que tienes que comparar. Es mejor tener ambos dispositivos a mano antes de empezar la verificación. 🤳",
+    "verifyOtherUserDescription": "Si verificas a otro usuario, puedes estar seguro de a quién estás escribiendo realmente.\n\nCuando empiezas una verificación, tú y el otro usuario veréis una ventana emergente en la app. En ella veréis una serie de emojiso números que tenéis que comparar.\n\nLa mejor forma de hacer esto es quedar o una videollamada.",
+    "verifyOtherDeviceDescription": "Cuando verificas otro dispositivo, esos dispositivos pueden intercambiar claves, incrementando tu seguridad global. Cuando inicias una verificación, aparece una ventana en la app en ambos dispositivos. En ella, verás una serie de emojis o números que tienes que comparar. Es mejor tener ambos dispositivos a mano antes de empezar la verificación.",
     "canceledKeyVerification": "{sender} canceló la verificación de clave",
     "@canceledKeyVerification": {
         "type": "String",
@@ -2282,7 +2282,7 @@
     "pushNotificationsNotAvailable": "No están disponibles las notificaciones emergentes",
     "passwordsDoNotMatch": "Las claves no coinciden",
     "passwordIsWrong": "La clave que has puesto es incorrecta",
-    "verifyOtherUser": "🔐 Verificar a otro usuario",
+    "verifyOtherUser": "Verificar a otro usuario",
     "isReadyForKeyVerification": "{sender} está preparado para verificación de clave",
     "@isReadyForKeyVerification": {
         "type": "String",
@@ -2316,8 +2316,8 @@
             }
         }
     },
-    "reportErrorDescription": "😭 Oh, no. Algo ha salido mal. Si quieres, puedes informar de este fallo a los desarrolladores.",
-    "hasKnocked": "🚪 {user} ha avisado",
+    "reportErrorDescription": "Oh, no. Algo ha salido mal. Si quieres, puedes informar de este fallo a los desarrolladores.",
+    "hasKnocked": "{user} ha avisado",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2372,7 +2372,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - Mensaje de voz de {sender}",
+    "sentVoiceMessage": "{duration} - Mensaje de voz de {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

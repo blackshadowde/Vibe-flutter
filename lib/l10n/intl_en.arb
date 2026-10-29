@@ -78,7 +78,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} accepted the invitation",
+    "acceptedTheInvitation": "{username} accepted the invitation",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -92,7 +92,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} activated end to end encryption",
+    "activatedEndToEndEncryption": "{username} activated end to end encryption",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -243,7 +243,7 @@
     "swipeRightToLeftToReply": "Swipe right to left to reply",
     "sendOnEnter": "Send on enter",
     "noMoreChatsFound": "No more chats found...",
-    "noChatsFoundHere": "No chats found here yet. Start a new chat with someone by using the button below. ⤵️",
+    "noChatsFoundHere": "No chats found here yet. Start a new chat with someone by using the button below.",
     "unread": "Unread",
     "space": "Space",
     "banFromChat": "Ban from chat",
@@ -659,7 +659,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} created the chat",
+    "createdTheChat": "{username} created the chat",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -965,7 +965,7 @@
     },
     "redactMessageDescription": "The message will be redacted for all participants in this conversation. This cannot be undone.",
     "optionalRedactReason": "(Optional) Reason for redacting this message...",
-    "invitedUser": "📩 {username} invited {targetName}",
+    "invitedUser": "{username} invited {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -999,7 +999,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} joined the chat",
+    "joinedTheChat": "{username} joined the chat",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -1013,7 +1013,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} kicked {targetName}",
+    "kicked": "{username} kicked {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -1025,7 +1025,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} kicked and banned {targetName}",
+    "kickedAndBanned": "{username} kicked and banned {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -1143,7 +1143,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 New message in Vibe",
+    "newMessageInFluffyChat": "New message in Vibe",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -1168,7 +1168,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "No emotes found. 😕",
+    "noEmotesFound": "No emotes found.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1521,7 +1521,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} sent a file",
+    "sentAFile": "{username} sent a file",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1530,7 +1530,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} sent an audio",
+    "sentAnAudio": "{username} sent an audio message",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1539,7 +1539,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} sent a picture",
+    "sentAPicture": "{username} sent a photo",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1548,7 +1548,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} sent a sticker",
+    "sentASticker": "{username} sent a sticker",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1557,7 +1557,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} sent a video",
+    "sentAVideo": "{username} sent a video",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1772,7 +1772,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} left the chat",
+    "userLeftTheChat": "{username} left the chat",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1944,7 +1944,7 @@
     "experimentalVideoCalls": "Experimental video calls",
     "youRejectedTheInvitation": "You rejected the invitation",
     "youJoinedTheChat": "You joined the chat",
-    "youAcceptedTheInvitation": "👍 You accepted the invitation",
+    "youAcceptedTheInvitation": "You accepted the invitation",
     "youBannedUser": "You banned {user}",
     "@youBannedUser": {
         "placeholders": {
@@ -1961,7 +1961,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 You have been invited by {user}",
+    "youInvitedBy": "You have been invited by {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1969,7 +1969,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 You invited {user}",
+    "youInvitedUser": "You invited {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1977,7 +1977,7 @@
             }
         }
     },
-    "youKicked": "👞 You kicked {user}",
+    "youKicked": "You kicked {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1985,7 +1985,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 You kicked and banned {user}",
+    "youKickedAndBanned": "You kicked and banned {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -2001,7 +2001,7 @@
             }
         }
     },
-    "hasKnocked": "🚪 {user} has knocked",
+    "hasKnocked": "{user} has knocked",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2068,11 +2068,11 @@
     "readUpToHere": "Read up to here",
     "jump": "Jump",
     "openLinkInBrowser": "Open link in browser",
-    "reportErrorDescription": "😭 Oh no. Something went wrong. If you want, you can report this bug to the developers.",
+    "reportErrorDescription": "Oh no. Something went wrong. If you want, you can report this bug to the developers.",
     "report": "report",
     "setColorTheme": "Set color theme:",
     "invite": "Invite",
-    "inviteGroupChat": "📨 Group chat invite",
+    "inviteGroupChat": "Group chat invite",
     "invalidInput": "Invalid input!",
     "wrongPinEntered": "Wrong pin entered! Try again in {seconds} seconds...",
     "@wrongPinEntered": {
@@ -2178,10 +2178,10 @@
     "sendReadReceiptsDescription": "Other participants in a chat can see when you have read a message.",
     "formattedMessages": "Formatted messages",
     "formattedMessagesDescription": "Display rich message content like bold text using markdown.",
-    "verifyOtherUser": "🔐 Verify other user",
-    "verifyOtherUserDescription": "If you verify another user, you can be sure that you know who you are really writing to. 💪\n\nWhen you start a verification, you and the other user will see a popup in the app. There you will then see a series of emojis or numbers that you have to compare with each other.\n\nThe best way to do this is to meet up or start a video call. 👭",
-    "verifyOtherDevice": "🔐 Verify other device",
-    "verifyOtherDeviceDescription": "When you verify another device, those devices can exchange keys, increasing your overall security. 💪 When you start a verification, a popup will appear in the app on both devices. There you will then see a series of emojis or numbers that you have to compare with each other. It's best to have both devices handy before you start the verification. 🤳",
+    "verifyOtherUser": "Verify other user",
+    "verifyOtherUserDescription": "If you verify another user, you can be sure that you know who you are really writing to.\n\nWhen you start a verification, you and the other user will see a popup in the app. There you will then see a series of emojis or numbers that you have to compare with each other.\n\nThe best way to do this is to meet up or start a video call.",
+    "verifyOtherDevice": "Verify other device",
+    "verifyOtherDeviceDescription": "When you verify another device, those devices can exchange keys, increasing your overall security. When you start a verification, a popup will appear in the app on both devices. There you will then see a series of emojis or numbers that you have to compare with each other. It's best to have both devices handy before you start the verification.",
     "acceptedKeyVerification": "{sender} accepted key verification",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2300,7 +2300,7 @@
     "sendRoomNotifications": "Send a @room notifications",
     "changeTheDescriptionOfTheGroup": "Change the description of the chat",
     "chatPermissionsDescription": "Define which power level is necessary for certain actions in this chat. The power levels 0, 50 and 100 are usually representing users, moderators and admins, but any gradation is possible.",
-    "updateInstalled": "🎉 Update {version} installed!",
+    "updateInstalled": "Update {version} installed!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2351,7 +2351,7 @@
     "appWantsToUseForLoginDescription": "You hereby allow the app and website to share information about you.",
     "open": "Open",
     "waitingForServer": "Waiting for server...",
-    "newChatRequest": "📩 New chat request",
+    "newChatRequest": "New chat request",
     "contentNotificationSettings": "Content notification settings",
     "generalNotificationSettings": "General notification settings",
     "roomNotificationSettings": "Room notification settings",
@@ -2406,7 +2406,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - Voice message from {sender}",
+    "sentVoiceMessage": "{sender} sent a voice message ({duration})",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

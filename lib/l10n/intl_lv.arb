@@ -60,7 +60,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "reportErrorDescription": "😭 Ak nē! Kaut kas nogāja greizi. Ja ir vēlēšanas, par šo nepilnību var ziņot izstrādātājiem.",
+    "reportErrorDescription": "Ak nē! Kaut kas nogāja greizi. Ja ir vēlēšanas, par šo nepilnību var ziņot izstrādātājiem.",
     "directChats": "Tiešās tērzēšanas",
     "@directChats": {
         "type": "String",
@@ -124,7 +124,7 @@
     },
     "oneClientLoggedOut": "Viens no klientiem ir atteicies",
     "unsupportedAndroidVersionLong": "Šai iespējai ir nepieciešama jaunāka Android versija. Lūgums pārbaudīt atjauninājumus vai Lineage OS atbalstu.",
-    "kicked": "👞 {username} izmeta {targetName}",
+    "kicked": "{username} izmeta {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -165,7 +165,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAPicture": "🖼️ {username} nosūtīja attēlu",
+    "sentAPicture": "{username} nosūtīja attēlu",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -227,7 +227,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} nosūtīja datni",
+    "sentAFile": "{username} nosūtīja datni",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -241,7 +241,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "youAcceptedTheInvitation": "👍 Tu pieņēmi uzaicinājumu",
+    "youAcceptedTheInvitation": "Tu pieņēmi uzaicinājumu",
     "banFromChat": "Izslēgt no tērzēšanas",
     "@banFromChat": {
         "type": "String",
@@ -271,7 +271,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 {user} Tevi uzaicināja",
+    "youInvitedBy": "{user} Tevi uzaicināja",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -293,7 +293,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAVideo": "🎥 {username} nosūtīja video",
+    "sentAVideo": "{username} nosūtīja video",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -354,7 +354,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "youKickedAndBanned": "🙅 Izraidīji {user} un liedzi piekļuvi",
+    "youKickedAndBanned": "Izraidīji {user} un liedzi piekļuvi",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -632,7 +632,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Netika atrasta neviena emocija. 😕",
+    "noEmotesFound": "Netika atrasta neviena emocija.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -679,7 +679,7 @@
         }
     },
     "setChatDescription": "Iestatīt tērzēšanas aprakstu",
-    "userLeftTheChat": "🚪 {username} pameta tērzēšanu",
+    "userLeftTheChat": "{username} pameta tērzēšanu",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -737,7 +737,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} izveidoja tērzēšanu",
+    "createdTheChat": "{username} izveidoja tērzēšanu",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -846,7 +846,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Jauna ziņa FluffyChat",
+    "newMessageInFluffyChat": "Jauna ziņa FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -884,7 +884,7 @@
         "placeholders": {}
     },
     "optionalRedactReason": "(Pēc izvēles) Ziņas labošanas iemesls...",
-    "acceptedTheInvitation": "👍 {username} pieņēma uzaicinājumu",
+    "acceptedTheInvitation": "{username} pieņēma uzaicinājumu",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -1159,7 +1159,7 @@
         }
     },
     "confirmEventUnpin": "Vai tiešām neatgriezeniski atspraust šo notikumu?",
-    "youInvitedUser": "📩 Tu uzaicināji {user}",
+    "youInvitedUser": "Tu uzaicināji {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1167,7 +1167,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} izmeta {targetName} un liedza piekļuvi",
+    "kickedAndBanned": "{username} izmeta {targetName} un liedza piekļuvi",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -1246,7 +1246,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} uzaicināja {targetName}",
+    "invitedUser": "{username} uzaicināja {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -1274,7 +1274,7 @@
         "placeholders": {}
     },
     "doNotShowAgain": "Vairs nerādīt",
-    "activatedEndToEndEncryption": "🔐 {username} iespējoja pilnīgu šifrēšanu",
+    "activatedEndToEndEncryption": "{username} iespējoja pilnīgu šifrēšanu",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -1351,7 +1351,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAnAudio": "🎤 {username} nosūtīja skaņu",
+    "sentAnAudio": "{username} nosūtīja skaņu",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1385,7 +1385,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "hasKnocked": "🚪 {user} pieklauvēja",
+    "hasKnocked": "{user} pieklauvēja",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1446,7 +1446,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "inviteGroupChat": "📨 Uzaicinājums uz kopas tērzēšanu",
+    "inviteGroupChat": "Uzaicinājums uz kopas tērzēšanu",
     "verifyTitle": "Apliecina citu kontu",
     "@verifyTitle": {
         "type": "String",
@@ -1604,7 +1604,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "youKicked": "👞 Tu izraidīji {user}",
+    "youKicked": "Tu izraidīji {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1787,7 +1787,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentASticker": "😊 {username} nosūtīja uzlīmi",
+    "sentASticker": "{username} nosūtīja uzlīmi",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1836,7 +1836,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} pievienojās tērzēšanai",
+    "joinedTheChat": "{username} pievienojās tērzēšanai",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -1984,8 +1984,8 @@
     "commandHint_sendraw": "Nosūtīt neapstrādātu JSON",
     "newPassword": "Jauna parole",
     "sendReadReceipts": "Nosūtīt lasīšanas atskaites",
-    "verifyOtherUser": "🔐 Apliecināt otru lietotāju",
-    "verifyOtherDevice": "🔐 Apliecināt otru ierīci",
+    "verifyOtherUser": "Apliecināt otru lietotāju",
+    "verifyOtherDevice": "Apliecināt otru ierīci",
     "yourGlobalUserIdIs": "Vispārējais lietotāja Id ir: ",
     "select": "Atlasīt",
     "initAppError": "Atgadījās kļūda lietotnes sāknēšanas laikā",
@@ -2101,7 +2101,7 @@
             }
         }
     },
-    "verifyOtherUserDescription": "Ar cita lietotāja apliecināšanu vari pārliecināties, ka zini, kam Tu tiešām raksti. 💪\n\nKad uzsāc apliecināšanu, Tu un otrs lietotājs lietotnē redzēs uznirstošo logu. Tajā jūs redzēsiet dažādas emocijzīmes vai skaitļus, kas ir jāsalīdzina savā starpā.\n\nLabākais veids, kā to izdarīt, ir satikties vai uzsākt videozvanu. 👭",
+    "verifyOtherUserDescription": "Ar cita lietotāja apliecināšanu vari pārliecināties, ka zini, kam Tu tiešām raksti.\n\nKad uzsāc apliecināšanu, Tu un otrs lietotājs lietotnē redzēs uznirstošo logu. Tajā jūs redzēsiet dažādas emocijzīmes vai skaitļus, kas ir jāsalīdzina savā starpā.\n\nLabākais veids, kā to izdarīt, ir satikties vai uzsākt videozvanu.",
     "sendTypingNotificationsDescription": "Citi tērzēšanas dalībnieki var redzēt, kad raksti jaunu ziņu.",
     "noUsersFoundWithQuery": "Diemžēl ar \"{query}\" netika atrasts neviens lietotājs. Lūgums pārbaudīt, vai ir pieļauta drukas kļūda.",
     "@noUsersFoundWithQuery": {
@@ -2130,7 +2130,7 @@
         "type": "String",
         "count": {}
     },
-    "verifyOtherDeviceDescription": "Kad apliecini citu ierīci, šīs ierīces var apmainīt atslēgas, palielinot vispārējo drošību. 💪 Pēc apliecināšanas uzsākšanas abās ierīcēs lietotnē parādīsies uznirstošais logs. Tajā būs redzamas dažādas emocijzīmes vai skaitļi, kas jāsalīdzina abās ierīcēs. Vislabāk, ja abas ierīces ir pieejamas, pirms tiek uzsākta apliecināšana. 🤳",
+    "verifyOtherDeviceDescription": "Kad apliecini citu ierīci, šīs ierīces var apmainīt atslēgas, palielinot vispārējo drošību. Pēc apliecināšanas uzsākšanas abās ierīcēs lietotnē parādīsies uznirstošais logs. Tajā būs redzamas dažādas emocijzīmes vai skaitļi, kas jāsalīdzina abās ierīcēs. Vislabāk, ja abas ierīces ir pieejamas, pirms tiek uzsākta apliecināšana.",
     "swipeRightToLeftToReply": "Pavilkt no labās puses uz kreiso, lai atbildētu",
     "searchIn": "Meklēt tērzēšanā \"{chat}\"...",
     "@searchIn": {
@@ -2145,7 +2145,7 @@
     "gallery": "Galerija",
     "files": "Datnes",
     "sendCanceled": "Sūtīšana atcelta",
-    "noChatsFoundHere": "Šeit vēl nav tērzēšanu. Jauna saruna ar kādu ir uzsākama ar zemāk esošo pogu. ⤵️",
+    "noChatsFoundHere": "Šeit vēl nav tērzēšanu. Jauna saruna ar kādu ir uzsākama ar zemāk esošo pogu.",
     "moderatorLevel": "{level} - Moderators",
     "@moderatorLevel": {
         "type": "String",
@@ -2188,7 +2188,7 @@
     "chatPermissionsDescription": "Noteikt, kurš spēka līmenis ir nepieciešams noteiktām darbībām šajā tērzēšanā. Spēka līmeņi 0, 50 un 100 parasti atbilst lietotājiem, moderatoriem un pārvaldītājiem, bet ir iespējams jebkāds iedalījums.",
     "doesNotSeemToBeAValidHomeserver": "Neizskatās pēc saderīga mājasservera. Nepareizs URL?",
     "loginWithMatrixId": "Pieteikties ar Matrix-Id",
-    "updateInstalled": "🎉 Atjauninājums {version} uzstādīts!",
+    "updateInstalled": "Atjauninājums {version} uzstādīts!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2304,7 +2304,7 @@
             }
         }
     },
-    "newChatRequest": "📩 Jauns tērzēšanas pieprasījums",
+    "newChatRequest": "Jauns tērzēšanas pieprasījums",
     "notificationRuleContainsUserNameDescription": "Paziņo lietotājam, kad ziņa satur viņa lietotājvārdu.",
     "notificationRuleRoomnotifDescription": "Paziņo lietotājam, kad ziņa satur \"@istaba\".",
     "notificationRuleEncryptedRoomOneToOneDescription": "Paziņo lietotājam par ziņām šifrētās viens pret viens istabās.",
@@ -2349,7 +2349,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - Balss ziņa no {sender}",
+    "sentVoiceMessage": "{duration} - Balss ziņa no {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

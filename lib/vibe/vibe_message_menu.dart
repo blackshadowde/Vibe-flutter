@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
@@ -86,7 +87,7 @@ class _Menu extends StatelessWidget {
     if (timeline == null) return;
     final text = event
         .getDisplayEvent(timeline)
-        .calcLocalizedBodyFallback(
+        .vibeBodyFallback(
           MatrixLocals(L10n.of(controller.context)),
           withSenderNamePrefix: false,
           hideReply: true,

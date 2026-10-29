@@ -262,7 +262,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username}님이 채팅을 생성함",
+    "createdTheChat": "{username}님이 채팅을 생성함",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -683,7 +683,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username}님이 종단간 암호화를 활성화함",
+    "activatedEndToEndEncryption": "{username}님이 종단간 암호화를 활성화함",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -697,7 +697,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username}님이 초대를 수락함",
+    "acceptedTheInvitation": "{username}님이 초대를 수락함",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -873,7 +873,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "userLeftTheChat": "🚪 {username}님이 채팅을 나감",
+    "userLeftTheChat": "{username}님이 채팅을 나감",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1062,7 +1062,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 FluffyChat에서 새로운 메시지",
+    "newMessageInFluffyChat": "FluffyChat에서 새로운 메시지",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -1293,7 +1293,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "이모트 발견되지 않음. 😕",
+    "noEmotesFound": "이모트 발견되지 않음.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1376,7 +1376,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username}님이 영상을 보냄",
+    "sentAVideo": "{username}님이 영상을 보냄",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1484,7 +1484,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username}님이 채팅에 참가함",
+    "joinedTheChat": "{username}님이 채팅에 참가함",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -1515,7 +1515,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username}님이 {targetName}님을 초대함",
+    "invitedUser": "{username}님이 {targetName}님을 초대함",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -1556,7 +1556,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentASticker": "😊 {username}님이 스티커를 보냄",
+    "sentASticker": "{username}님이 스티커를 보냄",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1565,7 +1565,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username}님이 사진을 보냄",
+    "sentAPicture": "{username}님이 사진을 보냄",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1574,7 +1574,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username}님이 오디오를 보냄",
+    "sentAnAudio": "{username}님이 오디오를 보냄",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1583,7 +1583,7 @@
             }
         }
     },
-    "sentAFile": "📁 {username}님이 파일을 보냄",
+    "sentAFile": "{username}님이 파일을 보냄",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1670,7 +1670,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kickedAndBanned": "🙅 {username}님이 {targetName}님을 추방하고 차단함",
+    "kickedAndBanned": "{username}님이 {targetName}님을 추방하고 차단함",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -1682,7 +1682,7 @@
             }
         }
     },
-    "kicked": "👞 {username}님이 {targetName}님을 추방함",
+    "kicked": "{username}님이 {targetName}님을 추방함",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -1770,7 +1770,7 @@
     },
     "jumpToLastReadMessage": "마지막으로 읽은 메시지로 이동",
     "commandHint_cuddle": "미소 보내기",
-    "reportErrorDescription": "😭 이런. 무언가 잘못되었습니다. 원한다면, 개발자에게 버그를 신고할 수 있습니다.",
+    "reportErrorDescription": "이런. 무언가 잘못되었습니다. 원한다면, 개발자에게 버그를 신고할 수 있습니다.",
     "setColorTheme": "색상 테마 설정:",
     "supposedMxid": "{mxid} 이어야 함",
     "@supposedMxid": {
@@ -1782,8 +1782,8 @@
         }
     },
     "user": "유저",
-    "youAcceptedTheInvitation": "👍 초대를 수락했습니다",
-    "youInvitedBy": "📩 {user}님에 의해 초대되었습니다",
+    "youAcceptedTheInvitation": "초대를 수락했습니다",
+    "youInvitedBy": "{user}님에 의해 초대되었습니다",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1794,7 +1794,7 @@
     "banUserDescription": "유저는 채팅에서 영구 추방되며 추방 해제 전까지 채팅을 다시 입력할 수 없습니다.",
     "removeDevicesDescription": "이 기기에서 로그아웃되며 더 이상 메시지를 받을 수 없습니다.",
     "tryAgain": "다시 시도하기",
-    "youKickedAndBanned": "🙅 {user}님을 영구 추방했습니다",
+    "youKickedAndBanned": "{user}님을 영구 추방했습니다",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1863,7 +1863,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 {user}님을 초대했습니다",
+    "youInvitedUser": "{user}님을 초대했습니다",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1892,7 +1892,7 @@
             }
         }
     },
-    "hasKnocked": "🚪 {user}님이 참가를 요청했습니다",
+    "hasKnocked": "{user}님이 참가를 요청했습니다",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1912,7 +1912,7 @@
         }
     },
     "sendTypingNotifications": "입력 알림 보내기",
-    "inviteGroupChat": "📨 그룹 채팅에 초대",
+    "inviteGroupChat": "그룹 채팅에 초대",
     "importEmojis": "이모지 불러오기",
     "wasDirectChatDisplayName": "빈 채팅 (전 {oldDisplayName})",
     "@wasDirectChatDisplayName": {
@@ -1930,7 +1930,7 @@
     "chatDescriptionHasBeenChanged": "채팅 설명 변경됨",
     "roomUpgradeDescription": "채팅이 새로운 방 버전으로 다시 생성됩니다. 모든 참가자는 새로운 채팅으로 전환해야합니다. https://spec.matrix.org/latest/rooms/ 에서 방 버전에 대해 자세히 알아볼 수 있습니다.",
     "pleaseEnterANumber": "0보다 큰 숫자를 입력하세요",
-    "youKicked": "👞 {user}님을 추방했습니다",
+    "youKicked": "{user}님을 추방했습니다",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -2010,7 +2010,7 @@
     "thisDevice": "이 기기:",
     "sendReadReceipts": "읽음 확인 보내기",
     "sendReadReceiptsDescription": "채팅의 다른 참가자들이 당신이 메시지를 읽었는지 볼 수 있습니다.",
-    "verifyOtherUser": "🔐 다른 유저 확인",
+    "verifyOtherUser": "다른 유저 확인",
     "searchChatsRooms": "#chats, @users 검색...",
     "groupCanBeFoundViaSearch": "검색으로 그룹 채팅을 찾을 수 있음",
     "restoreSessionBody": "앱이 백업에서 세션을 복원하려 시도중입니다. {url} 에서 개발자에게 오류를 신고하세요. 오류 메시지는 다음과 같습니다: {error}",
@@ -2070,9 +2070,9 @@
     "initAppError": "앱 초기화중 오류 발생",
     "sendTypingNotificationsDescription": "채팅의 다른 참가자들이 당신이 새 메시지를 입력중인것을 볼 수 있습니다.",
     "formattedMessages": "형식이 지정된 메시지",
-    "verifyOtherDevice": "🔐 다른 기기를 확인",
-    "verifyOtherUserDescription": "다른 유저를 확인하면, 당신은 당신이 누구에게 말하고있는지 알 수 있습니다. 💪\n\n확인을 시작할 때, 다른 유저는 앱에서 팝업을 볼 수 있습니다. 당신은 그런 다음 서로 비교해야 이모지 또는 숫자의 목록을 볼 수 있습니다.\n\n이 작업을 수행하는 가장 좋은 방법은 직접 만나거나 영상통화를 하는것입니다. 👭",
-    "verifyOtherDeviceDescription": "다른 장치를 확인하면, 장치와 키를 교환하고, 전반적인 보안을 증가시킵니다. 💪 확인을 시작하면 팝업은 두 장치에 나타납니다. 그런 다음 서로 비교해야 이모지 또는 숫자의 목록를 볼 수 있습니다. 확인을 시작하기 전에 모든 장치를 준비하세요. 🤳",
+    "verifyOtherDevice": "다른 기기를 확인",
+    "verifyOtherUserDescription": "다른 유저를 확인하면, 당신은 당신이 누구에게 말하고있는지 알 수 있습니다.\n\n확인을 시작할 때, 다른 유저는 앱에서 팝업을 볼 수 있습니다. 당신은 그런 다음 서로 비교해야 이모지 또는 숫자의 목록을 볼 수 있습니다.\n\n이 작업을 수행하는 가장 좋은 방법은 직접 만나거나 영상통화를 하는것입니다.",
+    "verifyOtherDeviceDescription": "다른 장치를 확인하면, 장치와 키를 교환하고, 전반적인 보안을 증가시킵니다. 확인을 시작하면 팝업은 두 장치에 나타납니다. 그런 다음 서로 비교해야 이모지 또는 숫자의 목록를 볼 수 있습니다. 확인을 시작하기 전에 모든 장치를 준비하세요.",
     "isReadyForKeyVerification": "{sender}가 키 검증 준비를 완료함",
     "@isReadyForKeyVerification": {
         "type": "String",
@@ -2196,7 +2196,7 @@
             }
         }
     },
-    "noChatsFoundHere": "대화가 발견되지 않았습니다. 아래 버튼을 사용하여 새 대화를 시작해 보세요. ⤵️",
+    "noChatsFoundHere": "대화가 발견되지 않았습니다. 아래 버튼을 사용하여 새 대화를 시작해 보세요.",
     "changeTheVisibilityOfChatHistory": "채팅 기록 표시 여부 바꾸기",
     "changeTheCanonicalRoomAlias": "메인 공개 채팅 주소 바꾸기",
     "sendCanceled": "전송 최소됨",
@@ -2232,7 +2232,7 @@
     "loginWithMatrixId": "Matrix-ID로 로그인",
     "doesNotSeemToBeAValidHomeserver": "호환되는 홈서버가 아닌 것 같습니다. URL을 올바르게 입력됐나요?",
     "continueText": "계속하기",
-    "updateInstalled": "🎉 {version} 업데이트가 설치되었습니다!",
+    "updateInstalled": "{version} 업데이트가 설치되었습니다!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2273,7 +2273,7 @@
     "strikeThrough": "취소선",
     "pleaseFillOut": "작성해주세요",
     "previous": "이전",
-    "newChatRequest": "📩 새 채팅 요청",
+    "newChatRequest": "새 채팅 요청",
     "synchronizingPleaseWaitCounter": " 동기화중… ({percentage}%)",
     "@synchronizingPleaseWaitCounter": {
         "type": "String",

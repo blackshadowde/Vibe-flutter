@@ -943,7 +943,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Nenhuns emotes encontrados. 😕",
+    "noEmotesFound": "Nenhuns emotes encontrados.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1400,7 +1400,7 @@
             }
         }
     },
-    "reportErrorDescription": "😭 Oh não. Ocorreu um problema. Se quiser, pode comunicar este erro aos desenvolvedores.",
+    "reportErrorDescription": "Oh não. Ocorreu um problema. Se quiser, pode comunicar este erro aos desenvolvedores.",
     "@youAreNoLongerParticipatingInThisChat": {
         "type": "String",
         "placeholders": {}
@@ -1442,7 +1442,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "youAcceptedTheInvitation": "👍 Aceitou o convite",
+    "youAcceptedTheInvitation": "Aceitou o convite",
     "userAndOthersAreTyping": "{username} e {count} outros estão a escrever…",
     "@userAndOthersAreTyping": {
         "type": "String",
@@ -1455,7 +1455,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Foi convidado por {user}",
+    "youInvitedBy": "Foi convidado por {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1481,7 +1481,7 @@
         "placeholders": {}
     },
     "appLockDescription": "Bloqueie a aplicação quando não a usa com um código pin",
-    "youKickedAndBanned": "🙅 Deu kick e baniu {user}",
+    "youKickedAndBanned": "Deu kick e baniu {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1615,7 +1615,7 @@
     "usersMustKnock": "Utilizadores têm que bater à porta",
     "whyIsThisMessageEncrypted": "Porque é que esta mensagem é ilegível?",
     "setChatDescription": "Definir descrição do chat",
-    "userLeftTheChat": "🚪 {username} saiu do chat",
+    "userLeftTheChat": "{username} saiu do chat",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1790,7 +1790,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Convidou {user}",
+    "youInvitedUser": "Convidou {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1896,7 +1896,7 @@
         "type": "String",
         "count": {}
     },
-    "hasKnocked": "🚪 {user} bateu à porta",
+    "hasKnocked": "{user} bateu à porta",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1976,7 +1976,7 @@
         }
     },
     "pleaseEnterANumber": "Por favor introduza um número maior que 0",
-    "youKicked": "👞 Deu kick a {user}",
+    "youKicked": "Deu kick a {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -2163,7 +2163,7 @@
         "placeholders": {}
     },
     "importNow": "Importar agora",
-    "noChatsFoundHere": "Não foi encontrado nenhum chat aqui. Comece um chat novo com alguém ao usar o botão abaixo. ⤵️",
+    "noChatsFoundHere": "Não foi encontrado nenhum chat aqui. Comece um chat novo com alguém ao usar o botão abaixo.",
     "changedTheChatName": "{username} mudou o nome do chat",
     "invite": "Convidar",
     "countInvited": "{count} convidados",
@@ -2200,7 +2200,7 @@
         }
     },
     "unsupportedAndroidVersionLong": "Esta funcionalidade requer uma versão de Android mais nova. Por favor verifique se há atualização ou suporter do Lineage OS.",
-    "inviteGroupChat": "📨 Convite para chat em grupo",
+    "inviteGroupChat": "Convite para chat em grupo",
     "storeSecurlyOnThisDevice": "Armazenado de forma segura neste dispositivo",
     "discardEdits": "Tem mudanças não guardadas. Descartar as suas edições?",
     "@discardEdits": {

@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} přijal/a pozvání",
+    "acceptedTheInvitation": "{username} přijal/a pozvání",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} aktivoval/a koncové šifrování",
+    "activatedEndToEndEncryption": "{username} aktivoval/a koncové šifrování",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -503,7 +503,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} založil/a chat",
+    "createdTheChat": "{username} založil/a chat",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -797,7 +797,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} pozval/a {targetName}",
+    "invitedUser": "{username} pozval/a {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -831,7 +831,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} se připojil/a do konverzace",
+    "joinedTheChat": "{username} se připojil/a do konverzace",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -845,7 +845,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} vyhodil/a {targetName}",
+    "kicked": "{username} vyhodil/a {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -971,7 +971,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Nová zpráva ve FluffyChatu",
+    "newMessageInFluffyChat": "Nová zpráva ve FluffyChatu",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -996,7 +996,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Nebyly nalezeny žádné emotikony. 😕",
+    "noEmotesFound": "Nebyly nalezeny žádné emotikony.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1958,7 +1958,7 @@
     "block": "Zablokovat",
     "blockListDescription": "Můžete blokovat uživatele, kteří vás obtěžují. Od uživatelů na vašem osobním seznamu blokovaných uživatelů nebudete moci přijímat žádné zprávy ani pozvánky do místnosti.",
     "blockedUsers": "Zablokování uživatelé",
-    "noChatsFoundHere": "Nejsou zde žádné konverzace. Začněte novou konverzaci s někým pomocí tlačítka níže. ⤵️",
+    "noChatsFoundHere": "Nejsou zde žádné konverzace. Začněte novou konverzaci s někým pomocí tlačítka níže.",
     "unread": "Nepřečtené",
     "space": "Prostor",
     "aboutHomeserver": "O {homeserver}",
@@ -1979,7 +1979,7 @@
             }
         }
     },
-    "hasKnocked": "🚪 {user} zaklepal",
+    "hasKnocked": "{user} zaklepal",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1994,10 +1994,10 @@
     "knock": "Zaklepat",
     "noBackupWarning": "Pozor! Bez povolení zálohování konverzací ztratíte přístup k zašifrovaným zprávám. Důrazně doporučujeme zálohování konverzací před odhlášením povolit.",
     "readUpToHere": "Čtěte až sem",
-    "reportErrorDescription": "😭 Ale ne, něco se porouchalo. Pokud chcete, můžete tento bug nahlásit vývojářům.",
+    "reportErrorDescription": "Ale ne, něco se porouchalo. Pokud chcete, můžete tento bug nahlásit vývojářům.",
     "report": "hlášení",
     "invite": "Pozvánka",
-    "inviteGroupChat": "📨 Skupinová pozvánka",
+    "inviteGroupChat": "Skupinová pozvánka",
     "noKeyForThisMessage": "K tomuto může dojít, pokud byla zpráva odeslána před přihlášením k účtu v tomto zařízení.\n\nJe také možné, že odesílatel zablokoval vaše zařízení nebo se něco pokazilo s internetovým připojením.\n\nJste schopni si zprávu přečíst v jiné relaci? Pak můžete zprávu přenést z něj! Přejděte do Nastavení > Zařízení a zkontrolujte, zda se Vaše zařízení vzájemně ověřila. Při příštím otevření místnosti, kdy budou obě relace v popředí, se klíče přenesou automaticky.\n\nNechcete klíče ztratit při odhlašování nebo přepínání zařízení? Ujistěte se, že jste v nastaveních povolili zálohování konverzací.",
     "invalidInput": "Nevhodný vstup!",
     "wrongPinEntered": "Nespravný PIN! Zkuste to znovu za {seconds} vteřin...",
@@ -2103,10 +2103,10 @@
     "sendReadReceiptsDescription": "Ostatní účastníci konverzace uvidí, že jste si přečetl/a jejich zprávu.",
     "formattedMessages": "Formátované zprávy",
     "formattedMessagesDescription": "Zobrazovat formátovaný obsah zpráv, jako například tučný text pomocí markdownu.",
-    "verifyOtherUser": "🔐 Ověřit jiného uživatele",
-    "verifyOtherUserDescription": "Když ověříte jiného uživatele, můžete si být jistí, že víte, s kým si píšete. 💪\n\nJakmile začnete s ověřením, vy a druhý uživatel uvidíte v aplikaci vyskakovací okno. V něm uvidíte sérii emodži nebo čísel, které musíte společně porovnat.\n\nNejjednodušší je setkat se osobně nebo si udělat videohovor. 👭",
-    "verifyOtherDevice": "🔐 Ověřit jiné zařízení",
-    "verifyOtherDeviceDescription": "Když ověříte jiné zařízení, tato zařízení si mohou vyměnit klíče, čímž zvýšíte vaše zabezpečení. 💪 Jakmile začnete s ověřením, v aplikaci na obou zařízeních se objeví vyskakovací okno. V něm uvidíte sérii emodži nebo čísel, které musíte na zařízeních porovnat mezi sebou. Než začnete s ověřováním, je fajn mít obě zařízení po ruce. 🤳",
+    "verifyOtherUser": "Ověřit jiného uživatele",
+    "verifyOtherUserDescription": "Když ověříte jiného uživatele, můžete si být jistí, že víte, s kým si píšete.\n\nJakmile začnete s ověřením, vy a druhý uživatel uvidíte v aplikaci vyskakovací okno. V něm uvidíte sérii emodži nebo čísel, které musíte společně porovnat.\n\nNejjednodušší je setkat se osobně nebo si udělat videohovor.",
+    "verifyOtherDevice": "Ověřit jiné zařízení",
+    "verifyOtherDeviceDescription": "Když ověříte jiné zařízení, tato zařízení si mohou vyměnit klíče, čímž zvýšíte vaše zabezpečení. Jakmile začnete s ověřením, v aplikaci na obou zařízeních se objeví vyskakovací okno. V něm uvidíte sérii emodži nebo čísel, které musíte na zařízeních porovnat mezi sebou. Než začnete s ověřováním, je fajn mít obě zařízení po ruce.",
     "acceptedKeyVerification": "{sender} přijal/a ověření klíče",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2194,7 +2194,7 @@
     "appWantsToUseForLoginDescription": "Pokračováním povolíte aplikaci a webové stránce sdílet mezi sebou informace o vás.",
     "open": "Otevřít",
     "waitingForServer": "Čekám na server...",
-    "newChatRequest": "📩 Nová žádost o konverzaci",
+    "newChatRequest": "Nová žádost o konverzaci",
     "generalNotificationSettings": "Obecné nastavení oznámení",
     "roomNotificationSettings": "Nastavení oznámení pro místnost",
     "userSpecificNotificationSettings": "Nastavení oznámení pro uživatele",
@@ -2225,7 +2225,7 @@
     "notificationRuleSuppressEditsDescription": "Ztlumí notifikace týkající se upravených zpráv.",
     "notificationRuleCall": "Hovor",
     "notificationRuleCallDescription": "Pošle uživateli oznámení ohledně hovorů.",
-    "sentVoiceMessage": "🎙️ {duration} - Hlasová zpráva od {sender}",
+    "sentVoiceMessage": "{duration} - Hlasová zpráva od {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

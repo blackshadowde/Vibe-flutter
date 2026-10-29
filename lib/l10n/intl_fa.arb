@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} دعوت را پذیرفت",
+    "acceptedTheInvitation": "{username} دعوت را پذیرفت",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -70,7 +70,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} رمزنگاری سراسری را فعال کرد",
+    "activatedEndToEndEncryption": "{username} رمزنگاری سراسری را فعال کرد",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -480,7 +480,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAPicture": "🖼️ {username} یک تصویر فرستاد",
+    "sentAPicture": "{username} یک تصویر فرستاد",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -489,7 +489,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} یک ویدئو فرستاد",
+    "sentAVideo": "{username} یک ویدئو فرستاد",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -517,7 +517,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} یک پرونده فرستاد",
+    "sentAFile": "{username} یک پرونده فرستاد",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -526,7 +526,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} یک صدا فرستاد",
+    "sentAnAudio": "{username} یک صدا فرستاد",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -561,7 +561,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} یک برچسب فرستاد",
+    "sentASticker": "{username} یک برچسب فرستاد",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -734,7 +734,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} چت را ساخت",
+    "createdTheChat": "{username} چت را ساخت",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -1009,7 +1009,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 پیام جدید در فلافی‌چت",
+    "newMessageInFluffyChat": "پیام جدید در فلافی‌چت",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -1135,7 +1135,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} کاربر {targetName} را بیرون کرد",
+    "kicked": "{username} کاربر {targetName} را بیرون کرد",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -1242,7 +1242,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} از {targetName} دعوت کرد",
+    "invitedUser": "{username} از {targetName} دعوت کرد",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -1254,7 +1254,7 @@
             }
         }
     },
-    "joinedTheChat": "👋 {username} به چت پیوست",
+    "joinedTheChat": "{username} به چت پیوست",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -1263,7 +1263,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} کاربر {targetName} را بیرون و محروم کرد",
+    "kickedAndBanned": "{username} کاربر {targetName} را بیرون و محروم کرد",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -1286,7 +1286,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "شکلکی پیدا نشد. 😕",
+    "noEmotesFound": "شکلکی پیدا نشد.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1707,7 +1707,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "youInvitedUser": "📩 شما {user} را دعوت کردید",
+    "youInvitedUser": "شما {user} را دعوت کردید",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1776,7 +1776,7 @@
             }
         }
     },
-    "userLeftTheChat": "👋 {username} چت را ترک کرد",
+    "userLeftTheChat": "{username} چت را ترک کرد",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1813,7 +1813,7 @@
     "openGallery": "بازکردن گالری",
     "removeFromSpace": "حذف از فضا",
     "confirmEventUnpin": "آیا از برداشتن سنجاق رویداد به صورت دائمی مطمئن هستید؟",
-    "youKickedAndBanned": "🙅 شما {user} را بیرون و محروم کردید",
+    "youKickedAndBanned": "شما {user} را بیرون و محروم کردید",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1832,7 +1832,7 @@
         "placeholders": {}
     },
     "youRejectedTheInvitation": "شما دعوت را رد کردید",
-    "youAcceptedTheInvitation": "👍 شما دعوت را پذیرفتید",
+    "youAcceptedTheInvitation": "شما دعوت را پذیرفتید",
     "videoCallsBetaWarning": "لطفا توجه داشته باشید که تماس‌های تصویری در حال حاضر آزمایشی هستند. ممکن است طبق انتظار کار نکنند یا روی همه پلتفرم‌ها اصلا کار نکنند.",
     "experimentalVideoCalls": "تماس‌های تصویری آزمایشی",
     "placeCall": "برقراری تماس",
@@ -1878,7 +1878,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 شما توسط {user} دعوت شده‌اید",
+    "youInvitedBy": "شما توسط {user} دعوت شده‌اید",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1886,7 +1886,7 @@
             }
         }
     },
-    "youKicked": "👞 شما {user} را بیرون کردید",
+    "youKicked": "شما {user} را بیرون کردید",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1919,7 +1919,7 @@
     "sendTypingNotifications": "فرستادن آگاه‌سازهای نوشتن",
     "swipeRightToLeftToReply": "کشیدن از راست به چپ برای پاسخ",
     "noMoreChatsFound": "چت دیگری پیدا نشد...",
-    "noChatsFoundHere": "اینجا هنوز چتی پیدا نشد. با استفاده از دکمه زیر چت جدیدی با کسی شروع کنید. ⤵️",
+    "noChatsFoundHere": "اینجا هنوز چتی پیدا نشد. با استفاده از دکمه زیر چت جدیدی با کسی شروع کنید.",
     "unread": "خوانده‌نشده",
     "space": "فضا",
     "checkList": "فهرست بررسی",
@@ -2002,7 +2002,7 @@
             }
         }
     },
-    "hasKnocked": "🚪 {user} در زده است",
+    "hasKnocked": "{user} در زده است",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2015,7 +2015,7 @@
     "knock": "در زدن",
     "setColorTheme": "تنظیم پوسته رنگی:",
     "invite": "دعوت",
-    "inviteGroupChat": "📨 دعوت به چت گروهی",
+    "inviteGroupChat": "دعوت به چت گروهی",
     "invalidInput": "ورودی نامعتبر!",
     "wrongPinEntered": "رمز کوتاه نادرست وارد شد! {seconds} ثانیه دیگر دوباره تلاش کنید...",
     "@wrongPinEntered": {
@@ -2120,10 +2120,10 @@
     "sendReadReceiptsDescription": "دیگر شرکت‌کنندگان در چت میتوانند ببینند که شما پیام را خوانده‌اید.",
     "formattedMessages": "پیام‌های قالب‌بندی‌شده",
     "formattedMessagesDescription": "نمایش محتوای پیام غنی مانند متن پررنگ با استفاده از مارک‌داون.",
-    "verifyOtherUser": "🔐 بازبینی کاربر دیگر",
-    "verifyOtherUserDescription": "اگر کاربر دیگری را بازبینی کنید، میتوانید مطمئن شوید که واقعاً با چه کسی در حال نوشتن هستید. 💪\n\nهنگام شروع بازبینی، شما و کاربر دیگر پنجره‌ای در برنامه خواهید دید. در آنجا مجموعه‌ای از شکلک‌ها یا اعداد را مشاهده میکنید که باید با یکدیگر مقایسه کنید.\n\nبهترین راه برای این کار دیدار حضوری یا شروع تماس تصویری است. 👭",
-    "verifyOtherDevice": "🔐 بازبینی دستگاه دیگر",
-    "verifyOtherDeviceDescription": "هنگام بازبینی دستگاه دیگر، آن دستگاه‌ها میتوانند کلیدها را تبادل کنند و امنیت کلی شما را افزایش دهند. 💪 هنگام شروع بازبینی، پنجره‌ای در برنامه روی هر دو دستگاه ظاهر میشود. در آنجا مجموعه‌ای از شکلک‌ها یا اعداد را مشاهده میکنید که باید با یکدیگر مقایسه کنید. بهتر است پیش از شروع بازبینی، هر دو دستگاه در دسترس باشند. 🤳",
+    "verifyOtherUser": "بازبینی کاربر دیگر",
+    "verifyOtherUserDescription": "اگر کاربر دیگری را بازبینی کنید، میتوانید مطمئن شوید که واقعاً با چه کسی در حال نوشتن هستید.\n\nهنگام شروع بازبینی، شما و کاربر دیگر پنجره‌ای در برنامه خواهید دید. در آنجا مجموعه‌ای از شکلک‌ها یا اعداد را مشاهده میکنید که باید با یکدیگر مقایسه کنید.\n\nبهترین راه برای این کار دیدار حضوری یا شروع تماس تصویری است.",
+    "verifyOtherDevice": "بازبینی دستگاه دیگر",
+    "verifyOtherDeviceDescription": "هنگام بازبینی دستگاه دیگر، آن دستگاه‌ها میتوانند کلیدها را تبادل کنند و امنیت کلی شما را افزایش دهند. هنگام شروع بازبینی، پنجره‌ای در برنامه روی هر دو دستگاه ظاهر میشود. در آنجا مجموعه‌ای از شکلک‌ها یا اعداد را مشاهده میکنید که باید با یکدیگر مقایسه کنید. بهتر است پیش از شروع بازبینی، هر دو دستگاه در دسترس باشند.",
     "acceptedKeyVerification": "{sender} بازبینی کلید را پذیرفت",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2242,7 +2242,7 @@
     "sendRoomNotifications": "فرستادن آگاه‌سازهای @room",
     "changeTheDescriptionOfTheGroup": "تغییر توضیح چت",
     "chatPermissionsDescription": "مشخص کنید کدام سطح دسترسی برای اقدامات خاصی در این چت لازم است. سطح‌های دسترسی ۰، ۵۰ و ۱۰۰ معمولاً نشان‌دهنده کاربران، ناظران و مدیران هستند، اما هر درجه‌بندی ممکن است.",
-    "updateInstalled": "🎉 به‌روزرسانی {version} نصب شد!",
+    "updateInstalled": "به‌روزرسانی {version} نصب شد!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2293,7 +2293,7 @@
     "appWantsToUseForLoginDescription": "شما بدین‌وسیله به برنامه و وبگاه اجازه میدهید اطلاعات شما را هم‌رسانی کنند.",
     "open": "باز کردن",
     "waitingForServer": "در انتظار سرور...",
-    "newChatRequest": "📩 درخواست چت جدید",
+    "newChatRequest": "درخواست چت جدید",
     "contentNotificationSettings": "تنظیمات آگاه‌ساز محتوا",
     "generalNotificationSettings": "تنظیمات آگاه‌ساز عمومی",
     "roomNotificationSettings": "تنظیمات آگاه‌ساز اتاق",
@@ -2348,7 +2348,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - پیام صوتی از {sender}",
+    "sentVoiceMessage": "{duration} - پیام صوتی از {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

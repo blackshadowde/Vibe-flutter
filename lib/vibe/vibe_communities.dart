@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:async';
@@ -791,7 +792,7 @@ class _VibeCommunityPaneState extends State<VibeCommunityPane> {
     );
     String? subtitle;
     if (local != null) {
-      subtitle = local.lastEvent?.calcLocalizedBodyFallback(
+      subtitle = local.lastEvent?.vibeBodyFallback(
         MatrixLocals(L10n.of(context)),
         hideReply: true,
         withSenderNamePrefix: true,

@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍{username}が招待を承諾しました",
+    "acceptedTheInvitation": "{username}が招待を承諾しました",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐{username}がエンドツーエンド暗号化を有効にしました",
+    "activatedEndToEndEncryption": "{username}がエンドツーエンド暗号化を有効にしました",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -400,7 +400,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username}がチャットを作成しました",
+    "createdTheChat": "{username}がチャットを作成しました",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -680,7 +680,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} が {targetName} を招待しました",
+    "invitedUser": "{username} が {targetName} を招待しました",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -714,7 +714,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} がチャットに参加しました",
+    "joinedTheChat": "{username} がチャットに参加しました",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -728,7 +728,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} は {targetName} をキックしました",
+    "kicked": "{username} は {targetName} をキックしました",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -740,7 +740,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} が {targetName} をキックしブロックしました",
+    "kickedAndBanned": "{username} が {targetName} をキックしブロックしました",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -844,7 +844,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 FluffyChatに新しいメッセージがあります",
+    "newMessageInFluffyChat": "FluffyChatに新しいメッセージがあります",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -869,7 +869,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Emoteは見つかりませんでした😕",
+    "noEmotesFound": "Emoteは見つかりませんでした",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1131,7 +1131,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username}はファイルを送信しました",
+    "sentAFile": "{username}はファイルを送信しました",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1140,7 +1140,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username}は音声を送信しました",
+    "sentAnAudio": "{username}は音声を送信しました",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1149,7 +1149,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username}は画像を送信しました",
+    "sentAPicture": "{username}は画像を送信しました",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1158,7 +1158,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username}はステッカーを送信しました",
+    "sentASticker": "{username}はステッカーを送信しました",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1167,7 +1167,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username}は動画を送信しました",
+    "sentAVideo": "{username}は動画を送信しました",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1352,7 +1352,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username}はチャットから退室しました",
+    "userLeftTheChat": "{username}はチャットから退室しました",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1652,7 +1652,7 @@
     "openGallery": "ギャラリーを開く",
     "removeFromSpace": "スペースから削除",
     "experimentalVideoCalls": "実験的なビデオ通話",
-    "youAcceptedTheInvitation": "👍 招待を承諾しました",
+    "youAcceptedTheInvitation": "招待を承諾しました",
     "youUnbannedUser": "{user} の禁止を解除しました",
     "@youUnbannedUser": {
         "placeholders": {
@@ -1661,7 +1661,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 {user} から招待されました",
+    "youInvitedBy": "{user} から招待されました",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1669,7 +1669,7 @@
             }
         }
     },
-    "youKicked": "👞 {user} をキックしました",
+    "youKicked": "{user} をキックしました",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1677,7 +1677,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 {user} をキックしてブロックしました",
+    "youKickedAndBanned": "{user} をキックしてブロックしました",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1711,7 +1711,7 @@
     "user": "ユーザー",
     "noBackupWarning": "警告！チャットのバックアップを有効にしないと、暗号化されたメッセージにアクセスできなくなります。ログアウトする前に、まずチャットのバックアップを有効にすることを強くお勧めします。",
     "disableEncryptionWarning": "セキュリティ上の理由から、以前は暗号化が有効だったチャットで暗号化を無効にすることはできません。",
-    "youInvitedUser": "📩 {user} を招待しました",
+    "youInvitedUser": "{user} を招待しました",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1947,7 +1947,7 @@
     "appLockDescription": "未使用時にアプリをPINコードでロック",
     "sendTypingNotifications": "入力通知を送信",
     "swipeRightToLeftToReply": "左にスワイプして返信",
-    "noChatsFoundHere": "ここにはまだチャットがありません。下のボタンを使ってみんなと新しいチャットを始めましょう。⤵️",
+    "noChatsFoundHere": "ここにはまだチャットがありません。下のボタンを使ってみんなと新しいチャットを始めましょう。",
     "commandHint_unban": "このルームから禁止されたユーザーを解禁する",
     "@commandHint_unban": {
         "type": "String",
@@ -1973,7 +1973,7 @@
     "optionalRedactReason": "（オプション）メッセージを削除する理由…",
     "passwordRecoverySettings": "パスワードの復元設定",
     "setChatDescription": "チャットの説明を設定",
-    "hasKnocked": "🚪 {user}がノックしました",
+    "hasKnocked": "{user}がノックしました",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2006,10 +2006,10 @@
     "readUpToHere": "ここまで既読です",
     "jump": "移動",
     "openLinkInBrowser": "リンクをブラウザで開く",
-    "reportErrorDescription": "😭 おっと。問題が発生しました。必要があれば、このバグを開発者に報告することができます。",
+    "reportErrorDescription": "おっと。問題が発生しました。必要があれば、このバグを開発者に報告することができます。",
     "setColorTheme": "カラーテーマの設定：",
     "invite": "招待",
-    "inviteGroupChat": "📨 グループチャットへ招待する",
+    "inviteGroupChat": "グループチャットへ招待する",
     "invalidInput": "無効な入力です！",
     "wrongPinEntered": "誤ったPINが入力されました！{seconds}秒後に再試行してください…",
     "@wrongPinEntered": {
@@ -2074,7 +2074,7 @@
     "inviteOtherUsers": "他のユーザーをこのチャットに招待する",
     "changeTheChatPermissions": "チャット権限を変更する",
     "changeTheDescriptionOfTheGroup": "チャットの説明を変更する",
-    "updateInstalled": "🎉 アップデート {version} をインストールしました！",
+    "updateInstalled": "アップデート {version} をインストールしました！",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2116,7 +2116,7 @@
     },
     "open": "開く",
     "waitingForServer": "サーバーを待機中…",
-    "newChatRequest": "📩 新しいチャットを要求",
+    "newChatRequest": "新しいチャットを要求",
     "contentNotificationSettings": "コンテンツ通知設定",
     "generalNotificationSettings": "全体通知設定",
     "roomNotificationSettings": "部屋通知設定",

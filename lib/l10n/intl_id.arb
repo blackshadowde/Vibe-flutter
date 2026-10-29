@@ -64,7 +64,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} menerima undangannya",
+    "acceptedTheInvitation": "{username} menerima undangannya",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -105,7 +105,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} mengundang {targetName}",
+    "invitedUser": "{username} mengundang {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -343,7 +343,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} membuat obrolan ini",
+    "createdTheChat": "{username} membuat obrolan ini",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -680,7 +680,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} mengaktifkan enkripsi ujung ke ujung",
+    "activatedEndToEndEncryption": "{username} mengaktifkan enkripsi ujung ke ujung",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -727,7 +727,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kickedAndBanned": "🙅 {username} mengeluarkan dan mencekal {targetName}",
+    "kickedAndBanned": "{username} mengeluarkan dan mencekal {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -739,7 +739,7 @@
             }
         }
     },
-    "kicked": "👞 {username} mengeluarkan {targetName}",
+    "kicked": "{username} mengeluarkan {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -756,7 +756,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} telah bergabung dengan obrolan",
+    "joinedTheChat": "{username} telah bergabung dengan obrolan",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -790,7 +790,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Tidak ada emote yang ditemukan. 😕",
+    "noEmotesFound": "Tidak ada emote yang ditemukan.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -805,7 +805,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Pesan baru di FluffyChat",
+    "newMessageInFluffyChat": "Pesan baru di FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -859,7 +859,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "userLeftTheChat": "🚪 {username} keluar dari obrolan",
+    "userLeftTheChat": "{username} keluar dari obrolan",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1216,7 +1216,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} mengirim video",
+    "sentAVideo": "{username} mengirim video",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1225,7 +1225,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} mengirim stiker",
+    "sentASticker": "{username} mengirim stiker",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1234,7 +1234,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} mengirim gambar",
+    "sentAPicture": "{username} mengirim gambar",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1243,7 +1243,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} mengirim suara",
+    "sentAnAudio": "{username} mengirim suara",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1252,7 +1252,7 @@
             }
         }
     },
-    "sentAFile": "📁 {username} mengirim file",
+    "sentAFile": "{username} mengirim file",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1745,7 +1745,7 @@
     "voiceCall": "Panggilan suara",
     "videoCallsBetaWarning": "Dicatat bahwa panggilan video sedang dalam beta. Fitur ini mungkin tidak berkerja dengan benar atau tidak berkerja sama sekali pada semua platform.",
     "experimentalVideoCalls": "Panggilan video eksperimental",
-    "youInvitedBy": "📩 Kamu telah diundang oleh {user}",
+    "youInvitedBy": "Kamu telah diundang oleh {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1753,7 +1753,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Kamu mengundang {user}",
+    "youInvitedUser": "Kamu mengundang {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1761,7 +1761,7 @@
             }
         }
     },
-    "youKicked": "👞 Kamu mengeluarkan {user}",
+    "youKicked": "Kamu mengeluarkan {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1769,7 +1769,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Kamu mengeluarkan dan mencekal {user}",
+    "youKickedAndBanned": "Kamu mengeluarkan dan mencekal {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1779,7 +1779,7 @@
     },
     "youRejectedTheInvitation": "Kamu menolak undangannya",
     "youJoinedTheChat": "Kamu bergabung ke obrolan",
-    "youAcceptedTheInvitation": "👍 Kamu menerima undangannya",
+    "youAcceptedTheInvitation": "Kamu menerima undangannya",
     "youBannedUser": "Kamu mencekal {user}",
     "@youBannedUser": {
         "placeholders": {
@@ -1898,7 +1898,7 @@
     "jump": "Lompat",
     "openLinkInBrowser": "Buka tautan dalam peramban",
     "report": "laporkan",
-    "reportErrorDescription": "😭 Aduh. Ada yang salah. Jika kamu mau, kamu bisa melaporkan kutu ini kepada para pengembang.",
+    "reportErrorDescription": "Aduh. Ada yang salah. Jika kamu mau, kamu bisa melaporkan kutu ini kepada para pengembang.",
     "notAnImage": "Bukan berkas gambar.",
     "importNow": "Impor sekarang",
     "importFromZipFile": "Impor dari berkas .zip",
@@ -1941,7 +1941,7 @@
     "setChatDescription": "Lihat deskripsi obrolan",
     "setColorTheme": "Atur tema warna:",
     "invite": "Undang",
-    "inviteGroupChat": "📨 Undangan percakapan grup",
+    "inviteGroupChat": "Undangan percakapan grup",
     "emoteKeyboardNoRecents": "Emote yang telah digunakan akan muncul di sini...",
     "@emoteKeyboardNoRecents": {
         "type": "String",
@@ -1963,7 +1963,7 @@
     "pushNotificationsNotAvailable": "Notifikasi dorongan tidak tersedia",
     "makeAdminDescription": "Setelah kamu membuat pengguna ini admin, kamu tidak akan dapat mengurungkan ini karena penggunanya akan memiliki perizinan yang sama seperti kamu.",
     "archiveRoomDescription": "Percakapan akan dipindahkan ke arsip. Pengguna lain akan melihat bahwa kamu telah meninggalkan percakapan.",
-    "hasKnocked": "🚪 {user} telah dikeluarkan",
+    "hasKnocked": "{user} telah dikeluarkan",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2008,7 +2008,7 @@
             }
         }
     },
-    "verifyOtherDevice": "🔐 Verifikasi perangkat lain",
+    "verifyOtherDevice": "Verifikasi perangkat lain",
     "requestedKeyVerification": "{sender} meminta verifikasi kunci",
     "@requestedKeyVerification": {
         "type": "String",
@@ -2045,7 +2045,7 @@
     "sendTypingNotificationsDescription": "Anggota lain dalam percakapan dapat melihat ketika kamu sedang mengetik sebuah pesan baru.",
     "sendReadReceipts": "Kirim laporan dibaca",
     "formattedMessages": "Pesan yang diformat",
-    "verifyOtherUser": "🔐 Verifikasi pengguna lain",
+    "verifyOtherUser": "Verifikasi pengguna lain",
     "sessionLostBody": "Sesimu hilang. Silakan laporkan kesalahan ini kepada pengembang di {url}. Pesan kesalahannya adalah: {error}",
     "@sessionLostBody": {
         "type": "String",
@@ -2099,8 +2099,8 @@
     "databaseMigrationBody": "Silakan tunggu. Ini dapat membutuhkan beberapa waktu.",
     "leaveEmptyToClearStatus": "Tinggalkan kosong untuk menghapus statusmu.",
     "initAppError": "Terjadi kesalahan saat init aplikasi",
-    "verifyOtherDeviceDescription": "Saat kamu memverifikasi perangkat lain, perangkat tersebut dapat bertukar kunci, sehingga meningkatkan keamananmu secara keseluruhan. 💪 Saat Anda memulai verifikasi, sebuah pemberitahuan akan muncul di aplikasi pada kedua perangkat. Di situ kemudian akan melihat serangkaian emoji atau angka yang harus dibandingkan satu sama lain. Sebaiknya siapkan kedua perangkat sebelum kamu memulai verifikasi. 🤳",
-    "verifyOtherUserDescription": "Jika kamu memverifikasi pengguna lain, kamu bisa yakin bahwa kamu tahu kepada siapa sebenarnya kamu menulis pesan kepadanya. 💪\n\nSaat kamu memulai verifikasi, kamu dan pengguna lain akan melihat pemberitahuan di aplikasi. Di sana kemudian akan melihat serangkaian emoji atau angka yang harus dibandingkan satu sama lain.\n\nCara terbaik untuk melakukannya adalah dengan bertemu secara langsung atau memulai panggilan video. 👭",
+    "verifyOtherDeviceDescription": "Saat kamu memverifikasi perangkat lain, perangkat tersebut dapat bertukar kunci, sehingga meningkatkan keamananmu secara keseluruhan. Saat Anda memulai verifikasi, sebuah pemberitahuan akan muncul di aplikasi pada kedua perangkat. Di situ kemudian akan melihat serangkaian emoji atau angka yang harus dibandingkan satu sama lain. Sebaiknya siapkan kedua perangkat sebelum kamu memulai verifikasi.",
+    "verifyOtherUserDescription": "Jika kamu memverifikasi pengguna lain, kamu bisa yakin bahwa kamu tahu kepada siapa sebenarnya kamu menulis pesan kepadanya.\n\nSaat kamu memulai verifikasi, kamu dan pengguna lain akan melihat pemberitahuan di aplikasi. Di sana kemudian akan melihat serangkaian emoji atau angka yang harus dibandingkan satu sama lain.\n\nCara terbaik untuk melakukannya adalah dengan bertemu secara langsung atau memulai panggilan video.",
     "commandHint_ignore": "Abaikan ID Matrix yang diberikan",
     "commandHint_unignore": "Batalkan pengabaian ID Matrix yang diberikan",
     "unreadChatsInApp": "{appname}: {unread} obrolan belum dibaca",
@@ -2161,7 +2161,7 @@
     },
     "files": "Berkas",
     "sendCanceled": "Pengiriman dibatalkan",
-    "noChatsFoundHere": "Belum ada chat di sini. Mulai chat baru dengan seseorang menggunakan tombol di bawah. ⤵️",
+    "noChatsFoundHere": "Belum ada chat di sini. Mulai chat baru dengan seseorang menggunakan tombol di bawah.",
     "markAsUnread": "Tandai sebagai belum dibaca",
     "goToSpace": "Pergi ke space: {space}",
     "@goToSpace": {
@@ -2208,7 +2208,7 @@
     "noMoreChatsFound": "Tidak ada chat lagi yang ditemukan...",
     "changelog": "Catatan perubahan",
     "sendRoomNotifications": "Kirim notifikasi @room",
-    "updateInstalled": "🎉 Pembaruan {version} terpasang!",
+    "updateInstalled": "Pembaruan {version} terpasang!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2315,7 +2315,7 @@
     },
     "deletePushRuleCanNotBeUndone": "Jika kamu menghapus pengaturan notifikasi ini, maka tidak dapat diurungkan.",
     "more": "Tambahan",
-    "newChatRequest": "📩 Permintaan pesan baru",
+    "newChatRequest": "Permintaan pesan baru",
     "allDevices": "Semua perangkat",
     "crossVerifiedDevices": "Perangkat terverifikasi silang",
     "waitingForServer": "Menunggu server...",
@@ -2355,7 +2355,7 @@
     "pleaseWaitUntilInvited": "Silakan menunggu sampai seseorang dari ruangan mengundang Anda.",
     "approve": "Terima",
     "youHaveKnocked": "Anda telah mengetuk",
-    "sentVoiceMessage": "🎙️ {duration} - Pesan suara dari {sender}",
+    "sentVoiceMessage": "{duration} - Pesan suara dari {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

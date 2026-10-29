@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/vibe/screens/chat_search/search_footer.dart';
 import 'package:vibe/utils/date_time_extension.dart';
@@ -127,7 +128,7 @@ class _MessageSearchResultListTile extends StatelessWidget {
         ),
         onOpen: (url) => UrlLauncher(context, url.url).launchUrl(),
         text: event
-            .calcLocalizedBodyFallback(
+            .vibeBodyFallback(
               plaintextBody: true,
               removeMarkdown: true,
               MatrixLocals(L10n.of(context)),

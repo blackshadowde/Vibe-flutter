@@ -1,6 +1,6 @@
 {
     "@@last_modified": "2021-08-14 12:41:09.826673",
-    "acceptedTheInvitation": "👍 {username} அழைப்பை ஏற்றுக்கொண்டது",
+    "acceptedTheInvitation": "{username} அழைப்பை ஏற்றுக்கொண்டது",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -164,7 +164,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kickedAndBanned": "🙅 {username} உதைத்து {targetName} ஐத் தடை செய்தார்",
+    "kickedAndBanned": "{username} உதைத்து {targetName} ஐத் தடை செய்தார்",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -193,7 +193,7 @@
         "placeholders": {}
     },
     "voiceCall": "குரல் அழைப்பு",
-    "youKickedAndBanned": "🙅 நீங்கள் உதைத்து தடைசெய்துள்ளீர்கள் {user}",
+    "youKickedAndBanned": "நீங்கள் உதைத்து தடைசெய்துள்ளீர்கள் {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -201,7 +201,7 @@
             }
         }
     },
-    "youKicked": "👞 {user}ஐ உதைத்துள்ளீர்கள்",
+    "youKicked": "{user}ஐ உதைத்துள்ளீர்கள்",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -436,7 +436,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} அரட்டையில் சேர்ந்தார்",
+    "joinedTheChat": "{username} அரட்டையில் சேர்ந்தார்",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -450,7 +450,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "உணர்ச்சிகள் எதுவும் காணப்படவில்லை. 😕",
+    "noEmotesFound": "உணர்ச்சிகள் எதுவும் காணப்படவில்லை.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -497,7 +497,7 @@
         "placeholders": {}
     },
     "report": "அறிக்கை",
-    "verifyOtherDevice": "🔐 பிற சாதனத்தை சரிபார்",
+    "verifyOtherDevice": "பிற சாதனத்தை சரிபார்",
     "startedACall": "{senderName} அழைப்பைத் தொடங்கினார்",
     "@startedACall": {
         "type": "String",
@@ -580,7 +580,7 @@
         "placeholders": {}
     },
     "messageInfo": "செய்தி தகவல்",
-    "sentAFile": "📁 {username} கோப்பை அனுப்பியுள்ளார்",
+    "sentAFile": "{username} கோப்பை அனுப்பியுள்ளார்",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -750,7 +750,7 @@
         }
     },
     "openLinkInBrowser": "உலாவியில் திறந்த இணைப்பை திறக்கவும்",
-    "reportErrorDescription": "😭 ஓ இல்லை. ஏதோ தவறு நடந்தது. நீங்கள் விரும்பினால், இந்த பிழையை டெவலப்பர்களிடம் புகாரளிக்கலாம்.",
+    "reportErrorDescription": "ஓ இல்லை. ஏதோ தவறு நடந்தது. நீங்கள் விரும்பினால், இந்த பிழையை டெவலப்பர்களிடம் புகாரளிக்கலாம்.",
     "invite": "அழைக்கவும்",
     "wrongPinEntered": "தவறான முள் நுழைந்தது! {seconds} விநாடிகளில் மீண்டும் முயற்சிக்கவும் ...",
     "@wrongPinEntered": {
@@ -926,7 +926,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} {targetName} ஐ உதைத்தார்",
+    "kicked": "{username} {targetName} ஐ உதைத்தார்",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -1066,7 +1066,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAnAudio": "🎤 {username} ஆடியோவை அனுப்பியுள்ளார்",
+    "sentAnAudio": "{username} ஆடியோவை அனுப்பியுள்ளார்",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1075,7 +1075,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} படத்தை அனுப்பியுள்ளார்",
+    "sentAPicture": "{username} படத்தை அனுப்பியுள்ளார்",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1084,7 +1084,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} ஒரு வீடியோவை அனுப்பியுள்ளார்",
+    "sentAVideo": "{username} ஒரு வீடியோவை அனுப்பியுள்ளார்",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1222,7 +1222,7 @@
             }
         }
     },
-    "noChatsFoundHere": "இங்கே அரட்டைகள் எதுவும் காணப்படவில்லை. கீழே உள்ள பொத்தானைப் பயன்படுத்தி ஒருவருடன் புதிய அரட்டையைத் தொடங்கவும். ⤵️",
+    "noChatsFoundHere": "இங்கே அரட்டைகள் எதுவும் காணப்படவில்லை. கீழே உள்ள பொத்தானைப் பயன்படுத்தி ஒருவருடன் புதிய அரட்டையைத் தொடங்கவும்.",
     "space": "இடைவெளி",
     "banned": "தடைசெய்யப்பட்டது",
     "@banned": {
@@ -1331,7 +1331,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} அரட்டையை உருவாக்கினார்",
+    "createdTheChat": "{username} அரட்டையை உருவாக்கினார்",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -1472,7 +1472,7 @@
     "noChatDescriptionYet": "அரட்டை விளக்கம் இதுவரை உருவாக்கப்படவில்லை.",
     "invalidServerName": "தவறான சேவையக பெயர்",
     "redactMessageDescription": "இந்த உரையாடலில் பங்கேற்பாளர்கள் அனைவருக்கும் செய்தி திருத்தப்படும். இதை செயல்தவிர்க்க முடியாது.",
-    "invitedUser": "📩 {username} {targetName} அழைக்கப்பட்டார்",
+    "invitedUser": "{username} {targetName} அழைக்கப்பட்டார்",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -1668,7 +1668,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentASticker": "😊 {username} ஒரு ச்டிக்கரை அனுப்பியது",
+    "sentASticker": "{username} ஒரு ச்டிக்கரை அனுப்பியது",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1804,7 +1804,7 @@
     "removeFromSpace": "இடத்திலிருந்து அகற்று",
     "confirmEventUnpin": "நிகழ்வை நிரந்தரமாக அவிழ்ப்பது உறுதி?",
     "youJoinedTheChat": "நீங்கள் அரட்டையில் சேர்ந்தீர்கள்",
-    "youAcceptedTheInvitation": "👍 நீங்கள் அழைப்பை ஏற்றுக்கொண்டீர்கள்",
+    "youAcceptedTheInvitation": "நீங்கள் அழைப்பை ஏற்றுக்கொண்டீர்கள்",
     "youBannedUser": "நீங்கள் {user} தடை செய்தீர்கள்",
     "@youBannedUser": {
         "placeholders": {
@@ -1821,7 +1821,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 நீங்கள் {user} ஆல் அழைக்கப்பட்டுள்ளீர்கள்",
+    "youInvitedBy": "நீங்கள் {user} ஆல் அழைக்கப்பட்டுள்ளீர்கள்",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1829,7 +1829,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 {user} ஐ அழைத்தீர்கள்",
+    "youInvitedUser": "{user} ஐ அழைத்தீர்கள்",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1845,7 +1845,7 @@
             }
         }
     },
-    "hasKnocked": "🚪 {user} தட்டியது",
+    "hasKnocked": "{user} தட்டியது",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1890,7 +1890,7 @@
             }
         }
     },
-    "inviteGroupChat": "📨 குழு அரட்டை அழைப்பு",
+    "inviteGroupChat": "குழு அரட்டை அழைப்பு",
     "invalidInput": "தவறான உள்ளீடு!",
     "archiveRoomDescription": "அரட்டை காப்பகத்திற்கு நகர்த்தப்படும். மற்ற பயனர்கள் நீங்கள் அரட்டையை விட்டுவிட்டீர்கள் என்பதைக் காண முடியும்.",
     "removeDevicesDescription": "நீங்கள் இந்த சாதனத்திலிருந்து வெளியேறுவீர்கள், இனி செய்திகளைப் பெற முடியாது.",
@@ -1925,9 +1925,9 @@
     "sendTypingNotificationsDescription": "அரட்டையில் பங்கேற்பாளர்கள் நீங்கள் ஒரு புதிய செய்தியைத் தட்டச்சு செய்யும் போது காணலாம்.",
     "sendReadReceiptsDescription": "அரட்டையில் பங்கேற்பாளர்கள் நீங்கள் ஒரு செய்தியைப் படிக்கும்போது பார்க்கலாம்.",
     "formattedMessagesDescription": "மார்க் டவுனைப் பயன்படுத்தி தைரியமான உரை போன்ற பணக்கார செய்தி உள்ளடக்கத்தைக் காண்பி.",
-    "verifyOtherUser": "🔐 மற்ற பயனரை சரிபார்",
-    "verifyOtherUserDescription": "நீங்கள் மற்றொரு பயனரைச் சரிபார்த்தால், நீங்கள் உண்மையில் யாருக்கு எழுதுகிறீர்கள் என்பது உங்களுக்குத் தெரியும் என்பதை நீங்கள் உறுதியாக நம்பலாம். 💪\n\nநீங்கள் ஒரு சரிபார்ப்பைத் தொடங்கும்போது, நீங்களும் மற்ற பயனரும் பயன்பாட்டில் ஒரு பாப்அப்பைக் காண்பீர்கள். நீங்கள் ஒருவருக்கொருவர் ஒப்பிட வேண்டிய தொடர்ச்சியான ஈமோசிகள் அல்லது எண்களைக் காண்பீர்கள்.\n\nஇதைச் செய்வதற்கான சிறந்த வழி வீடியோ அழைப்பைச் சந்திப்பது அல்லது தொடங்குவது. 👭",
-    "verifyOtherDeviceDescription": "நீங்கள் மற்றொரு சாதனத்தைச் சரிபார்க்கும்போது, அந்தச் சாதனங்கள் விசைகளைப் பரிமாறிக்கொள்ளலாம், உங்கள் ஒட்டுமொத்த பாதுகாப்பை அதிகரிக்கும். 💪 நீங்கள் ஒரு சரிபார்ப்பைத் தொடங்கும்போது, இரண்டு சாதனங்களிலும் பயன்பாட்டில் ஒரு பாப்அப் தோன்றும். நீங்கள் ஒருவருக்கொருவர் ஒப்பிட வேண்டிய தொடர்ச்சியான ஈமோசிகள் அல்லது எண்களைக் காண்பீர்கள். நீங்கள் சரிபார்ப்பைத் தொடங்குவதற்கு முன்பு இரண்டு சாதனங்களையும் எளிதில் வைத்திருப்பது நல்லது. 🤳",
+    "verifyOtherUser": "மற்ற பயனரை சரிபார்",
+    "verifyOtherUserDescription": "நீங்கள் மற்றொரு பயனரைச் சரிபார்த்தால், நீங்கள் உண்மையில் யாருக்கு எழுதுகிறீர்கள் என்பது உங்களுக்குத் தெரியும் என்பதை நீங்கள் உறுதியாக நம்பலாம்.\n\nநீங்கள் ஒரு சரிபார்ப்பைத் தொடங்கும்போது, நீங்களும் மற்ற பயனரும் பயன்பாட்டில் ஒரு பாப்அப்பைக் காண்பீர்கள். நீங்கள் ஒருவருக்கொருவர் ஒப்பிட வேண்டிய தொடர்ச்சியான ஈமோசிகள் அல்லது எண்களைக் காண்பீர்கள்.\n\nஇதைச் செய்வதற்கான சிறந்த வழி வீடியோ அழைப்பைச் சந்திப்பது அல்லது தொடங்குவது.",
+    "verifyOtherDeviceDescription": "நீங்கள் மற்றொரு சாதனத்தைச் சரிபார்க்கும்போது, அந்தச் சாதனங்கள் விசைகளைப் பரிமாறிக்கொள்ளலாம், உங்கள் ஒட்டுமொத்த பாதுகாப்பை அதிகரிக்கும். நீங்கள் ஒரு சரிபார்ப்பைத் தொடங்கும்போது, இரண்டு சாதனங்களிலும் பயன்பாட்டில் ஒரு பாப்அப் தோன்றும். நீங்கள் ஒருவருக்கொருவர் ஒப்பிட வேண்டிய தொடர்ச்சியான ஈமோசிகள் அல்லது எண்களைக் காண்பீர்கள். நீங்கள் சரிபார்ப்பைத் தொடங்குவதற்கு முன்பு இரண்டு சாதனங்களையும் எளிதில் வைத்திருப்பது நல்லது.",
     "canceledKeyVerification": "{sender} ரத்து செய்யப்பட்ட விசை சரிபார்ப்பு",
     "@canceledKeyVerification": {
         "type": "String",
@@ -1999,7 +1999,7 @@
     "changeTheCanonicalRoomAlias": "முக்கிய பொது அரட்டை முகவரியை மாற்றவும்",
     "changeTheDescriptionOfTheGroup": "அரட்டையின் விளக்கத்தை மாற்றவும்",
     "chatPermissionsDescription": "இந்த அரட்டையில் சில செயல்களுக்கு எந்த ஆற்றல் நிலை தேவை என்பதை வரையறுக்கவும். 0, 50 மற்றும் 100 ஆற்றல் நிலைகள் பொதுவாக பயனர்கள், மதிப்பீட்டாளர்கள் மற்றும் நிர்வாகிகளைக் குறிக்கின்றன, ஆனால் எந்த தரமும் சாத்தியமாகும்.",
-    "updateInstalled": "🎉 புதுப்பிப்பு {version} நிறுவப்பட்டது!",
+    "updateInstalled": "புதுப்பிப்பு {version} நிறுவப்பட்டது!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2077,7 +2077,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} அரட்டையை விட்டு வெளியேறினார்",
+    "userLeftTheChat": "{username} அரட்டையை விட்டு வெளியேறினார்",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -2287,7 +2287,7 @@
     "appWantsToUseForLoginDescription": "உங்களைப் பற்றிய தகவல்களைப் பகிர பயன்பாடு மற்றும் வலைத்தளத்தை இதன்மூலம் அனுமதிக்கிறீர்கள்.",
     "open": "திற",
     "waitingForServer": "சேவையகத்திற்காக காத்திருக்கிறது ...",
-    "newChatRequest": "📩 புதிய அரட்டை கோரிக்கை",
+    "newChatRequest": "புதிய அரட்டை கோரிக்கை",
     "contentNotificationSettings": "உள்ளடக்க அறிவிப்பு அமைப்புகள்",
     "generalNotificationSettings": "பொது அறிவிப்பு அமைப்புகள்",
     "roomNotificationSettings": "அறை அறிவிப்பு அமைப்புகள்",
@@ -2342,7 +2342,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️{duration} - {sender} இலிருந்து குரல் செய்தி",
+    "sentVoiceMessage": "{duration} - {sender} இலிருந்து குரல் செய்தி",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

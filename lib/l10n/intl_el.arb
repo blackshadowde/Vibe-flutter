@@ -101,7 +101,7 @@
         "placeholder": {}
     },
     "repeatPassword": "Επανάληψη κωδικού πρόσβασης",
-    "acceptedTheInvitation": "👍 {username} αποδέχτηκε την πρόσκληση",
+    "acceptedTheInvitation": "{username} αποδέχτηκε την πρόσκληση",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -132,7 +132,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} ενεργοποίησε την κρυπτογράφηση από άκρο σε άκρο",
+    "activatedEndToEndEncryption": "{username} ενεργοποίησε την κρυπτογράφηση από άκρο σε άκρο",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -236,7 +236,7 @@
     "appLockDescription": "Κλείδωμα εφαρμογής όταν δεν χρησιμοποιείται με κωδικό PIN",
     "swipeRightToLeftToReply": "Σύρσιμο δεξιά προς αριστερά για απάντηση",
     "noMoreChatsFound": "Δεν βρέθηκαν άλλες συνομιλίες...",
-    "noChatsFoundHere": "Δεν υπάρχουν συνομιλίες ακόμα. Ξεκίνα μια νέα συνομιλία με κάποιον χρησιμοποιώντας το κουμπί παρακάτω. ⤵️",
+    "noChatsFoundHere": "Δεν υπάρχουν συνομιλίες ακόμα. Ξεκίνα μια νέα συνομιλία με κάποιον χρησιμοποιώντας το κουμπί παρακάτω.",
     "unread": "Μη αναγνωσμένα",
     "space": "Χώρος",
     "changeDeviceName": "Αλλαγή ονόματος συσκευής",

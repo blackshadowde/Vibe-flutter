@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} принял(а) приглашение",
+    "acceptedTheInvitation": "{username} принял(а) приглашение",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} активировал(а) сквозное шифрование",
+    "activatedEndToEndEncryption": "{username} активировал(а) сквозное шифрование",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -503,7 +503,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} создал(а) чат",
+    "createdTheChat": "{username} создал(а) чат",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -797,7 +797,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} пригласил(а) {targetName}",
+    "invitedUser": "{username} пригласил(а) {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -831,7 +831,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} присоединился(ась) к чату",
+    "joinedTheChat": "{username} присоединился(ась) к чату",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -845,7 +845,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} выгнал(а) {targetName}",
+    "kicked": "{username} выгнал(а) {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -857,7 +857,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} выгнал(а) и заблокировал(а) {targetName}",
+    "kickedAndBanned": "{username} выгнал(а) и заблокировал(а) {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -962,7 +962,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Новое сообщение во FluffyChat",
+    "newMessageInFluffyChat": "Новое сообщение во FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -987,7 +987,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Эмодзи не найдены 😕",
+    "noEmotesFound": "Эмодзи не найдены",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1295,7 +1295,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} отправил(а) файл",
+    "sentAFile": "{username} отправил(а) файл",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1304,7 +1304,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} отправил(а) аудио",
+    "sentAnAudio": "{username} отправил(а) аудио",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1313,7 +1313,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} отправил(а) изображение",
+    "sentAPicture": "{username} отправил(а) изображение",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1322,7 +1322,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} отправил(а) стикер",
+    "sentASticker": "{username} отправил(а) стикер",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1331,7 +1331,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} отправил(а) видео",
+    "sentAVideo": "{username} отправил(а) видео",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1536,7 +1536,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} покинул(а) чат",
+    "userLeftTheChat": "{username} покинул(а) чат",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1738,7 +1738,7 @@
     "pinMessage": "Прикрепить к комнате",
     "confirmEventUnpin": "Вы уверены, что хотите навсегда открепить событие?",
     "youRejectedTheInvitation": "Вы отклонили приглашение",
-    "youAcceptedTheInvitation": "👍 Вы приняли приглашение",
+    "youAcceptedTheInvitation": "Вы приняли приглашение",
     "youUnbannedUser": "Вы разблокировали {user}",
     "@youUnbannedUser": {
         "placeholders": {
@@ -1748,7 +1748,7 @@
         }
     },
     "youJoinedTheChat": "Вы присоединились к чату",
-    "youKickedAndBanned": "🙅 Вы выгнали и заблокировали {user}",
+    "youKickedAndBanned": "Вы выгнали и заблокировали {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1756,7 +1756,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Вы пригласили {user}",
+    "youInvitedUser": "Вы пригласили {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1764,7 +1764,7 @@
             }
         }
     },
-    "youKicked": "👞 Вы выгнали {user}",
+    "youKicked": "Вы выгнали {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1788,7 +1788,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Вы были приглашены {user}",
+    "youInvitedBy": "Вы были приглашены {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1859,7 +1859,7 @@
     "disableEncryptionWarning": "В целях безопасности Вы не можете отключить шифрование в чате, где оно было включено.",
     "noBackupWarning": "Внимание! Без резервного копиирования, Вы потеряете доступ к своим зашифрованным сообщениям. Крайне рекомендуется включить резервное копирование перед выходом.",
     "noOtherDevicesFound": "Другие устройства не найдены",
-    "reportErrorDescription": "😭 О, нет. Что-то пошло не так. При желании вы можете сообщить об этой ошибке разработчикам.",
+    "reportErrorDescription": "О, нет. Что-то пошло не так. При желании вы можете сообщить об этой ошибке разработчикам.",
     "report": "пожаловаться",
     "jumpToLastReadMessage": "Последнее прочитанное сообщение",
     "wasDirectChatDisplayName": "Пустой чат (был {oldDisplayName})",
@@ -1925,7 +1925,7 @@
     "setChatDescription": "Установить описание чата",
     "setColorTheme": "Цветовая тема:",
     "invite": "Пригласить",
-    "inviteGroupChat": "📨 Вас пригласили в групповой чат",
+    "inviteGroupChat": "Вас пригласили в групповой чат",
     "invalidInput": "Недопустимый ввод!",
     "wrongPinEntered": "Wrong pin entered! Try again in {seconds} seconds...",
     "@wrongPinEntered": {
@@ -1947,7 +1947,7 @@
     "pushNotificationsNotAvailable": "Push-уведомления недоступны",
     "makeAdminDescription": "Как только вы назначите этого пользователя администратором, вы не сможете этого отменить, так как их права доступа и ваши будут одинаковы.",
     "archiveRoomDescription": "Чат переместится в архив. Другим пользователям будет видно, что вы вышли из чата.",
-    "hasKnocked": "🚪 {user} постучался",
+    "hasKnocked": "{user} постучался",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2020,11 +2020,11 @@
     },
     "addChatOrSubSpace": "Добавить чат или субпространство",
     "sendReadReceipts": "Отправка квитанций о прочтении",
-    "verifyOtherUser": "🔐 Подтвердить другого пользователя",
-    "verifyOtherDevice": "🔐 Подтвердить другое устройство",
+    "verifyOtherUser": "Подтвердить другого пользователя",
+    "verifyOtherDevice": "Подтвердить другое устройство",
     "sendReadReceiptsDescription": "Другие участники чата могут видеть, когда вы прочитали сообщение.",
-    "verifyOtherUserDescription": "Если вы подтвердите другого пользователя, то вы можете быть уверены зная, кому вы действительно пишете. 💪\n\nКогда вы начинаете подтверждение, вы и другой пользователь увидите всплывающее окно в приложении. Там вы увидите ряд чисел или эмодзи, которые вы должны сравнить друг с другом.\n\nЛучший способ сделать это - встретиться в реальной жизни или по видео звонку. 👭",
-    "verifyOtherDeviceDescription": "При подтверждении другого устройства эти устройства могут обмениваться ключами, повышая общую безопасность. 💪 При запуске подтверждения в приложении на обоих устройствах появится всплывающее окно. Там вы увидите ряд чисел или эмодзи, которые вы должны сравнить друг с другом. Лучше иметь оба устройства под рукой перед началом проверки. 🤳",
+    "verifyOtherUserDescription": "Если вы подтвердите другого пользователя, то вы можете быть уверены зная, кому вы действительно пишете.\n\nКогда вы начинаете подтверждение, вы и другой пользователь увидите всплывающее окно в приложении. Там вы увидите ряд чисел или эмодзи, которые вы должны сравнить друг с другом.\n\nЛучший способ сделать это - встретиться в реальной жизни или по видео звонку.",
+    "verifyOtherDeviceDescription": "При подтверждении другого устройства эти устройства могут обмениваться ключами, повышая общую безопасность. При запуске подтверждения в приложении на обоих устройствах появится всплывающее окно. Там вы увидите ряд чисел или эмодзи, которые вы должны сравнить друг с другом. Лучше иметь оба устройства под рукой перед началом проверки.",
     "formattedMessagesDescription": "Отображать содержимое расширенных сообщений, такой как жирный текст, с помощью Markdown.",
     "acceptedKeyVerification": "{sender} принял(а) подтверждение ключей",
     "@acceptedKeyVerification": {
@@ -2168,8 +2168,8 @@
         "space": {}
     },
     "sendCanceled": "Отправка отменена",
-    "noChatsFoundHere": "Не было найдено ни одного чата. Начать с кем-нибудь новый чат можно, нажав кнопку ниже. ⤵️",
-    "updateInstalled": "🎉 Обновление {version} успешно установлено!",
+    "noChatsFoundHere": "Не было найдено ни одного чата. Начать с кем-нибудь новый чат можно, нажав кнопку ниже.",
+    "updateInstalled": "Обновление {version} успешно установлено!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2229,7 +2229,7 @@
     "compress": "Сжатие",
     "notificationRuleMessage": "Сообщение",
     "appWantsToUseForLoginDescription": "Вы позволяете приложению и веб-сайту делиться информацией о вас.",
-    "newChatRequest": "📩 Запрос нового чата",
+    "newChatRequest": "Запрос нового чата",
     "allDevices": "Все устройства",
     "roomNotificationSettings": "Настройки уведомлений комнаты",
     "notificationRuleContainsUserName": "Содержит имя пользователя",
@@ -2314,7 +2314,7 @@
     "notificationRuleJitsiDescription": "Уведомляет пользователя о событиях виджета Jitsi.",
     "notificationRuleServerAcl": "Запретить события ACL сервера",
     "notificationRuleServerAclDescription": "Удаляет уведомления о событиях ACL сервера.",
-    "sentVoiceMessage": "️🎙️ {duration} - Голосовое сообщение от {sender}",
+    "sentVoiceMessage": "️ {duration} - Голосовое сообщение от {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

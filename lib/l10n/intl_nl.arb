@@ -10,7 +10,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} heeft de uitnodiging geaccepteerd",
+    "acceptedTheInvitation": "{username} heeft de uitnodiging geaccepteerd",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -24,7 +24,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} heeft eind-tot-eindversleuteling geactiveerd",
+    "activatedEndToEndEncryption": "{username} heeft eind-tot-eindversleuteling geactiveerd",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -503,7 +503,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} heeft de chat gemaakt",
+    "createdTheChat": "{username} heeft de chat gemaakt",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -797,7 +797,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} heeft {targetName} uitgenodigd",
+    "invitedUser": "{username} heeft {targetName} uitgenodigd",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -831,7 +831,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} is toegetreden tot de chat",
+    "joinedTheChat": "{username} is toegetreden tot de chat",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -845,7 +845,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} heeft {targetName} verwijderd",
+    "kicked": "{username} heeft {targetName} verwijderd",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -857,7 +857,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} heeft {targetName} verwijderd en verbannen",
+    "kickedAndBanned": "{username} heeft {targetName} verwijderd en verbannen",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -971,7 +971,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Nieuw bericht in FluffyChat",
+    "newMessageInFluffyChat": "Nieuw bericht in FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -996,7 +996,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Geen emoticons gevonden. 😕",
+    "noEmotesFound": "Geen emoticons gevonden.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1304,7 +1304,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} heeft een bestand verzonden",
+    "sentAFile": "{username} heeft een bestand verzonden",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1313,7 +1313,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} heeft een audio verzonden",
+    "sentAnAudio": "{username} heeft een audio verzonden",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1322,7 +1322,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} heeft een afbeelding verzonden",
+    "sentAPicture": "{username} heeft een afbeelding verzonden",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1331,7 +1331,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} heeft een sticker verzonden",
+    "sentASticker": "{username} heeft een sticker verzonden",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1340,7 +1340,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} heeft een video verzonden",
+    "sentAVideo": "{username} heeft een video verzonden",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1545,7 +1545,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} is vertrokken uit de chat",
+    "userLeftTheChat": "{username} is vertrokken uit de chat",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1745,7 +1745,7 @@
     "voiceCall": "Spraakgesprek",
     "confirmEventUnpin": "Weet je zeker dat je de gebeurtenis definitief wilt losmaken?",
     "experimentalVideoCalls": "Videogesprekken (experimenteel)",
-    "youAcceptedTheInvitation": "👍 Je hebt de uitnodiging geaccepteerd",
+    "youAcceptedTheInvitation": "Je hebt de uitnodiging geaccepteerd",
     "youRejectedTheInvitation": "Je hebt de uitnodiging afgewezen",
     "youJoinedTheChat": "Je bent toegetreden tot de chat",
     "youBannedUser": "Je hebt {user} verbannen",
@@ -1764,7 +1764,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Je bent uitgenodigd door {user}",
+    "youInvitedBy": "Je bent uitgenodigd door {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1772,7 +1772,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Je hebt {user} uitgenodigd",
+    "youInvitedUser": "Je hebt {user} uitgenodigd",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1780,7 +1780,7 @@
             }
         }
     },
-    "youKicked": "👞 Je hebt {user} weggestuurd",
+    "youKicked": "Je hebt {user} weggestuurd",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1788,7 +1788,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Je hebt weggestuurd en verbannen {user}",
+    "youKickedAndBanned": "Je hebt weggestuurd en verbannen {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1904,7 +1904,7 @@
     "exportEmotePack": "Emote-pakket als zip exporteren",
     "replace": "Vervang",
     "report": "Rapporteer",
-    "reportErrorDescription": "😭 Oh nee. Er is iets misgegaan. Probeer het later nog eens. Als je wilt, kun je de bug rapporteren aan de ontwikkelaars.",
+    "reportErrorDescription": "Oh nee. Er is iets misgegaan. Probeer het later nog eens. Als je wilt, kun je de bug rapporteren aan de ontwikkelaars.",
     "sendTypingNotifications": "Toon 'aan het typen'-meldingen",
     "chatPermissions": "Chatrechten",
     "chatDescription": "Onderwerp",
@@ -1941,7 +1941,7 @@
     "setChatDescription": "Onderwerp instellen",
     "setColorTheme": "Kleurthema instellen:",
     "invite": "Uitnodigen",
-    "inviteGroupChat": "📨 Groeps-chat uitnodiging",
+    "inviteGroupChat": "Groeps-chat uitnodiging",
     "emoteKeyboardNoRecents": "Recent gebruikte emoticons zullen hier verschijnen...",
     "@emoteKeyboardNoRecents": {
         "type": "String",
@@ -1963,7 +1963,7 @@
     "pushNotificationsNotAvailable": "Pushmeldingen zijn niet beschikbaar",
     "makeAdminDescription": "Wanneer je deze persoon beheerder maakt kun je dit niet ongedaan maken als jullie dezelfde rechten hebben.",
     "archiveRoomDescription": "De chat zal naar het archief worden verplaatst. Andere personen zullen in staat zijn te zien dat je de chat hebt verlaten.",
-    "hasKnocked": "🚪 {user} heeft geklopt",
+    "hasKnocked": "{user} heeft geklopt",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2069,7 +2069,7 @@
     "incomingMessages": "Inkomende berichten",
     "discover": "Ontdek",
     "commandHint_ignore": "Negeer de gegeven Matrix-ID",
-    "noChatsFoundHere": "Hier zijn nog geen chats. Begin een nieuwe chat met iemand door op de onderstaande knop te klikken. ⤵️",
+    "noChatsFoundHere": "Hier zijn nog geen chats. Begin een nieuwe chat met iemand door op de onderstaande knop te klikken.",
     "unableToJoinChat": "Kan niet toetreden tot de chat. Misschien heeft de andere partij het gesprek al afgesloten.",
     "aboutHomeserver": "Over {homeserver}",
     "@aboutHomeserver": {
@@ -2177,7 +2177,7 @@
     "sendTypingNotificationsDescription": "Andere deelnemers in de chat kunnen zien wanneer je een bericht aan het typen bent.",
     "sendCanceled": "Versturen geannuleerd",
     "opacity": "Doorzichtigheid:",
-    "verifyOtherUserDescription": "Als je een persoon verifieert ben je er zeker van dat je echt met haar contact hebt. 💪\n\nWanneer je een verificatie start ziet de persoon een popup in de app. Hier staat een serie van emoji's of getallen die je met elkaar moet vergelijken.\n\nDe beste manier om dit te doen is in persoon of met een videogesprek. 👭",
+    "verifyOtherUserDescription": "Als je een persoon verifieert ben je er zeker van dat je echt met haar contact hebt.\n\nWanneer je een verificatie start ziet de persoon een popup in de app. Hier staat een serie van emoji's of getallen die je met elkaar moet vergelijken.\n\nDe beste manier om dit te doen is in persoon of met een videogesprek.",
     "changeTheVisibilityOfChatHistory": "Zichtbaarheid van de chat-geschiedenis wijzigen",
     "sendRoomNotifications": "@room-meldingen versturen",
     "noticeChatBackupDeviceVerification": "Opmerking: Als al je apparaten zijn verbonden met de chat back-up worden ze automatisch geverifieerd.",
@@ -2239,8 +2239,8 @@
         "space": {}
     },
     "contactServerSecurity": "Contact opnemen met serverbeveiliger",
-    "newChatRequest": "📩 Nieuw chat verzoek",
-    "updateInstalled": "🎉 Update {version} geïnstalleerd!",
+    "newChatRequest": "Nieuw chat verzoek",
+    "updateInstalled": "Update {version} geïnstalleerd!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2256,7 +2256,7 @@
     "supportPage": "Supportpagina",
     "serverInformation": "Server-informatie:",
     "name": "Naam",
-    "verifyOtherDeviceDescription": "Een geverifieerd ander apparaat zorgt ervoor dat de apparaten sleutels uitwisselen, wat je beveiliging versterkt. 💪 Als je de verificatie start verschijnt er een popup op beide apparaten. Hier staat een reeks emoji's of getallen die je met elkaar moet vergelijken. Het is handig om beide apparaten bij de hand te hebben voordat je de verificatie start. 🤳",
+    "verifyOtherDeviceDescription": "Een geverifieerd ander apparaat zorgt ervoor dat de apparaten sleutels uitwisselen, wat je beveiliging versterkt. Als je de verificatie start verschijnt er een popup op beide apparaten. Hier staat een reeks emoji's of getallen die je met elkaar moet vergelijken. Het is handig om beide apparaten bij de hand te hebben voordat je de verificatie start.",
     "commandHint_unignore": "Herstel de negeerde Matrix-ID",
     "restoreSessionBody": "De app probeert nu je sessie te herstellen van een back-up. Meldt alsjeblieft deze fout aan de ontwikkelaars via deze link {url}. De foutmelding is: {error}",
     "@restoreSessionBody": {
@@ -2276,8 +2276,8 @@
     "changeTheDescriptionOfTheGroup": "Onderwerp wijzigen",
     "sendReadReceiptsDescription": "Andere deelnemers van de chat kunnen zien of je een bericht hebt gelezen.",
     "formattedMessagesDescription": "Geef rijke berichtinhoud weer zoals vetgedrukte tekst met markdown.",
-    "verifyOtherUser": "🔐 Persoon verifiëren",
-    "verifyOtherDevice": "🔐 Ander apparaat verifiëren",
+    "verifyOtherUser": "Persoon verifiëren",
+    "verifyOtherDevice": "Ander apparaat verifiëren",
     "doesNotSeemToBeAValidHomeserver": "Dit lijkt geen ondersteunde server. Verkeerde URL?",
     "continueText": "Doorgaan",
     "appWantsToUseForLogin": "Inloggen met '{server}'",
@@ -2355,7 +2355,7 @@
     "pleaseWaitUntilInvited": "Wacht even alsjeblieft tot iemand van de chat je uitnodigt.",
     "approve": "Goedkeuren",
     "youHaveKnocked": "Je hebt geklopt",
-    "sentVoiceMessage": "🎙️ {duration} - Spraakbericht van {sender}",
+    "sentVoiceMessage": "{duration} - Spraakbericht van {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

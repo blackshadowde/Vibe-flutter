@@ -26,7 +26,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} taklifni qabul qildi",
+    "acceptedTheInvitation": "{username} taklifni qabul qildi",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -40,7 +40,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} shifrlashni yakunlash uchun faollashtirdi",
+    "activatedEndToEndEncryption": "{username} shifrlashni yakunlash uchun faollashtirdi",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -186,7 +186,7 @@
     },
     "sendOnEnter": "Enterda yuborish",
     "noMoreChatsFound": "Boshqa chatlar topilmadi...",
-    "noChatsFoundHere": "Bu yerda hali chat topilmadi. Quyidagi tugmadan foydalanib, kimdir bilan yangi suhbat boshlang. ⤵️",
+    "noChatsFoundHere": "Bu yerda hali chat topilmadi. Quyidagi tugmadan foydalanib, kimdir bilan yangi suhbat boshlang.",
     "unread": "Oʻqilmagan",
     "space": "Boʻshliq",
     "banFromChat": "Suhbatdan taqiqlash",
@@ -600,7 +600,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} suhbat yaratdi",
+    "createdTheChat": "{username} suhbat yaratdi",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -827,7 +827,7 @@
     },
     "redactMessageDescription": "Xabar ushbu suhbatdagi barcha ishtirokchilar uchun oʻchiriladi. Buni bekor qilib boʻlmaydi.",
     "optionalRedactReason": "(Ixtiyoriy) Ushbu xabarni oʻchirish sababi...",
-    "invitedUser": "📩 {username} {targetName}ni taklif qildi",
+    "invitedUser": "{username} {targetName}ni taklif qildi",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -940,7 +940,7 @@
             }
         }
     },
-    "joinedTheChat": "👋 {username} suhbatga qoʻshildi",
+    "joinedTheChat": "{username} suhbatga qoʻshildi",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -954,7 +954,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} {targetName}ni tepdi",
+    "kicked": "{username} {targetName}ni tepdi",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -966,7 +966,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} {targetName}ni tepdi va blokladi",
+    "kickedAndBanned": "{username} {targetName}ni tepdi va blokladi",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -1084,7 +1084,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 FluffyChat yangi xabarlar",
+    "newMessageInFluffyChat": "FluffyChat yangi xabarlar",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -1109,7 +1109,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Hech qanday emoteʼlar topilmadi 😕",
+    "noEmotesFound": "Hech qanday emoteʼlar topilmadi",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1452,7 +1452,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} fayl yubordi",
+    "sentAFile": "{username} fayl yubordi",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1461,7 +1461,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} audio yubordi",
+    "sentAnAudio": "{username} audio yubordi",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1470,7 +1470,7 @@
             }
         }
     },
-    "sentAPicture": "️ 🖼️ {username} rasm yubordi",
+    "sentAPicture": "️ {username} rasm yubordi",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1479,7 +1479,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} stiker yubordi",
+    "sentASticker": "{username} stiker yubordi",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1488,7 +1488,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} video yubordi",
+    "sentAVideo": "{username} video yubordi",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1703,7 +1703,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} suhbatni tark etdi",
+    "userLeftTheChat": "{username} suhbatni tark etdi",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1886,7 +1886,7 @@
     "disableEncryptionWarning": "Xavfsizlik nuqtai nazaridan, agar u ilgari yoqilgan boʻlsa, suhbatda shifrlashni oʻchirib qoʻyolmaysiz.",
     "reopenChat": "Suhbatni qayta ochish",
     "noBackupWarning": "Diqqat! Suhbatni zaxiralashni yoqmasangiz, shifrlangan xabarlaringizga kirish huquqini yoʻqotasiz. Tizimdan chiqishdan oldin chatni zaxiralashni yoqishingiz tavsiya etiladi.",
-    "inviteGroupChat": "📨 Guruh suhbatiga taklif",
+    "inviteGroupChat": "Guruh suhbatiga taklif",
     "archiveRoomDescription": "Suhbat arxivga koʻchiriladi. Boshqa foydalanuvchilar sizning suhbatdan chiqqaningizni koʻra oladilar.",
     "roomUpgradeDescription": "Keyin suhbat yangi guruh versiyasi bilan qayta yaratiladi. Barcha ishtirokchilarga yangi suhbatga oʻtishlari kerakligi haqida xabar beriladi. Guruh versiyalari haqida koʻproq maʼlumotni https://spec.matrix.org/latest/rooms/ manzilida topishingiz mumkin",
     "banUserDescription": "Foydalanuvchi suhbatdan bloklanadi va blokdan chiqarilmaguncha suhbatga qayta kira olmaydi.",
@@ -1936,7 +1936,7 @@
     "chatPermissionsDescription": "Ushbu suhbatda muayyan harakatlar uchun qaysi quvvat darajasi zarurligini aniqlang. 0, 50 va 100 quvvat darajalari odatda foydalanuvchilar, moderatorlar va administratorlarni ifodalaydi, ammo har qanday gradatsiya mumkin.",
     "noticeChatBackupDeviceVerification": "Eslatma: Barcha qurilmalaringizni suhbat zaxira nusxasiga ulaganingizda, ular avtomatik ravishda tasdiqlanadi.",
     "unableToJoinChat": "Chatga qoʻshilib boʻlmadi. Ehtimol, boshqa tomon suhbatni allaqachon yopib qoʻygan.",
-    "newChatRequest": "📩 Yangi suhbat uchun soʻrov",
+    "newChatRequest": "Yangi suhbat uchun soʻrov",
     "shareKeysWithDescription": "Shifrlangan suhbatlarda xabarlaringizni oʻqishlari uchun qaysi qurilmalarga ishonish kerak?",
     "enterNewChat": "Yangi suhbatga kirish",
     "removeFromSpaceDescription": "Suhbat maydondan olib tashlanadi, lekin hali ham suhbatlarlar ro‘yxatida chiqadi.",
@@ -1996,7 +1996,7 @@
     "readUpToHere": "Bu yerga qadar o‘qish",
     "jump": "Sakrash",
     "openLinkInBrowser": "Havolani brauzerda ochish",
-    "reportErrorDescription": "😭 Voy yo‘q. Nimadir xato ketdi. Agar xohlasangiz, bu xato haqida dasturchilarga xabar berishingiz mumkin.",
+    "reportErrorDescription": "Voy yo‘q. Nimadir xato ketdi. Agar xohlasangiz, bu xato haqida dasturchilarga xabar berishingiz mumkin.",
     "report": "hisobot",
     "setColorTheme": "Rang mavzusini sozlash:",
     "invite": "Taklif qilish",
@@ -2073,10 +2073,10 @@
     "sendReadReceipts": "Oʻqilganlik haqida xabarnomalarni yuborish",
     "formattedMessages": "Formatlangan xabarlar",
     "formattedMessagesDescription": "Markdown yordamida qalin matn kabi boy xabar mazmunini koʻrsating.",
-    "verifyOtherUser": "🔐 Boshqa foydalanuvchini tasdiqlang",
-    "verifyOtherUserDescription": "Agar siz boshqa foydalanuvchini tasdiqlasangiz, aslida kimga yozayotganingizni bilishingizga amin boʻlishingiz mumkin. 💪\n\nTekshiruvni boshlaganingizda, siz va boshqa foydalanuvchi ilovada qalqib chiquvchi oynani koʻrasiz. Keyin u yerda siz bir-biringiz bilan taqqoslashingiz kerak boʻlgan bir qator emojilar yoki raqamlarni koʻrasiz.\n\nBuning eng yaxshi usuli - uchrashish yoki video qoʻngʻiroqni boshlash. 👭",
-    "verifyOtherDevice": "🔐 Boshqa qurilmani tasdiqlang",
-    "verifyOtherDeviceDescription": "Boshqa qurilmani tasdiqlaganingizda, bu qurilmalar kalitlarni almashishi mumkin, bu umumiy xavfsizligingizni oshiradi. 💪 Tasdiqlashni boshlaganingizda, ikkala qurilmada ham ilovada qalqib chiquvchi oyna paydo bo‘ladi. U yerda siz bir-biri bilan taqqoslashingiz kerak bo‘lgan emojilar yoki raqamlar qatorini ko‘rasiz. Tasdiqlashni boshlashdan oldin ikkala qurilma ham yoningizda bo‘lgani ma’qul. ✓",
+    "verifyOtherUser": "Boshqa foydalanuvchini tasdiqlang",
+    "verifyOtherUserDescription": "Agar siz boshqa foydalanuvchini tasdiqlasangiz, aslida kimga yozayotganingizni bilishingizga amin boʻlishingiz mumkin.\n\nTekshiruvni boshlaganingizda, siz va boshqa foydalanuvchi ilovada qalqib chiquvchi oynani koʻrasiz. Keyin u yerda siz bir-biringiz bilan taqqoslashingiz kerak boʻlgan bir qator emojilar yoki raqamlarni koʻrasiz.\n\nBuning eng yaxshi usuli - uchrashish yoki video qoʻngʻiroqni boshlash.",
+    "verifyOtherDevice": "Boshqa qurilmani tasdiqlang",
+    "verifyOtherDeviceDescription": "Boshqa qurilmani tasdiqlaganingizda, bu qurilmalar kalitlarni almashishi mumkin, bu umumiy xavfsizligingizni oshiradi. Tasdiqlashni boshlaganingizda, ikkala qurilmada ham ilovada qalqib chiquvchi oyna paydo bo‘ladi. U yerda siz bir-biri bilan taqqoslashingiz kerak bo‘lgan emojilar yoki raqamlar qatorini ko‘rasiz. Tasdiqlashni boshlashdan oldin ikkala qurilma ham yoningizda bo‘lgani ma’qul.",
     "acceptedKeyVerification": "{sender} kalit tekshiruvini qabul qildi",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2201,7 +2201,7 @@
         }
     },
     "sendRoomNotifications": "@room bildirishnomalarini yuborish",
-    "updateInstalled": "🎉 {version} versiyasiga yangilandi!",
+    "updateInstalled": "{version} versiyasiga yangilandi!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2278,7 +2278,7 @@
             }
         }
     },
-    "sentVoiceMessage": "️ 🎙️{duration} - {sender}dan ovozli xabar",
+    "sentVoiceMessage": "️ {duration} - {sender}dan ovozli xabar",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {
@@ -2362,7 +2362,7 @@
     },
     "thread": "Sahifa",
     "youRejectedTheInvitation": "Taklifni rad etdingiz",
-    "youAcceptedTheInvitation": "👍 Taklifni qabul qildingiz",
+    "youAcceptedTheInvitation": "Taklifni qabul qildingiz",
     "youBannedUser": "Siz {user}ni blokladingiz",
     "@youBannedUser": {
         "placeholders": {
@@ -2379,7 +2379,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Sizni {user} taklif qildi",
+    "youInvitedBy": "Sizni {user} taklif qildi",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -2387,7 +2387,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Siz {user}ni taklif qildingiz",
+    "youInvitedUser": "Siz {user}ni taklif qildingiz",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -2395,7 +2395,7 @@
             }
         }
     },
-    "youKicked": "👞 Siz {user}ni chiqarib yubordingiz",
+    "youKicked": "Siz {user}ni chiqarib yubordingiz",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -2403,7 +2403,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Siz {user}ni chiqardingiz va blokladingiz",
+    "youKickedAndBanned": "Siz {user}ni chiqardingiz va blokladingiz",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -2419,7 +2419,7 @@
             }
         }
     },
-    "hasKnocked": "🚪 {user} taqillatdi",
+    "hasKnocked": "{user} taqillatdi",
     "@hasKnocked": {
         "placeholders": {
             "user": {

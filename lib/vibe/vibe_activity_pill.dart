@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_member_tags.dart';
 import 'dart:async';
 
@@ -147,7 +148,7 @@ class _VibeActivityHostState extends State<VibeActivityHost> {
     if (VibeLock.isLocked(e.room.id)) return;
     if (e.type != EventTypes.Message && e.type != EventTypes.Encrypted) return;
     if (!e.status.isSynced) return;
-    final body = e.calcLocalizedBodyFallback(
+    final body = e.vibeBodyFallback(
       MatrixLocals(L10n.of(context)),
       plaintextBody: true,
       hideReply: true,

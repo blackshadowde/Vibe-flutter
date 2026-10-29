@@ -10,7 +10,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} 已接受邀請",
+    "acceptedTheInvitation": "{username} 已接受邀請",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -24,7 +24,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} 已啟用點對點加密",
+    "activatedEndToEndEncryption": "{username} 已啟用點對點加密",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -393,7 +393,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} 建立了聊天室",
+    "createdTheChat": "{username} 建立了聊天室",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -668,7 +668,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} 邀請了 {targetName}",
+    "invitedUser": "{username} 邀請了 {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -702,7 +702,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} 加入了聊天室",
+    "joinedTheChat": "{username} 加入了聊天室",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -716,7 +716,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} 踢了 {targetName}",
+    "kicked": "{username} 踢了 {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -728,7 +728,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} 踢了 {targetName} 並將其封鎖",
+    "kickedAndBanned": "{username} 踢了 {targetName} 並將其封鎖",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -832,7 +832,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 來自 FluffyChat 的新訊息",
+    "newMessageInFluffyChat": "來自 FluffyChat 的新訊息",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -857,7 +857,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "表情符號不存在。😕",
+    "noEmotesFound": "表情符號不存在。",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1118,7 +1118,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤{username} 傳送了一個音訊",
+    "sentAnAudio": "{username} 傳送了一個音訊",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1127,7 +1127,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️{username} 傳送了一張圖片",
+    "sentAPicture": "{username} 傳送了一張圖片",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1136,7 +1136,7 @@
             }
         }
     },
-    "sentASticker": "😊{username} 傳送了貼圖",
+    "sentASticker": "{username} 傳送了貼圖",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1145,7 +1145,7 @@
             }
         }
     },
-    "sentAVideo": "🎥{username} 傳送了影片",
+    "sentAVideo": "{username} 傳送了影片",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1697,7 +1697,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "hasKnocked": "🚪 {user} 敲門了",
+    "hasKnocked": "{user} 敲門了",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1719,7 +1719,7 @@
     "reopenChat": "重新開啟聊天室",
     "yourGlobalUserIdIs": "您的全域使用者ID是： ",
     "experimentalVideoCalls": "實驗性視訊通話",
-    "youAcceptedTheInvitation": "👍 您接受了邀請",
+    "youAcceptedTheInvitation": "您接受了邀請",
     "storeSecurlyOnThisDevice": "在此裝置上安全存儲",
     "countFiles": "{count} 個文件",
     "@countFiles": {
@@ -1743,8 +1743,8 @@
     "searchChatsRooms": "搜尋 #chats, @users...",
     "sendReadReceipts": "傳送已讀回條",
     "formattedMessagesDescription": "使用 markdown 顯示豐富的訊息內容，如粗體文字。",
-    "verifyOtherDevice": "🔐 驗證其他裝置",
-    "youInvitedUser": "📩 您邀請了 {user}",
+    "verifyOtherDevice": "驗證其他裝置",
+    "youInvitedUser": "您邀請了 {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1753,7 +1753,7 @@
         }
     },
     "pinMessage": "釘選到房間",
-    "youKicked": "👞 您踢出了 {user}",
+    "youKicked": "您踢出了 {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1763,7 +1763,7 @@
     },
     "users": "使用者",
     "youRejectedTheInvitation": "您拒絕了邀請",
-    "youKickedAndBanned": "🙅 您踢出並封鎖了 {user}",
+    "youKickedAndBanned": "您踢出並封鎖了 {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1881,7 +1881,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 您被 {user} 邀請",
+    "youInvitedBy": "您被 {user} 邀請",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1916,7 +1916,7 @@
     "select": "選擇",
     "files": "文件",
     "sendTypingNotificationsDescription": "聊天室中的其他參與者可以看到您正在輸入新訊息。",
-    "verifyOtherDeviceDescription": "當您驗證另一個裝置時，這些裝置可以交換密鑰，提升您的整體安全性。💪 當您開始驗證時，一個彈出視窗將在兩個裝置上的應用程式中出現。在那裡，您將看到一系列的表情符號或數字，您需要相互比較。在開始驗證之前最好有兩個裝置在手邊。🤳",
+    "verifyOtherDeviceDescription": "當您驗證另一個裝置時，這些裝置可以交換密鑰，提升您的整體安全性。 當您開始驗證時，一個彈出視窗將在兩個裝置上的應用程式中出現。在那裡，您將看到一系列的表情符號或數字，您需要相互比較。在開始驗證之前最好有兩個裝置在手邊。",
     "acceptedKeyVerification": "{sender} 接受了密鑰驗證",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -1965,7 +1965,7 @@
     "setChatDescription": "設定聊天室描述",
     "groupName": "群組名稱",
     "searchForUsers": "搜尋 @users...",
-    "inviteGroupChat": "📨 邀請群組聊天室",
+    "inviteGroupChat": "邀請群組聊天室",
     "knocking": "敲門",
     "sessionLostBody": "您的會話已丟失。請將此錯誤報告給開發人員，網址為 {url}。錯誤訊息為：{error}",
     "@sessionLostBody": {
@@ -2040,7 +2040,7 @@
     },
     "jumpToLastReadMessage": "跳至最後讀取的訊息",
     "openLinkInBrowser": "在瀏覽器中開啟連結",
-    "reportErrorDescription": "😭 哦不。出了些問題。如果您願意，可以將此錯誤報告給開發者。",
+    "reportErrorDescription": "哦不。出了些問題。如果您願意，可以將此錯誤報告給開發者。",
     "readUpToHere": "讀到這裡",
     "report": "報告",
     "pleaseEnterANumber": "請輸入大於 0 的數字",
@@ -2143,8 +2143,8 @@
     "noKeyForThisMessage": "如果訊息是在您登入此裝置之前傳送的，就可能會發生這種情況。\n\n也有可能是傳送者已經封鎖了您的裝置，或者網絡連接出了問題。\n\n如果您能在另一個會話中讀取該訊息，那麼您可以從中轉移訊息！前往設定 > 裝置，並確保您的裝置已相互驗證。當您下次打開房間且兩個會話都在前景時，密鑰將自動傳輸。\n\n不想在登出或切換裝置時丟失密鑰？請確保您已在設定中啟用了聊天室備份。",
     "newSpaceDescription": "空間允許您整合您的聊天室並建立私人或公開社群。",
     "invalidInput": "無效的輸入！",
-    "verifyOtherUser": "🔐 驗證其他使用者",
-    "verifyOtherUserDescription": "如果您驗證了另一個使用者，您可以確定您真正與誰通信。💪\n\n當您開始驗證時，您和另一個使用者將在應用程式中看到一個彈出視窗。在那裡，您將看到一系列的表情符號或數字，您需要相互比較。\n\n最好的方式是見面或開始視訊通話。👭",
+    "verifyOtherUser": "驗證其他使用者",
+    "verifyOtherUserDescription": "如果您驗證了另一個使用者，您可以確定您真正與誰通信。\n\n當您開始驗證時，您和另一個使用者將在應用程式中看到一個彈出視窗。在那裡，您將看到一系列的表情符號或數字，您需要相互比較。\n\n最好的方式是見面或開始視訊通話。",
     "requestedKeyVerification": "{sender} 請求了密鑰驗證",
     "@requestedKeyVerification": {
         "type": "String",
@@ -2213,7 +2213,7 @@
     "loginWithMatrixId": "以Matrix-ID登入",
     "inviteOtherUsers": "邀請其他用戶進入本聊天",
     "sendRoomNotifications": "傳送一條 @room 群提醒",
-    "updateInstalled": "🎉已成功安裝{version}版本!",
+    "updateInstalled": "已成功安裝{version}版本!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2238,7 +2238,7 @@
             }
         }
     },
-    "noChatsFoundHere": "還沒開始聊天嗎？點擊下方按鈕找個人聊聊吧⤵",
+    "noChatsFoundHere": "還沒開始聊天嗎？點擊下方按鈕找個人聊聊吧",
     "changeTheDescriptionOfTheGroup": "變更聊天室說明",
     "calculatingFileSize": "正在計算檔案大小…",
     "setWallpaper": "設定背景樣式",
@@ -2277,7 +2277,7 @@
     "name": "名稱",
     "website": "網站",
     "compress": "壓縮",
-    "newChatRequest": "📩 新的聊天邀請",
+    "newChatRequest": "新的聊天邀請",
     "enterNewChat": "進入新聊天室",
     "version": "版本",
     "unableToJoinChat": "無法加入聊天室。對話可能以被其他方結束。",

@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} приймає запрошення",
+    "acceptedTheInvitation": "{username} приймає запрошення",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} активує наскрізне шифрування",
+    "activatedEndToEndEncryption": "{username} активує наскрізне шифрування",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -327,7 +327,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} створює бесіду",
+    "createdTheChat": "{username} створює бесіду",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -517,7 +517,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} запрошує {targetName}",
+    "invitedUser": "{username} запрошує {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -551,7 +551,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} приєднується до бесіди",
+    "joinedTheChat": "{username} приєднується до бесіди",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -560,7 +560,7 @@
             }
         }
     },
-    "kicked": "👞 {username} вилучає {targetName}",
+    "kicked": "{username} вилучає {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -572,7 +572,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} вилучає та блокує {targetName}",
+    "kickedAndBanned": "{username} вилучає та блокує {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -661,7 +661,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Нове повідомлення у FluffyChat",
+    "newMessageInFluffyChat": "Нове повідомлення у FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -671,7 +671,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Емодзі не знайдено. 😕",
+    "noEmotesFound": "Емодзі не знайдено.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -809,7 +809,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} надсилає файл",
+    "sentAFile": "{username} надсилає файл",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -818,7 +818,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} надсилає аудіо",
+    "sentAnAudio": "{username} надсилає аудіо",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -827,7 +827,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} надсилає зображення",
+    "sentAPicture": "{username} надсилає зображення",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -836,7 +836,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} надсилає наліпку",
+    "sentASticker": "{username} надсилає наліпку",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -845,7 +845,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} надсилає відео",
+    "sentAVideo": "{username} надсилає відео",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -992,7 +992,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} виходить з бесіди",
+    "userLeftTheChat": "{username} виходить з бесіди",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1746,7 +1746,7 @@
     "unsupportedAndroidVersionLong": "Для цієї функції потрібна новіша версія Android. Перевірте наявність оновлень або підтримку Lineage OS.",
     "videoCallsBetaWarning": "Зауважте, що відеовиклики на ранньому етапі розробки. Вони можуть працювати не так, як очікувалося, або взагалі не працювати на всіх платформах.",
     "experimentalVideoCalls": "Експериментальні відеовиклики",
-    "youInvitedBy": "📩 Ви були запрошені {user}",
+    "youInvitedBy": "Ви були запрошені {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1754,7 +1754,7 @@
             }
         }
     },
-    "youAcceptedTheInvitation": "👍 Ви погодилися на запрошення",
+    "youAcceptedTheInvitation": "Ви погодилися на запрошення",
     "youRejectedTheInvitation": "Ви відхилили запрошення",
     "youHaveWithdrawnTheInvitationFor": "Ви відкликали запрошення для {user}",
     "@youHaveWithdrawnTheInvitationFor": {
@@ -1772,7 +1772,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Ви вилучили й заблокували {user}",
+    "youKickedAndBanned": "Ви вилучили й заблокували {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1781,7 +1781,7 @@
         }
     },
     "youJoinedTheChat": "Ви приєдналися до бесіди",
-    "youKicked": "👞 Ви вилучили {user}",
+    "youKicked": "Ви вилучили {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1797,7 +1797,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Ви запросили {user}",
+    "youInvitedUser": "Ви запросили {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1942,7 +1942,7 @@
     "invite": "Запросити",
     "redactMessageDescription": "Повідомлення буде відредаговано для всіх учасників цієї розмови. Це не можна скасувати.",
     "setChatDescription": "Налаштувати опис бесіди",
-    "inviteGroupChat": "📨 Запрошення до групової бесіди",
+    "inviteGroupChat": "Запрошення до групової бесіди",
     "emoteKeyboardNoRecents": "Тут з'являться нещодавно використані смайлики...",
     "@emoteKeyboardNoRecents": {
         "type": "String",
@@ -1964,7 +1964,7 @@
     "pushNotificationsNotAvailable": "Push-сповіщення недоступні",
     "makeAdminDescription": "Після того, як ви зробите цього користувача адміністратором, ви, можливо, не зможете це скасувати, оскільки він матиме ті самі права, що й ви.",
     "archiveRoomDescription": "Бесіду буде переміщено до архіву. Інші користувачі зможуть побачити, що ви вийшли з неї.",
-    "hasKnocked": "🚪{user} стукає до вас",
+    "hasKnocked": "{user} стукає до вас",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2068,10 +2068,10 @@
     "sendReadReceipts": "Надіслати підтвердження прочитання",
     "sendTypingNotificationsDescription": "Інші учасники бесіди бачитимуть, коли ви набираєте нове повідомлення.",
     "formattedMessagesDescription": "Показувати розширений вміст повідомлень, наприклад, жирний текст, використовуючи markdown.",
-    "verifyOtherUser": "🔐 Звірити іншого користувача",
-    "verifyOtherUserDescription": "Якщо ви звіряєте іншого користувача, ви можете бути впевнені, що знаєте, кому ви насправді пишете. 💪\n\nКоли ви почнете звірення, ви та інший користувач побачите спливне вікно в застосунку. Там ви побачите набір смайликів або чисел, які вам потрібно буде порівняти між собою.\n\nНайкращий спосіб зробити це — зустрітися або розпочати відеовиклик. 👭",
-    "verifyOtherDeviceDescription": "Коли ви звіряєте інший пристрій, ці пристрої можуть обмінюватися ключами, підвищуючи вашу загальну безпеку. 💪 Коли ви розпочнете звірення, в застосунку на обох пристроях з'явиться спливне вікно. Там ви побачите набір смайликів або чисел, які вам потрібно буде порівняти між собою. Найкраще мати обидва пристрої під рукою перед початком звірення. 🤳",
-    "verifyOtherDevice": "🔐 Звірити інший пристрій",
+    "verifyOtherUser": "Звірити іншого користувача",
+    "verifyOtherUserDescription": "Якщо ви звіряєте іншого користувача, ви можете бути впевнені, що знаєте, кому ви насправді пишете.\n\nКоли ви почнете звірення, ви та інший користувач побачите спливне вікно в застосунку. Там ви побачите набір смайликів або чисел, які вам потрібно буде порівняти між собою.\n\nНайкращий спосіб зробити це — зустрітися або розпочати відеовиклик.",
+    "verifyOtherDeviceDescription": "Коли ви звіряєте інший пристрій, ці пристрої можуть обмінюватися ключами, підвищуючи вашу загальну безпеку. Коли ви розпочнете звірення, в застосунку на обох пристроях з'явиться спливне вікно. Там ви побачите набір смайликів або чисел, які вам потрібно буде порівняти між собою. Найкраще мати обидва пристрої під рукою перед початком звірення.",
+    "verifyOtherDevice": "Звірити інший пристрій",
     "completedKeyVerification": "{sender} завершує звірення ключів",
     "@completedKeyVerification": {
         "type": "String",
@@ -2202,7 +2202,7 @@
     },
     "markAsUnread": "Позначити непрочитаним",
     "changeTheDescriptionOfTheGroup": "Змінити опис чату",
-    "updateInstalled": "🎉 Оновлення {version} встановлено!",
+    "updateInstalled": "Оновлення {version} встановлено!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2216,7 +2216,7 @@
     "noMoreChatsFound": "Більше чатів не знайдено...",
     "unread": "Непрочитані",
     "sendCanceled": "Надсилання скасовано",
-    "noChatsFoundHere": "Бесід ще немає. Розпочніть спілкування натиснувши кнопку нижче. ⤵️",
+    "noChatsFoundHere": "Бесід ще немає. Розпочніть спілкування натиснувши кнопку нижче.",
     "loginWithMatrixId": "Увійти за допомогою Matrix-ID",
     "doesNotSeemToBeAValidHomeserver": "Здається, це несумісний домашній сервер. Неправильна URL-адреса?",
     "calculatingFileSize": "Обчислення розміру файлу...",
@@ -2272,7 +2272,7 @@
             }
         }
     },
-    "newChatRequest": "📩 Новий запит на спілкування",
+    "newChatRequest": "Новий запит на спілкування",
     "allDevices": "Усім пристроям",
     "crossVerifiedDevicesIfEnabled": "З перехресною верифікацією пристроїв, якщо ввімкнено",
     "crossVerifiedDevices": "З перехресною верифікацією пристроїв",
@@ -2356,7 +2356,7 @@
     "notificationRuleRoomOneToOne": "Кімната \"Один на один\"",
     "approve": "Схвалити",
     "youHaveKnocked": "Ви постукали",
-    "sentVoiceMessage": "🎙️Голосове повідомлення від {sender} ({duration})",
+    "sentVoiceMessage": "Голосове повідомлення від {sender} ({duration})",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

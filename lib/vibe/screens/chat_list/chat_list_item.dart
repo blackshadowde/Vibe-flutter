@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_mute.dart';
 import 'package:vibe/config/app_config.dart';
 import 'package:vibe/l10n/l10n.dart';
@@ -316,7 +317,7 @@ class ChatListItem extends StatelessWidget {
                               '${lastEvent?.eventId}_${lastEvent?.type}_${lastEvent?.redacted}',
                             ),
                             future: needLastEventSender
-                                ? lastEvent.calcLocalizedBody(
+                                ? lastEvent.vibeBody(
                                     MatrixLocals(L10n.of(context)),
                                     hideReply: true,
                                     hideEdit: true,
@@ -328,7 +329,7 @@ class ChatListItem extends StatelessWidget {
                                             room.lastEvent?.senderId),
                                   )
                                 : null,
-                            initialData: lastEvent?.calcLocalizedBodyFallback(
+                            initialData: lastEvent?.vibeBodyFallback(
                               MatrixLocals(L10n.of(context)),
                               hideReply: true,
                               hideEdit: true,

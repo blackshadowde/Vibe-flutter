@@ -653,7 +653,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Nenašli sa žiadne emotikony. 😕",
+    "noEmotesFound": "Nenašli sa žiadne emotikony.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}

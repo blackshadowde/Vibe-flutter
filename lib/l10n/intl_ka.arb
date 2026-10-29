@@ -223,7 +223,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username}-მ(ა) მიიღო მოწვევა",
+    "acceptedTheInvitation": "{username}-მ(ა) მიიღო მოწვევა",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -540,7 +540,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} შექმნა ჩატი",
+    "createdTheChat": "{username} შექმნა ჩატი",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -607,7 +607,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username}-მ(ა) გააქტიურა end to end დაშიფვრა",
+    "activatedEndToEndEncryption": "{username}-მ(ა) გააქტიურა end to end დაშიფვრა",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {

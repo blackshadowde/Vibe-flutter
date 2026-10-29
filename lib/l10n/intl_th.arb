@@ -102,7 +102,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} ได้รับการชวนแล้ว",
+    "acceptedTheInvitation": "{username} ได้รับการชวนแล้ว",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -138,7 +138,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} เปิดใช้งาน end to end encryption",
+    "activatedEndToEndEncryption": "{username} เปิดใช้งาน end to end encryption",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {

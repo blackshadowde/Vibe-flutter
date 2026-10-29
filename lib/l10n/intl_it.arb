@@ -10,7 +10,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} ha accettato l'invito",
+    "acceptedTheInvitation": "{username} ha accettato l'invito",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -24,7 +24,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} ha abilitato la crittografia end to end",
+    "activatedEndToEndEncryption": "{username} ha abilitato la crittografia end to end",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -398,7 +398,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} ha creato la chat",
+    "createdTheChat": "{username} ha creato la chat",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -673,7 +673,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} ha invitato {targetName}",
+    "invitedUser": "{username} ha invitato {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -707,7 +707,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} si è unito/a alla chat",
+    "joinedTheChat": "{username} si è unito/a alla chat",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -721,7 +721,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} ha espulso {targetName}",
+    "kicked": "{username} ha espulso {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -733,7 +733,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} ha espulso e bandito {targetName}",
+    "kickedAndBanned": "{username} ha espulso e bandito {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -837,7 +837,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Nuovo messaggio in FluffyChat",
+    "newMessageInFluffyChat": "Nuovo messaggio in FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -862,7 +862,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Nessun emote trovato. 😕",
+    "noEmotesFound": "Nessun emote trovato.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1119,7 +1119,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} ha inviato un file",
+    "sentAFile": "{username} ha inviato un file",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1128,7 +1128,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} ha inviato un file audio",
+    "sentAnAudio": "{username} ha inviato un file audio",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1137,7 +1137,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} ha inviato un'immagine",
+    "sentAPicture": "{username} ha inviato un'immagine",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1146,7 +1146,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} ha inviato un adesivo",
+    "sentASticker": "{username} ha inviato un adesivo",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1155,7 +1155,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} ha inviato un video",
+    "sentAVideo": "{username} ha inviato un video",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1335,7 +1335,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} ha abbandonato la chat",
+    "userLeftTheChat": "{username} ha abbandonato la chat",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1601,7 +1601,7 @@
         "placeholders": {}
     },
     "commandHint_cuddle": "Invia una coccola",
-    "reportErrorDescription": "😭 Oh no. Qualcosa è andato storto. Se vuoi, puoi segnalare questo bug agli sviluppatori.",
+    "reportErrorDescription": "Oh no. Qualcosa è andato storto. Se vuoi, puoi segnalare questo bug agli sviluppatori.",
     "unsupportedAndroidVersion": "Versione di Android non supportata",
     "oneClientLoggedOut": "Uno dei tuoi client è stato disconnesso",
     "setColorTheme": "Imposta tema colore:",
@@ -1620,7 +1620,7 @@
         }
     },
     "user": "Utente",
-    "youAcceptedTheInvitation": "👍 Hai accettato l'invito",
+    "youAcceptedTheInvitation": "Hai accettato l'invito",
     "noMatrixServer": "{server1} non è un server matrix, vuoi invece usare {server2}?",
     "@noMatrixServer": {
         "type": "String",
@@ -1633,7 +1633,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Sei stato invitato/a da {user}",
+    "youInvitedBy": "Sei stato invitato/a da {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1644,7 +1644,7 @@
     "banUserDescription": "L'utente sarà bannato dalla chat e non sarà in grado di rientrare finché non verrà sbannato.",
     "removeDevicesDescription": "Sarai disconnesso da questo dispositivo e non potrai più ricevere messaggi.",
     "tryAgain": "Riprova",
-    "youKickedAndBanned": "🙅 Hai rimosso e bannato {user}",
+    "youKickedAndBanned": "Hai rimosso e bannato {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1758,7 +1758,7 @@
     },
     "reportUser": "Segnala utente",
     "confirmEventUnpin": "Sei sicuro di voler permanentemente sfissare l'evento?",
-    "youInvitedUser": "📩 Hai invitato {user}",
+    "youInvitedUser": "Hai invitato {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1821,7 +1821,7 @@
         "type": "String",
         "description": "Usage hint for the command /myroomavatar"
     },
-    "hasKnocked": "🚪 {user} ha bussato",
+    "hasKnocked": "{user} ha bussato",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1852,7 +1852,7 @@
         }
     },
     "sendTypingNotifications": "Invia notifiche di scrittura",
-    "inviteGroupChat": "📨 Invita a una chat di gruppo",
+    "inviteGroupChat": "Invita a una chat di gruppo",
     "voiceCall": "Chiamata vocale",
     "commandHint_kick": "Rimuovi l'utente fornito da questa stanza",
     "@commandHint_kick": {
@@ -1906,7 +1906,7 @@
         "description": "Usage hint for the command /invite"
     },
     "pleaseEnterANumber": "Per favore inserisci un numero maggiore di 0",
-    "youKicked": "👞 Hai rimosso {user}",
+    "youKicked": "Hai rimosso {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -2005,14 +2005,14 @@
     "newPassword": "Nuova password",
     "pleaseChooseAStrongPassword": "Per favore scegli una password forte",
     "thisDevice": "Questo dispositivo:",
-    "verifyOtherUser": "🔐 Verifica altro utente",
-    "verifyOtherUserDescription": "Se verifichi un altro utente, puoi essere certo di sapere a chi stai realmente scrivendo. 💪\n\nQuando inizi una verifica, tu e l'altro utente vedrete un popup nell'app. Lì vedrai una serie di emoji o numeri che dovrai confrontare tra loro.\n\nIl modo migliore per farlo è incontrarsi o avviare una videochiamata. 👭",
-    "verifyOtherDevice": "🔐 Verifica altro dispositivo",
-    "verifyOtherDeviceDescription": "Quando verifichi un altro dispositivo, questi dispositivi possono scambiarsi le chiavi, aumentando la tua sicurezza complessiva. 💪 Quando inizi una verifica, apparirà un popup nell'app su entrambi i dispositivi. Lì vedrai una serie di emoji o numeri che dovrai confrontare tra loro. È meglio avere entrambi i dispositivi a portata di mano prima di iniziare la verifica. 🤳",
+    "verifyOtherUser": "Verifica altro utente",
+    "verifyOtherUserDescription": "Se verifichi un altro utente, puoi essere certo di sapere a chi stai realmente scrivendo.\n\nQuando inizi una verifica, tu e l'altro utente vedrete un popup nell'app. Lì vedrai una serie di emoji o numeri che dovrai confrontare tra loro.\n\nIl modo migliore per farlo è incontrarsi o avviare una videochiamata.",
+    "verifyOtherDevice": "Verifica altro dispositivo",
+    "verifyOtherDeviceDescription": "Quando verifichi un altro dispositivo, questi dispositivi possono scambiarsi le chiavi, aumentando la tua sicurezza complessiva. Quando inizi una verifica, apparirà un popup nell'app su entrambi i dispositivi. Lì vedrai una serie di emoji o numeri che dovrai confrontare tra loro. È meglio avere entrambi i dispositivi a portata di mano prima di iniziare la verifica.",
     "discover": "Scopri",
     "leaveEmptyToClearStatus": "Lascia vuoto per cancellare il tuo stato.",
     "incomingMessages": "Messaggi in arrivo",
-    "noChatsFoundHere": "Nessuna chat trovata. Inizia una nuova chat con qualcuno usando il pulsante qui sotto. ⤵️",
+    "noChatsFoundHere": "Nessuna chat trovata. Inizia una nuova chat con qualcuno usando il pulsante qui sotto.",
     "unread": "Non letti",
     "space": "Spazio",
     "knock": "Bussa",
@@ -2183,7 +2183,7 @@
         }
     },
     "changeTheDescriptionOfTheGroup": "Cambia la descrizione della chat",
-    "updateInstalled": "🎉 Aggiornamento {version} installato!",
+    "updateInstalled": "Aggiornamento {version} installato!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2311,7 +2311,7 @@
     },
     "deletePushRuleCanNotBeUndone": "Se si elimina questa impostazione di notifica, questo non può essere annullato.",
     "more": "Di più",
-    "newChatRequest": "📩 Nuova richiesta di chat",
+    "newChatRequest": "Nuova richiesta di chat",
     "shareKeysWith": "Condividi le chiavi con...",
     "shareKeysWithDescription": "Quali dispositivi dovrebbero essere fidati in modo che possano leggere i tuoi messaggi in chat crittografate?",
     "allDevices": "Tutti i dispositivi",
@@ -2365,7 +2365,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - Messaggio vocale da {sender}",
+    "sentVoiceMessage": "{duration} - Messaggio vocale da {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -280,7 +281,7 @@ Future<void> _tryPushHelper(
     await flutterLocalNotificationsPlugin.show(
       id: '${client.clientName}_${notification.roomId}'.hashCode,
       title: hideContent ? AppSettings.applicationName.value : 'Vibe',
-      body: hideContent ? 'New message' : '🔒 New message',
+      body: 'New message',
       // tapping opens the chat (not for locked chats, as before)
       payload: hideContent && !VibeLock.isLocked(event.room.id)
           ? VibePushPayload(
@@ -330,7 +331,7 @@ Future<void> _tryPushHelper(
   // Calculate the body
   final body = event.type == EventTypes.Encrypted
       ? l10n.newMessageInFluffyChat
-      : await event.calcLocalizedBody(
+      : await event.vibeBody(
           matrixLocals,
           plaintextBody: true,
           withSenderNamePrefix: false,
@@ -427,7 +428,7 @@ Future<void> _tryPushHelper(
           groupConversation: !event.room.isDirectChat,
           messages: [newMessage],
         ),
-    ticker: event.calcLocalizedBodyFallback(
+    ticker: event.vibeBodyFallback(
       matrixLocals,
       plaintextBody: true,
       withSenderNamePrefix: !event.room.isDirectChat,

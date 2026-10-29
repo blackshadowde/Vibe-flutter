@@ -10,7 +10,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} ha acceptat la invitació",
+    "acceptedTheInvitation": "{username} ha acceptat la invitació",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -24,7 +24,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} ha activat el xifratge d’extrem a extrem",
+    "activatedEndToEndEncryption": "{username} ha activat el xifratge d’extrem a extrem",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -368,7 +368,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} ha creat el xat",
+    "createdTheChat": "{username} ha creat el xat",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -608,7 +608,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} ha convidat a {targetName}",
+    "invitedUser": "{username} ha convidat a {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -642,7 +642,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} s'ha unit al xat",
+    "joinedTheChat": "{username} s'ha unit al xat",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -656,7 +656,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} ha expulsat a {targetName}",
+    "kicked": "{username} ha expulsat a {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -668,7 +668,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} ha expulsat i vetat a {targetName}",
+    "kickedAndBanned": "{username} ha expulsat i vetat a {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -772,7 +772,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Missatge nou al FluffyChat",
+    "newMessageInFluffyChat": "Missatge nou al FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -792,7 +792,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "No s’ha trobat cap emoticona. 😕",
+    "noEmotesFound": "No s’ha trobat cap emoticona.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1008,7 +1008,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} ha enviat un fitxer",
+    "sentAFile": "{username} ha enviat un fitxer",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1017,7 +1017,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} ha enviat un àudio",
+    "sentAnAudio": "{username} ha enviat un àudio",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1026,7 +1026,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} ha enviat una imatge",
+    "sentAPicture": "{username} ha enviat una imatge",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1035,7 +1035,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} ha enviat un adhesiu",
+    "sentASticker": "{username} ha enviat un adhesiu",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1044,7 +1044,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} ha enviat un vídeo",
+    "sentAVideo": "{username} ha enviat un vídeo",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1219,7 +1219,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} ha marxat del xat",
+    "userLeftTheChat": "{username} ha marxat del xat",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1666,7 +1666,7 @@
     },
     "jumpToLastReadMessage": "Salta a l'últim missatge llegit",
     "commandHint_cuddle": "Envia una carícia",
-    "reportErrorDescription": "😭 Oh no. Hi ha hagut algun error. Si vols, pots informar d'aquest bug a l'equip de desenvolupament.",
+    "reportErrorDescription": "Oh no. Hi ha hagut algun error. Si vols, pots informar d'aquest bug a l'equip de desenvolupament.",
     "removeYourAvatar": "Esborra el teu avatar",
     "@removeYourAvatar": {
         "type": "String",
@@ -1685,7 +1685,7 @@
         }
     },
     "user": "Usuàrïi",
-    "youAcceptedTheInvitation": "👍 Has acceptat la invitació",
+    "youAcceptedTheInvitation": "Has acceptat la invitació",
     "noMatrixServer": "{server1} no és un servidor de matrix, vols fer servir {server2} ?",
     "@noMatrixServer": {
         "type": "String",
@@ -1698,7 +1698,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 {user} t'ha convidat",
+    "youInvitedBy": "{user} t'ha convidat",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1709,7 +1709,7 @@
     "banUserDescription": "Es vetarà li usuàriï al xat i no podrà tornar-hi a entrar fins que se li aixequi el veto.",
     "removeDevicesDescription": "Tancaràs la sessió d'aquest dispositiu i no hi podràs rebre més missatges.",
     "tryAgain": "Torna-ho a provar",
-    "youKickedAndBanned": "🙅 Has expulsat i vetat a {user}",
+    "youKickedAndBanned": "Has expulsat i vetat a {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1808,7 +1808,7 @@
     },
     "reportUser": "Denuncia l'usuàrïi",
     "confirmEventUnpin": "Vols desfixar l'esdeveniment permanentment?",
-    "youInvitedUser": "📩 Has convidat a {user}",
+    "youInvitedUser": "Has convidat a {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1851,7 +1851,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "hasKnocked": "🚪 {user} pica a la porta",
+    "hasKnocked": "{user} pica a la porta",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1872,7 +1872,7 @@
         }
     },
     "sendTypingNotifications": "Envia notificacions d'escriptura",
-    "inviteGroupChat": "📨 Invitació de grup",
+    "inviteGroupChat": "Invitació de grup",
     "voiceCall": "Videotrucada",
     "commandHint_unban": "Aixeca el veto a aquesti usuàriï per aquesta sala",
     "@commandHint_unban": {
@@ -1901,7 +1901,7 @@
     "removeFromSpace": "Esborra de l'espai",
     "roomUpgradeDescription": "El xat serà recreat amb una versió de sala nova. Totis lis participants seran notificadis que han de canviar al nou xat. Pots llegir més sobre les versions de sala a https://spec.matrix.org/latest/rooms/",
     "pleaseEnterANumber": "Introdueix un número major que 0",
-    "youKicked": "👞 Has expulsat a {user}",
+    "youKicked": "Has expulsat a {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -2003,8 +2003,8 @@
     },
     "formattedMessages": "Missatges amb format",
     "formattedMessagesDescription": "Mostra contingut amb format enriquit com text en cursiva, fent servir markdown.",
-    "verifyOtherUser": "🔐 Verifica uni altri usuàrïi",
-    "verifyOtherDevice": "🔐 Verifica un altre dispositiu",
+    "verifyOtherUser": "Verifica uni altri usuàrïi",
+    "verifyOtherDevice": "Verifica un altre dispositiu",
     "initAppError": "S'ha produït un error mentre s'inicialitzava l'aplicació",
     "noUsersFoundWithQuery": "No s'ha trobat cap usuàrïi amb \"{query}\". Revisa si ho has escrit malament.",
     "@noUsersFoundWithQuery": {
@@ -2079,8 +2079,8 @@
             }
         }
     },
-    "verifyOtherUserDescription": "Si verifiques aquesti usuàrïi, podràs estar seguri de a qui estàs escrivint. . 💪\n\nQuan inicies una verificació, l'altra persona i tu veureu un missatge emergent a l'app. Us sortiran un seguit d'emojis o números a cada pantalla, que haureu de comparar.\n\nLa millor manera de fer-ho és quedar en persona o fer una vídeo-trucada. 👭",
-    "verifyOtherDeviceDescription": "Quan verifiques un altre dispositiu, aquests poden intercanviar claus, així que es millora la seguretat total. 💪 Quan comences una verificació, apareixerà un missatge emergent a tots dos dispositius. A cadascun hi apareixerà un seguit d'emojis o de números que hauràs de comparar. El millor és tenir tots dos dispositius a mà abans d'iniciar la verificació. 🤳",
+    "verifyOtherUserDescription": "Si verifiques aquesti usuàrïi, podràs estar seguri de a qui estàs escrivint..\n\nQuan inicies una verificació, l'altra persona i tu veureu un missatge emergent a l'app. Us sortiran un seguit d'emojis o números a cada pantalla, que haureu de comparar.\n\nLa millor manera de fer-ho és quedar en persona o fer una vídeo-trucada.",
+    "verifyOtherDeviceDescription": "Quan verifiques un altre dispositiu, aquests poden intercanviar claus, així que es millora la seguretat total. Quan comences una verificació, apareixerà un missatge emergent a tots dos dispositius. A cadascun hi apareixerà un seguit d'emojis o de números que hauràs de comparar. El millor és tenir tots dos dispositius a mà abans d'iniciar la verificació.",
     "requestedKeyVerification": "{sender} ha soŀlicitat verificar claus",
     "@requestedKeyVerification": {
         "type": "String",
@@ -2104,7 +2104,7 @@
     "commandHint_ignore": "Ignora el compte de matrix especificat",
     "commandHint_unignore": "Deixa d'ignorar el compt de matrix especificat",
     "sendCanceled": "S'ha canceŀlat l'enviament",
-    "noChatsFoundHere": "Encara no hi ha xats. Obre una conversa amb algú picant al botó de sota. ⤵️",
+    "noChatsFoundHere": "Encara no hi ha xats. Obre una conversa amb algú picant al botó de sota.",
     "knock": "Pica",
     "knocking": "S'està picant",
     "goToSpace": "Ves a l'espai {space}",
@@ -2171,7 +2171,7 @@
     },
     "markAsUnread": "Marca com a no llegit",
     "chatPermissionsDescription": "Defineix quin nivell de permisos cal per cada acció en aquest xat. Els nivells 0, 50 i 100 normalment representen usuàriïs, mods i admins, però es pot canviar.",
-    "updateInstalled": "🎉 S'ha actualitzat a la versió {version}!",
+    "updateInstalled": "S'ha actualitzat a la versió {version}!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2319,7 +2319,7 @@
     "shareKeysWithDescription": "Quins dispositius vols que puguin llegir els teus missatges xifrats?",
     "previous": "Anterior",
     "notificationRuleMasterDescription": "Ignora totes les altres regles i deshabilita totes les notificacions.",
-    "newChatRequest": "📩 Soŀlicitud de missatge",
+    "newChatRequest": "Soŀlicitud de missatge",
     "allDevices": "Tots els dispositius",
     "crossVerifiedDevices": "Els dispositius verificats mútuament",
     "verifiedDevicesOnly": "Només els dispositius verificats",
@@ -2364,7 +2364,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - Missatge de veu de {sender}",
+    "sentVoiceMessage": "{duration} - Missatge de veu de {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

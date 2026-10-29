@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_slash.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
 import 'dart:ui' as ui;
@@ -888,7 +889,7 @@ class Message extends StatelessWidget {
                               onPressed: () => enterThread(event.eventId),
                               icon: const Icon(Icons.message),
                               label: Text(
-                                '${L10n.of(context).countReplies(threadChildren.length)} | ${threadChildren.first.calcLocalizedBodyFallback(MatrixLocals(L10n.of(context)), withSenderNamePrefix: true)}',
+                                '${L10n.of(context).countReplies(threadChildren.length)} | ${threadChildren.first.vibeBodyFallback(MatrixLocals(L10n.of(context)), withSenderNamePrefix: true)}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),

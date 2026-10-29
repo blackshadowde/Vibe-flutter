@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_drop.dart';
 import 'package:vibe/vibe/vibe_pending_files.dart';
 import 'package:vibe/vibe/vibe_mention_controller.dart';
@@ -1456,7 +1457,7 @@ class ChatController extends State<ChatPageWithRoom>
       editEvent = event;
       sendController.text = event
           .getDisplayEvent(timeline)
-          .calcLocalizedBodyFallback(
+          .vibeBodyFallback(
             MatrixLocals(L10n.of(context)),
             withSenderNamePrefix: false,
             hideReply: true,
@@ -1730,7 +1731,7 @@ class ChatController extends State<ChatPageWithRoom>
   Future<void> _cancelEditWithConfirmation() async {
     final originalText = editEvent!
         .getDisplayEvent(timeline!)
-        .calcLocalizedBodyFallback(
+        .vibeBodyFallback(
           MatrixLocals(L10n.of(context)),
           withSenderNamePrefix: false,
           hideReply: true,

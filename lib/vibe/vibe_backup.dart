@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -72,7 +73,7 @@ abstract class VibeBackup {
             't': e.originServerTs.millisecondsSinceEpoch,
             'b': e.type == EventTypes.Encrypted
                 ? '[could not be decrypted]'
-                : e.calcLocalizedBodyFallback(
+                : e.vibeBodyFallback(
                     const MatrixDefaultLocalizations(),
                     hideReply: true,
                     plaintextBody: true,

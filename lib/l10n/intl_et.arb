@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} võttis kutse vastu",
+    "acceptedTheInvitation": "{username} võttis kutse vastu",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐{username} võttis kasutusele läbiva krüptimise",
+    "activatedEndToEndEncryption": "{username} võttis kasutusele läbiva krüptimise",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -503,7 +503,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} algatas vestluse",
+    "createdTheChat": "{username} algatas vestluse",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -797,7 +797,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} saatis kutse kasutajale {targetName}",
+    "invitedUser": "{username} saatis kutse kasutajale {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -831,7 +831,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} liitus vestlusega",
+    "joinedTheChat": "{username} liitus vestlusega",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -845,7 +845,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} müksas kasutaja {targetName} välja",
+    "kicked": "{username} müksas kasutaja {targetName} välja",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -857,7 +857,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅{username} müksas kasutaja {targetName} välja ning seadis talle suhtluskeelu",
+    "kickedAndBanned": "{username} müksas kasutaja {targetName} välja ning seadis talle suhtluskeelu",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -971,7 +971,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Uus sõnum FluffyChati vahendusel",
+    "newMessageInFluffyChat": "Uus sõnum FluffyChati vahendusel",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -996,7 +996,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Ühtegi emotsioonitegevust ei leidunud. 😕",
+    "noEmotesFound": "Ühtegi emotsioonitegevust ei leidunud.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1304,7 +1304,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} saatis faili",
+    "sentAFile": "{username} saatis faili",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1313,7 +1313,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} saatis helifaili",
+    "sentAnAudio": "{username} saatis helifaili",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1322,7 +1322,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} saatis pildi",
+    "sentAPicture": "{username} saatis pildi",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1331,7 +1331,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} saatis kleepsu",
+    "sentASticker": "{username} saatis kleepsu",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1340,7 +1340,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} saatis video",
+    "sentAVideo": "{username} saatis video",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1545,7 +1545,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪{username} lahkus vestlusest",
+    "userLeftTheChat": "{username} lahkus vestlusest",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1746,7 +1746,7 @@
     "videoCallsBetaWarning": "Palun arvesta, et videokõned on veel beetajärgus. Nad ei pruugi veel toimida kõikidel platvormidel korrektselt.",
     "experimentalVideoCalls": "Katselised videokõned",
     "unsupportedAndroidVersionLong": "See funktsionaalsus eeldab uuemat Androidi versiooni. Palun kontrolli, kas sinu nutiseadmele leidub süsteemiuuendusi või saaks seal Lineage OSi kasutada.",
-    "youAcceptedTheInvitation": "👍 Sa võtsid kutse vastu",
+    "youAcceptedTheInvitation": "Sa võtsid kutse vastu",
     "youUnbannedUser": "Sa eemaldasid suhtluskeelu kasutajalt {user}",
     "@youUnbannedUser": {
         "placeholders": {
@@ -1772,7 +1772,7 @@
         }
     },
     "youJoinedTheChat": "Sa liitusid vestlusega",
-    "youKickedAndBanned": "🙅Sa müksasid kasutaja {user} välja ning seadsid talle suhtluskeelu",
+    "youKickedAndBanned": "Sa müksasid kasutaja {user} välja ning seadsid talle suhtluskeelu",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1781,7 +1781,7 @@
         }
     },
     "youRejectedTheInvitation": "Sa lükkasid kutse tagasi",
-    "youKicked": "👞 Sa müksasid kasutaja {user} välja",
+    "youKicked": "Sa müksasid kasutaja {user} välja",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1789,7 +1789,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Sa saatsid kutse kasutajale {user}",
+    "youInvitedUser": "Sa saatsid kutse kasutajale {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1797,7 +1797,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 {user} saatis sulle kutse",
+    "youInvitedBy": "{user} saatis sulle kutse",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1899,7 +1899,7 @@
     "jump": "Hüppa",
     "openLinkInBrowser": "Ava link veebibrauseris",
     "report": "teata",
-    "reportErrorDescription": "😭 Oh appike! Midagi läks valesti. Kui soovid, võid sellest veast arendajatele teatada.",
+    "reportErrorDescription": "Oh appike! Midagi läks valesti. Kui soovid, võid sellest veast arendajatele teatada.",
     "importFromZipFile": "Impordi zip-failist",
     "exportEmotePack": "Ekspordi emotikonide pakk zip-failina",
     "replace": "Asenda",
@@ -1942,7 +1942,7 @@
             }
         }
     },
-    "inviteGroupChat": "📨 Kutse jututuppa",
+    "inviteGroupChat": "Kutse jututuppa",
     "emoteKeyboardNoRecents": "Hiljuti kasutatud emotikonid kuvame siin...",
     "@emoteKeyboardNoRecents": {
         "type": "String",
@@ -1964,7 +1964,7 @@
     "pushNotificationsNotAvailable": "Tõuketeavitused pole saadaval",
     "makeAdminDescription": "Kui annad sellele kasutajale peakasutaja õigused, siis kuna tal on sinuga samad õigused, sa ei saa seda toimingut enam tagasi pöörata.",
     "archiveRoomDescription": "Selle vestluse tõstame nüüd arhiivi. Muud osalejad näevad, et sa oled vestlusest lahkunud.",
-    "hasKnocked": "🚪{user} on jututoa uksele koputanud",
+    "hasKnocked": "{user} on jututoa uksele koputanud",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2037,12 +2037,12 @@
         }
     },
     "sendReadReceipts": "Saada lugemisteatisi",
-    "verifyOtherUserDescription": "Kui sa oled vestluse teise osapoole verifitseerinud, siis saad kindel olla, et tead, kellega suhtled. 💪\n\nKui alustad verifitseerimist, siis sinul ja teisel osapoolel tekib rakenduses hüpikaken. Seal kuvatakse emotikonide või numbrite jada, mida peate omavahel võrdlema.\n\nKõige lihtsam on seda teha kas omavahelise kohtumise ajal või videokõne kestel. 👭",
+    "verifyOtherUserDescription": "Kui sa oled vestluse teise osapoole verifitseerinud, siis saad kindel olla, et tead, kellega suhtled.\n\nKui alustad verifitseerimist, siis sinul ja teisel osapoolel tekib rakenduses hüpikaken. Seal kuvatakse emotikonide või numbrite jada, mida peate omavahel võrdlema.\n\nKõige lihtsam on seda teha kas omavahelise kohtumise ajal või videokõne kestel.",
     "sendTypingNotificationsDescription": "Muud vestluses osalejad saavad näha, kui sa oled uut sõnumit kirjutamas.",
     "sendReadReceiptsDescription": "Muud vestluses osalejad näevad, kas oled sõnumit lugenud.",
     "formattedMessages": "Vormindatud sõnumid",
-    "verifyOtherUser": "🔐 Verifitseeri teine kasutaja",
-    "verifyOtherDevice": "🔐 Verifitseeri oma muu seade",
+    "verifyOtherUser": "Verifitseeri teine kasutaja",
+    "verifyOtherDevice": "Verifitseeri oma muu seade",
     "canceledKeyVerification": "{sender} katkestas krüptovõtmete verifitseerimise",
     "@canceledKeyVerification": {
         "type": "String",
@@ -2062,7 +2062,7 @@
         }
     },
     "formattedMessagesDescription": "Kasutades markdown-süntaksit kuva vormindust, nagu rasvases kirjas tekst.",
-    "verifyOtherDeviceDescription": "Kui sa oled oma muu seadme verifitseerinud, siis need seadmed võivad vahetada krüptovõtmeid ning see parandab üldist turvalisust. 💪 Kui alustad verifitseerimist, siis sinu mõlemas seadmes tekib rakenduses hüpikaken. Seal kuvatakse emotikonide või numbrite jada, mida pead omavahel võrdlema. On oluline, et mõlemad seadmed on verifitseerimise alustamisel sinu kõrval. 🤳",
+    "verifyOtherDeviceDescription": "Kui sa oled oma muu seadme verifitseerinud, siis need seadmed võivad vahetada krüptovõtmeid ning see parandab üldist turvalisust. Kui alustad verifitseerimist, siis sinu mõlemas seadmes tekib rakenduses hüpikaken. Seal kuvatakse emotikonide või numbrite jada, mida pead omavahel võrdlema. On oluline, et mõlemad seadmed on verifitseerimise alustamisel sinu kõrval.",
     "acceptedKeyVerification": "{sender} nõustus krüptovõtmete verifitseerimisega",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2205,7 +2205,7 @@
     "changeTheChatPermissions": "Muuda vestluse õigusi",
     "changeTheDescriptionOfTheGroup": "Muuda vestluse/jututoa kirjeldust",
     "chatPermissionsDescription": "Määra erinevatele kasutajatele selles vestluses vajalikud õigused. Tüüpiliselt on need 0, 50 ja 100 (vastavalt kasutajad, moderaatorid ja peakasutajad), kuid igasugused vahepealsed variatsioonid on ka võimalikud.",
-    "updateInstalled": "🎉 Versiooniuuendus {version} on paigaldatud!",
+    "updateInstalled": "Versiooniuuendus {version} on paigaldatud!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2216,7 +2216,7 @@
     },
     "changelog": "Muudatuste logi",
     "sendCanceled": "Saatmine on katkestatud",
-    "noChatsFoundHere": "Siin ei leidu veel ühtegi vestlust. Alusta uut vestlust klõpsides allpool asuvat nuppu. ⤵️",
+    "noChatsFoundHere": "Siin ei leidu veel ühtegi vestlust. Alusta uut vestlust klõpsides allpool asuvat nuppu.",
     "loginWithMatrixId": "Logi sisse Matrix-ID alusel",
     "doesNotSeemToBeAValidHomeserver": "Ei tundu olema ühilduv koduserver. Kas võrguaadress on ikka õige?",
     "calculatingFileSize": "Arvutame faili suurust...",
@@ -2284,7 +2284,7 @@
             }
         }
     },
-    "newChatRequest": "📩 Uus vestluskutse",
+    "newChatRequest": "Uus vestluskutse",
     "notificationRuleCallDescription": "Teavita kasutajat saabuvast video- või häälkõnest.",
     "notificationRuleEncryptedRoomOneToOneDescription": "Teavita kasutajat kahepoolse krüptitud vestluse sõnumitest.",
     "notificationRuleMasterDescription": "Ära järgi muid reegleid ja lülita kõik teavitused välja.",
@@ -2365,7 +2365,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - Häälsõnum kasutajalt {sender}",
+    "sentVoiceMessage": "{duration} - Häälsõnum kasutajalt {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

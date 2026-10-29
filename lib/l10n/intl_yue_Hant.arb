@@ -41,7 +41,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noChatsFoundHere": "暫時未有偈傾。撳下面粒掣同人開始傾偈 ⤵️",
+    "noChatsFoundHere": "暫時未有偈傾。撳下面粒掣同人開始傾偈",
     "bannedUser": "{username} Ban 咗 {targetName}",
     "@bannedUser": {
         "type": "String",
@@ -100,7 +100,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} 同意咗邀请",
+    "acceptedTheInvitation": "{username} 同意咗邀请",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -114,7 +114,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} 開咗點對點加密",
+    "activatedEndToEndEncryption": "{username} 開咗點對點加密",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {

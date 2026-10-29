@@ -172,7 +172,7 @@ abstract class VibeCall {
     final data = {'url': url, 'server': server, 'video': video, 'e2ee': true};
     return room.sendEvent({
       'msgtype': MessageTypes.Text,
-      'body': '${video ? '📹 Video' : '📞 Voice'} call · join: $url',
+      'body': '${video ? 'Video' : 'Voice'} call · join: $url',
       _key: data,
     });
   }
@@ -185,7 +185,7 @@ abstract class VibeCall {
     String url,
     bool video,
   ) async {
-    final body = '${video ? '📹 Video' : '📞 Voice'} call ended';
+    final body = '${video ? 'Video' : 'Voice'} call ended';
     try {
       await room.sendEvent({
         'msgtype': MessageTypes.Text,

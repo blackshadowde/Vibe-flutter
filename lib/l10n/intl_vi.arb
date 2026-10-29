@@ -391,7 +391,7 @@
     "makeAdminDescription": "Khi bạn đặt người dùng này làm quản trị viên, bạn không thể hoàn tác việc này vì khi đó họ sẽ có quyền ngang bạn.",
     "setColorTheme": "Chọn màu giao diện:",
     "openLinkInBrowser": "Mở đường dẫn trong trình duyệt",
-    "inviteGroupChat": "📨 Mời nhóm trò chuyện",
+    "inviteGroupChat": "Mời nhóm trò chuyện",
     "addToSpace": "Thêm vào không gian",
     "importEmojis": "Nhập Biểu cảm",
     "importFromZipFile": "Nhập vào từ tệp .zip",
@@ -436,7 +436,7 @@
             }
         }
     },
-    "reportErrorDescription": "😭 Ôi. Có lỗi xảy ra. Bạn có thể báo cáo lỗi tới nhà phát triển nếu muốn.",
+    "reportErrorDescription": "Ôi. Có lỗi xảy ra. Bạn có thể báo cáo lỗi tới nhà phát triển nếu muốn.",
     "banUserDescription": "Người dùng sẽ bị cấm khỏi cuộc trò chuyện và không thể tham gia lại cho tới khi được gỡ cấm.",
     "learnMore": "Tìm hiểu thêm",
     "incomingMessages": "Tin nhắn đến",

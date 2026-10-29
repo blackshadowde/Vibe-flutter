@@ -10,7 +10,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} accepterade inbjudan",
+    "acceptedTheInvitation": "{username} accepterade inbjudan",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -24,7 +24,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} aktiverade ändpunktskryptering",
+    "activatedEndToEndEncryption": "{username} aktiverade ändpunktskryptering",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -361,7 +361,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} skapade chatten",
+    "createdTheChat": "{username} skapade chatten",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -631,7 +631,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} bjöd in {targetName}",
+    "invitedUser": "{username} bjöd in {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -665,7 +665,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} anslöt till chatten",
+    "joinedTheChat": "{username} anslöt till chatten",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -679,7 +679,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} sparkade ut {targetName}",
+    "kicked": "{username} sparkade ut {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -691,7 +691,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} sparkade och bannade {targetName}",
+    "kickedAndBanned": "{username} sparkade och bannade {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -795,7 +795,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Nya meddelanden i FluffyChat",
+    "newMessageInFluffyChat": "Nya meddelanden i FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -820,7 +820,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Hittade inga dekaler. 😕",
+    "noEmotesFound": "Hittade inga dekaler.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1067,7 +1067,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} skickade en fil",
+    "sentAFile": "{username} skickade en fil",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1076,7 +1076,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} skickade ett ljudklipp",
+    "sentAnAudio": "{username} skickade ett ljudklipp",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1085,7 +1085,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} skickade en bild",
+    "sentAPicture": "{username} skickade en bild",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1094,7 +1094,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} skickade ett klistermärke",
+    "sentASticker": "{username} skickade ett klistermärke",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1103,7 +1103,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} skickade en video",
+    "sentAVideo": "{username} skickade en video",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1283,7 +1283,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} lämnade chatten",
+    "userLeftTheChat": "{username} lämnade chatten",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1747,8 +1747,8 @@
     "experimentalVideoCalls": "Experimentella videosamtal",
     "storeSecurlyOnThisDevice": "Lagra säkert på denna enhet",
     "youJoinedTheChat": "Du gick med i chatten",
-    "youAcceptedTheInvitation": "👍 Du accepterade inbjudan",
-    "youKicked": "👞 Du sparkade ut {user}",
+    "youAcceptedTheInvitation": "Du accepterade inbjudan",
+    "youKicked": "Du sparkade ut {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1846,7 +1846,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Du har blivit inbjuden av {user}",
+    "youInvitedBy": "Du har blivit inbjuden av {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1854,7 +1854,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Du bjöd in {user}",
+    "youInvitedUser": "Du bjöd in {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1862,7 +1862,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Du sparkade ut och förbjöd {user}",
+    "youKickedAndBanned": "Du sparkade ut och förbjöd {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1895,7 +1895,7 @@
             }
         }
     },
-    "reportErrorDescription": "😭 Åh nej. Något gick fel. Om du vill ian du rapportera denna bugg till utvecklarna.",
+    "reportErrorDescription": "Åh nej. Något gick fel. Om du vill ian du rapportera denna bugg till utvecklarna.",
     "setColorTheme": "Välj färgtema:",
     "banUserDescription": "Användaren kommer bannlysas från chatten och kommer inte kunna gå med i chatten igen tills bannlysningen avslutas.",
     "removeDevicesDescription": "Du kommer att bli utloggad från den här enheten och kommer inte längre kunna få meddelanden.",
@@ -1955,7 +1955,7 @@
         }
     },
     "sendTypingNotifications": "Skicka skrivnotifikationer",
-    "inviteGroupChat": "📨 Gruppchattsinbjudan",
+    "inviteGroupChat": "Gruppchattsinbjudan",
     "importEmojis": "Importera emojier",
     "noChatDescriptionYet": "Ingen chatt-beskrivning än.",
     "learnMore": "Lär dig mer",
@@ -2037,7 +2037,7 @@
     "databaseMigrationBody": "Var vänlig vänta. Detta kan ta en stund.",
     "sendTypingNotificationsDescription": "Andra deltagare i en diskussion kan se när du skriver.",
     "formattedMessagesDescription": "Visa formaterat meddelandeinnehåll som fet stil med markdown.",
-    "verifyOtherUser": "🔐 Verifiera användaren",
+    "verifyOtherUser": "Verifiera användaren",
     "formattedMessages": "Formaterade meddelanden",
     "canceledKeyVerification": "{sender} avbröt nyckelverifieringen",
     "@canceledKeyVerification": {
@@ -2076,7 +2076,7 @@
         }
     },
     "sendReadReceipts": "Skicka läskvitton",
-    "verifyOtherDevice": "🔐 Verifiera enhet",
+    "verifyOtherDevice": "Verifiera enhet",
     "acceptedKeyVerification": "{sender} accepterade nyckelverifieringen",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2087,8 +2087,8 @@
         }
     },
     "incomingMessages": "Inkommande meddelanden",
-    "verifyOtherUserDescription": "Om du verifierar en användare så kan du vara säker på vem du verkligen skriver till. 💪\n\nNär du påbörjar en verifiering så ser du och den andra användaren en popup-ruta i appen. I den rutan ser du ett antal tecken som du jämför med vad den andra användaren ser.\n\nDet bästa sättet att göra detta är att träffas fysiskt, eller genom att starta ett videosamtal. 👭",
-    "verifyOtherDeviceDescription": "När du verifierar en enhet så kan era enheter utväxla nycklar, vilket förbättrar säkerheten. 💪 När du påbörjar en verifiering så ser du en popup-ruta på båda enheterna. I den rutan ser du ett antal tecken som du jämför med det som visas på den andra enheten. Det är bäst att ha båda enheterna till hands innan du påbörjar verifieringen. 🤳",
+    "verifyOtherUserDescription": "Om du verifierar en användare så kan du vara säker på vem du verkligen skriver till.\n\nNär du påbörjar en verifiering så ser du och den andra användaren en popup-ruta i appen. I den rutan ser du ett antal tecken som du jämför med vad den andra användaren ser.\n\nDet bästa sättet att göra detta är att träffas fysiskt, eller genom att starta ett videosamtal.",
+    "verifyOtherDeviceDescription": "När du verifierar en enhet så kan era enheter utväxla nycklar, vilket förbättrar säkerheten. När du påbörjar en verifiering så ser du en popup-ruta på båda enheterna. I den rutan ser du ett antal tecken som du jämför med det som visas på den andra enheten. Det är bäst att ha båda enheterna till hands innan du påbörjar verifieringen.",
     "isReadyForKeyVerification": "{sender} är redo för nyckelverifiering",
     "@isReadyForKeyVerification": {
         "type": "String",
@@ -2114,7 +2114,7 @@
     "appLockDescription": "Lås appen när den inte används med en pin-kod",
     "swipeRightToLeftToReply": "Svep från höger till vänster för att svara",
     "noMoreChatsFound": "Inga fler chattar hittades...",
-    "noChatsFoundHere": "Inga chattar kunde hittas här ännu. Starta en ny chatt med någon genom att använda knappen nedan. ⤵️",
+    "noChatsFoundHere": "Inga chattar kunde hittas här ännu. Starta en ny chatt med någon genom att använda knappen nedan.",
     "unread": "Olästa",
     "space": "Utrymme",
     "changedTheChatDescription": "{username} ändrade chattens beskrivning",
@@ -2245,7 +2245,7 @@
     "sendRoomNotifications": "Skicka en @rum notis",
     "changeTheDescriptionOfTheGroup": "Ändra beskrivningen på chatten",
     "chatPermissionsDescription": "Definiera vilket tillståndsnivå som krävs för vissa handlingar i chatten. Tillståndsnivåerna 0, 50 och 100 representerar ofta användare, moderatorer och admins, men vilken gradering som helst fungerar.",
-    "updateInstalled": "🎉 Uppdatering {version} installerad!",
+    "updateInstalled": "Uppdatering {version} installerad!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2296,7 +2296,7 @@
     "appWantsToUseForLoginDescription": "Du tillåter härmed appen och hemsidan att dela information om dig.",
     "open": "Öppna",
     "waitingForServer": "Väntar på server...",
-    "newChatRequest": "📩 Ny chatt förfrågan",
+    "newChatRequest": "Ny chatt förfrågan",
     "contentNotificationSettings": "Innehållsnotis-inställningar",
     "generalNotificationSettings": "Allmänna notis-inställningar",
     "roomNotificationSettings": "rumsnotis-inställningar",

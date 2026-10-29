@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} elfogadta a meghívást",
+    "acceptedTheInvitation": "{username} elfogadta a meghívást",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} aktiválta a végpontok közötti titkosítást",
+    "activatedEndToEndEncryption": "{username} aktiválta a végpontok közötti titkosítást",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -337,7 +337,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} csevegést hozott létre",
+    "createdTheChat": "{username} csevegést hozott létre",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -552,7 +552,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} meghívta {targetName} felhasználót",
+    "invitedUser": "{username} meghívta {targetName} felhasználót",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -586,7 +586,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} csatlakozott a csevegéshez",
+    "joinedTheChat": "{username} csatlakozott a csevegéshez",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -600,7 +600,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} kirúgta {targetName}-t",
+    "kicked": "{username} kirúgta {targetName}-t",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -612,7 +612,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} kirúgta és kitiltotta {targetName}-t",
+    "kickedAndBanned": "{username} kirúgta és kitiltotta {targetName}-t",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -706,7 +706,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Új FluffyChat üzenet",
+    "newMessageInFluffyChat": "Új FluffyChat üzenet",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -721,7 +721,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Nem találhatóak hangulatjelek. 😕",
+    "noEmotesFound": "Nem találhatóak hangulatjelek.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -884,7 +884,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} küldött egy fájlt",
+    "sentAFile": "{username} küldött egy fájlt",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -893,7 +893,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} hangüzenetet küldött",
+    "sentAnAudio": "{username} hangüzenetet küldött",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -902,7 +902,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} képet küldött",
+    "sentAPicture": "{username} képet küldött",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -911,7 +911,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} matricát küldött",
+    "sentASticker": "{username} matricát küldött",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -920,7 +920,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} videót küldött",
+    "sentAVideo": "{username} videót küldött",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1090,7 +1090,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} elhagyta a csevegést",
+    "userLeftTheChat": "{username} elhagyta a csevegést",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1665,7 +1665,7 @@
         }
     },
     "jumpToLastReadMessage": "Az utoljára olvasott üzenethez ugrás",
-    "reportErrorDescription": "😭 Sajnos, valami félresiklott. Ha kívánja, jelezheti a bugot a fejlesztőknek.",
+    "reportErrorDescription": "Sajnos, valami félresiklott. Ha kívánja, jelezheti a bugot a fejlesztőknek.",
     "removeYourAvatar": "Profilképének törlése",
     "@removeYourAvatar": {
         "type": "String",
@@ -1684,8 +1684,8 @@
         }
     },
     "user": "Felhasználó",
-    "youAcceptedTheInvitation": "👍 Elfogadta a meghívást",
-    "youInvitedBy": "📩 {user} jóvoltából kapott meghívást",
+    "youAcceptedTheInvitation": "Elfogadta a meghívást",
+    "youInvitedBy": "{user} jóvoltából kapott meghívást",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1696,7 +1696,7 @@
     "banUserDescription": "A felhasználó kitiltásra kerül a csevegésből, és nem fog tudni visszajönni egészen a kitiltás feloldásáig.",
     "removeDevicesDescription": "Ki fog jelentkezni a készülékről, és többé nem fog tudni fogadni üzeneteket.",
     "tryAgain": "Próbálja újra",
-    "youKickedAndBanned": "🙅 Kirúgta és kitiltotta {user}-t",
+    "youKickedAndBanned": "Kirúgta és kitiltotta {user}-t",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1830,7 +1830,7 @@
     },
     "reportUser": "Felhasználó jelentése",
     "confirmEventUnpin": "Biztosan végleg le akarja venni a kitűzött eseményt?",
-    "youInvitedUser": "📩 Meghívta {user}-t",
+    "youInvitedUser": "Meghívta {user}-t",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1875,7 +1875,7 @@
             }
         }
     },
-    "hasKnocked": "🚪 {user} bekopogott",
+    "hasKnocked": "{user} bekopogott",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1896,7 +1896,7 @@
         }
     },
     "sendTypingNotifications": "Gépelési értesítés megjelenítése",
-    "inviteGroupChat": "📨 Meghívó a csoportba",
+    "inviteGroupChat": "Meghívó a csoportba",
     "voiceCall": "Hang hívás",
     "importEmojis": "Emojik importálása",
     "wasDirectChatDisplayName": "Üres csevegés (korábban {oldDisplayName})",
@@ -1923,7 +1923,7 @@
     "removeFromSpace": "Eltávolítás a térről",
     "roomUpgradeDescription": "A csevegés újra elkészül az új szoba verzióval. Minden résztvevő értesítést kap, hogy át kell állniuk az új csevegésre. További információkért a szoba verziókról látogasson el a https://spec.matrix.org/latest/rooms/ címre",
     "pleaseEnterANumber": "Adjon meg egy 0-nál nagyobb számot",
-    "youKicked": "👞 Kirúgta {user}-t",
+    "youKicked": "Kirúgta {user}-t",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -2016,8 +2016,8 @@
     "sendReadReceipts": "Olvasási igazolás küldése",
     "formattedMessages": "Formázott üzenetek",
     "formattedMessagesDescription": "Formázott szöveg - mint például félkövér - megjelenítése \"markdown\"-al.",
-    "verifyOtherUser": "🔐 Más felhasználó igazolása",
-    "verifyOtherDevice": "🔐 Más eszköz hitelesítése",
+    "verifyOtherUser": "Más felhasználó igazolása",
+    "verifyOtherDevice": "Más eszköz hitelesítése",
     "sessionLostBody": "A munkamenete elvesződött. Kérem jelentse ezt a fejlesztőknek a {url} címen. A hiba szövege a következő: {error}",
     "@sessionLostBody": {
         "type": "String",
@@ -2100,8 +2100,8 @@
     "groupName": "Csoport név",
     "createGroupAndInviteUsers": "Hozzon létre egy csoportot és hívjon meg felhasználókat",
     "groupCanBeFoundViaSearch": "A csoportokat kereséssel találhatja meg",
-    "verifyOtherUserDescription": "Ha megerősít egy másik felhasználót, akkor teljesen biztos lehet abban kivel cseveg. 💪\n\nA megerősítési folyamat kezdetekor megjelenik egy felugró ablak mindkettőjüknél. Ekkor egy hangulatjel vagy szám sor összehasonlítási folyamat veszi kezdetét.\n\nA legpraktikusabb módja ennek, hogy találkozzanak, vagy videó hívás során beszéljék meg. 👭",
-    "verifyOtherDeviceDescription": "Amikor egy másik eszközt hitelesít, az eszközök kulcsokat cserélnek egymás között, ezáltal növelve az összbiztonságot. 💪 Amikor megkezdődik a folyamat, mind a két eszközön megjelenik egy felugró üzenet. Hangulatjelek és számok sorozata fog megjelenni, amit össze tud hasonlítani a két eszközön. Érdemes tehát mind a két eszközt a közelben tartani. 🤳",
+    "verifyOtherUserDescription": "Ha megerősít egy másik felhasználót, akkor teljesen biztos lehet abban kivel cseveg.\n\nA megerősítési folyamat kezdetekor megjelenik egy felugró ablak mindkettőjüknél. Ekkor egy hangulatjel vagy szám sor összehasonlítási folyamat veszi kezdetét.\n\nA legpraktikusabb módja ennek, hogy találkozzanak, vagy videó hívás során beszéljék meg.",
+    "verifyOtherDeviceDescription": "Amikor egy másik eszközt hitelesít, az eszközök kulcsokat cserélnek egymás között, ezáltal növelve az összbiztonságot. Amikor megkezdődik a folyamat, mind a két eszközön megjelenik egy felugró üzenet. Hangulatjelek és számok sorozata fog megjelenni, amit össze tud hasonlítani a két eszközön. Érdemes tehát mind a két eszközt a közelben tartani.",
     "accessAndVisibility": "Hozzáférés és láthatóság",
     "accessAndVisibilityDescription": "Ki számára engedélyezett a csevegéshez való csatlakozás, és hogyan találhatja azt meg.",
     "calls": "Hívások",
@@ -2173,7 +2173,7 @@
         }
     },
     "changeGeneralChatSettings": "Általános csevegés beállítások módosítása",
-    "updateInstalled": "🎉 {version} verziójú frissítés telepítve!",
+    "updateInstalled": "{version} verziójú frissítés telepítve!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2184,7 +2184,7 @@
     },
     "changelog": "Változásnapló",
     "sendCanceled": "Küldés visszavonva",
-    "noChatsFoundHere": "Itt még nem található csevegés. Kezdjen egy új csevegést valakivel a lenti gomb segítéségvel. ⤵️",
+    "noChatsFoundHere": "Itt még nem található csevegés. Kezdjen egy új csevegést valakivel a lenti gomb segítéségvel.",
     "goToSpace": "Ugrás a {space} térre",
     "@goToSpace": {
         "type": "String",
@@ -2303,7 +2303,7 @@
     "open": "Megnyitás",
     "notificationRuleSuppressNotices": "Minden automata üzenetet némít",
     "notificationRuleSuppressNoticesDescription": "Némít minden automata klienstől érkező értesítést mint például botok.",
-    "newChatRequest": "📩 Új csevegés kérelem",
+    "newChatRequest": "Új csevegés kérelem",
     "notificationRuleContainsUserNameDescription": "Értesíti a felhasználót, ha az üzenet tartalmazza a nevét.",
     "notificationRuleInviteForMeDescription": "Értesíti a felhasználót szoba meghívás esetén.",
     "notificationRuleMemberEvent": "Tagi Esemény",
@@ -2330,7 +2330,7 @@
     "notificationRuleRoomOneToOneDescription": "Értesíti a felhasználót a négyszemközti szobában levő üzenetekről.",
     "notificationRuleJitsi": "Jitsi",
     "notificationRuleJitsiDescription": "Értesíti a felhasználót a Jitsi widget eseményekről.",
-    "sentVoiceMessage": "🎙️ {duration} - {sender}",
+    "sentVoiceMessage": "{duration} - {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

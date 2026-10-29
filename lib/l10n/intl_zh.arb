@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} 接受了邀请",
+    "acceptedTheInvitation": "{username} 接受了邀请",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} 激活了端到端加密",
+    "activatedEndToEndEncryption": "{username} 激活了端到端加密",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -489,7 +489,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} 创建了聊天",
+    "createdTheChat": "{username} 创建了聊天",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -769,7 +769,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} 邀请了 {targetName}",
+    "invitedUser": "{username} 邀请了 {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -803,7 +803,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} 加入了聊天",
+    "joinedTheChat": "{username} 加入了聊天",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -817,7 +817,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} 踢出了 {targetName}",
+    "kicked": "{username} 踢出了 {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -829,7 +829,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} 踢出并封禁了 {targetName}",
+    "kickedAndBanned": "{username} 踢出并封禁了 {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -933,7 +933,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 FluffyChat 新消息",
+    "newMessageInFluffyChat": "FluffyChat 新消息",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -958,7 +958,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "未找到表情。😕",
+    "noEmotesFound": "未找到表情。",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1244,7 +1244,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁{username} 发送了文件",
+    "sentAFile": "{username} 发送了文件",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1253,7 +1253,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤{username} 发送了音频",
+    "sentAnAudio": "{username} 发送了音频",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1262,7 +1262,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} 发送了图片",
+    "sentAPicture": "{username} 发送了图片",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1271,7 +1271,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} 发送了贴纸",
+    "sentASticker": "{username} 发送了贴纸",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1280,7 +1280,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} 发送了视频",
+    "sentAVideo": "{username} 发送了视频",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1470,7 +1470,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪{username} 离开了聊天",
+    "userLeftTheChat": "{username} 离开了聊天",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1756,7 +1756,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 你受到了 {user} 的邀请",
+    "youInvitedBy": "你受到了 {user} 的邀请",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1764,7 +1764,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 你邀请了 {user}",
+    "youInvitedUser": "你邀请了 {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1772,7 +1772,7 @@
             }
         }
     },
-    "youKicked": "👞 你踢出了 {user}",
+    "youKicked": "你踢出了 {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1788,7 +1788,7 @@
             }
         }
     },
-    "youAcceptedTheInvitation": "👍 你接受了邀请",
+    "youAcceptedTheInvitation": "你接受了邀请",
     "youHaveWithdrawnTheInvitationFor": "你撤回了对 {user} 的邀请",
     "@youHaveWithdrawnTheInvitationFor": {
         "placeholders": {
@@ -1797,7 +1797,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 你踢出并封禁了 {user}",
+    "youKickedAndBanned": "你踢出并封禁了 {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1897,7 +1897,7 @@
             }
         }
     },
-    "reportErrorDescription": "😭 哦不。出了点差错。如果你愿意，可以向开发人员报告此错误。",
+    "reportErrorDescription": "哦不。出了点差错。如果你愿意，可以向开发人员报告此错误。",
     "noBackupWarning": "警告！如果不启用聊天备份，你将无法访问加密消息。强烈建议在退出登录前先启用聊天备份。",
     "reopenChat": "重新打开聊天",
     "importEmojis": "导入表情包",
@@ -1942,7 +1942,7 @@
             }
         }
     },
-    "inviteGroupChat": "📨 群聊邀请",
+    "inviteGroupChat": "群聊邀请",
     "emoteKeyboardNoRecents": "最近使用过的表情会出现在这里...",
     "@emoteKeyboardNoRecents": {
         "type": "String",
@@ -2038,8 +2038,8 @@
     },
     "sendTypingNotificationsDescription": "聊天中的其他参与者可以看到你正在输入新消息。",
     "formattedMessagesDescription": "使用 Markdown 显示富文本内容，例如加粗文本。",
-    "verifyOtherUserDescription": "如果你验证了其他用户，就可以确保你清楚自己正在与谁进行通信。💪\n\n当你开始验证时，你和其他用户将在应用中看到一个弹出窗口。然后你会看到一系列表情符号或数字，你和其他用户需要比较它们是否一致。\n\n最好的方式是线下会面或开始视频通话。👭",
-    "verifyOtherDeviceDescription": "当你验证另一个设备时，这些设备可以交换密钥，从而提高整体安全性。 💪 当你开始验证时，两个设备上的应用都将显示一个弹出窗口。然后你会看到一系列表情符号或数字，你需要比较两个设备上显示的内容。在开始验证之前，最好将两个设备都放在手边。🤳",
+    "verifyOtherUserDescription": "如果你验证了其他用户，就可以确保你清楚自己正在与谁进行通信。\n\n当你开始验证时，你和其他用户将在应用中看到一个弹出窗口。然后你会看到一系列表情符号或数字，你和其他用户需要比较它们是否一致。\n\n最好的方式是线下会面或开始视频通话。",
+    "verifyOtherDeviceDescription": "当你验证另一个设备时，这些设备可以交换密钥，从而提高整体安全性。 当你开始验证时，两个设备上的应用都将显示一个弹出窗口。然后你会看到一系列表情符号或数字，你需要比较两个设备上显示的内容。在开始验证之前，最好将两个设备都放在手边。",
     "canceledKeyVerification": "{sender} 取消了密钥验证",
     "@canceledKeyVerification": {
         "type": "String",
@@ -2051,8 +2051,8 @@
     },
     "sendReadReceipts": "发送已读回执",
     "formattedMessages": "格式化的消息",
-    "verifyOtherDevice": "🔐 验证其它设备",
-    "verifyOtherUser": "🔐 验证其他用户",
+    "verifyOtherDevice": "验证其它设备",
+    "verifyOtherUser": "验证其他用户",
     "sendReadReceiptsDescription": "聊天中的其他参与者可以看到你是否读过消息。",
     "acceptedKeyVerification": "{sender} 接受了密钥验证",
     "@acceptedKeyVerification": {
@@ -2206,7 +2206,7 @@
     "changeGeneralChatSettings": "更改常规聊天设置",
     "chatPermissionsDescription": "定义此聊天中哪个权限等级对特定操作是必需的。权限等级 0、50 和 100 通常代表用户、主持人和管理员，但你可以自定义任何等级。",
     "changelog": "更新记录",
-    "updateInstalled": "🎉 已安装更新 {version} ！",
+    "updateInstalled": "已安装更新 {version} ！",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2216,7 +2216,7 @@
         }
     },
     "sendCanceled": "发送被取消",
-    "noChatsFoundHere": "此处尚未找到聊天。使用下方按钮 ⤵️ 开始和某人的新聊天",
+    "noChatsFoundHere": "此处尚未找到聊天。使用下方按钮 开始和某人的新聊天",
     "loginWithMatrixId": "使用 Matrix-ID 登录",
     "doesNotSeemToBeAValidHomeserver": "似乎不是兼容的主服务器。URL 不正确？",
     "calculatingFileSize": "计算文件尺寸中…",
@@ -2284,7 +2284,7 @@
             }
         }
     },
-    "newChatRequest": "📩 新的聊天请求",
+    "newChatRequest": "新的聊天请求",
     "generalNotificationSettings": "常规通知设置",
     "userSpecificNotificationSettings": "使用特定通知设置",
     "notificationRuleMaster": "静音所有通知",
@@ -2366,7 +2366,7 @@
         }
     },
     "checkList": "清单",
-    "sentVoiceMessage": "🎙️ {duration} - 来自 {sender} 的语音消息",
+    "sentVoiceMessage": "{duration} - 来自 {sender} 的语音消息",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

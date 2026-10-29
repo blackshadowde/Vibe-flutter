@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/config/themes.dart';
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/vibe/screens/chat/utd_dialog.dart';
@@ -53,7 +54,7 @@ class StateMessage extends StatelessWidget {
                           children: [
                             if (event.type != EventTypes.Encrypted)
                               TextSpan(
-                                text: event.calcLocalizedBodyFallback(
+                                text: event.vibeBodyFallback(
                                   MatrixLocals(L10n.of(context)),
                                 ),
                               )

@@ -24,7 +24,7 @@
             }
         }
     },
-    "activatedEndToEndEncryption": "🔐 {username} otti käyttöön päästä-päähän salauksen",
+    "activatedEndToEndEncryption": "{username} otti käyttöön päästä-päähän salauksen",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -621,7 +621,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} kutsui käyttäjän {targetName}",
+    "invitedUser": "{username} kutsui käyttäjän {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -650,7 +650,7 @@
             }
         }
     },
-    "kicked": "👞 {username} potki käyttäjän {targetName}",
+    "kicked": "{username} potki käyttäjän {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -662,7 +662,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} potki ja antoi porttikiellon käyttäjälle {targetName}",
+    "kickedAndBanned": "{username} potki ja antoi porttikiellon käyttäjälle {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -776,7 +776,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Uusi viesti FluffyChätissä",
+    "newMessageInFluffyChat": "Uusi viesti FluffyChätissä",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -1035,7 +1035,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} liittyi keskusteluun",
+    "joinedTheChat": "{username} liittyi keskusteluun",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -1049,7 +1049,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Emoteja ei löytynyt. 😕",
+    "noEmotesFound": "Emoteja ei löytynyt.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1390,7 +1390,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} poistui keskustelusta",
+    "userLeftTheChat": "{username} poistui keskustelusta",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1542,7 +1542,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} lähetti tiedoston",
+    "sentAFile": "{username} lähetti tiedoston",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1551,7 +1551,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} lähetti ääniviestin",
+    "sentAnAudio": "{username} lähetti ääniviestin",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1611,7 +1611,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAPicture": "🖼️ {username} lähetti kuvan",
+    "sentAPicture": "{username} lähetti kuvan",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1620,7 +1620,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} lähetti tarran",
+    "sentASticker": "{username} lähetti tarran",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1629,7 +1629,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} lähetti videon",
+    "sentAVideo": "{username} lähetti videon",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1746,7 +1746,7 @@
     "experimentalVideoCalls": "Kokeelliset videopuhelut",
     "youRejectedTheInvitation": "Kieltäydyit kutsusta",
     "youJoinedTheChat": "Liityit keskusteluun",
-    "youAcceptedTheInvitation": "👍 Hyväksyit kutsun",
+    "youAcceptedTheInvitation": "Hyväksyit kutsun",
     "youBannedUser": "Annoit porttikiellon käyttäjälle {user}",
     "@youBannedUser": {
         "placeholders": {
@@ -1763,7 +1763,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 {user} kutsui sinut",
+    "youInvitedBy": "{user} kutsui sinut",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1771,7 +1771,7 @@
             }
         }
     },
-    "youKicked": "👞 Potkit käyttäjän {user} keskustelusta",
+    "youKicked": "Potkit käyttäjän {user} keskustelusta",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1779,7 +1779,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Kutsuit käyttäjän {user}",
+    "youInvitedUser": "Kutsuit käyttäjän {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1787,7 +1787,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Potkit ja annoit porttikiellon käyttäjälle {user}",
+    "youKickedAndBanned": "Potkit ja annoit porttikiellon käyttäjälle {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1887,7 +1887,7 @@
     "encryptThisChat": "Salaa tämä keskustelu",
     "noBackupWarning": "Varoitus! Ilman avainvarmuuskopion käyttöönottoa menetät pääsyn salattuihin viesteihisi. Suosittelemme ehdottomasti avainvarmuuskopion käyttöönottoa ennen uloskirjautumista.",
     "fileIsTooBigForServer": "Ei voi lähettää! Palvelin tukee liitetiedostoja vain enintään {max}.",
-    "reportErrorDescription": "😭 Voi ei. Jokin meni pieleen. Halutessasi voit ilmoittaa ongelman kehittäjille.",
+    "reportErrorDescription": "Voi ei. Jokin meni pieleen. Halutessasi voit ilmoittaa ongelman kehittäjille.",
     "wasDirectChatDisplayName": "Tyhjä keskustelu (oli {oldDisplayName})",
     "@wasDirectChatDisplayName": {
         "type": "String",
@@ -1932,7 +1932,7 @@
     },
     "redactMessageDescription": "Viesti poistetaan kaikilta keskustelun osallistujilta. Tätä ei voida kumota.",
     "invalidInput": "Virheellinen syöte!",
-    "hasKnocked": "🚪 {user} on koputtanut",
+    "hasKnocked": "{user} on koputtanut",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1950,7 +1950,7 @@
         }
     },
     "sendTypingNotifications": "Lähetä kirjoitusilmoituksia",
-    "inviteGroupChat": "📨 Kutsu ryhmäkeskusteluun",
+    "inviteGroupChat": "Kutsu ryhmäkeskusteluun",
     "importEmojis": "Tuo emojit",
     "noChatDescriptionYet": "Keskustelun kuvausta ei ole vielä luotu.",
     "notAnImage": "Tämä ei ole kuvatiedosto.",
@@ -2006,7 +2006,7 @@
     },
     "commandHint_roomupgrade": "Päivitä tämä huone annettuun huoneversioon",
     "appLockDescription": "Lukitse sovellus kun sitä ei käytetä PIN-koodin kanssa",
-    "noChatsFoundHere": "Täältä ei löytynyt vielä pikakeskusteluja. Aloita uusi pikakeskustelu jonkun kanssa alla olevalla painikkeella. ⤵️",
+    "noChatsFoundHere": "Täältä ei löytynyt vielä pikakeskusteluja. Aloita uusi pikakeskustelu jonkun kanssa alla olevalla painikkeella.",
     "space": "Tila",
     "checkList": "Tarkistuslista",
     "countInvited": "{count} kutsuttu",
@@ -2132,10 +2132,10 @@
     "sendReadReceiptsDescription": "Muut keskustelun osallistujat näkevät, milloin olet lukenut viestin.",
     "formattedMessages": "Muotoillut viestit",
     "formattedMessagesDescription": "Näytä rikasta viestisisältöä, kuten lihavoitua tekstiä, käyttämällä Markdownia.",
-    "verifyOtherUser": "🔐 Vahvista toinen käyttäjä",
-    "verifyOtherUserDescription": "Jos vahvistat toisen käyttäjän, voit olla varma, että tiedät kenelle todella kirjoitat. 💪\n\nKun aloitat vahvistuksen, sinä ja toinen käyttäjä näette sovelluksessa ponnahdusikkunan. Siellä näette sitten sarjan emojeja tai numeroita, joita teidän on verrattava toisiinsa.\n\nParas tapa tehdä tämä on tavata heidät tai aloittaa videopuhelu. 👭",
-    "verifyOtherDevice": "🔐 Vahvista toinen laite",
-    "verifyOtherDeviceDescription": "Kun vahvistat toisen laitteen, kyseiset laitteet voivat vaihtaa avaimia, mikä lisää yleistä turvallisuuttasi. 💪 Kun aloitat vahvistuksen, molempien laitteiden sovellukseen ilmestyy ponnahdusikkuna. Siellä näet sitten sarjan emojeja tai numeroita, joita sinun on verrattava toisiinsa. On parasta pitää molemmat laitteet käsillä ennen vahvistuksen aloittamista. 🤳",
+    "verifyOtherUser": "Vahvista toinen käyttäjä",
+    "verifyOtherUserDescription": "Jos vahvistat toisen käyttäjän, voit olla varma, että tiedät kenelle todella kirjoitat.\n\nKun aloitat vahvistuksen, sinä ja toinen käyttäjä näette sovelluksessa ponnahdusikkunan. Siellä näette sitten sarjan emojeja tai numeroita, joita teidän on verrattava toisiinsa.\n\nParas tapa tehdä tämä on tavata heidät tai aloittaa videopuhelu.",
+    "verifyOtherDevice": "Vahvista toinen laite",
+    "verifyOtherDeviceDescription": "Kun vahvistat toisen laitteen, kyseiset laitteet voivat vaihtaa avaimia, mikä lisää yleistä turvallisuuttasi. Kun aloitat vahvistuksen, molempien laitteiden sovellukseen ilmestyy ponnahdusikkuna. Siellä näet sitten sarjan emojeja tai numeroita, joita sinun on verrattava toisiinsa. On parasta pitää molemmat laitteet käsillä ennen vahvistuksen aloittamista.",
     "acceptedKeyVerification": "{sender} hyväksyi avaimen vahvistuksen",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2254,7 +2254,7 @@
     "sendRoomNotifications": "Lähetä @room-ilmoituksia",
     "changeTheDescriptionOfTheGroup": "Muuta keskustelun kuvausta",
     "chatPermissionsDescription": "Määritä tarvittava tehotaso tietyille toiminnoille tässä pikakeskustelussa. Tehotasot 0, 50 ja 100 edustavat yleensä käyttäjiä, valvoja ja ylläpitäjiä, mutta mikä tahansa porrastus on mahdollinen.",
-    "updateInstalled": "🎉 Päivitys {version} asennettu!",
+    "updateInstalled": "Päivitys {version} asennettu!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2297,7 +2297,7 @@
     },
     "appWantsToUseForLoginDescription": "Annat täten sovellukselle ja verkkosivustolle luvan jakaa tietoja sinusta.",
     "waitingForServer": "Odotetaan palvelinta...",
-    "newChatRequest": "📩 Uusi pikakeskustelupyyntö",
+    "newChatRequest": "Uusi pikakeskustelupyyntö",
     "contentNotificationSettings": "Sisältöilmoitusten asetukset",
     "generalNotificationSettings": "Yleiset ilmoitusasetukset",
     "roomNotificationSettings": "Huoneen ilmoitusten asetukset",
@@ -2351,7 +2351,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - Ääniviesti {sender}:lta",
+    "sentVoiceMessage": "{duration} - Ääniviesti {sender}:lta",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

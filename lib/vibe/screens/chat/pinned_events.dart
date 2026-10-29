@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'dart:async';
 
 import 'package:vibe/l10n/l10n.dart';
@@ -46,7 +47,7 @@ class PinnedEvents extends StatelessWidget {
                     icon: const Icon(Icons.push_pin_outlined),
                     label:
                         event
-                            ?.calcLocalizedBodyFallback(
+                            ?.vibeBodyFallback(
                               MatrixLocals(l10n),
                               withSenderNamePrefix: true,
                               hideReply: true,
@@ -79,7 +80,7 @@ class PinnedEvents extends StatelessWidget {
         return ChatAppBarListTile(
           title:
               event
-                  ?.calcLocalizedBodyFallback(
+                  ?.vibeBodyFallback(
                     MatrixLocals(L10n.of(context)),
                     withSenderNamePrefix: true,
                     hideReply: true,

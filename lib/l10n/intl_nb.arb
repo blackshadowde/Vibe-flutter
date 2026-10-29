@@ -10,7 +10,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} godtok invitasjonen",
+    "acceptedTheInvitation": "{username} godtok invitasjonen",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -830,7 +830,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Fant ingen smilefjes. 😕",
+    "noEmotesFound": "Fant ingen smilefjes.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1550,7 +1550,7 @@
             }
         }
     },
-    "updateInstalled": "🎉 Oppdatering {version} installert!",
+    "updateInstalled": "Oppdatering {version} installert!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -1735,7 +1735,7 @@
             }
         }
     },
-    "youAcceptedTheInvitation": "👍 Du har akseptert invitasjonen",
+    "youAcceptedTheInvitation": "Du har akseptert invitasjonen",
     "youBannedUser": "Du stengte ute {user}",
     "@youBannedUser": {
         "placeholders": {
@@ -1790,7 +1790,7 @@
     "noDatabaseEncryption": "Databasekryptering støttes ikke på denne plattformen",
     "changeGeneralChatSettings": "Endre generelle chatinnstillinger",
     "changeTheChatPermissions": "Endre chattillatelsene",
-    "youInvitedBy": "📩 Du har blitt invitert av {user}",
+    "youInvitedBy": "Du har blitt invitert av {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1798,7 +1798,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Du inviterte {user}",
+    "youInvitedUser": "Du inviterte {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1806,7 +1806,7 @@
             }
         }
     },
-    "youKicked": "👞 You sparket ut {user}",
+    "youKicked": "You sparket ut {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1814,7 +1814,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Du sparket og stengte ute {user}",
+    "youKickedAndBanned": "Du sparket og stengte ute {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1868,13 +1868,13 @@
     "disableEncryptionWarning": "Av sikkerhetshensyn kan du ikke deaktivere kryptering i en chat der det har vært aktivert tidligere.",
     "readUpToHere": "Lest frem til her",
     "jump": "Hopp",
-    "reportErrorDescription": "😭 Å nei. Noe gikk galt. Hvis du ønsker det, kan du rapportere denne feilen til utviklerne.",
+    "reportErrorDescription": "Å nei. Noe gikk galt. Hvis du ønsker det, kan du rapportere denne feilen til utviklerne.",
     "invalidInput": "Ugyldig inndata!",
     "pleaseEnterANumber": "Vennligst skriv inn et tall større enn 0",
     "archiveRoomDescription": "Chatten vil bli flyttet til arkivet. Andre brukere vil kunne se at du har forlatt chatten.",
     "removeDevicesDescription": "Du vil bli logget ut av denne enheten og vil ikke lenger kunne motta meldinger.",
     "setColorTheme": "Angi fargetema:",
-    "inviteGroupChat": "📨 Invitasjon til gruppechat",
+    "inviteGroupChat": "Invitasjon til gruppechat",
     "pleaseChooseAStrongPassword": "Vennligst velg et sterkt passord",
     "publicChatAddresses": "Offentlige chatadresser",
     "createNewAddress": "Opprett ny adresse",
@@ -1893,7 +1893,7 @@
     "notificationRuleSuppressNoticesDescription": "Demper varsler fra automatiserte klienter som roboter.",
     "notificationRuleInviteForMe": "Inviter for meg",
     "notificationRuleInviteForMeDescription": "Varsler bruker når en blir invitert til et rom.",
-    "newChatRequest": "📩 Ny chatforespørsel",
+    "newChatRequest": "Ny chatforespørsel",
     "appWantsToUseForLogin": "Bruk '{server}' for å logge inn",
     "@appWantsToUseForLogin": {
         "type": "String",
@@ -1972,8 +1972,8 @@
     "changeTheCanonicalRoomAlias": "Endre hovedadressen til den offentlige chatten",
     "sendRoomNotifications": "Send en @room varsling",
     "formattedMessagesDescription": "Vis rikt meldingsinnhold som fet skrift ved hjelp av markdown.",
-    "verifyOtherUser": "🔐 Verifiser annen bruker",
-    "verifyOtherDevice": "🔐 Verifiser annen enhet",
+    "verifyOtherUser": "Verifiser annen bruker",
+    "verifyOtherDevice": "Verifiser annen enhet",
     "sendTypingNotificationsDescription": "Andre deltakere i en chat kan se når du skriver en ny melding.",
     "sendReadReceiptsDescription": "Andre deltakere i en chat kan se når du har lest en melding.",
     "commandHint_logout": "Logg av din nåværende enhet",
@@ -1988,7 +1988,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} – Talemelding fra {sender}",
+    "sentVoiceMessage": "{duration} – Talemelding fra {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {
@@ -2360,7 +2360,7 @@
             }
         }
     },
-    "noChatsFoundHere": "Ingen chatter her. Bruk knappen under for å starte en ny samtale. ⤵️",
+    "noChatsFoundHere": "Ingen chatter her. Bruk knappen under for å starte en ny samtale.",
     "changedTheChatDescription": "{username} endret beskrivelsen av chatten",
     "changedTheChatName": "{username} endret navnet på chatten",
     "commandHint_markasdm": "Marker som rom for direktemeldinger for den angitte Matrix-IDen",
@@ -2396,8 +2396,8 @@
     "makeAdminDescription": "Når du gjør denne brukeren til administrator, kan du kanskje ikke omgjøre det senere. Brukeren vil da få de samme rettighetene som deg.",
     "joinSpace": "Bli med i området",
     "publicSpaces": "Offentlige områder",
-    "verifyOtherUserDescription": "Hvis du verifiserer en annen bruker, kan du være trygg på at du vet hvem du faktisk skriver med. 💪\n\nNår du starter en verifisering, vil både du og den andre brukeren se et popup-vindu i appen. Der vil dere se en serie emojier eller tall som dere må sammenligne med hverandre.\n\nDen beste måten å gjøre dette på er å møtes ansikt til ansikt eller starte en videosamtale. 👭",
-    "verifyOtherDeviceDescription": "Når du verifiserer en annen enhet, kan disse enhetene utveksle nøkler, noe som øker den generelle sikkerheten din. 💪 Når du starter en verifisering, vil det dukke opp et popup-vindu i appen på begge enhetene. Der vil du se en serie emojier eller tall som du må sammenligne med hverandre. Det er best å ha begge enhetene forhånden før du starter verifiseringen. 🤳",
+    "verifyOtherUserDescription": "Hvis du verifiserer en annen bruker, kan du være trygg på at du vet hvem du faktisk skriver med.\n\nNår du starter en verifisering, vil både du og den andre brukeren se et popup-vindu i appen. Der vil dere se en serie emojier eller tall som dere må sammenligne med hverandre.\n\nDen beste måten å gjøre dette på er å møtes ansikt til ansikt eller starte en videosamtale.",
+    "verifyOtherDeviceDescription": "Når du verifiserer en annen enhet, kan disse enhetene utveksle nøkler, noe som øker den generelle sikkerheten din. Når du starter en verifisering, vil det dukke opp et popup-vindu i appen på begge enhetene. Der vil du se en serie emojier eller tall som du må sammenligne med hverandre. Det er best å ha begge enhetene forhånden før du starter verifiseringen.",
     "clientWellKnownInformation": "Velkjent informasjon om klienten:",
     "baseUrl": "Base URL",
     "identityServer": "Identitetsserver:",
@@ -2416,7 +2416,7 @@
     "createSticker": "Lag sticker eller emoji",
     "useAsSticker": "Bruk som sticker",
     "pollQuestion": "Spørsmål til avstemning",
-    "hasKnocked": "🚪{user} har banket på",
+    "hasKnocked": "{user} har banket på",
     "@hasKnocked": {
         "placeholders": {
             "user": {

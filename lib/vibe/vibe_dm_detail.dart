@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_mute.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/vibe/vibe_call.dart';
@@ -1080,7 +1081,7 @@ class _DmSheetState extends State<_DmSheet> {
         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
       ),
       subtitle: Text(
-        e.calcLocalizedBodyFallback(
+        e.vibeBodyFallback(
           MatrixLocals(L10n.of(context)),
           hideReply: true,
         ),

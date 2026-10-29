@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:vibe/vibe/vibe_text_size.dart';
@@ -81,7 +82,7 @@ class ReplyContent extends StatelessWidget {
                 ),
                 Text(
                   displayEvent
-                      .calcLocalizedBodyFallback(
+                      .vibeBodyFallback(
                         MatrixLocals(L10n.of(context)),
                         withSenderNamePrefix: false,
                         hideReply: true,

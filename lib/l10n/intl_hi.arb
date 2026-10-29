@@ -26,7 +26,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} ने निमंत्रण स्वीकार किया",
+    "acceptedTheInvitation": "{username} ने निमंत्रण स्वीकार किया",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -40,7 +40,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} ने एंड-टू-एंड एन्क्रिप्शन चालू किया",
+    "activatedEndToEndEncryption": "{username} ने एंड-टू-एंड एन्क्रिप्शन चालू किया",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {

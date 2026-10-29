@@ -27,7 +27,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} yeqbel tinubga",
+    "acceptedTheInvitation": "{username} yeqbel tinubga",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -41,7 +41,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} irmed awgelhen seg yixef ɣer yixef",
+    "activatedEndToEndEncryption": "{username} irmed awgelhen seg yixef ɣer yixef",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -498,7 +498,7 @@
     },
     "redactMessageDescription": "Izen ad yettwakkesn i imttekkiyen merra deg udiwenni-agi. Ur tezmireḍ ara ad tesfesxeḍ.",
     "optionalRedactReason": "(Afrayan) Sebba n tukksa n izen-agi…",
-    "invitedUser": "📩 {username} yenced {targetName}",
+    "invitedUser": "{username} yenced {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -520,7 +520,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋{username} yekcem ɣer udiwenni",
+    "joinedTheChat": "{username} yekcem ɣer udiwenni",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -534,7 +534,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞{username} yessuffeɣ-d {targetName}",
+    "kicked": "{username} yessuffeɣ-d {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -546,7 +546,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} yessuffeɣ-d udiɣ igdel {targetName}",
+    "kickedAndBanned": "{username} yessuffeɣ-d udiɣ igdel {targetName}",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -652,7 +652,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} yesnulfa-d adiwenni",
+    "createdTheChat": "{username} yesnulfa-d adiwenni",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -753,7 +753,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Izen amaynut deg FluffyChat",
+    "newMessageInFluffyChat": "Izen amaynut deg FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -783,7 +783,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Ulac izamulen uḥulfu yettwafen. 😕",
+    "noEmotesFound": "Ulac izamulen uḥulfu yettwafen.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -920,7 +920,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪{username} yeffeɣ seg udiwenni",
+    "userLeftTheChat": "{username} yeffeɣ seg udiwenni",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1287,7 +1287,7 @@
     },
     "open": "Ldi",
     "waitingForServer": "Araǧu n uqeddac...",
-    "newChatRequest": "📩 Asuter n udiwenni amaynut",
+    "newChatRequest": "Asuter n udiwenni amaynut",
     "contentNotificationSettings": "Iɣewwaṛen n telɣut n ugbur",
     "generalNotificationSettings": "Iɣewwaren imuta n ilɣa",
     "roomNotificationSettings": "Iɣewwaṛen n telɣut n texxamt",
@@ -1323,10 +1323,10 @@
     "sendTypingNotifications": "Azen alɣu ttaruɣ",
     "swipeRightToLeftToReply": "Zuɣer seg uyeffus ɣer uzelmaḍ akken ad d-terreḍ",
     "noMoreChatsFound": "Ulac ugar n idiwenniyen yettwafen…",
-    "noChatsFoundHere": "Ur d-nufi ula d yiwen n udiwenni da. Bdu adiwenni akked yiwen s useqdec n tqeffalt ukessar-a. ⤵️",
+    "noChatsFoundHere": "Ur d-nufi ula d yiwen n udiwenni da. Bdu adiwenni akked yiwen s useqdec n tqeffalt ukessar-a.",
     "youRejectedTheInvitation": "Tugiḍ tinnubga",
     "youJoinedTheChat": "Tekcemeḍ ɣer udiwenni",
-    "youAcceptedTheInvitation": "👍 Tqebleḍ tinubga",
+    "youAcceptedTheInvitation": "Tqebleḍ tinubga",
     "youBannedUser": "Tgedleḍ {user}",
     "@youBannedUser": {
         "placeholders": {
@@ -1343,7 +1343,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Tettwaɛerḍeḍ sɣur {user}",
+    "youInvitedBy": "Tettwaɛerḍeḍ sɣur {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1351,7 +1351,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Tɛerḍeḍ-d {user}",
+    "youInvitedUser": "Tɛerḍeḍ-d {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1359,7 +1359,7 @@
             }
         }
     },
-    "youKicked": "👞 Tegliḍ s rrkel {user}",
+    "youKicked": "Tegliḍ s rrkel {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1367,7 +1367,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Tegliḍ s rrkel u tgedleḍ {user}",
+    "youKickedAndBanned": "Tegliḍ s rrkel u tgedleḍ {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1383,7 +1383,7 @@
             }
         }
     },
-    "hasKnocked": "🚪{user} yesṭebṭbed",
+    "hasKnocked": "{user} yesṭebṭbed",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -1456,7 +1456,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} yuzen afaylu",
+    "sentAFile": "{username} yuzen afaylu",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1465,7 +1465,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} yuzen ameslaw",
+    "sentAnAudio": "{username} yuzen ameslaw",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1474,7 +1474,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} yuzen tugna",
+    "sentAPicture": "{username} yuzen tugna",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1483,7 +1483,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} yuzen ticṛeṭ n tesfift",
+    "sentASticker": "{username} yuzen ticṛeṭ n tesfift",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1492,7 +1492,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} yuzen tavidyut",
+    "sentAVideo": "{username} yuzen tavidyut",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1538,11 +1538,11 @@
     "readUpToHere": "Ɣeṛ dagi",
     "jump": "Neggez",
     "openLinkInBrowser": "Ldi aseɣwen deg yiminig",
-    "reportErrorDescription": "😭 Uhu. Yella kra n wugur ay yellan. Ma tebɣiḍ, tzemreḍ ad tazneḍ aneqqis-a i yineflayen.",
+    "reportErrorDescription": "Uhu. Yella kra n wugur ay yellan. Ma tebɣiḍ, tzemreḍ ad tazneḍ aneqqis-a i yineflayen.",
     "report": "aneqqis",
     "setColorTheme": "Sbadu asentel n yini:",
     "invite": "Snubget",
-    "inviteGroupChat": "📨Snubget ɣer udiwenni n ugraw",
+    "inviteGroupChat": "Snubget ɣer udiwenni n ugraw",
     "invalidInput": "Anekcam d armeɣtu!",
     "wrongPinEntered": "Tettwasekcem tangalt PIN d armeɣtut! Ɛreḍ tikkelt nniḍen deg {seconds} n tasinin…",
     "@wrongPinEntered": {

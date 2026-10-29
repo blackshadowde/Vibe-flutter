@@ -3,7 +3,6 @@
 import 'dart:ui' as ui;
 
 import 'package:cross_file/cross_file.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:vibe/config/themes.dart';
@@ -18,17 +17,9 @@ import 'package:vibe/vibe/vibe_pending_files.dart';
 /// chat itself (same bubbles, names, avatars and text box); send, and the
 /// pane goes away and the reply lands in the chat.
 abstract class VibeReplyThread {
-  static Offset? _lastDown;
-  static bool _listening = false;
-
-  /// Where the finger last touched the screen (the message being answered).
-  static void _listen() {
-    if (_listening) return;
-    _listening = true;
-    GestureBinding.instance.pointerRouter.addGlobalRoute((e) {
-      if (e is PointerDownEvent) _lastDown = e.position;
-    });
-  }
+  /// Apple's sheet motion (a spring with no bounce, ~0.5 s response), as a
+  /// curve: quick to start, long soft landing.
+  static const _sheetCurve = Cubic(0.32, 0.72, 0, 1);
 
   static String? _parentId(Event e) =>
       e.inReplyToEventId(includingFallback: false);
@@ -106,25 +97,19 @@ abstract class VibeReplyThread {
     String? threadLastEventId,
   }) async {
     VibeHaptics.light();
-    _listen();
     final chain = _loaded(replyTo, timeline);
-    final size = MediaQuery.sizeOf(context);
-    final from = _lastDown;
-    // the pane grows out of the tapped message and shrinks back into it
-    final origin = from == null || size.isEmpty
-        ? Alignment.center
-        : Alignment(
-            (from.dx / size.width * 2 - 1).clamp(-1.0, 1.0),
-            (from.dy / size.height * 2 - 1).clamp(-1.0, 1.0),
-          );
+    // A live blur is nearly free on iPhone but redrawn every frame on
+    // Android, where it made the slide stutter: Android gets a dim instead.
+    final blur = Theme.of(context).platform == TargetPlatform.iOS ||
+        Theme.of(context).platform == TargetPlatform.macOS;
     await Navigator.of(context, rootNavigator: true).push(
       PageRouteBuilder<void>(
         opaque: false,
         barrierDismissible: true,
         barrierLabel: 'Close',
-        barrierColor: Colors.black.withValues(alpha: 0.3),
-        transitionDuration: const Duration(milliseconds: 300),
-        reverseTransitionDuration: const Duration(milliseconds: 260),
+        barrierColor: Colors.black.withValues(alpha: blur ? 0.25 : 0.55),
+        transitionDuration: const Duration(milliseconds: 460),
+        reverseTransitionDuration: const Duration(milliseconds: 340),
         pageBuilder: (ctx, _, _) => _ThreadPane(
           room: room,
           timeline: timeline,
@@ -137,52 +122,36 @@ abstract class VibeReplyThread {
           threadLastEventId: threadLastEventId,
         ),
         transitionsBuilder: (ctx, anim, _, child) {
-          final t = CurvedAnimation(
-            parent: anim,
-            curve: Curves.easeOutQuart,
-            reverseCurve: Curves.easeInCubic,
+          // Like an iPhone sheet: the pane slides up as one solid piece
+          // (only moved, never faded or resized, so nothing is redrawn while
+          // it travels) and slides back down on close.
+          final slide = Tween(begin: const Offset(0, 1), end: Offset.zero)
+              .animate(
+                CurvedAnimation(
+                  parent: anim,
+                  curve: _sheetCurve,
+                  reverseCurve: _sheetCurve.flipped,
+                ),
+              );
+          final pane = SlideTransition(
+            position: slide,
+            child: RepaintBoundary(child: child),
           );
+          if (!blur) return pane;
           return Stack(
             children: [
-              // a fixed blur that fades in: cheaper than animating the blur
               Positioned.fill(
                 child: IgnorePointer(
                   child: FadeTransition(
-                    opacity: t,
+                    opacity: anim,
                     child: BackdropFilter(
-                      filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                       child: const SizedBox.expand(),
                     ),
                   ),
                 ),
               ),
-              // Opening: a small grow out of the tapped message with a quick
-              // fade. Closing: the pane slides down whole (never see-through,
-              // so the chat and the pane don't show through each other).
-              AnimatedBuilder(
-                animation: anim,
-                child: RepaintBoundary(child: child),
-                builder: (ctx, child) {
-                  final v = anim.value;
-                  if (anim.status == AnimationStatus.reverse) {
-                    final d = Curves.easeInCubic.transform(1 - v);
-                    return FractionalTranslation(
-                      translation: Offset(0, d),
-                      child: child,
-                    );
-                  }
-                  final grow = Curves.easeOutCubic.transform(v);
-                  final fade = Curves.easeOut.transform((v / 0.35).clamp(0.0, 1.0));
-                  return Opacity(
-                    opacity: fade,
-                    child: Transform.scale(
-                      alignment: origin,
-                      scale: 0.94 + 0.06 * grow,
-                      child: child,
-                    ),
-                  );
-                },
-              ),
+              pane,
             ],
           );
         },
@@ -242,14 +211,32 @@ class _ThreadPaneState extends State<_ThreadPane>
     });
     // No keyboard on open: it resized the pane while it was still moving.
     // Tap the text box to type.
-    Future<void>.delayed(const Duration(milliseconds: 160), () {
-      if (mounted) _intro.forward();
-    });
     VibeReplyThread._olderParents(_chain, widget.timeline).then((older) {
       if (mounted && older.isNotEmpty) {
         setState(() => _chain = [...older, ..._chain]);
       }
     });
+  }
+
+  Animation<double>? _route;
+
+  /// The messages slide in only once the pane has landed, so the two
+  /// motions never run at the same time.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_route != null) return;
+    final route = _route = ModalRoute.of(context)?.animation;
+    if (route == null || route.isCompleted) {
+      _intro.forward();
+      return;
+    }
+    void landed(AnimationStatus s) {
+      if (s != AnimationStatus.completed) return;
+      route.removeStatusListener(landed);
+      if (mounted) _intro.forward();
+    }
+    route.addStatusListener(landed);
   }
 
   @override

@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} katılma davetini kabul etti",
+    "acceptedTheInvitation": "{username} katılma davetini kabul etti",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} uçtan uca şifrelemeyi etkinleştirdi",
+    "activatedEndToEndEncryption": "{username} uçtan uca şifrelemeyi etkinleştirdi",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -504,7 +504,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} sohbeti oluşturdu",
+    "createdTheChat": "{username} sohbeti oluşturdu",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -798,7 +798,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username}, {targetName} kişisini davet etti",
+    "invitedUser": "{username}, {targetName} kişisini davet etti",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -832,7 +832,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} sohbete katıldı",
+    "joinedTheChat": "{username} sohbete katıldı",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -846,7 +846,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username}, {targetName} kişisini attı",
+    "kicked": "{username}, {targetName} kişisini attı",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -858,7 +858,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username}, {targetName} kişisini attı ve engelledi",
+    "kickedAndBanned": "{username}, {targetName} kişisini attı ve engelledi",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -972,7 +972,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 FluffyChat'te yeni mesaj",
+    "newMessageInFluffyChat": "FluffyChat'te yeni mesaj",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -997,7 +997,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "İfade bulunamadı. 😕",
+    "noEmotesFound": "İfade bulunamadı.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1305,7 +1305,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} bir dosya gönderdi",
+    "sentAFile": "{username} bir dosya gönderdi",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1314,7 +1314,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} bir ses gönderdi",
+    "sentAnAudio": "{username} bir ses gönderdi",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1323,7 +1323,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} bir resim gönderdi",
+    "sentAPicture": "{username} bir resim gönderdi",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1332,7 +1332,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} bir çıkartma gönderdi",
+    "sentASticker": "{username} bir çıkartma gönderdi",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1341,7 +1341,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} bir video gönderdi",
+    "sentAVideo": "{username} bir video gönderdi",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1546,7 +1546,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} sohbetten ayrıldı",
+    "userLeftTheChat": "{username} sohbetten ayrıldı",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1747,8 +1747,8 @@
     "videoCallsBetaWarning": "Görüntülü aramaların şu anda beta aşamasında olduğunu lütfen unutmayın. Tüm platformlarda beklendiği gibi veya hiç çalışmayabilirler.",
     "experimentalVideoCalls": "Deneysel görüntülü aramalar",
     "youJoinedTheChat": "Sohbete katıldınız",
-    "youAcceptedTheInvitation": "👍 Daveti kabul ettiniz",
-    "youKickedAndBanned": "🙅 {user} kullanıcısını attınız ve yasakladınız",
+    "youAcceptedTheInvitation": "Daveti kabul ettiniz",
+    "youKickedAndBanned": "{user} kullanıcısını attınız ve yasakladınız",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1764,7 +1764,7 @@
             }
         }
     },
-    "youKicked": "👞 {user} kullanıcısını attınız",
+    "youKicked": "{user} kullanıcısını attınız",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1781,7 +1781,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 {user} tarafından davet edildiniz",
+    "youInvitedBy": "{user} tarafından davet edildiniz",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1789,7 +1789,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 {user} kullanıcısını davet ettiniz",
+    "youInvitedUser": "{user} kullanıcısını davet ettiniz",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1898,7 +1898,7 @@
     "readUpToHere": "Buraya kadar oku",
     "jump": "Atla",
     "openLinkInBrowser": "Bağlantıyı tarayıcıda aç",
-    "reportErrorDescription": "😭 Olamaz. Bir şeyler yanlış gitti. İsterseniz bu hatayı geliştiricilere bildirebilirsiniz.",
+    "reportErrorDescription": "Olamaz. Bir şeyler yanlış gitti. İsterseniz bu hatayı geliştiricilere bildirebilirsiniz.",
     "report": "bildir",
     "notAnImage": "Bir resim dosyası değil.",
     "importNow": "Şimdi içe aktar",
@@ -1942,7 +1942,7 @@
     },
     "setChatDescription": "Sohbet açıklamasını ayarla",
     "chatDescriptionHasBeenChanged": "Sohbet açıklaması değişti",
-    "inviteGroupChat": "📨 Grup sohbetine davet et",
+    "inviteGroupChat": "Grup sohbetine davet et",
     "emoteKeyboardNoRecents": "Son kullanılan ifadeler burada görünecek...",
     "@emoteKeyboardNoRecents": {
         "type": "String",
@@ -1964,7 +1964,7 @@
     "pushNotificationsNotAvailable": "Anlık bildirimler kullanılamıyor",
     "makeAdminDescription": "Bu kullanıcıyı yönetici yaptıktan sonra, sizinle aynı izinlere sahip olacağı için bunu geri alamayabilirsiniz.",
     "archiveRoomDescription": "Sohbet arşive taşınacak. Diğer kullanıcıları sohbeti terk ettiğinizi görebilecek.",
-    "hasKnocked": "🚪 {user} tıklattı",
+    "hasKnocked": "{user} tıklattı",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2026,7 +2026,7 @@
     },
     "thisDevice": "Bu aygıt:",
     "formattedMessagesDescription": "Markdown kullanarak kalın metin gibi zengin mesaj içeriğini görüntüle.",
-    "verifyOtherDevice": "🔐 Diğer aygıtı doğrula",
+    "verifyOtherDevice": "Diğer aygıtı doğrula",
     "searchForUsers": "@kullanıcıları ara...",
     "commandHint_ignore": "Verilen matrix kimliğini görmezden gel",
     "commandHint_unignore": "Verilen matrix kimliğini görmezden gelmeyi iptal et",
@@ -2046,7 +2046,7 @@
     "noOneCanJoin": "Kimse katılamaz",
     "nothingFound": "Hiçbir şey bulunamadı...",
     "sendReadReceiptsDescription": "Sohbetteki diğer katılımcılar bir mesajı okuduğunuzu görebilir.",
-    "verifyOtherDeviceDescription": "Başka bir aygıtı doğruladığınızda, bu aygıtlar anahtarları değiş tokuş ederek genel güvenliğinizi artırır. 💪 Bir doğrulama başlattığınızda, her iki aygıttaki uygulamada bir açılır pencere görünecektir. Orada birbirleriyle karşılaştırmanız gereken bir dizi emoji veya sayı göreceksiniz. Doğrulamaya başlamadan önce her iki aygıtın da elinizin altında olması en iyisidir. 🤳",
+    "verifyOtherDeviceDescription": "Başka bir aygıtı doğruladığınızda, bu aygıtlar anahtarları değiş tokuş ederek genel güvenliğinizi artırır. Bir doğrulama başlattığınızda, her iki aygıttaki uygulamada bir açılır pencere görünecektir. Orada birbirleriyle karşılaştırmanız gereken bir dizi emoji veya sayı göreceksiniz. Doğrulamaya başlamadan önce her iki aygıtın da elinizin altında olması en iyisidir.",
     "noDatabaseEncryption": "Veri tabanı şifrelemesi bu platformda desteklenmiyor",
     "thereAreCountUsersBlocked": "Şu anda {count} engellenen kullanıcı var.",
     "@thereAreCountUsersBlocked": {
@@ -2122,7 +2122,7 @@
             }
         }
     },
-    "verifyOtherUser": "🔐 Diğer kullanıcıyı doğrula",
+    "verifyOtherUser": "Diğer kullanıcıyı doğrula",
     "startedKeyVerification": "{sender} anahtar doğrulama başlattı",
     "@startedKeyVerification": {
         "type": "String",
@@ -2134,7 +2134,7 @@
     },
     "discover": "Keşfet",
     "incomingMessages": "Gelen mesajlar",
-    "verifyOtherUserDescription": "Başka bir kullanıcıyı doğrularsanız, gerçekten kime yazdığınızı bildiğinizden emin olabilirsiniz. 💪\n\nBir doğrulama başlattığınızda, siz ve diğer kullanıcı uygulamada bir açılır pencere görecektir. Orada birbirinizle karşılaştırmanız gereken bir dizi emoji veya sayı göreceksiniz.\n\nBunu yapmanın en iyi yolu buluşmak veya bir görüntülü arama başlatmaktır. 👭",
+    "verifyOtherUserDescription": "Başka bir kullanıcıyı doğrularsanız, gerçekten kime yazdığınızı bildiğinizden emin olabilirsiniz.\n\nBir doğrulama başlattığınızda, siz ve diğer kullanıcı uygulamada bir açılır pencere görecektir. Orada birbirinizle karşılaştırmanız gereken bir dizi emoji veya sayı göreceksiniz.\n\nBunu yapmanın en iyi yolu buluşmak veya bir görüntülü arama başlatmaktır.",
     "stickers": "Çıkartmalar",
     "unreadChatsInApp": "{appname}: {unread} okunmayan sohbet",
     "@unreadChatsInApp": {
@@ -2206,7 +2206,7 @@
     "changeTheVisibilityOfChatHistory": "Sohbet geçmişinin görünürlüğünü değiştir",
     "chatPermissionsDescription": "Bu sohbette belirli eylemler için hangi güç düzeyinin gerekli olduğunu tanımlayın. 0, 50 ve 100 güç düzeyleri genellikle kullanıcıları, moderatörleri ve yöneticileri temsil eder, ancak herhangi bir derecelendirme mümkündür.",
     "changelog": "Değişiklik günlüğü",
-    "updateInstalled": "🎉 Güncelleme {version} kuruldu!",
+    "updateInstalled": "Güncelleme {version} kuruldu!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2216,7 +2216,7 @@
         }
     },
     "sendCanceled": "Gönderme iptal edildi",
-    "noChatsFoundHere": "Burada henüz sohbet bulunamadı. Aşağıdaki düğmeyi kullanarak biriyle yeni bir sohbet başlatın. ⤵️",
+    "noChatsFoundHere": "Burada henüz sohbet bulunamadı. Aşağıdaki düğmeyi kullanarak biriyle yeni bir sohbet başlatın.",
     "loginWithMatrixId": "Matrix kimliği ile oturum aç",
     "doesNotSeemToBeAValidHomeserver": "Uyumlu bir ana sunucu gibi görünmüyor. Yanlış URL mi?",
     "calculatingFileSize": "Dosya boyutu hesaplanıyor...",

@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username}(e)k gonbidapena onartu du",
+    "acceptedTheInvitation": "{username}(e)k gonbidapena onartu du",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username}(e)k ertzetik ertzerako zifratzea gaitu du",
+    "activatedEndToEndEncryption": "{username}(e)k ertzetik ertzerako zifratzea gaitu du",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -327,7 +327,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username}(e)k txata sortu du",
+    "createdTheChat": "{username}(e)k txata sortu du",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -517,7 +517,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username}(e)k {targetName} gonbidatu du",
+    "invitedUser": "{username}(e)k {targetName} gonbidatu du",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -551,7 +551,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} txatera batu da",
+    "joinedTheChat": "{username} txatera batu da",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -565,7 +565,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username}(e)k {targetName} kanporatu du",
+    "kicked": "{username}(e)k {targetName} kanporatu du",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -577,7 +577,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username}(e)k {targetName} kanporatu eta debekua ezarri dio",
+    "kickedAndBanned": "{username}(e)k {targetName} kanporatu eta debekua ezarri dio",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -666,7 +666,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Mezu berria FluffyChaten",
+    "newMessageInFluffyChat": "Mezu berria FluffyChaten",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -681,7 +681,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Ez da emoterik aurkitu. 😕",
+    "noEmotesFound": "Ez da emoterik aurkitu.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -834,7 +834,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username}(e)k fitxategia bidali du",
+    "sentAFile": "{username}(e)k fitxategia bidali du",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -843,7 +843,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username}(e)k audioa bidali du",
+    "sentAnAudio": "{username}(e)k audioa bidali du",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -852,7 +852,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username}(e)k irudia bidali du",
+    "sentAPicture": "{username}(e)k irudia bidali du",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -861,7 +861,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username}(e)k pegatina bidali du",
+    "sentASticker": "{username}(e)k pegatina bidali du",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -870,7 +870,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username}(e)k bideoa bidali du",
+    "sentAVideo": "{username}(e)k bideoa bidali du",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1040,7 +1040,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username}(e)k txata utzi du",
+    "userLeftTheChat": "{username}(e)k txata utzi du",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1747,7 +1747,7 @@
     "removeFromSpace": "Kendu gunetik",
     "reportUser": "Salatu erabiltzailea",
     "youJoinedTheChat": "Txatera batu zara",
-    "youAcceptedTheInvitation": "👍 Gonbidapena onartu duzu",
+    "youAcceptedTheInvitation": "Gonbidapena onartu duzu",
     "youBannedUser": "{user}(r)i debekua ezarri diozu",
     "@youBannedUser": {
         "placeholders": {
@@ -1764,7 +1764,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 {user}(e)k gonbidatu zaitu",
+    "youInvitedBy": "{user}(e)k gonbidatu zaitu",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1772,7 +1772,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 {user} gonbidatu duzu",
+    "youInvitedUser": "{user} gonbidatu duzu",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1780,7 +1780,7 @@
             }
         }
     },
-    "youKicked": "👞 {user} kanporatu duzu",
+    "youKicked": "{user} kanporatu duzu",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1788,7 +1788,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 {user} kanporatu eta debekua ezarri diozu",
+    "youKickedAndBanned": "{user} kanporatu eta debekua ezarri diozu",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1877,7 +1877,7 @@
         }
     },
     "jumpToLastReadMessage": "Joan irakurritako azken mezura",
-    "reportErrorDescription": "😭 O ez! Zerbaitek huts egin du. Nahi izanez gero, eman garatzaileei errorearen berri.",
+    "reportErrorDescription": "O ez! Zerbaitek huts egin du. Nahi izanez gero, eman garatzaileei errorearen berri.",
     "cuddleContent": "{senderName}(e)k samurki besarkatu zaitu",
     "@cuddleContent": {
         "type": "String",
@@ -1957,14 +1957,14 @@
     "createGroup": "Sortu taldea",
     "invite": "Gonbidatu",
     "invalidInput": "Sartu duzunak ez du balio!",
-    "inviteGroupChat": "📨 Taldeko txatera gonbidapena",
+    "inviteGroupChat": "Taldeko txatera gonbidapena",
     "banUserDescription": "Erabiltzailea txatetik kanporatu eta berriro sartzeko debekua ezarriko zaio; ezingo da berriro sartu debekua kendu arte.",
     "removeDevicesDescription": "Gailu honetako saioa amaituko da eta ezingo duzu mezurik jaso aurrerantzean.",
     "unbanUserDescription": "Erabiltzailea txatera berriro sartu ahal izango da berak nahi izanez gero.",
     "pushNotificationsNotAvailable": "Push jakinarazpenak ez daude erabilgarri",
     "makeAdminDescription": "Behin erabiltzaile hau administratzaile eginda, litekeena da desegin ezin izatea zuk dituzun baimenak izango dituelako.",
     "archiveRoomDescription": "Txata artxibategira mugituko da. Beste erabiltzaileek txatetik alde egin duzula ikusi ahal izango dute.",
-    "hasKnocked": "🚪 {user}(e)k baimena eskatu du",
+    "hasKnocked": "{user}(e)k baimena eskatu du",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2038,7 +2038,7 @@
     },
     "sendReadReceipts": "Bidali irakurri izanaren agiria",
     "formattedMessages": "Formatua duten mezuak",
-    "verifyOtherDevice": "🔐 Egiaztatu beste gailu bat",
+    "verifyOtherDevice": "Egiaztatu beste gailu bat",
     "acceptedKeyVerification": "{sender}(e)k gakoaren egiaztapena onartu du",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2085,11 +2085,11 @@
             }
         }
     },
-    "verifyOtherDeviceDescription": "Beste gailu bat egiaztatzean, gailu horiek gakoak truka ditzakete, eta segurtasun orokorra handitu. 💪 Egiaztapena hasten duzunean, laster-leiho bat agertuko da bi gailuetan. Bertan, elkarrekin alderatu behar diren emoji edo zenbaki batzuk ikusiko dituzu. Hobe da bi gailuak eskura izatea egiaztapena hasi aurretik. 🤳",
-    "verifyOtherUserDescription": "Beste erabiltzaile bat egiaztatzen baduzu, ziur egon zaitezke nori idazten ari zaren. 💪\n\nEgiaztapena hasten duzunean, zuk eta beste erabiltzaileak laster-leiho bat ikusiko duzue aplikazioan. Bertan, elkarrekin alderatu behar diren emoji edo zenbaki batzuk erakutsiko dira.\n\nBideo-dei bat hastea edo aurrez-aurre batzea da horretarako modurik onena. 👭",
+    "verifyOtherDeviceDescription": "Beste gailu bat egiaztatzean, gailu horiek gakoak truka ditzakete, eta segurtasun orokorra handitu. Egiaztapena hasten duzunean, laster-leiho bat agertuko da bi gailuetan. Bertan, elkarrekin alderatu behar diren emoji edo zenbaki batzuk ikusiko dituzu. Hobe da bi gailuak eskura izatea egiaztapena hasi aurretik.",
+    "verifyOtherUserDescription": "Beste erabiltzaile bat egiaztatzen baduzu, ziur egon zaitezke nori idazten ari zaren.\n\nEgiaztapena hasten duzunean, zuk eta beste erabiltzaileak laster-leiho bat ikusiko duzue aplikazioan. Bertan, elkarrekin alderatu behar diren emoji edo zenbaki batzuk erakutsiko dira.\n\nBideo-dei bat hastea edo aurrez-aurre batzea da horretarako modurik onena.",
     "formattedMessagesDescription": "Erakutsi mezu aberatsen edukia markdown erabiliz, testu lodia esaterako.",
     "sendTypingNotificationsDescription": "Txateko beste partaideek mezu berri bat idazten ari zarela ikus dezakete.",
-    "verifyOtherUser": "🔐 Egiaztatu beste erabiltzaile bat",
+    "verifyOtherUser": "Egiaztatu beste erabiltzaile bat",
     "startedKeyVerification": "{sender}(e)k gakoen egiaztapena hasi du",
     "@startedKeyVerification": {
         "type": "String",
@@ -2204,7 +2204,7 @@
     "changeGeneralChatSettings": "Aldatu txataren ezarpen orokorrak",
     "changeTheVisibilityOfChatHistory": "Aldatu txataren historiaren ikusgaitasuna",
     "changeTheCanonicalRoomAlias": "Aldatu txataren helbide publiko nagusia",
-    "updateInstalled": "🎉 {version} bertsioa instalatu da!",
+    "updateInstalled": "{version} bertsioa instalatu da!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2216,7 +2216,7 @@
     "changelog": "Aldaketak",
     "chatPermissionsDescription": "Definitu zer botere-maila behar den txat honetako ekintza jakinetarako. 0, 50 eta 100 botere-mailek erabiltzaileak, moderatzaileak eta administratzaileak ordezkatzen dituzte, baina edozein graduazio posible da.",
     "sendCanceled": "Bidalketa bertan behera utzi da",
-    "noChatsFoundHere": "Ez da txatik aurkitu. Hasi norbaitekin txateatzen beheko botoia erabiliz. ⤵️",
+    "noChatsFoundHere": "Ez da txatik aurkitu. Hasi norbaitekin txateatzen beheko botoia erabiliz.",
     "loginWithMatrixId": "Hasi saioa Matrix IDarekin",
     "doesNotSeemToBeAValidHomeserver": "Ez dirudi zerbitzaria bateragarria denik. Zuzena da URLa?",
     "calculatingFileSize": "Fitxategiaren tamaina kalkulatzen…",
@@ -2279,7 +2279,7 @@
     "notificationRuleMaster": "Isilarazi jakinarazpen guztiak",
     "userSpecificNotificationSettings": "Erabiltzaile zehatzen jakinarazpenen ezarpenak",
     "more": "Gehiago",
-    "newChatRequest": "📩 Txat-eskaera berria",
+    "newChatRequest": "Txat-eskaera berria",
     "contentNotificationSettings": "Edukiaren jakinarazpenen ezarpenak",
     "notificationRuleContainsUserNameDescription": "Mezuan erabiltzaile-izena aipatzen denean jakinarazten du.",
     "notificationRuleMasterDescription": "Gainerako arauak gainidatzi eta jakinarazpenak ezgaitzen ditu.",
@@ -2366,7 +2366,7 @@
             }
         }
     },
-    "sentVoiceMessage": "🎙️ {duration} - {sender}(r)en ahots-mezua",
+    "sentVoiceMessage": "{duration} - {sender}(r)en ahots-mezua",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {

@@ -222,7 +222,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 Tinanggap ni {username} ang imbitasyon",
+    "acceptedTheInvitation": "Tinanggap ni {username} ang imbitasyon",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -231,7 +231,7 @@
             }
         }
     },
-    "activatedEndToEndEncryption": "🔐 Na-activate ni {username} ang end to end encryption",
+    "activatedEndToEndEncryption": "Na-activate ni {username} ang end to end encryption",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -465,7 +465,7 @@
             }
         }
     },
-    "createdTheChat": "💬 Ginawa ni {username} ang chat",
+    "createdTheChat": "Ginawa ni {username} ang chat",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -776,7 +776,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noChatsFoundHere": "Walang pang mga chat na nahanap dito. Magsimula ng bagong chat kasama ang isang tao sa pamamagitan ng paggamit ng button sa ibaba. ⤵️",
+    "noChatsFoundHere": "Walang pang mga chat na nahanap dito. Magsimula ng bagong chat kasama ang isang tao sa pamamagitan ng paggamit ng button sa ibaba.",
     "aboutHomeserver": "Tungkol sa {homeserver}",
     "@aboutHomeserver": {
         "type": "String",

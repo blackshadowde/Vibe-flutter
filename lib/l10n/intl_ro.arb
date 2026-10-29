@@ -655,7 +655,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬{username} a creat chatul",
+    "createdTheChat": "{username} a creat chatul",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -730,7 +730,7 @@
             }
         }
     },
-    "joinedTheChat": "👋{username} a intrat în chat",
+    "joinedTheChat": "{username} a intrat în chat",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -739,7 +739,7 @@
             }
         }
     },
-    "kicked": "👞{username} a dat afară pe {targetName}",
+    "kicked": "{username} a dat afară pe {targetName}",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -811,7 +811,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Nu s-a găsit nici un emote. 😕",
+    "noEmotesFound": "Nu s-a găsit nici un emote.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -957,7 +957,7 @@
     "unsupportedAndroidVersionLong": "Această funcție are nevoie de o versiune de Android mai nouă. Vă rugăm să verificați dacă sunt actualizări sau suport de la Lineage OS.",
     "youRejectedTheInvitation": "Ați respins invitația",
     "youJoinedTheChat": "Va-ți alăturat la chat",
-    "youAcceptedTheInvitation": "👍Ați acceptat invitația",
+    "youAcceptedTheInvitation": "Ați acceptat invitația",
     "youHaveWithdrawnTheInvitationFor": "Ați retras invitația pentru {user}",
     "@youHaveWithdrawnTheInvitationFor": {
         "placeholders": {
@@ -966,7 +966,7 @@
             }
         }
     },
-    "youInvitedBy": "📩Ați fost invitat de {user}",
+    "youInvitedBy": "Ați fost invitat de {user}",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -974,7 +974,7 @@
             }
         }
     },
-    "youInvitedUser": "📩Ați invitat pe {user}",
+    "youInvitedUser": "Ați invitat pe {user}",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -982,7 +982,7 @@
             }
         }
     },
-    "youKicked": "👞Ați dat afară pe {user}",
+    "youKicked": "Ați dat afară pe {user}",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1057,7 +1057,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kickedAndBanned": "🙅{username} a dat afară și a interzis pe {targetName} din cameră",
+    "kickedAndBanned": "{username} a dat afară și a interzis pe {targetName} din cameră",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -1166,7 +1166,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪{username} a plecat din chat",
+    "userLeftTheChat": "{username} a plecat din chat",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1245,7 +1245,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAnAudio": "🎤{username} a trimis audio",
+    "sentAnAudio": "{username} a trimis audio",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1254,7 +1254,7 @@
             }
         }
     },
-    "sentAFile": "📁{username} a trimis un fișier",
+    "sentAFile": "{username} a trimis un fișier",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1273,12 +1273,12 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Mesaj nou în FluffyChat",
+    "newMessageInFluffyChat": "Mesaj nou în FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
     },
-    "sentAPicture": "🖼️ {username} a trimis o poză",
+    "sentAPicture": "{username} a trimis o poză",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1287,7 +1287,7 @@
             }
         }
     },
-    "sentAVideo": "🎥{username} a trimis un video",
+    "sentAVideo": "{username} a trimis un video",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1296,7 +1296,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} a trimis un sticker",
+    "sentASticker": "{username} a trimis un sticker",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1578,7 +1578,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "youKickedAndBanned": "🙅Ați dat afară și interzis pe {user}",
+    "youKickedAndBanned": "Ați dat afară și interzis pe {user}",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1771,7 +1771,7 @@
             }
         }
     },
-    "invitedUser": "📩{username} a invitat {targetName}",
+    "invitedUser": "{username} a invitat {targetName}",
     "@invitedUser": {
         "type": "String",
         "placeholders": {

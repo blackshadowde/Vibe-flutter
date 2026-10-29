@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
 import 'package:vibe/l10n/l10n.dart';
 import 'package:vibe/vibe/screens/chat/event_info_dialog.dart';
@@ -47,7 +48,7 @@ class UtdDialog extends StatelessWidget {
           thumbVisibility: true,
           child: SingleChildScrollView(
             child: SelectableText(
-              event.calcLocalizedBodyFallback(MatrixLocals(L10n.of(context))),
+              event.vibeBodyFallback(MatrixLocals(L10n.of(context))),
             ),
           ),
         ),

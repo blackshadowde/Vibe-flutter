@@ -11,7 +11,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "acceptedTheInvitation": "👍 {username} hat die Einladung angenommen",
+    "acceptedTheInvitation": "{username} hat die Einladung angenommen",
     "@acceptedTheInvitation": {
         "type": "String",
         "placeholders": {
@@ -25,7 +25,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "activatedEndToEndEncryption": "🔐 {username} hat Ende-zu-Ende Verschlüsselung aktiviert",
+    "activatedEndToEndEncryption": "{username} hat Ende-zu-Ende Verschlüsselung aktiviert",
     "@activatedEndToEndEncryption": {
         "type": "String",
         "placeholders": {
@@ -498,7 +498,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "createdTheChat": "💬 {username} hat den Chat erstellt",
+    "createdTheChat": "{username} hat den Chat erstellt",
     "@createdTheChat": {
         "type": "String",
         "placeholders": {
@@ -792,7 +792,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "invitedUser": "📩 {username} hat {targetName} eingeladen",
+    "invitedUser": "{username} hat {targetName} eingeladen",
     "@invitedUser": {
         "type": "String",
         "placeholders": {
@@ -826,7 +826,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "joinedTheChat": "👋 {username} ist dem Chat beigetreten",
+    "joinedTheChat": "{username} ist dem Chat beigetreten",
     "@joinedTheChat": {
         "type": "String",
         "placeholders": {
@@ -840,7 +840,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "kicked": "👞 {username} hat {targetName} hinausgeworfen",
+    "kicked": "{username} hat {targetName} hinausgeworfen",
     "@kicked": {
         "type": "String",
         "placeholders": {
@@ -852,7 +852,7 @@
             }
         }
     },
-    "kickedAndBanned": "🙅 {username} hat {targetName} hinausgeworfen und verbannt",
+    "kickedAndBanned": "{username} hat {targetName} hinausgeworfen und verbannt",
     "@kickedAndBanned": {
         "type": "String",
         "placeholders": {
@@ -966,7 +966,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "newMessageInFluffyChat": "💬 Neue Nachricht in FluffyChat",
+    "newMessageInFluffyChat": "Neue Nachricht in FluffyChat",
     "@newMessageInFluffyChat": {
         "type": "String",
         "placeholders": {}
@@ -991,7 +991,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "noEmotesFound": "Keine Emoticons gefunden. 😕",
+    "noEmotesFound": "Keine Emoticons gefunden.",
     "@noEmotesFound": {
         "type": "String",
         "placeholders": {}
@@ -1287,7 +1287,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "sentAFile": "📁 {username} hat eine Datei gesendet",
+    "sentAFile": "{username} hat eine Datei gesendet",
     "@sentAFile": {
         "type": "String",
         "placeholders": {
@@ -1296,7 +1296,7 @@
             }
         }
     },
-    "sentAnAudio": "🎤 {username} hat eine Audio-Datei gesendet",
+    "sentAnAudio": "{username} hat eine Audio-Datei gesendet",
     "@sentAnAudio": {
         "type": "String",
         "placeholders": {
@@ -1305,7 +1305,7 @@
             }
         }
     },
-    "sentAPicture": "🖼️ {username} hat ein Bild gesendet",
+    "sentAPicture": "{username} hat ein Bild gesendet",
     "@sentAPicture": {
         "type": "String",
         "placeholders": {
@@ -1314,7 +1314,7 @@
             }
         }
     },
-    "sentASticker": "😊 {username} hat einen Sticker gesendet",
+    "sentASticker": "{username} hat einen Sticker gesendet",
     "@sentASticker": {
         "type": "String",
         "placeholders": {
@@ -1323,7 +1323,7 @@
             }
         }
     },
-    "sentAVideo": "🎥 {username} hat ein Video gesendet",
+    "sentAVideo": "{username} hat ein Video gesendet",
     "@sentAVideo": {
         "type": "String",
         "placeholders": {
@@ -1528,7 +1528,7 @@
             }
         }
     },
-    "userLeftTheChat": "🚪 {username} hat den Chat verlassen",
+    "userLeftTheChat": "{username} hat den Chat verlassen",
     "@userLeftTheChat": {
         "type": "String",
         "placeholders": {
@@ -1746,7 +1746,7 @@
     "markAsRead": "Als gelesen markiert",
     "reportUser": "Benutzer melden",
     "confirmEventUnpin": "Möchtest du das Ereignis wirklich dauerhaft lösen?",
-    "youKicked": "👞 Du hast {user} rausgeworfen",
+    "youKicked": "Du hast {user} rausgeworfen",
     "@youKicked": {
         "placeholders": {
             "user": {
@@ -1754,7 +1754,7 @@
             }
         }
     },
-    "youKickedAndBanned": "🙅 Du hast {user} rausgeworfen und verbannt",
+    "youKickedAndBanned": "Du hast {user} rausgeworfen und verbannt",
     "@youKickedAndBanned": {
         "placeholders": {
             "user": {
@@ -1772,7 +1772,7 @@
     },
     "youRejectedTheInvitation": "Du hast die Einladung abgelehnt",
     "youJoinedTheChat": "Du bist dem Chat beigetreten",
-    "youAcceptedTheInvitation": "👍 Du hast die Einladung angenommen",
+    "youAcceptedTheInvitation": "Du hast die Einladung angenommen",
     "youBannedUser": "Du hast den {user} verbannt",
     "@youBannedUser": {
         "placeholders": {
@@ -1789,7 +1789,7 @@
             }
         }
     },
-    "youInvitedBy": "📩 Du wurdest von {user} eingeladen",
+    "youInvitedBy": "Du wurdest von {user} eingeladen",
     "@youInvitedBy": {
         "placeholders": {
             "user": {
@@ -1797,7 +1797,7 @@
             }
         }
     },
-    "youInvitedUser": "📩 Du hast {user} eingeladen",
+    "youInvitedUser": "Du hast {user} eingeladen",
     "@youInvitedUser": {
         "placeholders": {
             "user": {
@@ -1897,7 +1897,7 @@
     "readUpToHere": "Bis hier gelesen",
     "jump": "Springen",
     "openLinkInBrowser": "Link im Browser öffnen",
-    "reportErrorDescription": "😭 Oh nein. Etwas ist schief gelaufen. Wenn du möchtest, kannst du den Bug bei den Entwicklern melden.",
+    "reportErrorDescription": "Oh nein. Etwas ist schief gelaufen. Wenn du möchtest, kannst du den Bug bei den Entwicklern melden.",
     "report": "Melden",
     "importNow": "Jetzt importieren",
     "importEmojis": "Emojis importieren",
@@ -1941,9 +1941,9 @@
     "noChatDescriptionYet": "Noch keine Chatbeschreibung vorhanden.",
     "invalidServerName": "Ungültiger Servername",
     "setChatDescription": "Chatbeschreibung festlegen",
-    "inviteGroupChat": "📨 Einladungen zum Gruppenchat",
+    "inviteGroupChat": "Einladungen zum Gruppenchat",
     "invalidInput": "Ungültige Eingabe!",
-    "hasKnocked": "🚪 {user} hat angeklopft",
+    "hasKnocked": "{user} hat angeklopft",
     "@hasKnocked": {
         "placeholders": {
             "user": {
@@ -2039,10 +2039,10 @@
     "formattedMessages": "Formatierte Nachrichten",
     "sendTypingNotificationsDescription": "Andere Teilnehmer in einem Chat können sehen, wenn du eine neue Nachricht tippst.",
     "formattedMessagesDescription": "Formatierte Nachrichteninhalte wie fettgedruckten Text mit Markdown anzeigen.",
-    "verifyOtherUser": "🔐 Anderen Benutzer verifizieren",
+    "verifyOtherUser": "Anderen Benutzer verifizieren",
     "sendReadReceiptsDescription": "Andere Teilnehmer in einem Chat können sehen, ob du eine Nachricht gelesen hast.",
-    "verifyOtherDevice": "🔐 Anderes Gerät verifizieren",
-    "verifyOtherUserDescription": "Wenn du einen anderen Benutzer verifizierst, kannst du sicher sein, dass du weißt, an wen du wirklich schreibst. 💪\n\nWenn du eine Verifizierung startest, wird dir und dem anderen Nutzer ein Popup in der App angezeigt. Dort siehst du dann eine Reihe von Emojis oder Zahlen, die ihr miteinander vergleichen müsst.\n\nDas geht am besten, wenn man sich trifft oder einen Videoanruf startet. 👭",
+    "verifyOtherDevice": "Anderes Gerät verifizieren",
+    "verifyOtherUserDescription": "Wenn du einen anderen Benutzer verifizierst, kannst du sicher sein, dass du weißt, an wen du wirklich schreibst.\n\nWenn du eine Verifizierung startest, wird dir und dem anderen Nutzer ein Popup in der App angezeigt. Dort siehst du dann eine Reihe von Emojis oder Zahlen, die ihr miteinander vergleichen müsst.\n\nDas geht am besten, wenn man sich trifft oder einen Videoanruf startet.",
     "acceptedKeyVerification": "{sender} hat die Schlüsselverifikation akzeptiert",
     "@acceptedKeyVerification": {
         "type": "String",
@@ -2097,7 +2097,7 @@
             }
         }
     },
-    "verifyOtherDeviceDescription": "Wenn du ein anderes Gerät verifizierst, können diese Geräte Schlüssel austauschen, was die Sicherheit insgesamt erhöht. 💪Sobald du eine Verifizierung startest, erscheint ein Pop-up in der App auf beiden Geräten. Dort siehst du dann eine Reihe von Emojis oder Zahlen, die du miteinander vergleichen musst. Am besten hältst du beide Geräte bereit, bevor du die Verifizierung startest. 🤳",
+    "verifyOtherDeviceDescription": "Wenn du ein anderes Gerät verifizierst, können diese Geräte Schlüssel austauschen, was die Sicherheit insgesamt erhöht. Sobald du eine Verifizierung startest, erscheint ein Pop-up in der App auf beiden Geräten. Dort siehst du dann eine Reihe von Emojis oder Zahlen, die du miteinander vergleichen musst. Am besten hältst du beide Geräte bereit, bevor du die Verifizierung startest.",
     "incomingMessages": "Eingehende Nachrichten",
     "commandHint_unignore": "Angegebene Matrix-ID nicht mehr ignorieren",
     "commandHint_ignore": "Angegebene Matrix-ID ignorieren",
@@ -2204,7 +2204,7 @@
     "changeTheCanonicalRoomAlias": "Ändern der Hauptadresse für den öffentlichen Chat",
     "sendRoomNotifications": "Sende eine @room-Benachrichtigung",
     "changeTheDescriptionOfTheGroup": "Chat-Beschreibung ändern",
-    "updateInstalled": "🎉 Update {version} installiert!",
+    "updateInstalled": "Update {version} installiert!",
     "@updateInstalled": {
         "type": "String",
         "placeholders": {
@@ -2215,7 +2215,7 @@
     },
     "changelog": "Änderungsprotokoll",
     "sendCanceled": "Senden abgebrochen",
-    "noChatsFoundHere": "Hier wurden noch keine Chats gefunden. Starte einen neuen Chat mit jemandem, indem du die Schaltfläche unten verwenden. ⤵️",
+    "noChatsFoundHere": "Hier wurden noch keine Chats gefunden. Starte einen neuen Chat mit jemandem, indem du die Schaltfläche unten verwenden.",
     "doesNotSeemToBeAValidHomeserver": "Scheint kein kompatibler Homeserver zu sein. Falsche URL?",
     "loginWithMatrixId": "Mit Matrix-ID anmelden",
     "calculatingFileSize": "Dateigröße wird berechnet ...",
@@ -2269,7 +2269,7 @@
     "compress": "Komprimieren",
     "supportPage": "Support-Seite",
     "serverInformation": "Server-Informationen:",
-    "newChatRequest": "📩 Neue Chat-Anfrage",
+    "newChatRequest": "Neue Chat-Anfrage",
     "synchronizingPleaseWaitCounter": " Synchronisierung… ({percentage}%)",
     "@synchronizingPleaseWaitCounter": {
         "type": "String",
@@ -2370,7 +2370,7 @@
     "crossVerifiedDevicesIfEnabled": "Cross-verifizierte Geräte, falls aktiviert",
     "notificationRuleServerAcl": "Unterdrücken von Server-ACL-Ereignissen",
     "notificationRuleMemberEventDescription": "Unterdrückt Benachrichtigungen zu Mitgliedschaftsereignissen.",
-    "sentVoiceMessage": "🎙️ {duration} - Sprachnachricht von {sender}",
+    "sentVoiceMessage": "{duration} - Sprachnachricht von {sender}",
     "@sentVoiceMessage": {
         "type": "String",
         "placeholders": {
