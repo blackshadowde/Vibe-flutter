@@ -10,6 +10,7 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 - Sign-in screen: "By continuing you agree to the Terms", with new [terms of use](https://get-vibe.github.io/terms.html) (rules, report and block, child safety)
 - Google Play build: no photo-library permission. Sending photos uses the system photo picker; saving to the gallery needs no permission
 - Storage permissions only on the old Android versions that use them (read: Android 12 and below, write: Android 10)
+- Google Play version is its own app, `app.vibe.chat`, because `com.vibe.app` is taken on Play by another developer. The GitHub version keeps `com.vibe.app`, so nothing changes for existing installs ([68db71c](https://github.com/blackshadowde/Vibe-flutter/commit/68db71cde))
 - Play listing name "Vibe – Secure Chat": "Matrix" is the Matrix.org Foundation's trademark, so the listing only says Vibe works with the Matrix protocol
 
 ## 2026-10-28
