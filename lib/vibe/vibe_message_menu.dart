@@ -6,6 +6,7 @@
 import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
+import 'package:vibe/vibe/vibe_new_hint.dart';
 import 'package:vibe/vibe/vibe_motion.dart';
 import 'package:vibe/vibe/vibe_animated_emoji.dart';
 import 'package:vibe/vibe/vibe_emoji_sheet.dart';
@@ -98,6 +99,7 @@ class _Menu extends StatelessWidget {
         controller.pendingText = controller.sendController.text;
       }
       controller.replyEvent = null;
+      controller.replyQuote = null;
       controller.editEvent = event;
       controller.sendController.text = text;
       controller.sendController.selection = TextSelection.collapsed(
@@ -313,6 +315,21 @@ class _Menu extends StatelessWidget {
                 _close();
                 controller.replyAction(replyTo: event);
               }),
+            // answer just some words of a text message (new: highlighted
+            // the first few times so people find it)
+            if (canSend &&
+                {
+                  MessageTypes.Text,
+                  MessageTypes.Notice,
+                  MessageTypes.Emote,
+                }.contains(event.messageType))
+              VibeNewHint(
+                id: 'quote_part',
+                child: item(Icons.format_quote_rounded, 'Quote part', () {
+                  _close();
+                  controller.quotePartAction(event);
+                }),
+              ),
             if (canEdit)
               item(Icons.edit_outlined, 'Edit', _edit, color: _blue),
             item(

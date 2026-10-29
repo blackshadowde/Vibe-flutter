@@ -22,7 +22,46 @@ class ReplyDisplay extends StatelessWidget {
     final editing = controller.editEvent != null;
 
     Widget label = const SizedBox.shrink();
-    if (reply != null) {
+    final quote = controller.replyQuote;
+    if (reply != null && quote != null) {
+      final name = reply.senderFromMemoryOrFallback.calcDisplayname(
+        i18n: MatrixLocals(L10n.of(context)),
+      );
+      // "Reply to quote from name" + the words; tap to pick other words
+      label = InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => controller.quotePartAction(reply),
+        child: Row(
+          children: [
+            Icon(Icons.format_quote_rounded, color: cs.primary, size: 26),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Reply to quote from $name',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: cs.primary,
+                    ),
+                  ),
+                  Text(
+                    quote.replaceAll('\n', ' '),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (reply != null) {
       final name = reply.senderFromMemoryOrFallback.calcDisplayname(
         i18n: MatrixLocals(L10n.of(context)),
       );

@@ -6,6 +6,7 @@
 import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_drop.dart';
 import 'package:vibe/vibe/vibe_pending_files.dart';
+import 'package:vibe/vibe/vibe_quote.dart';
 import 'package:vibe/vibe/vibe_mention_controller.dart';
 import 'package:vibe/vibe/vibe_reply_thread.dart';
 import 'package:vibe/vibe/vibe_dialog.dart';
@@ -190,6 +191,9 @@ class ChatController extends State<ChatPageWithRoom>
   final Set<String> unfolded = {};
 
   Event? replyEvent;
+
+  /// The part of [replyEvent] being answered ("Quote part").
+  String? replyQuote;
 
   Event? editEvent;
 
@@ -822,7 +826,7 @@ class ChatController extends State<ChatPageWithRoom>
       // ignore: unawaited_futures
       VibeEffects.send(
         room,
-        sendController.text,
+        _withQuote(sendController.text),
         effect,
         inReplyTo: replyEvent,
         threadRootEventId: activeThreadId,
@@ -830,7 +834,7 @@ class ChatController extends State<ChatPageWithRoom>
     } else {
       // ignore: unawaited_futures
       room.sendTextEvent(
-        sendController.text,
+        _withQuote(sendController.text),
         inReplyTo: replyEvent,
         editEventId: editEvent?.eventId,
         parseCommands: parseCommands,
@@ -846,6 +850,7 @@ class ChatController extends State<ChatPageWithRoom>
       sendController.text = pendingText;
       _inputTextIsEmpty = pendingText.isEmpty;
       replyEvent = null;
+      replyQuote = null;
       editEvent = null;
       pendingText = '';
     });
@@ -1058,6 +1063,7 @@ class ChatController extends State<ChatPageWithRoom>
     }
     setState(() {
       replyEvent = null;
+      replyQuote = null;
     });
     return;
   }
@@ -1328,6 +1334,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (openReplyThread(target)) return;
     setState(() {
       replyEvent = target;
+      replyQuote = null;
       selectedEvents.clear();
     });
     // Open the keyboard after the reply bar has been laid out, so the two
@@ -1725,8 +1732,34 @@ class ChatController extends State<ChatPageWithRoom>
       pendingText = '';
     }
     replyEvent = null;
+    replyQuote = null;
     editEvent = null;
   });
+
+  /// Quote part of [event]: pick the words, then answer them.
+  Future<void> quotePartAction(Event event) async {
+    final quote = await VibeQuotePicker.pick(context, event);
+    if (!mounted || quote == null || quote.isEmpty) return;
+    setState(() {
+      replyEvent = event;
+      replyQuote = quote;
+      editEvent = null;
+      selectedEvents.clear();
+    });
+    Future.delayed(const Duration(milliseconds: 60), () {
+      if (mounted) inputFocus.requestFocus();
+    });
+  }
+
+  /// The picked words go above the text as a quote (commands and edits
+  /// are sent as they are).
+  String _withQuote(String text) {
+    final quote = replyQuote;
+    if (quote == null || editEvent != null || text.startsWith('/')) {
+      return text;
+    }
+    return VibeQuotePicker.withQuote(quote, text);
+  }
 
   Future<void> _cancelEditWithConfirmation() async {
     final originalText = editEvent!
