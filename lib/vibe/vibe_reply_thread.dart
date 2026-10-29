@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:cross_file/cross_file.dart';
@@ -14,8 +15,9 @@ import 'package:vibe/vibe/vibe_pending_files.dart';
 
 /// Reply threads: when a message already has two or more replies, replying
 /// opens the whole thread in a pane over the blurred chat. It looks like the
-/// chat itself (same bubbles, names, avatars and text box); send, and the
-/// pane goes away and the reply lands in the chat.
+/// chat itself (same bubbles, names, avatars and text box). Sent replies
+/// slide in from the text box and show the same status dots as the chat
+/// (encrypting, sent, delivered, read); new replies from others appear live.
 abstract class VibeReplyThread {
   /// Apple's sheet motion (a spring with no bounce, ~0.5 s response), as a
   /// curve: quick to start, long soft landing.
@@ -202,9 +204,37 @@ class _ThreadPaneState extends State<_ThreadPane>
   bool _sending = false;
   bool _canSend = false;
 
+  /// Messages already on screen; anything new slides in from the text box.
+  final Set<String> _seen = {};
+  StreamSubscription<Event>? _eventSub;
+  StreamSubscription<SyncUpdate>? _syncSub;
+
+  /// Stays the same while a message goes from "sending" to "sent".
+  static String _key(Event e) => e.transactionId ?? e.eventId;
+
+  /// Picks up new and updated messages from the chat (own replies being
+  /// sent, replies from others, status changes, read markers).
+  void _refresh() {
+    if (!mounted) return;
+    final fresh = VibeReplyThread._loaded(widget.replyTo, widget.timeline);
+    final byKey = {for (final e in _chain) _key(e): e};
+    for (final e in fresh) {
+      byKey[_key(e)] = e;
+    }
+    final merged = byKey.values.where((e) => !e.redacted).toList()
+      ..sort((a, b) => a.originServerTs.compareTo(b.originServerTs));
+    setState(() => _chain = merged);
+  }
+
   @override
   void initState() {
     super.initState();
+    _seen.addAll(_chain.map(_key));
+    final client = widget.room.client;
+    _eventSub = client.onTimelineEvent.stream
+        .where((e) => e.roomId == widget.room.id)
+        .listen((_) => _refresh());
+    _syncSub = client.onSync.stream.listen((_) => _refresh());
     _text.addListener(() {
       final can = _text.text.trim().isNotEmpty;
       if (can != _canSend) setState(() => _canSend = can);
@@ -213,6 +243,8 @@ class _ThreadPaneState extends State<_ThreadPane>
     // Tap the text box to type.
     VibeReplyThread._olderParents(_chain, widget.timeline).then((older) {
       if (mounted && older.isNotEmpty) {
+        // older messages above: no slide-in for those
+        _seen.addAll(older.map(_key));
         setState(() => _chain = [...older, ..._chain]);
       }
     });
@@ -241,6 +273,8 @@ class _ThreadPaneState extends State<_ThreadPane>
 
   @override
   void dispose() {
+    _eventSub?.cancel();
+    _syncSub?.cancel();
     _text.dispose();
     _scroll.dispose();
     _focus.dispose();
@@ -271,20 +305,21 @@ class _ThreadPaneState extends State<_ThreadPane>
       );
       _files.clear();
     }
+    // The pane stays open: the reply slides in from the text box and its
+    // dots follow it (encrypting, sent, delivered, read).
+    _text.clear();
+    setState(() => _sending = false);
+    VibeHaptics.light();
+    if (text.isEmpty) return;
     try {
-      if (text.isNotEmpty) {
-        await widget.room.sendTextEvent(
-          text,
-          inReplyTo: _target,
-          threadRootEventId: widget.threadRootEventId,
-          threadLastEventId: widget.threadLastEventId,
-        );
-      }
-      VibeHaptics.light();
-      if (mounted) Navigator.of(context).pop();
+      await widget.room.sendTextEvent(
+        text,
+        inReplyTo: _target,
+        threadRootEventId: widget.threadRootEventId,
+        threadLastEventId: widget.threadLastEventId,
+      );
     } catch (e) {
       if (!mounted) return;
-      setState(() => _sending = false);
       messenger.showSnackBar(
         SnackBar(content: Text(e.toLocalizedString(context))),
       );
@@ -370,13 +405,21 @@ class _ThreadPaneState extends State<_ThreadPane>
                   reverse: true,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: events.length,
+                  // a new message at the bottom keeps the others' state
+                  findChildIndexCallback: (key) {
+                    if (key is! ValueKey<String>) return null;
+                    final i = events.indexWhere((e) => _key(e) == key.value);
+                    return i < 0 ? null : i;
+                  },
                   itemBuilder: (context, i) {
                     final e = events[i];
                     // the newest few slide up one after another; the rest
                     // (off screen) just appear
                     final start = i < 6 ? i * 0.09 : 0.0;
+                    // sent or received while the pane is open
+                    final isNew = _seen.add(_key(e));
                     return RepaintBoundary(
-                      key: ValueKey(e.eventId),
+                      key: ValueKey(_key(e)),
                       child: AnimatedBuilder(
                         animation: _intro,
                         builder: (context, child) {
@@ -392,7 +435,9 @@ class _ThreadPaneState extends State<_ThreadPane>
                             ),
                           );
                         },
-                        child: Message(
+                        child: _SlideIn(
+                          play: isNew,
+                          child: Message(
                       e,
                       nextEvent: i + 1 < events.length ? events[i + 1] : null,
                       previousEvent: i > 0 ? events[i - 1] : null,
@@ -414,6 +459,7 @@ class _ThreadPaneState extends State<_ThreadPane>
                       singleSelected: false,
                       enterThread: null,
                     ),
+                        ),
                       ),
                     );
                   },
@@ -544,4 +590,53 @@ class _ThreadPaneState extends State<_ThreadPane>
       ),
     );
   }
+}
+
+/// A message sent or received while the pane is open rises from the text
+/// box into place (moved and faded only, so nothing is laid out again).
+class _SlideIn extends StatefulWidget {
+  final bool play;
+  final Widget child;
+  const _SlideIn({required this.play, required this.child});
+
+  @override
+  State<_SlideIn> createState() => _SlideInState();
+}
+
+class _SlideInState extends State<_SlideIn>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 360),
+    value: widget.play ? 0 : 1,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.play) _c.forward();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _c,
+    child: widget.child,
+    builder: (context, child) {
+      if (_c.isCompleted) return child!;
+      final v = Curves.easeOutCubic.transform(_c.value);
+      return Opacity(
+        opacity: v,
+        child: Transform.translate(
+          offset: Offset(0, 48 * (1 - v)),
+          child: child,
+        ),
+      );
+    },
+  );
 }
