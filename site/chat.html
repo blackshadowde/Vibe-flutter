@@ -54,9 +54,10 @@ a.btn{display:block;padding:14px;border-radius:16px;text-decoration:none;font-we
   document.getElementById('id').textContent = id;
   if (id[0] === '@') document.getElementById('title').textContent = 'Chat with ' + id.slice(1).split(':')[0];
   var app = 'vibe://chat/' + id.replace('#', '%23');
-  // Android: open Vibe if it's installed, otherwise go to the download.
+  // Android: open Vibe if it's installed (GitHub com.vibe.app or Google Play
+  // app.vibe.chat, so no package is named), otherwise go to the download.
   var open = android
-    ? 'intent://chat/' + id.replace('#', '%23') + '#Intent;scheme=vibe;package=com.vibe.app;S.browser_fallback_url=' + encodeURIComponent(get) + ';end'
+    ? 'intent://chat/' + id.replace('#', '%23') + '#Intent;scheme=vibe;S.browser_fallback_url=' + encodeURIComponent(get) + ';end'
     : app;
   document.getElementById('open').href = open;
   document.getElementById('other').href = 'https://matrix.to/#/' + id;

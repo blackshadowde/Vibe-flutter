@@ -128,7 +128,7 @@ jobs:
             exit 1
           }
 
-      - name: Play version (no updater, no "install apps" or photo-library permission)
+      - name: Play version (app ID app.vibe.chat, no updater, no "install apps" or photo-library permission)
         run: |
           set -euo pipefail
           M=android/app/src/main/AndroidManifest.xml
@@ -143,6 +143,12 @@ jobs:
             if grep -q "$P" "$M"; then echo "::error::$P still there"; exit 1; fi
           done
           echo "removed READ_MEDIA_IMAGES and READ_MEDIA_VIDEO"
+          # com.vibe.app is taken on Google Play by another developer, so the
+          # Play version is its own app: app.vibe.chat. GitHub keeps com.vibe.app.
+          G=android/app/build.gradle.kts
+          sed -i 's/applicationId = "com.vibe.app"/applicationId = "app.vibe.chat"/' "$G"
+          grep -q 'applicationId = "app.vibe.chat"' "$G" || { echo "::error::app ID not changed"; exit 1; }
+          echo "app ID app.vibe.chat"
 
       - name: Build app bundle
         run: |

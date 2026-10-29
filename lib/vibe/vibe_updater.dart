@@ -66,8 +66,8 @@ abstract class VibeUpdater {
   /// Google Play build (`--dart-define=VIBE_STORE=play`): Play does the
   /// updating, so Vibe never downloads or installs an APK itself.
   static const fromPlay = String.fromEnvironment('VIBE_STORE') == 'play';
-  static const _playUrl = 'market://details?id=com.vibe.app';
-  static const _playWeb = 'https://play.google.com/store/apps/details?id=com.vibe.app';
+  static const _playUrl = 'market://details?id=app.vibe.chat';
+  static const _playWeb = 'https://play.google.com/store/apps/details?id=app.vibe.chat';
 
   /// Opens Vibe's page in the Play Store (the browser if Play isn't there).
   static Future<void> openPlay() async {

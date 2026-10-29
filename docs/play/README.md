@@ -8,8 +8,10 @@ before submitting; you are the one declaring it to Google.
 Actions → **Vibe for Google Play (app bundle)** → Run. Download the `.aab`
 under the run's **Artifacts** and upload it in the Play Console.
 
-The Play build is the same app as the GitHub APK (same package `com.vibe.app`,
-same signing key) except: no built-in updater, no "install apps" permission
+`com.vibe.app` is taken on Google Play by another developer, so the Play
+version is its own app, **`app.vibe.chat`** (the workflow sets it; GitHub keeps
+`com.vibe.app`). Both can be installed side by side and each updates from its
+own store. It's signed with the same key. Otherwise it's the same app, except: no built-in updater, no "install apps" permission
 (Play does the updating) and no photo-library permission (Play allows that
 only for gallery-type apps, so the attach sheet opens the system photo picker
 instead of its own gallery grid).
