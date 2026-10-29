@@ -6,6 +6,7 @@
 import 'package:vibe/vibe/vibe_event_body.dart';
 import 'package:vibe/vibe/vibe_member_tags.dart';
 import 'package:vibe/vibe/vibe_palette.dart';
+import 'package:vibe/vibe/vibe_quote.dart';
 import 'package:vibe/vibe/vibe_effects.dart';
 import 'package:vibe/vibe/vibe_emoji_sheet.dart';
 import 'package:vibe/vibe/vibe_haptics.dart';
@@ -567,7 +568,9 @@ class VibeMessage extends StatelessWidget {
                 : (theme.brightness == Brightness.light
                       ? rname.colorScheme.primary
                       : rname.colorScheme.primaryContainer);
-            final preview = replyEvent
+            // a reply to part of a message shows the quoted words
+            final quoted = VibeQuotePicker.quoteOf(event);
+            final preview = quoted ?? replyEvent
                 .getDisplayEvent(timeline)
                 .vibeBodyFallback(
                   MatrixLocals(L10n.of(context)),
