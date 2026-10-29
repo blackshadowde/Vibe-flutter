@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete Account</title>
+<meta name="description" content="How to delete your Vibe (Matrix) account and what happens to your data.">
+<meta name="theme-color" content="#0B0C0E">
+<link rel="canonical" href="https://get-vibe.github.io/delete-account.html">
+<link rel="icon" href="assets/icon.png">
+<style>
+@font-face{font-family:Figtree;src:url(assets/figtree.ttf)}
+:root{--bg:#0B0C0E;--surface:#16171A;--line:#2A2C31;--text:#F2F3F5;--muted:#A3A8B0;--blurple:#8A94FF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Figtree,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 16px 80px}
+a{color:var(--blurple)}
+.top{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:700;font-size:18px}
+h1{font-size:clamp(28px,6vw,40px);margin:32px 0 8px}
+.lead{color:var(--muted);margin:0 0 32px}
+section{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin:0 0 14px;scroll-margin-top:16px}
+section:target{border-color:var(--blurple)}
+h2{font-size:19px;margin:0 0 8px}
+p,li{color:var(--muted);margin:0 0 8px}
+ul{padding-left:20px;margin:0}
+b{color:var(--text)}
+</style>
+</head>
+<body>
+<main>
+<a class="top" href="./"><img src="assets/icon.png" alt="" width="28" height="28">Vibe</a>
+<h1>Delete your account</h1>
+<p class="lead">Vibe has no accounts of its own. You sign in with a Matrix account, which lives on the Matrix server you chose (for example matrix.org or unredacted.org). Deleting it happens on that server.</p>
+
+<section id="in-app">
+<h2>In the Vibe app</h2>
+<ul>
+<li>Open <b>Settings → Security &amp; sign-in</b>.</li>
+<li>Tap <b>Delete account</b> at the bottom, read the warning, and type your Matrix ID to confirm. Your server may also ask for your password.</li>
+</ul>
+<p>Your server then deactivates the account for good: you can't sign in again, and the username can't be used again. Vibe also asks the server to erase the messages you sent. (Servers that manage accounts on their own page, like matrix.org, may send you there instead; see below.)</p>
+</section>
+
+<section id="web">
+<h2>Without the app</h2>
+<p>Use your server's own account page. On matrix.org: sign in at <a href="https://account.matrix.org">account.matrix.org</a> and choose to deactivate the account. Other servers have a similar page, or you can sign in at <a href="https://app.element.io">app.element.io</a> and use Settings → Account → Deactivate account. If your server has no such option, contact its admin.</p>
+</section>
+
+<section id="data">
+<h2>What happens to your data</h2>
+<ul>
+<li><b>On the server:</b> your profile, devices and sign-ins are removed. Vibe asks it to erase your messages too. Copies already delivered to other people's devices stay with them, as with email.</li>
+<li><b>On your phone:</b> signing out or uninstalling Vibe deletes everything Vibe stored on the device, including your encryption keys.</li>
+<li><b>Vibe itself</b> keeps nothing about you: it has no servers, no analytics and no tracking. See the <a href="https://github.com/blackshadowde/Vibe-flutter/blob/Vibe/PRIVACY.md">privacy policy</a>.</li>
+</ul>
+</section>
+
+<p class="lead" style="margin-top:28px">Questions? <a href="https://github.com/blackshadowde/Vibe-flutter/issues">Ask on GitHub</a>.</p>
+</main>
+</body>
+</html>
