@@ -6,6 +6,8 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 ## 2026-10-29
 
 ### Changed
+- Thread pane is now a tree: a line down the side, answers to an older message indented under it, no repeated reply line ([534aac3](https://github.com/blackshadowde/Vibe-flutter/commit/534aac3ae))
+- Settings > Chats & storage: switch to turn off the text stickers shown above the text box while typing ([534aac3](https://github.com/blackshadowde/Vibe-flutter/commit/534aac3ae))
 - Thread pane stays open after you send: your reply rises from the text box into the thread with the chat's status dots (encrypting, sent, delivered, read), and new replies appear live ([d0d4acf](https://github.com/blackshadowde/Vibe-flutter/commit/d0d4acf86))
 
 ### Fixed
