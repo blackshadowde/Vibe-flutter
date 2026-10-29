@@ -6,6 +6,7 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 ## 2026-10-29
 
 ### Added
+- Swipe a text message and keep holding: the arrow turns into a quote mark, release to quote just part of it ([792ff7b](https://github.com/blackshadowde/Vibe-flutter/commit/792ff7b3b))
 - Quote part of a message: long-press a text message, tap Quote part, pick the words and answer just those (shown as a quote in every Matrix app). New features get a short "New" highlight the first few times ([9953651](https://github.com/blackshadowde/Vibe-flutter/commit/995365198))
 
 ### Changed
