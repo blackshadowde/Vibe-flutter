@@ -177,7 +177,7 @@ jobs:
             fi
             echo "---"
             echo
-            echo "A Discord-style, end-to-end encrypted messenger for Android, built on Matrix."
+            echo "An end-to-end encrypted messenger for Android, built on Matrix."
             echo
             echo "**Download:** tap \`Vibe-${VIBE_VERSION}.apk\` below, then open it to install"
             echo "(allow \"Install unknown apps\" for your browser when Android asks)."
@@ -187,7 +187,9 @@ jobs:
             echo "Free and open source (AGPL-3.0), based on FluffyChat."
             echo
             echo "**SHA-256:** \`$(sha256sum "Vibe-${VIBE_VERSION}.apk" | cut -d' ' -f1)\`"
-          } > release-body.md
+          } > release-body.raw
+          # in Vibe's own words: no "X-style" comparisons with other apps
+          python3 scripts/clean_notes.py < release-body.raw > release-body.md
           cat release-body.md
 
       - uses: softprops/action-gh-release@v2

@@ -1,0 +1,30 @@
+name: Clean release notes
+
+# One-off / on demand: rewrites every GitHub release's notes through
+# scripts/clean_notes.py, so they describe Vibe in its own words.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rewrite release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          n=0
+          for id in $(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" --paginate --jq '.[].id'); do
+            gh api "repos/${GITHUB_REPOSITORY}/releases/$id" --jq '.body // ""' > old.md
+            python3 scripts/clean_notes.py < old.md > new.md
+            if ! cmp -s old.md new.md; then
+              gh api -X PATCH "repos/${GITHUB_REPOSITORY}/releases/$id" -F body=@new.md > /dev/null
+              n=$((n+1))
+            fi
+          done
+          echo "::notice::Cleaned $n release notes"
