@@ -65,6 +65,17 @@ object VibeDropNative {
         })
     }
 
+    /**
+     * desktop_drop (used for desktop) also listens on Android, on the content
+     * view inside the window, so it got drops first and handed the chat a
+     * content:// link it can't open ("Cannot open file"). Vibe handles
+     * Android drops above, so its listener is removed. Called on every
+     * resume: the plugin sets it again when the screen is rebuilt.
+     */
+    fun silenceDesktopDrop(activity: Activity) {
+        activity.findViewById<View>(android.R.id.content)?.setOnDragListener(null)
+    }
+
     private fun copy(activity: Activity, uri: Uri): Map<String, String>? = try {
         val cr = activity.contentResolver
         val mime = cr.getType(uri) ?: "application/octet-stream"

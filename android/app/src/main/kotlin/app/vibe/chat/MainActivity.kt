@@ -39,6 +39,7 @@ class MainActivity : FlutterFragmentActivity() {
     override fun onResume() {
         super.onResume()
         current = this
+        VibeDropNative.silenceDesktopDrop(this)
         requestHighRefreshRate()
     }
 
