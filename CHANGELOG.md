@@ -5,6 +5,9 @@ https://github.com/blackshadowde/Vibe-flutter/releases
 
 ## 2026-10-29
 
+### Fixed
+- Dropping a photo or video from another app on Android failed with "Cannot open file". A desktop drag-and-drop library caught the drop before Vibe's own handler; it's now switched off on Android ([3c67951](https://github.com/blackshadowde/Vibe-flutter/commit/3c67951e6))
+
 ### Google Play policies ([fc55515](https://github.com/blackshadowde/Vibe-flutter/commit/fc55515e2))
 - Long-press a message from someone else: **Report** sends it to your server's admins
 - Sign-in screen: "By continuing you agree to the Terms", with new [terms of use](https://get-vibe.github.io/terms.html) (rules, report and block, child safety)
