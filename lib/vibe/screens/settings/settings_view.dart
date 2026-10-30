@@ -278,6 +278,8 @@ class SettingsView extends StatelessWidget {
               VibeSettingsGroup(
                 title: 'Support',
                 rows: [
+                  // Google Play build: Play does the updating, no Updates row
+                  if (!VibeUpdater.fromPlay)
                   ValueListenableBuilder<VibeRelease?>(
                     valueListenable: VibeUpdater.pending,
                     builder: (context, update, _) => VibeSettingsRow(

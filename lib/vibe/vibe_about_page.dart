@@ -166,7 +166,8 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
               style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
             ),
           ),
-          if (PlatformInfos.isAndroid) ...[
+          // Google Play build: no update button (Play does the updating)
+          if (PlatformInfos.isAndroid && !VibeUpdater.fromPlay) ...[
             const SizedBox(height: 10),
             _AboutButton(
               text: 'Check for updates',
