@@ -3,6 +3,14 @@
 Vibe's changes are listed on each release:
 https://github.com/blackshadowde/Vibe-flutter/releases
 
+## 2026-10-30
+
+### Security and privacy ([a4ec5c0](https://github.com/blackshadowde/Vibe-flutter/commit/a4ec5c05c))
+- In-app updates (GitHub version) are checked before installing: the exact APK, its SHA-256 from the release notes, and the same signing key as the installed Vibe
+- No Firebase anywhere in the build scripts
+- Privacy policy: who is responsible, legal basis, how long data is kept, your rights, data outside your country, minimum age 16
+- Google Play version: no in-app updater; Google Play does the updating
+
 ## 2026-10-29
 
 ### Added
