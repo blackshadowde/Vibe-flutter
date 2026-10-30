@@ -48,7 +48,7 @@ class _VibeUpdatesPageState extends State<VibeUpdatesPage> {
   }
 
   Future<void> _refresh() async {
-    if (VibeUpdater.checking.value) return;
+    if (VibeUpdater.fromPlay || VibeUpdater.checking.value) return;
     setState(() => _error = null);
     try {
       await VibeUpdater.refresh();
@@ -87,8 +87,14 @@ class _VibeUpdatesPageState extends State<VibeUpdatesPage> {
           ValueListenableBuilder<bool>(
             valueListenable: VibeUpdater.checking,
             builder: (context, busy, _) => IconButton(
-              tooltip: 'Check for updates',
-              onPressed: busy ? null : _refresh,
+              tooltip: VibeUpdater.fromPlay
+                  ? 'Check on Google Play'
+                  : 'Check for updates',
+              onPressed: busy
+                  ? null
+                  : VibeUpdater.fromPlay
+                  ? VibeUpdater.openPlay
+                  : _refresh,
               icon: busy
                   ? const SizedBox(
                       width: 20,

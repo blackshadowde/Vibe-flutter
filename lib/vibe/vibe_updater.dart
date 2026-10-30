@@ -130,6 +130,8 @@ abstract class VibeUpdater {
 
   /// Asks GitHub now. Updates [pending] / [lastChecked]. Throws when offline.
   static Future<VibeRelease?> refresh() async {
+    // Google Play build: Play does the updating, Vibe never checks GitHub.
+    if (fromPlay) return null;
     await load();
     checking.value = true;
     try {
