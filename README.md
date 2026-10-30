@@ -5,7 +5,7 @@
 <h1 align="center">Vibe</h1>
 
 <p align="center">
-  <b>A Discord-style, end-to-end encrypted messenger built on Matrix.</b><br>
+  <b>An end-to-end encrypted messenger with servers and channels, built on Matrix.</b><br>
   Android · iPhone · Web. No phone number. No ads. Open source.
 </p>
 
@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/hero.png" alt="Vibe: the Discord feel, Matrix privacy. Home and chat screens on two phones." width="100%">
+  <img src="docs/screenshots/hero.png" alt="Vibe: your servers, Matrix privacy. Home and chat screens on two phones." width="100%">
 </p>
 
 <p align="center">
@@ -37,7 +37,7 @@
 
 Vibe is a private chat app for family and friends. It runs on [Matrix](https://matrix.org), the open, decentralised chat network, so you can talk to anyone on any Matrix server, like matrix.org, Unredacted or Mozilla, and no single company owns your account.
 
-It looks and feels like Discord: a rail of profile pictures on the left, your DMs in the middle, and chats that slide over the top.
+The layout: a rail of profile pictures on the left, your DMs in the middle, and chats that slide over the top.
 
 ## Features
 
@@ -47,7 +47,7 @@ It looks and feels like Discord: a rail of profile pictures on the left, your DM
 - Up to date with the latest Matrix SDK (14.2) and encryption library (vodozemac 0.9)
 
 **Chat**
-- Replies with Discord-style curved lines and swipe-to-reply
+- Replies with curved lines and swipe-to-reply
 - Animated reactions for every emoji
 - Starred messages, pinned chats, edits and read receipts
 - Media slideshow for every photo and video in a chat
@@ -72,7 +72,7 @@ It looks and feels like Discord: a rail of profile pictures on the left, your DM
 - 🌐 Pick any Matrix server, or create an account right in the app
 - 🔔 Notifications through a **direct connection** to your server, or **built-in without Google** (ntfy). No Firebase
 - 💾 Keep media on your phone and save photos to your gallery
-- 🎨 Discord-style palette, Figtree font, haptics and 120 Hz animations
+- 🎨 Dark palette, Figtree font, haptics and 120 Hz animations
 
 ## Download and install
 
@@ -163,6 +163,6 @@ Bundled third-party material: the Figtree typeface and the sticker fonts Bangers
 
 Matrix is an open standard from the [Matrix.org Foundation](https://matrix.org).
 
-Vibe is an independent project. It is not affiliated with, endorsed by or sponsored by Discord Inc.; "Discord" is a trademark of Discord Inc. and is used here only to describe the layout style. Other names (Matrix, Element, Spotify and so on) belong to their owners.
+Vibe is an independent project, not affiliated with or endorsed by any other app or company. Names such as Matrix, Element and Spotify belong to their owners.
 
-<sub>Keywords: Matrix client, Android messenger, iPhone Matrix app, Discord style chat, end-to-end encryption, E2EE, private messenger, no phone number, FluffyChat fork, Flutter.</sub>
+<sub>Keywords: Matrix client, Android messenger, iPhone Matrix app, servers and channels, end-to-end encryption, E2EE, private messenger, no phone number, FluffyChat fork, Flutter.</sub>

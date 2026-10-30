@@ -24,6 +24,8 @@ class VibeRelease {
   final int size; // bytes, 0 if unknown
   final List<String> notes;
   final String pageUrl;
+  /// SHA-256 of the APK from the release notes; checked before installing.
+  final String sha256;
   const VibeRelease({
     required this.version,
     required this.apkUrl,
@@ -31,6 +33,7 @@ class VibeRelease {
     required this.size,
     required this.notes,
     required this.pageUrl,
+    this.sha256 = '',
   });
 
   Map<String, Object?> toJson() => {
@@ -40,6 +43,7 @@ class VibeRelease {
     'size': size,
     'notes': notes,
     'pageUrl': pageUrl,
+    'sha256': sha256,
   };
 
   static VibeRelease? fromJson(Object? j) {
@@ -52,6 +56,7 @@ class VibeRelease {
         size: (j['size'] as num?)?.toInt() ?? 0,
         notes: (j['notes'] as List? ?? const []).whereType<String>().toList(),
         pageUrl: j['pageUrl'] as String? ?? '',
+        sha256: j['sha256'] as String? ?? '',
       );
     } catch (_) {
       return null;
@@ -220,13 +225,20 @@ abstract class VibeUpdater {
     final j = jsonDecode(res.body) as Map<String, dynamic>;
     final tag = (j['tag_name'] as String? ?? '').replaceFirst('v', '');
     if (tag.isEmpty || compare(tag, current) <= 0) return null;
+    // exactly the release's own APK, never just "any .apk"
     final assets = (j['assets'] as List? ?? const [])
         .whereType<Map>()
-        .where((a) => (a['name'] as String? ?? '').endsWith('.apk'))
+        .where((a) => a['name'] == 'Vibe-$tag.apk')
         .toList();
     if (assets.isEmpty) return null;
     final apk = assets.first;
+    // every release lists the APK's SHA-256; without it, no in-app update
+    final sha = RegExp(r'SHA-256:\*\*\s*`([0-9a-f]{64})`')
+        .firstMatch(j['body'] as String? ?? '')
+        ?.group(1);
+    if (sha == null) return null;
     return VibeRelease(
+      sha256: sha,
       version: tag,
       apkUrl: apk['browser_download_url'] as String,
       apkName: apk['name'] as String,
@@ -406,13 +418,21 @@ class _UpdateSheetState extends State<_UpdateSheet> {
         return;
       }
       if (mounted) setState(() => _stage = _Stage.installing);
-      await VibeUpdater._channel.invokeMethod('install', {'id': id});
+      // Android checks the file's fingerprint and that it's signed with
+      // the same key as this Vibe before the installer opens.
+      await VibeUpdater._channel.invokeMethod('install', {
+        'id': id,
+        'sha256': r.sha256,
+      });
     } catch (e) {
       Logs().w('Vibe update install failed', e);
       if (mounted) {
         setState(() {
           _stage = _Stage.failed;
-          _error = 'Could not open the installer.';
+          // the safety check's reason, if that's what stopped it
+          _error = e is PlatformException && e.message != null
+              ? e.message!
+              : 'Could not open the installer.';
         });
       }
     }

@@ -34,7 +34,7 @@ const vibeReleaseNotes = <({String version, List<String> items})>[
     version: '3.0',
     items: [
       'Save received photos to your gallery and keep media on the phone',
-      'Discord-style swipe to reply, smoother and with a vibration',
+      'Swipe to reply, smoother and with a vibration',
       'Fixes: unread badges, read receipts, pop-up notifications, haptics, sign-in, and more',
     ],
   ),

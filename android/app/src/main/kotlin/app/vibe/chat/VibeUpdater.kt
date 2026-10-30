@@ -111,14 +111,35 @@ object VibeUpdater {
                                 result.error("vibe_updater", "Download not found", null)
                                 return@setMethodCallHandler
                             }
-                            val intent = Intent(Intent.ACTION_VIEW)
-                                .setDataAndType(uri, APK_MIME)
-                                .addFlags(
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or
-                                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
-                                )
-                            app.startActivity(intent)
-                            result.success(true)
+                            val sha = call.argument<String>("sha256")
+                            val main = android.os.Handler(android.os.Looper.getMainLooper())
+                            // reading 50 MB twice: off the main thread
+                            Thread {
+                                val problem = try {
+                                    verify(app, dm, id, sha)
+                                } catch (e: Throwable) {
+                                    "Couldn't check the update"
+                                }
+                                main.post {
+                                    try {
+                                        if (problem != null) {
+                                            dm.remove(id)
+                                            result.error("vibe_updater", problem, null)
+                                        } else {
+                                            val intent = Intent(Intent.ACTION_VIEW)
+                                                .setDataAndType(uri, APK_MIME)
+                                                .addFlags(
+                                                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                                                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                                                )
+                                            app.startActivity(intent)
+                                            result.success(true)
+                                        }
+                                    } catch (e: Throwable) {
+                                        result.error("vibe_updater", e.message, null)
+                                    }
+                                }
+                            }.start()
                         }
                         else -> result.notImplemented()
                     }
@@ -127,4 +148,61 @@ object VibeUpdater {
                 }
             }
     }
+
+    /**
+     * Before installing: the APK must match the SHA-256 published with the
+     * release, and be signed with the same key as the installed Vibe.
+     * Returns what's wrong, or null when it's safe.
+     */
+    private fun verify(app: Context, dm: DownloadManager, id: Long, sha256: String?): String? {
+        if (sha256.isNullOrBlank()) return "No fingerprint for this update"
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+        dm.openDownloadedFile(id).use { pfd ->
+            java.io.FileInputStream(pfd.fileDescriptor).use { input ->
+                val buf = ByteArray(64 * 1024)
+                while (true) {
+                    val n = input.read(buf)
+                    if (n <= 0) break
+                    digest.update(buf, 0, n)
+                }
+            }
+        }
+        val hex = digest.digest().joinToString("") { "%02x".format(it) }
+        if (!hex.equals(sha256, ignoreCase = true)) return "The download doesn't match the release"
+
+        // signer: copy to a readable file and compare with this app's signer
+        val tmp = File(app.cacheDir, "update-check.apk")
+        try {
+            dm.openDownloadedFile(id).use { pfd ->
+                java.io.FileInputStream(pfd.fileDescriptor).use { input ->
+                    tmp.outputStream().use { input.copyTo(it) }
+                }
+            }
+            val pm = app.packageManager
+            val flags = android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
+            val mine = pm.getPackageInfo(app.packageName, flags).signingInfo
+                ?: return "Can't read Vibe's signature"
+            val ours = (if (mine.hasMultipleSigners()) mine.apkContentsSigners else mine.signingCertificateHistory)
+                .map { certId(it.toByteArray()) }.toSet()
+            // some Android 10-12 phones leave signingInfo empty for APK
+            // files: fall back to the older signature list
+            val apk = pm.getPackageArchiveInfo(tmp.path, flags)?.signingInfo
+            @Suppress("DEPRECATION")
+            val theirsRaw = apk?.apkContentsSigners
+                ?: pm.getPackageArchiveInfo(
+                    tmp.path,
+                    android.content.pm.PackageManager.GET_SIGNATURES,
+                )?.signatures
+                ?: return "The update isn't signed"
+            val theirs = theirsRaw.map { certId(it.toByteArray()) }.toSet()
+            if (theirs.intersect(ours).isEmpty()) return "The update isn't signed by Vibe"
+        } finally {
+            tmp.delete()
+        }
+        return null
+    }
+
+    private fun certId(cert: ByteArray): String =
+        java.security.MessageDigest.getInstance("SHA-256").digest(cert)
+            .joinToString("") { "%02x".format(it) }
 }

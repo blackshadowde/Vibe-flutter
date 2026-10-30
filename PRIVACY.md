@@ -50,8 +50,9 @@ links that point to a call server.
 
 ## Other servers Vibe contacts
 
-- **GitHub:** on Android, Vibe checks for updates every few hours
-  (`api.github.com`). iPhone update lists (SideStore / AltStore) and the
+- **GitHub:** the Android version from GitHub checks for updates every few
+  hours (`api.github.com`). The Google Play version doesn't; Google Play
+  updates it. iPhone update lists (SideStore / AltStore) and the
   website (get-vibe.github.io) are on GitHub too.
 - **get-vibe.github.io:** the list of suggested servers when you sign in,
   and the help page.
@@ -73,6 +74,53 @@ microphone, photos, location (sharing a location) and contacts (sharing a
 contact; your contacts never leave the phone unless you send one).
 Chat backups are encrypted with your backup password (AES-256).
 
+## Who is responsible
+
+Vibe is made by an independent developer (GitHub: blackshadowde). Vibe has
+no servers and receives no data about you, so the developer holds nothing
+about you. Your Matrix server is responsible for the data stored there
+(see its own privacy policy).
+
+## Legal basis
+
+Vibe only sends data to make the features you use work (sending messages,
+calls, notifications), on your request. Under the GDPR that is processing
+needed to provide the service you asked for (Art. 6(1)(b)).
+
+## How long data is kept
+
+- **On your phone:** until you sign out or uninstall Vibe.
+- **On your Matrix server:** as long as that server keeps it (its policy).
+- **ntfy.sh** (only with "Built-in" notifications): keeps a notification
+  for up to 12 hours so it can be delivered.
+- **The developer:** nothing is kept, because nothing is received.
+
+## Your rights
+
+You can see, export or delete your data on your Matrix server (sign in to
+your server's account page), and delete your account at any time: see
+https://get-vibe.github.io/delete-account.html. As the developer holds no
+data about you, there is nothing to request from Vibe itself.
+
+## Data outside your country
+
+Depending on the services you use, data may go to servers in other
+countries: your Matrix server, ntfy.sh, call.element.io, GitHub and Google
+Fonts (mostly in the EU and the USA). Each has its own privacy policy.
+
+## Children
+
+Vibe is not meant for children. You need to be at least 16 to use it (or
+the minimum age in your country, if higher).
+
+## Changes
+
+If this policy changes, the new version is published here, at
+https://github.com/blackshadowde/Vibe-flutter/blob/Vibe/PRIVACY.md, and the
+change is listed in the changelog.
+
 ## Contact
 
-Questions: open an issue at https://github.com/blackshadowde/Vibe-flutter/issues
+Questions: open an issue at https://github.com/blackshadowde/Vibe-flutter/issues,
+or write to the email address on Vibe's Google Play page. Security problems:
+report privately at https://github.com/blackshadowde/Vibe-flutter/security/advisories/new

@@ -218,7 +218,7 @@ class _VibeAboutPageState extends State<VibeAboutPage> {
               applicationLegalese:
                   'Vibe is free software under the GNU AGPL v3 or later, '
                   'a modified version of FluffyChat by Christian Kußowski '
-                  'and contributors. Not affiliated with Discord Inc.',
+                  'and contributors.',
             ),
           ),
           const SizedBox(height: 10),
@@ -402,8 +402,7 @@ class VibeCreditsSheet extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(4, 18, 4, 0),
             child: Text(
               'Vibe is free software under the GNU AGPL v3, like FluffyChat. '
-              'It is not made by or affiliated with Discord Inc.; Discord is '
-              'a trademark of Discord Inc. Tap a card to open its page. '
+              'Tap a card to open its page. '
               'Every library\'s licence: About, Open-source licences.',
               style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
             ),
